@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 100;
+use Test::Most tests => 107;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -234,6 +234,23 @@ EOF
 	]);
 	eval { %p = $i->params() };
 	ok($@ =~ /_upload_dir isn't a directory/);
+	ok(defined($p{country}));
+	ok($p{country} eq '44');
+	ok($p{datafile} =~ /^hello.txt_.+/);
+	$filename = File::Spec->catfile(File::Spec->tmpdir(), $p{datafile});
+	ok(!-e $filename);
+	ok(!-r $filename);
+	close $fin;
+
+	open ($fin, '<', \$input);
+	local *STDIN = $fin;
+
+	CGI::Info->reset();	# Force stdin re-read
+	$i = new_ok('CGI::Info' => [
+		upload_dir => undef,
+	]);
+	eval { %p = $i->params() };
+	ok($@ =~ /Attempt to upload a file when upload_dir has not been set/);
 	ok(defined($p{country}));
 	ok($p{country} eq '44');
 	ok($p{datafile} =~ /^hello.txt_.+/);
