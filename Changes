@@ -5,6 +5,7 @@ Revision history for CGI-Info
 		access a site is http://www.example.com., domain_name() will
 		return example.com, not example.com..
 	params() - return nothing when the call is OPTIONS
+	Added more hardening to file uploads
 
 0.46	Mon 11 Nov 08:46:26 EST 2013
 	Corrected some documentation issues on params()

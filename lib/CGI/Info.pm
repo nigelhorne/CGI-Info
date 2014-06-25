@@ -698,24 +698,24 @@ sub _multipart_data {
 						$self->_warn({
 							warning => 'No upload filename given'
 						});
-					}
-					if($filename =~ /[\\\/]/) {
+					} elsif($filename =~ /[\\\/\|]/) {
 						$self->_warn({
 							warning => "Disallowing invalid filename: $filename"
 						});
-					}
-					$filename = $self->_create_file_name({
-						filename => $filename
-					});
-
-					my $full_path = File::Spec->catfile($self->{_upload_dir}, $filename);
-					unless(open($fout, '>', $full_path)) {
-						$self->_warn({
-							warning => "Can't open $full_path"
+					} else {
+						$filename = $self->_create_file_name({
+							filename => $filename
 						});
+
+						my $full_path = File::Spec->catfile($self->{_upload_dir}, $filename);
+						unless(open($fout, '>', $full_path)) {
+							$self->_warn({
+								warning => "Can't open $full_path"
+							});
+						}
+						$writing_file = 1;
+						push(@pairs, "$key=$filename");
 					}
-					$writing_file = 1;
-					push(@pairs, "$key=$filename");
 				}
 			}
 			# TODO: handle Content-Type: text/plain, etc.
