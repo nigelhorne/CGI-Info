@@ -30,4 +30,11 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'CGI-Info-*' },
+    META_ADD		=> {
+    	resources => {
+		type => 'git',
+		url => 'git://github.com/nigelhorne/CGI-Info.git',
+		web => 'https://github.com/nigelhorne/CGI-Info',
+	},
+    }
 );
