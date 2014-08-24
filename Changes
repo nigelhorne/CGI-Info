@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.47
+0.47	Sun Aug 24 14:56:10 EDT 2014
 	Support hostnames with dots at the end, e.g. when the URL used to
 		access a site is http://www.example.com., domain_name() will
 		return example.com, not example.com..
