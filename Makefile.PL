@@ -3,17 +3,17 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'CGI::Info',
-    AUTHOR              => q{Nigel Horne <njh@bandsman.co.uk>},
-    VERSION_FROM        => 'lib/CGI/Info.pm',
+    NAME		=> 'CGI::Info',
+    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+    VERSION_FROM	=> 'lib/CGI/Info.pm',
     ABSTRACT_FROM       => 'lib/CGI/Info.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
       ? ('LICENSE'=> 'GPL')
       : ()),
-    PL_FILES            => {},
+    PL_FILES	=> {},
     PREREQ_PM => {
-        'Test::Most' => 0,
+	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
 	'URI::Heuristic' => 0,
 	'Sys::Hostname' => 0,
@@ -28,8 +28,8 @@ WriteMakefile(
 	'File::Basename' => 0,
 	'String::Clean::XSS' => 0,
     },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'CGI-Info-*' },
+    dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean		=> { FILES => 'CGI-Info-*' },
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },
     	resources => {
