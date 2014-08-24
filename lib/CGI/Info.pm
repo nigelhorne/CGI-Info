@@ -8,8 +8,7 @@ use warnings;
 use strict;
 use Carp;
 use File::Spec;
-use Socket;
-use List::Member;	# Can go when expect has been removed
+use Socket;	# For AF_INET
 use File::Basename;
 use String::Clean::XSS;
 
@@ -53,6 +52,11 @@ Takes an optional boolean parameter syslog, to log messages to
 L<Sys::Syslog>.
 
 Takes optional parameter logger, an object which is used for warnings
+
+Takes optional parameter cache, an object which is used to cache IP
+lookups.
+This cache object is an object that understands get() and set() messages,
+such as a L<CHI> object.
 =cut
 
 our $stdin_data;	# Class variable storing STDIN in case the class
@@ -75,6 +79,7 @@ sub new {
 		_upload_dir => $args{upload_dir} ? $args{upload_dir} : undef,
 		_logger => $args{logger},
 		_syslog => $args{syslog},
+		_cache => $args{cache},	# e.g. CHI
 	}, $class;
 }
 
@@ -368,8 +373,8 @@ Expect is a reference to a list of arguments that you expect to see and
 pass on.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
-It's use is deprecated, use allow instead, expect will be removed in a later
-version.
+It's use is deprecated, use allow instead.
+Expect will be removed in a later version.
 
 Upload_dir is a string containing a directory where files being uploaded
 are to be stored.
@@ -397,6 +402,7 @@ constructor.
 	my $u = CGI::Untaint->new(%params);
 
 	use CGI::Info;
+	use CGI::IDS;
 	# ...
 	my $info = CGI::Info->new();
 	my $allowed = {
@@ -410,6 +416,12 @@ constructor.
 		expect => \@expected,
 		upload_dir = $info->tmpdir()
 	});
+	my $ids = CGI::IDS->new();
+	$ids->set_scan_keys(scan_keys => 1);
+	if($ids->detect_attacks(request => $paramsref) > 0) {
+		die 'horribly';
+	}
+
 
 If the request is an XML request, CGI::Info will put the request into
 the params element 'XML', thus:
@@ -550,6 +562,12 @@ sub params {
 		$self->_warn({
 			warning => 'Use POST, GET or HEAD'
 		});
+	}
+
+	# Can go when expect has been removed
+	if($self->{_expect}) {
+		require List::Member;
+		List::Member->import();
 	}
 
 	foreach(@pairs) {
@@ -992,16 +1010,28 @@ sub is_robot {
 		return 0;
 	}
 
-	my $agent = $ENV{'HTTP_USER_AGENT'};
+	my $remote = $ENV{'REMOTE_ADDR'};
+	if($self->{_cache}) {
+		my $is_robot = $self->{_cache}->get("is_robot/$remote");
+		if(defined($is_robot)) {
+			return $is_robot;
+		}
+	}
 
+	my $agent = $ENV{'HTTP_USER_AGENT'};
 	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie/i) {
+		if($self->{_cache}) {
+			$self->{_cache}->set("is_robot/$remote", 1, '1 day');
+		}
 		return 1;
 	}
 
-	my $remote = $ENV{'REMOTE_ADDR'};
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 	if($hostname =~ /google\.|msnbot/) {
+		if($self->{_cache}) {
+			$self->{_cache}->set("is_robot/$remote", 1, '1 day');
+		}
 		return 1;
 	}
 
@@ -1012,9 +1042,16 @@ sub is_robot {
 		}
 	}
 	if($self->{_browser_detect}) {
-		return $self->{_browser_detect}->robot();
+		my $is_robot = $self->{_browser_detect}->robot();
+		if($self->{_cache}) {
+			$self->{_cache}->set("is_robot/$remote", $is_robot, '1 day');
+		}
+		return $is_robot;
 	}
 
+	if($self->{_cache}) {
+		$self->{_cache}->set("is_robot/$remote", 0, '1 day');
+	}
 	return 0;
 }
 
@@ -1042,9 +1079,19 @@ sub is_search_engine {
 	}
 
 	my $remote = $ENV{'REMOTE_ADDR'};
+	if($self->{_cache}) {
+		my $is_search = $self->{_cache}->get("is_search/$remote");
+		if(defined($is_search)) {
+			return $is_search;
+		}
+	}
+
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 	if($hostname =~ /google\.|msnbot/) {
+		if($self->{_cache}) {
+			$self->{_cache}->set("is_search/$remote", 1, '1 day');
+		}
 		return 1;
 	}
 	unless($self->{_browser_detect}) {
@@ -1055,9 +1102,16 @@ sub is_search_engine {
 	}
 	if($self->{_browser_detect}) {
 		my $browser = $self->{_browser_detect};
-		return($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo());
+		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo());
+		if($self->{_cache}) {
+			$self->{_cache}->set("is_search/$remote", $is_search, '1 day');
+		}
+		return $is_search;
 	}
 
+	if($self->{_cache}) {
+		$self->{_cache}->set("is_search/$remote", 0, '1 day');
+	}
 	return 0;
 }
 

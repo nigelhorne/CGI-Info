@@ -9,10 +9,26 @@ BEGIN {
 	use_ok('CGI::Info');
 }
 
-ROBOT: {
+SEARCH: {
 	delete $ENV{'REMOTE_ADDR'};
 	delete $ENV{'HTTP_USER_AGENT'};
 
+	my $cache;
+
+	eval {
+		require CHI;
+
+		CHI->import;
+	};
+
+	if($@) {
+		diag("CHI not installed");
+		$cache = undef;
+	} else {
+		diag("Using CHI $CHI::VERSION");
+		my $hash = {};
+		$cache = CHI->new(driver => 'Memory', datastore => $hash);
+	}
 	my $i = new_ok('CGI::Info');
 	ok($i->is_search_engine() == 0);
 
@@ -53,7 +69,9 @@ ROBOT: {
 
 	$ENV{'HTTP_USER_AGENT'} = 'A nonsense user agent string';
 	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
-	$i = new_ok('CGI::Info');
+	$i = new_ok('CGI::Info' => [
+		cache => $cache,
+	]);
 	ok($i->is_search_engine() == 0);
 	ok($i->browser_type() eq 'robot');
 }

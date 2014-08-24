@@ -13,6 +13,14 @@ ROBOT: {
 	delete $ENV{'REMOTE_ADDR'};
 	delete $ENV{'HTTP_USER_AGENT'};
 
+	my $cache;
+
+	eval {
+		require CHI;
+
+		CHI->import;
+	};
+
 	my $i = new_ok('CGI::Info');
 	ok($i->is_robot() == 0);
 
@@ -40,6 +48,8 @@ ROBOT: {
 
 	$ENV{'REMOTE_ADDR'} = '74.92.149.57';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.7; en-US; rv:1.9.2.20) Gecko/20110803 Firefox/3.6.20';
-	$i = new_ok('CGI::Info');
+	$i = new_ok('CGI::Info' => [
+		cache => $cache,
+	]);
 	ok($i->is_robot() == 0);
 }
