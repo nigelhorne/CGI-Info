@@ -7,6 +7,7 @@ Revision history for CGI-Info
 	params() - return nothing when the call is OPTIONS
 	Added more hardening to file uploads
 	Added optional cache argument to new() to speed up look-ups
+	Test that tmpdir works at the class level
 
 0.46	Mon 11 Nov 08:46:26 EST 2013
 	Corrected some documentation issues on params()

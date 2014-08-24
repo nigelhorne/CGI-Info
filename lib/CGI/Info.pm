@@ -2,8 +2,6 @@ package CGI::Info;
 
 # TODO: When not running as CGI, allow --robot, --tablet, --search and --phone
 #	to be given to test those environments
-# TODO: Allow tmpdir() to be run as a class method as well so that it can be
-#	called before the object is created
 # TODO: remove the expect argument
 
 use warnings;
@@ -916,6 +914,10 @@ Tmpdir allows a reference of the options to be passed.
 	my $info = CGI::Info->new();
 	my $dir = $info->tmpdir(default => '/var/tmp');
 	my $dir = $info->tmpdir({ default => '/var/tmp' });
+
+	# or
+
+	my $dir = CGI::Info->tmpdir();
 =cut
 
 sub tmpdir {

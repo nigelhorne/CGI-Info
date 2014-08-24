@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 26;
+use Test::Most tests => 28;
 use Test::NoWarnings;
 
 BEGIN {
@@ -32,6 +32,7 @@ PATHS: {
 
 	$i = new_ok('CGI::Info');
 	$dir = $i->tmpdir(default => '/non-existant-path');
+	ok(CGI::Info->tmpdir(default => '/non-existant-path') eq $dir);
 	ok($dir eq '/non-existant-path');
 
 	$i = new_ok('CGI::Info');
@@ -54,6 +55,7 @@ PATHS: {
 
 	$ENV{'C_DOCUMENT_ROOT'} = $ENV{'HOME'};
 	$dir = $i->tmpdir();
+	ok(CGI::Info->tmpdir() eq $dir);
 	ok($dir !~ '/non-existant-path');
 	ok(-w $dir);
 	ok(-d $dir);
