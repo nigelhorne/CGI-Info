@@ -1081,6 +1081,15 @@ sub is_search_engine {
 		return 0;
 	}
 
+	my $remote = $ENV{'REMOTE_ADDR'};
+
+	if($self->{_cache}) {
+		my $is_search = $self->{_cache}->get("is_search/$remote");
+		if(defined($is_search)) {
+			return $is_search;
+		}
+	}
+
 	# Don't use HTTP_USER_AGENT to detect more than we really have to since
 	# that is easily spoofed
 	if($ENV{'HTTP_USER_AGENT'} =~ /www\.majestic12\.co\.uk/) {
@@ -1090,17 +1099,9 @@ sub is_search_engine {
 		return 1;
 	}
 
-	my $remote = $ENV{'REMOTE_ADDR'};
-	if($self->{_cache}) {
-		my $is_search = $self->{_cache}->get("is_search/$remote");
-		if(defined($is_search)) {
-			return $is_search;
-		}
-	}
-
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-	if($hostname =~ /google\.|msnbot|/) {
+	if($hostname =~ /google\.|msnbot/) {
 		if($self->{_cache}) {
 			$self->{_cache}->set("is_search/$remote", 1, '1 day');
 		}
