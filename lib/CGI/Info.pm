@@ -10,6 +10,7 @@ use Carp;
 use File::Spec;
 use Socket;	# For AF_INET
 use String::Clean::XSS;
+use String::EscapeCage;
 
 =head1 NAME
 
@@ -663,7 +664,7 @@ sub _sanitise_input {
 	# $arg =~ s/[;<>\*|`&\$!?#\(\)\[\]\{\}'"\\\r]//g;
 
 	# return $arg;
-	return convert_XSS($arg);
+	return String::EscapeCage->new(convert_XSS($arg))->escapecstring();
 }
 
 sub _multipart_data {

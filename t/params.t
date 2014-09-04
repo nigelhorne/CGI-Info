@@ -2,9 +2,10 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 107;
+use Test::Most tests => 110;
 use Test::NoWarnings;
 use File::Spec;
+use CGI::IDS;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -71,6 +72,12 @@ PARAMS: {
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{'&lt;script&gt;alert(123)&lt;/script&gt;'} eq 'wilma');
+
+	$ENV{'QUERY_STRING'} = 'username=admin&password=foo';
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{'username'} eq 'admin');
+	ok($p{'password'} eq 'foo');
 
 	$ENV{'QUERY_STRING'} = 'foo%41=%20bar';
 	$i = new_ok('CGI::Info');
