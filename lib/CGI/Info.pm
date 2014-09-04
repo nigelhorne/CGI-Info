@@ -9,7 +9,6 @@ use strict;
 use Carp;
 use File::Spec;
 use Socket;	# For AF_INET
-use File::Basename;
 use String::Clean::XSS;
 
 =head1 NAME
@@ -108,6 +107,9 @@ sub script_name {
 
 sub _find_paths {
         my $self = shift;
+
+	require File::Basename;
+	File::Basename->import();
 
         if($ENV{'SCRIPT_NAME'}) {
                 $self->{_script_name} = File::Basename::basename($ENV{'SCRIPT_NAME'});
