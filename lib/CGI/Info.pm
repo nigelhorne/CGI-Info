@@ -419,10 +419,12 @@ constructor.
 		expect => \@expected,
 		upload_dir = $info->tmpdir()
 	});
-	my $ids = CGI::IDS->new();
-	$ids->set_scan_keys(scan_keys => 1);
-	if($ids->detect_attacks(request => $paramsref) > 0) {
-		die 'horribly';
+	if(defined($paramsref)) {
+		my $ids = CGI::IDS->new();
+		$ids->set_scan_keys(scan_keys => 1);
+		if($ids->detect_attacks(request => $paramsref) > 0) {
+			die 'horribly';
+		}
 	}
 
 
