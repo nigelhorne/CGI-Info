@@ -9,8 +9,6 @@ use strict;
 use Carp;
 use File::Spec;
 use Socket;	# For AF_INET
-use String::Clean::XSS;
-use String::EscapeCage;
 
 =head1 NAME
 
@@ -574,6 +572,10 @@ sub params {
 		require List::Member;
 		List::Member->import();
 	}
+	require String::Clean::XSS;
+	require String::EscapeCage;
+	String::Clean::XSS->import();
+	String::EscapeCage->import();
 
 	foreach(@pairs) {
 		my($key, $value) = split(/=/, $_);
