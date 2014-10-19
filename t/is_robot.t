@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 17;
+use Test::Most tests => 19;
 use Test::NoWarnings;
+use Data::Dumper;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -20,6 +21,15 @@ ROBOT: {
 
 		CHI->import;
 	};
+		my $hash = {};
+	if($@) {
+		diag("CHI not installed");
+		$cache = undef;
+	} else {
+		diag("Using CHI $CHI::VERSION");
+		# my $hash = {};
+		$cache = CHI->new(driver => 'Memory', datastore => $hash);
+	}
 
 	my $i = new_ok('CGI::Info');
 	ok($i->is_robot() == 0);
@@ -52,4 +62,9 @@ ROBOT: {
 		cache => $cache,
 	]);
 	ok($i->is_robot() == 0);
+	SKIP: {
+		skip 'Test requires CHI access', 2 unless($cache);
+		ok(defined($cache->get('is_robot/74.92.149.57')));
+		ok(!defined($cache->get('is_robot/74.92.149.58')));
+	}
 }

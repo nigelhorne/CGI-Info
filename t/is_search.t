@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 22;
+use Test::Most tests => 24;
 use Test::NoWarnings;
 
 BEGIN {
@@ -29,6 +29,7 @@ SEARCH: {
 		my $hash = {};
 		$cache = CHI->new(driver => 'Memory', datastore => $hash);
 	}
+
 	my $i = new_ok('CGI::Info');
 	ok($i->is_search_engine() == 0);
 
@@ -74,4 +75,9 @@ SEARCH: {
 	]);
 	ok($i->is_search_engine() == 0);
 	ok($i->browser_type() eq 'robot');
+	SKIP: {
+		skip 'Test requires CHI access', 2 unless($cache);
+		ok(defined($cache->get('is_search/212.159.106.41')));
+		ok(!defined($cache->get('is_search/212.159.106.42')));
+	}
 }

@@ -354,8 +354,8 @@ as a list of key=value lines.
 
 Returns undef if the parameters can't be determined.
 
-If an argument is given twice or more, then the values are put in a
-comma separated string.
+If an argument is given twice or more, then the values are put in a comma
+separated string.
 
 The returned hash value can be passed into L<CGI::Untaint>.
 
@@ -370,15 +370,14 @@ A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
 
-Expect is a reference to a list of arguments that you expect to see and
-pass on.
+Expect is a reference to a list of arguments that you expect to see and pass on.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
 It's use is deprecated, use allow instead.
 Expect will be removed in a later version.
 
-Upload_dir is a string containing a directory where files being uploaded
-are to be stored.
+Upload_dir is a string containing a directory where files being uploaded are to
+be stored.
 
 Takes optional parameter logger, an object which is used for warnings and
 traces.
@@ -424,7 +423,6 @@ constructor.
 			die 'horribly';
 		}
 	}
-
 
 If the request is an XML request, CGI::Info will put the request into
 the params element 'XML', thus:
@@ -628,6 +626,33 @@ sub params {
 		}
 	}
 	return \%FORM;
+}
+
+=head2 param
+
+Get a single parameter.
+Takes an optional single string parameter which is the argument to return. If
+that parameter is given param() is a wrapper to params() with no arguments.
+
+	use CGI::Info;
+	# ...
+	my $info = CGI::Info->new();
+	my $bar = $info->param('foo');
+
+=cut
+
+sub param {
+	my ($self, $field) = @_;
+
+	my $params = $self->params();
+	if(!defined($field)) {
+		return $params;
+	}
+	if(!defined($params)) {
+		return;
+	}
+
+	return $params->{$field};
 }
 
 # Emit a warning message somewhere

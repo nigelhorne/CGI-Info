@@ -5,7 +5,6 @@ use warnings;
 use Test::Most tests => 110;
 use Test::NoWarnings;
 use File::Spec;
-use CGI::IDS;
 
 BEGIN {
 	use_ok('CGI::Info');
