@@ -639,6 +639,15 @@ that parameter is given param() is a wrapper to params() with no arguments.
 	my $info = CGI::Info->new();
 	my $bar = $info->param('foo');
 
+If the requested parameter isn't in the allowed list, an error message will
+be thrown:
+
+	use CGI::Info;
+	my $allowed = {
+		'foo' => qr(\d+),
+	};
+	my $bar = $info->param('bar');  # Gives an error message
+
 =cut
 
 sub param {
@@ -648,6 +657,14 @@ sub param {
 	if(!defined($field)) {
 		return $params;
 	}
+	# Is this a permitted argument?
+	if($self->{_allow} && (!exists($self->{_allow}->{$field}))) {
+		$self->_warn({
+			warning => "param: $field isn't in the allow list"
+		});
+		return;
+	}
+
 	if(!defined($params)) {
 		return;
 	}

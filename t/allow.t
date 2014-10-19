@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 23;
+use Test::Most tests => 24;
 use Test::NoWarnings;
 
 BEGIN {
@@ -43,6 +43,9 @@ ALLOWED: {
 	ok(!exists($p{foo}));
 	ok(!exists($p{fred}));
 	ok($i->as_string() eq '');
+	local $SIG{__WARN__} = sub { die $_[0] };
+	eval { $i->param('fred') };
+	ok($@ =~ /fred isn't in the allow list at/);
 
 	$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma';
 
