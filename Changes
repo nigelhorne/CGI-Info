@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.48
+0.48	Sun Oct 19 20:35:56 EDT 2014
 	Incorporated patch-1 from https://github.com/szabgab/CGI-Info
 	Consider Majestic12 to be a search engine
 	Only load File::Basename when needed
