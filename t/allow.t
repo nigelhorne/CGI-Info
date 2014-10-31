@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 24;
+use Test::Most tests => 26;
 use Test::NoWarnings;
 
 BEGIN {
@@ -55,6 +55,9 @@ ALLOWED: {
 	%p = %{$i->params()};
 	ok($p{foo} eq '123');
 	ok(!exists($p{fred}));
+	ok($i->param('foo') eq '123');
+	eval { $i->param('fred') };
+	ok($@ =~ /fred isn't in the allow list at/);
 	ok($i->as_string() eq 'foo=123');
 
 	%allowed = ('foo' => qr([a-z]+));
