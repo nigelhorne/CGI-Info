@@ -64,7 +64,7 @@ ROBOT: {
 	ok($i->is_robot() == 0);
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);
-		ok(defined($cache->get('is_robot/74.92.149.57')));
-		ok(!defined($cache->get('is_robot/74.92.149.58')));
+		ok(defined($cache->get("is_robot/74.92.149.57/$ENV{HTTP_USER_AGENT}")));
+		ok(!defined($cache->get("is_robot/74.92.149.58/$ENV{HTTP_USER_AGENT}")));
 	}
 }

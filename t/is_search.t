@@ -77,7 +77,7 @@ SEARCH: {
 	ok($i->browser_type() eq 'robot');
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);
-		ok(defined($cache->get('is_search/212.159.106.41')));
-		ok(!defined($cache->get('is_search/212.159.106.42')));
+		ok(defined($cache->get("is_search/212.159.106.41/$ENV{HTTP_USER_AGENT}")));
+		ok(!defined($cache->get("is_search/212.159.106.42/$ENV{HTTP_USER_AGENT}")));
 	}
 }
