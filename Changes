@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.49
 	Ensure different agents from the same IP don't clash in the cache
+	Restore alloing new() arguments to be a reference
 
 0.48	Sun Oct 19 20:35:56 EDT 2014
 	Incorporated patch-1 from https://github.com/szabgab/CGI-Info

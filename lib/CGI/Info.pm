@@ -60,9 +60,10 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
 
 sub new {
-	my ($proto, %args) = @_;
+	my $proto = shift;
 
 	my $class = ref($proto) || $proto;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	return bless {
 		# _script_name => undef,
