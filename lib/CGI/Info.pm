@@ -51,8 +51,7 @@ L<Sys::Syslog>.
 
 Takes optional parameter logger, an object which is used for warnings
 
-Takes optional parameter cache, an object which is used to cache IP
-lookups.
+Takes optional parameter cache, an object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 =cut
