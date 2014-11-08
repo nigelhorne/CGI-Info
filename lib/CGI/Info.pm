@@ -1064,18 +1064,15 @@ sub is_robot {
 
 	my $remote = $ENV{'REMOTE_ADDR'};
 	my $agent = $ENV{'HTTP_USER_AGENT'};
+	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie/i) {
+		return 1;
+	}
+
 	if($self->{_cache}) {
 		my $is_robot = $self->{_cache}->get("is_robot/$remote/$agent");
 		if(defined($is_robot)) {
 			return $is_robot;
 		}
-	}
-
-	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie/i) {
-		if($self->{_cache}) {
-			$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
-		}
-		return 1;
 	}
 
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
