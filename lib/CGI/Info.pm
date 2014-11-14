@@ -844,7 +844,13 @@ sub is_mobile {
 
 	if($ENV{'HTTP_USER_AGENT'}) {
 		my $agent = $ENV{'HTTP_USER_AGENT'};
-		if($agent =~ /.+iPhone.+/) {
+		# if($agent =~ /.+iPhone.+/) {
+			# return 1;
+		# }
+		# if($agent =~ /.+Android.+/) {
+			# return 1;
+		# }
+		if($agent =~ /(?^:.+(?:Android|iPhone).+)/) {
 			return 1;
 		}
 
