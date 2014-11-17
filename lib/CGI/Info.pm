@@ -464,9 +464,7 @@ sub params {
 
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
 		if(@ARGV) {
-			foreach(@ARGV) {
-				push(@pairs, $_);
-			}
+			@pairs = @ARGV;
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
 		} elsif(!$self->{_args_read}) {
