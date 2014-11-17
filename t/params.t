@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 110;
+use Test::Most tests => 113;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -321,4 +321,18 @@ EOF
 	ok(!-e $filename);
 	ok(!-r $filename);
 	close $fin;
+
+	# Check params are read from command line arguments for testing scripts
+	delete $ENV{'GATEWAY_INTERFACE'};
+	delete $ENV{'REQUEST_METHOD'};
+	delete $ENV{'QUERY_STRING'};
+	push(@ARGV, 'foo=bar');
+	push(@ARGV, 'fred=wilma');
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{fred} eq 'wilma');
+	ok($i->as_string() eq 'foo=bar;fred=wilma');
+
+	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
+
 }
