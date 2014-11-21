@@ -573,18 +573,18 @@ sub params {
 	String::Clean::XSS->import();
 	String::EscapeCage->import();
 
-	foreach(@pairs) {
-		my($key, $value) = split(/=/, $_);
+	foreach my $arg (@pairs) {
+		$arg =~ tr/+/ /;
+		my($key, $value) = split(/=/, $arg);
 
 		next unless($key);
 
-		$key =~ tr/+/ /;
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
-		unless($value) {
+		if($value) {
+			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
+		} else {
 			$value = '';
 		}
-		$value =~ tr/+/ /;
-		$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 
 		$key = $self->_sanitise_input($key);
 
@@ -1206,7 +1206,7 @@ sub is_search_engine {
 
 =head2 browser_type
 
-Returns one of 'web', 'robot' and 'mobile'.
+Returns one of 'web', 'search_engine', 'robot' and 'mobile'.
 
     # Code to display a different web page for a browser, search engine and
     # smartphone
@@ -1233,7 +1233,10 @@ sub browser_type {
 	if($self->is_mobile()) {
 		return 'mobile';
 	}
-	if($self->is_search_engine() || $self->is_robot()) {
+	if($self->is_search_engine()) {
+		return 'search_engine';
+	}
+	if($self->is_robot()) {
 		return 'robot';
 	}
 	return 'web';
