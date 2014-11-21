@@ -852,6 +852,14 @@ sub is_mobile {
 			return 1;
 		}
 
+		my $remote = $ENV{'REMOTE_ADDR'};
+		if(defined($remote) && $self->{_cache}) {
+			my $is_mobile = $self->{_cache}->get("is_mobile/$remote/$agent");
+			if(defined($is_mobile)) {
+				return $is_mobile;
+			}
+		}
+
 		unless($self->{_browser_detect}) {
 			if(eval { require HTTP::BrowserDetect; }) {
 				HTTP::BrowserDetect->import();
@@ -860,7 +868,11 @@ sub is_mobile {
 		}
 		if($self->{_browser_detect}) {
 			my $device = $self->{_browser_detect}->device();
-			return (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
+			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
+			if($self->{_cache}) {
+				$self->{_cache}->set("is_mobile/$remote/$agent", $is_mobile, '1 day');
+			}
+			return $is_mobile;
 		}
 	}
 
@@ -874,12 +886,9 @@ Returns a boolean if the website is being viewed on a tablet such as an iPad.
 =cut
 
 sub is_tablet {
-        if($ENV{'HTTP_USER_AGENT'}) {
-                my $agent = $ENV{'HTTP_USER_AGENT'};
-                if($agent =~ /.+(iPad|TabletPC).+/) {
-                        # TODO: add others when I see some nice user_agents
-                        return 1;
-                }
+        if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
+		# TODO: add others when I see some nice user_agents
+		return 1;
         }
 
         return 0;
@@ -1081,7 +1090,7 @@ sub is_robot {
 
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-	if($hostname =~ /google\.|msnbot/) {
+	if($hostname =~ /google|msnbot|bingbot/) {
 		if($self->{_cache}) {
 			$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
 		}
@@ -1161,7 +1170,7 @@ sub is_search_engine {
 	unless($self->{_browser_detect}) {
 		if(eval { require HTTP::BrowserDetect; }) {
 			HTTP::BrowserDetect->import();
-			$self->{_browser_detect} = HTTP::BrowserDetect->new($ENV{'HTTP_USER_AGENT'});
+			$self->{_browser_detect} = HTTP::BrowserDetect->new($agent);
 		}
 	}
 	if($self->{_browser_detect}) {
