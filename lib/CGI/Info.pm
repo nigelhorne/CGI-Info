@@ -1234,7 +1234,7 @@ sub browser_type {
 		return 'mobile';
 	}
 	if($self->is_search_engine()) {
-		return 'search_engine';
+		return 'search';
 	}
 	if($self->is_robot()) {
 		return 'robot';
