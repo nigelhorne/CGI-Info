@@ -1075,6 +1075,10 @@ sub is_robot {
 		return 0;
 	}
 
+	if(defined($self->{_is_robot})) {
+		return $self->{_is_robot};
+	}
+
 	my $remote = $ENV{'REMOTE_ADDR'};
 	my $agent = $ENV{'HTTP_USER_AGENT'};
 	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie/i) {
@@ -1084,6 +1088,7 @@ sub is_robot {
 	if($self->{_cache}) {
 		my $is_robot = $self->{_cache}->get("is_robot/$remote/$agent");
 		if(defined($is_robot)) {
+			$self->{_is_robot} = $is_robot;
 			return $is_robot;
 		}
 	}
@@ -1094,6 +1099,7 @@ sub is_robot {
 		if($self->{_cache}) {
 			$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
 		}
+		$self->{_is_robot} = 1;
 		return 1;
 	}
 
@@ -1108,12 +1114,14 @@ sub is_robot {
 		if($self->{_cache}) {
 			$self->{_cache}->set("is_robot/$remote/$agent", $is_robot, '1 day');
 		}
+		$self->{_is_robot} = $is_robot;
 		return $is_robot;
 	}
 
 	if($self->{_cache}) {
 		$self->{_cache}->set("is_robot/$remote/$agent", 0, '1 day');
 	}
+	$self->{_is_robot} = 0;
 	return 0;
 }
 
@@ -1143,9 +1151,14 @@ sub is_search_engine {
 	my $remote = $ENV{'REMOTE_ADDR'};
 	my $agent = $ENV{'HTTP_USER_AGENT'};
 
+	if(defined($self->{_is_search_engine})) {
+		return $self->{_is_search_engine};
+	}
+
 	if($self->{_cache}) {
 		my $is_search = $self->{_cache}->get("is_search/$remote/$agent");
 		if(defined($is_search)) {
+			$self->{_is_search_engine} = $is_search;
 			return $is_search;
 		}
 	}
@@ -1165,6 +1178,7 @@ sub is_search_engine {
 		if($self->{_cache}) {
 			$self->{_cache}->set("is_search/$remote/$agent", 1, '1 day');
 		}
+		$self->{_is_search_engine} = 1;
 		return 1;
 	}
 	unless($self->{_browser_detect}) {
@@ -1179,12 +1193,14 @@ sub is_search_engine {
 		if($self->{_cache}) {
 			$self->{_cache}->set("is_search/$remote/$agent", $is_search, '1 day');
 		}
+		$self->{_is_search_engine} = $is_search;
 		return $is_search;
 	}
 
 	if($self->{_cache}) {
 		$self->{_cache}->set("is_search/$remote/$agent", 0, '1 day');
 	}
+	$self->{_is_search_engine} = 0;
 	return 0;
 }
 
