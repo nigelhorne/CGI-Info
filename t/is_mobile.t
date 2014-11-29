@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 28;
+use Test::Most tests => 30;
 use Test::NoWarnings;
 
 BEGIN {
@@ -50,7 +50,9 @@ MOBILE: {
 
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Linux; Android 4.2.2; SAMSUNG-SGH-I337 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.59 Mobile Safari/537.36';
 	$i = new_ok('CGI::Info');
-	ok($i->is_mobile() == 1);
+	ok($i->is_mobile());
+	ok(!$i->is_search_engine());
+	ok(!$i->is_robot());
 	ok($i->browser_type eq 'mobile');
 
 	$ENV{'HTTP_USER_AGENT'} = 'A nonsense user agent string';
