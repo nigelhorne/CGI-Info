@@ -869,7 +869,7 @@ sub is_mobile {
 		if($self->{_browser_detect}) {
 			my $device = $self->{_browser_detect}->device();
 			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
-			if($self->{_cache}) {
+			if($self->{_cache} && defined($remote)) {
 				$self->{_cache}->set("is_mobile/$remote/$agent", $is_mobile, '1 day');
 			}
 			return $is_mobile;
@@ -1079,13 +1079,13 @@ sub is_robot {
 		return $self->{_is_robot};
 	}
 
-	my $remote = $ENV{'REMOTE_ADDR'};
 	my $agent = $ENV{'HTTP_USER_AGENT'};
 	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie/i) {
 		return 1;
 	}
+	my $remote = $ENV{'REMOTE_ADDR'};
 
-	if($self->{_cache}) {
+	if($self->{_cache} && defined($remote)) {
 		my $is_robot = $self->{_cache}->get("is_robot/$remote/$agent");
 		if(defined($is_robot)) {
 			$self->{_is_robot} = $is_robot;
@@ -1093,14 +1093,16 @@ sub is_robot {
 		}
 	}
 
-	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-	if($hostname =~ /google|msnbot|bingbot/) {
-		if($self->{_cache}) {
-			$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
+	if(defined($remote)) {
+		# TODO: DNS lookup, not gethostbyaddr - though that will be slow
+		my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
+		if($hostname =~ /google|msnbot|bingbot/) {
+			if($self->{_cache}) {
+				$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
+			}
+			$self->{_is_robot} = 1;
+			return 1;
 		}
-		$self->{_is_robot} = 1;
-		return 1;
 	}
 
 	unless($self->{_browser_detect}) {
@@ -1111,14 +1113,14 @@ sub is_robot {
 	}
 	if($self->{_browser_detect}) {
 		my $is_robot = $self->{_browser_detect}->robot();
-		if($self->{_cache}) {
+		if($self->{_cache} && defined($remote)) {
 			$self->{_cache}->set("is_robot/$remote/$agent", $is_robot, '1 day');
 		}
 		$self->{_is_robot} = $is_robot;
 		return $is_robot;
 	}
 
-	if($self->{_cache}) {
+	if($self->{_cache} && defined($remote)) {
 		$self->{_cache}->set("is_robot/$remote/$agent", 0, '1 day');
 	}
 	$self->{_is_robot} = 0;
@@ -1148,14 +1150,14 @@ sub is_search_engine {
 		return 0;
 	}
 
-	my $remote = $ENV{'REMOTE_ADDR'};
-	my $agent = $ENV{'HTTP_USER_AGENT'};
-
 	if(defined($self->{_is_search_engine})) {
 		return $self->{_is_search_engine};
 	}
 
-	if($self->{_cache}) {
+	my $remote = $ENV{'REMOTE_ADDR'};
+	my $agent = $ENV{'HTTP_USER_AGENT'};
+
+	if($self->{_cache} && defined($remote)) {
 		my $is_search = $self->{_cache}->get("is_search/$remote/$agent");
 		if(defined($is_search)) {
 			$self->{_is_search_engine} = $is_search;
@@ -1172,15 +1174,6 @@ sub is_search_engine {
 		return 1;
 	}
 
-	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-	if($hostname =~ /google\.|msnbot/) {
-		if($self->{_cache}) {
-			$self->{_cache}->set("is_search/$remote/$agent", 1, '1 day');
-		}
-		$self->{_is_search_engine} = 1;
-		return 1;
-	}
 	unless($self->{_browser_detect}) {
 		if(eval { require HTTP::BrowserDetect; }) {
 			HTTP::BrowserDetect->import();
@@ -1197,6 +1190,17 @@ sub is_search_engine {
 		return $is_search;
 	}
 
+	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
+	if(defined($remote)) {
+		my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
+		if($hostname =~ /google\.|msnbot/) {
+			if($self->{_cache}) {
+				$self->{_cache}->set("is_search/$remote/$agent", 1, '1 day');
+			}
+			$self->{_is_search_engine} = 1;
+			return 1;
+		}
+	}
 	if($self->{_cache}) {
 		$self->{_cache}->set("is_search/$remote/$agent", 0, '1 day');
 	}
