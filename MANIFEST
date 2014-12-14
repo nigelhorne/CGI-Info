@@ -41,6 +41,7 @@ t/strict.t
 t/taint.t
 t/tmpdir.t
 t/untaint.t
+t/used.t
 t/vars.t
 t/xml.t
 META.yml                                 Module meta-data (added by MakeMaker)

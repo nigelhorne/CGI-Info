@@ -270,7 +270,6 @@ sub _find_site_details {
 		if($self->{_cgi_site} =~ /(.*)\.+$/) {
 			$self->{_cgi_site} = $1;
 		}
-
 	} elsif($ENV{'SERVER_NAME'}) {
 		$self->{_cgi_site} = URI::Heuristic::uf_uristr($ENV{'SERVER_NAME'});
 	} else {
