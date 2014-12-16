@@ -12,9 +12,11 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES	=> {},
-    PREREQ_PM => {
+    BUILD_REQUIRES => {
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
+    },
+    PREREQ_PM => {
 	'URI::Heuristic' => 0,
 	'Sys::Hostname' => 0,
 	'File::Spec' => 0,
@@ -24,7 +26,6 @@ WriteMakefile(
 	'List::Member' => 0,
 	# 'Test::Kwalitee' => 0,
 	'HTTP::BrowserDetect' => 1.42,	# Include baidu etc.
-	'Test::Requires' => 0,
 	'File::Basename' => 0,
 	'String::Clean::XSS' => 0,
 	'String::EscapeCage' => 0.02,
