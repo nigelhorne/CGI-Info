@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 16;
+use Test::Most tests => 17;
 use Test::NoWarnings;
 use Sys::Hostname;
 
@@ -50,4 +50,6 @@ HOSTNAMES: {
 	$i = new_ok('CGI::Info');
 	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');;
 	ok($i->host_name() eq 'www.bandsman.co.uk');
+	# Check calling twice return path
+	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');;
 }

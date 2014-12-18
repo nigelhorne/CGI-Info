@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 48;
+use Test::Most tests => 52;
 use File::Spec;
 use Cwd;
 use Test::NoWarnings;
@@ -17,11 +17,12 @@ PATHS: {
         delete $ENV{'SCRIPT_FILENAME'};
 
 	my $i = new_ok('CGI::Info');
-	ok($i->script_name() eq 'script.t');
 	ok(File::Spec->file_name_is_absolute($i->script_path()));
 	ok($i->script_path() =~ /.+script\.t$/);
 	ok($i->script_name() eq 'script.t');
 	ok($i->script_path() eq File::Spec->catfile($i->script_dir(), $i->script_name()));
+	# Check calling twice return path
+	ok($i->script_name() eq 'script.t');
 
 	ok(-f $i->script_path());
 	my @statb = stat($i->script_path());
@@ -170,5 +171,20 @@ PATHS: {
 	} else {
 		ok($i->script_dir() =~ /\/tmp\/cgi-bin$/);
 		ok($i->script_path() =~ /\/tmp\/cgi-bin\/bar.pl$/);
+	}
+
+	$ENV{'SCRIPT_NAME'} = 'bar.pl';
+	$ENV{'DOCUMENT_ROOT'} = '/tmp';
+	$i = new_ok('CGI::Info');
+	ok($i->script_name() eq 'bar.pl');
+	if($^O eq 'MSWin32') {
+		TODO: {
+			local $TODO = 'Script_dir test needs to be done on Windows';
+			ok($i->script_dir() eq '\\tmp');
+			ok($i->script_path() eq '\\tmp\\bar.pl');
+		}
+	} else {
+		ok($i->script_dir() eq '/tmp');
+		ok($i->script_path() eq '/tmp/bar.pl');
 	}
 }

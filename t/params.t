@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 113;
+use Test::Most tests => 127;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -304,6 +304,23 @@ EOF
 	ok(!-r $filename);
 	close $fin;
 
+	open ($fin, '<', \$input);
+	local *STDIN = $fin;
+	$script_path = $i->script_path();
+	CGI::Info->reset();	# Force stdin re-read
+	$i = new_ok('CGI::Info' => [
+		upload_dir => '.',
+	]);
+	eval { %p = $i->params() };
+	ok($@ =~ /_upload_dir must be a full pathname/);
+	ok(defined($p{country}));
+	ok($p{country} eq '44');
+	ok($p{datafile} =~ /^hello.txt_.+/);
+	$filename = File::Spec->catfile(File::Spec->tmpdir(), $p{datafile});
+	ok(!-e $filename);
+	ok(!-r $filename);
+	close $fin;
+
 	$ENV{'CONTENT_TYPE'} = 'xyzzy';
 	open ($fin, '<', \$input);
 	local *STDIN = $fin;
@@ -314,6 +331,38 @@ EOF
 	]);
 	eval { %p = $i->params() };
 	ok($@ =~ /POST: Invalid or unsupported content type: xyzzy/);
+	ok(defined($p{country}));
+	ok($p{country} eq '44');
+	ok($p{datafile} =~ /^hello.txt_.+/);
+	$filename = File::Spec->catfile(File::Spec->tmpdir(), $p{datafile});
+	ok(!-e $filename);
+	ok(!-r $filename);
+	close $fin;
+
+	$ENV{'CONTENT_TYPE'} = 'Multipart/form-data; boundary=-----xyz';
+	$input = <<'EOF';
+-------xyz
+Content-Disposition: form-data; name="country"
+
+44
+-------xyz
+Content-Disposition: form-data; name="datafile"; filename="../../../passwd"
+Content-Type: text/plain
+
+Hello, World
+
+-------xyz--
+EOF
+	open ($fin, '<', \$input);
+	local *STDIN = $fin;
+	$script_path = $i->script_path();
+	CGI::Info->reset();	# Force stdin re-read
+	$i = new_ok('CGI::Info' => [
+		upload_dir => File::Spec->tmpdir()
+	]);
+	eval { %p = $i->params() };
+	diag($@);
+	ok($@ =~ /Disallowing invalid filename/);
 	ok(defined($p{country}));
 	ok($p{country} eq '44');
 	ok($p{datafile} =~ /^hello.txt_.+/);
