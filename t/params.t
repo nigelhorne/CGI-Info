@@ -329,10 +329,28 @@ EOF
 	push(@ARGV, 'foo=bar');
 	push(@ARGV, 'fred=wilma');
 	$i = new_ok('CGI::Info');
-	%p = %{$i->params()};
+	%p = %{$i->params(logger => MyLogger->new())};
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
+}
 
+# On some platforms it's failing - find out why
+package MyLogger;
+
+sub new {
+	my ($proto, %args) = @_;
+
+	my $class = ref($proto) || $proto;
+
+	return bless { }, $class;
+}
+
+sub debug {
+	my $self = shift;
+	my $message = shift;
+
+	# Enable this for debugging
+	# ::diag($message);
 }

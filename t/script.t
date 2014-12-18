@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 44;
+use Test::Most tests => 48;
 use File::Spec;
 use Cwd;
 use Test::NoWarnings;
@@ -144,6 +144,21 @@ PATHS: {
 
 	# No leading /
 	$ENV{'SCRIPT_NAME'} = 'tmp/cgi-bin/bar.pl';
+	$i = new_ok('CGI::Info');
+	ok($i->script_name() eq 'bar.pl');
+	if($^O eq 'MSWin32') {
+		TODO: {
+			local $TODO = 'Script_dir test needs to be done on Windows';
+			ok($i->script_dir() =~ /\/tmp\/cgi-bin$/);
+			ok($i->script_path() =~ /\/tmp\/cgi-bin\/bar.pl$/);
+		}
+	} else {
+		ok($i->script_dir() =~ /\/tmp\/cgi-bin$/);
+		ok($i->script_path() =~ /\/tmp\/cgi-bin\/bar.pl$/);
+	}
+
+	$ENV{'SCRIPT_NAME'} = '/cgi-bin/bar.pl';
+	$ENV{'DOCUMENT_ROOT'} = '/tmp';
 	$i = new_ok('CGI::Info');
 	ok($i->script_name() eq 'bar.pl');
 	if($^O eq 'MSWin32') {
