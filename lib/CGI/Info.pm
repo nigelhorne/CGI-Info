@@ -562,6 +562,10 @@ sub params {
 		});
 	}
 
+	unless(scalar @pairs) {
+		return;
+	}
+
 	# Can go when expect has been removed
 	if($self->{_expect}) {
 		require List::Member;
@@ -614,14 +618,14 @@ sub params {
 			}
 		}
 	}
-
-	$self->{_paramref} = \%FORM;
-
 	if($self->{_logger}) {
 		while(my ($key,$value) = each %FORM) {
 			$self->{_logger}->debug("$key=$value");
 		}
 	}
+
+	$self->{_paramref} = \%FORM;
+
 	return \%FORM;
 }
 

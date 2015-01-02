@@ -4,6 +4,7 @@ Revision history for CGI-Info
 	Put is_mobile in the cache
 	Added 'search' to the list of return values from browser_type()
 	Added t/used.t
+	Don't load cleaning modules when no arguments are given
 
 0.49	Fri Nov  7 17:16:25 EST 2014
 	Ensure different agents from the same IP don't clash in the cache
