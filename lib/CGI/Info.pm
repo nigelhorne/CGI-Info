@@ -16,11 +16,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.49
+Version 0.50
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 SYNOPSIS
 
@@ -572,9 +572,9 @@ sub params {
 		List::Member->import();
 	}
 	require String::Clean::XSS;
-	require String::EscapeCage;
 	String::Clean::XSS->import();
-	String::EscapeCage->import();
+	# require String::EscapeCage;
+	# String::EscapeCage->import();
 
 	foreach my $arg (@pairs) {
 		$arg =~ tr/+/ /;
@@ -711,7 +711,8 @@ sub _sanitise_input {
 	# $arg =~ s/[;<>\*|`&\$!?#\(\)\[\]\{\}'"\\\r]//g;
 
 	# return $arg;
-	return String::EscapeCage->new(convert_XSS($arg))->escapecstring();
+	# return String::EscapeCage->new(convert_XSS($arg))->escapecstring();
+	return convert_XSS($arg);
 }
 
 sub _multipart_data {
@@ -1362,7 +1363,7 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2014 Nigel Horne.
+Copyright 2010-2015 Nigel Horne.
 
 This program is released under the following licence: GPL
 
