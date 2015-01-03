@@ -30,6 +30,7 @@ cgi
 http
 https
 params
+param
 stdin
 tmpdir
 Tmpdir
