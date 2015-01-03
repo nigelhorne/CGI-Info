@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.51
+	Fix breakage on older perls
+
 0.50	Fri Jan  2 10:37:56 EST 2015
 	Put is_mobile in the cache
 	Added 'search' to the list of return values from browser_type()
