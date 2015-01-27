@@ -1094,7 +1094,7 @@ sub is_robot {
 	if(defined($remote)) {
 		# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 		my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-		if($hostname =~ /google|msnbot|bingbot/) {
+		if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
 			if($self->{_cache}) {
 				$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
 			}
@@ -1111,11 +1111,13 @@ sub is_robot {
 	}
 	if($self->{_browser_detect}) {
 		my $is_robot = $self->{_browser_detect}->robot();
-		if($self->{_cache} && defined($remote)) {
-			$self->{_cache}->set("is_robot/$remote/$agent", $is_robot, '1 day');
+		if(defined($is_robot)) {
+			if($self->{_cache} && defined($remote)) {
+				$self->{_cache}->set("is_robot/$remote/$agent", $is_robot, '1 day');
+			}
+			$self->{_is_robot} = $is_robot;
+			return $is_robot;
 		}
-		$self->{_is_robot} = $is_robot;
-		return $is_robot;
 	}
 
 	if($self->{_cache} && defined($remote)) {

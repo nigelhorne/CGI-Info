@@ -1,5 +1,9 @@
 Revision history for CGI-Info
 
+0.52
+	Fix problem where mobile Chrome claimed it's a robot when data
+		compression is enabled
+
 0.51	Fri Jan  2 20:34:46 EST 2015
 	Fix breakage on older Perls
 

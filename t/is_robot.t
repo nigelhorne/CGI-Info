@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 19;
+use Test::Most tests => 21;
 use Test::NoWarnings;
 use Data::Dumper;
 
@@ -67,4 +67,8 @@ ROBOT: {
 		ok(defined($cache->get("is_robot/74.92.149.57/$ENV{HTTP_USER_AGENT}")));
 		ok(!defined($cache->get("is_robot/74.92.149.58/$ENV{HTTP_USER_AGENT}")));
 	}
+	$ENV{'REMOTE_ADDR'} = '66.249.83.131';
+	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Linux; Android 4.4.4; SAMSUNG-SGH-I337 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.89 Mobile Safari/537.36';
+	$i = new_ok('CGI::Info');
+	ok($i->is_robot() == 0);
 }
