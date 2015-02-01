@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 127;
+use Test::Most tests => 132;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -29,23 +29,32 @@ PARAMS: {
 	ok($i->as_string() eq '');
 
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
-
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
-	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=baz';
+	$ENV{'QUERY_STRING'} = 'name=nigel+horne';
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
-	ok($p{foo} eq 'bar,baz');
+	ok($p{name} eq 'nigel horne');
+
+	$ENV{'QUERY_STRING'} = 'name=nigel%2Bhorne';
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{name} eq 'nigel horne');
+
+	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=%3Dbaz';
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{foo} eq 'bar,=baz');
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar,baz;fred=wilma');
+	ok($i->as_string() eq 'foo=bar,\\=baz;fred=wilma');
 
 	# Reading twice should yield the same result
 	%p = %{$i->params()};
-	ok($p{foo} eq 'bar,baz');
+	ok($p{foo} eq 'bar,=baz');
 
 	$ENV{'QUERY_STRING'} = 'foo=&fred=wilma';
 	$i = new_ok('CGI::Info');
@@ -89,10 +98,11 @@ PARAMS: {
 	ok(!$i->params());
 
 	$ENV{'REQUEST_METHOD'} = 'HEAD';
-	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
+	$ENV{'QUERY_STRING'} = 'foo=b+ar&fred=wilma';
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
+	ok($p{foo} eq 'b ar');
 
 	$ENV{'REQUEST_METHOD'} = 'FOO';
 	$i = new_ok('CGI::Info');

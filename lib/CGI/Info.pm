@@ -577,14 +577,15 @@ sub params {
 	# String::EscapeCage->import();
 
 	foreach my $arg (@pairs) {
-		$arg =~ tr/+/ /;
 		my($key, $value) = split(/=/, $arg);
 
 		next unless($key);
 
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
+		$key =~ tr/+/ /;
 		if($value) {
 			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
+			$value =~ tr/+/ /;
 		} else {
 			$value = '';
 		}
