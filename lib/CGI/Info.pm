@@ -505,7 +505,9 @@ sub params {
 				$buffer = $stdin_data;
 			} else {
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
-					croak 'POST failed: something else may have read STDIN';
+					$self->_warn({
+						warning => 'POST failed: something else may have read STDIN'
+					});
 				}
 				$stdin_data = $buffer;
 			}
@@ -517,17 +519,29 @@ sub params {
 			}
 		} elsif($content_type =~ /multipart\/form-data/i) {
 			if(!defined($self->{_upload_dir})) {
-				croak 'Attempt to upload a file when upload_dir has not been set';
+				$self->_warn({
+					warning => 'Attempt to upload a file when upload_dir has not been set'
+				});
+				return;
 			}
 			if(!File::Spec->file_name_is_absolute($self->{_upload_dir})) {
-				croak '_upload_dir must be a full pathname';
+				$self->_warn({
+					warning => '_upload_dir must be a full pathname'
+				});
+				return;
 			}
 			if(!-d $self->{_upload_dir}) {
-				croak '_upload_dir isn\'t a directory';
+				$self->_warn({
+					warning => '_upload_dir isn\'t a directory'
+				});
+				return;
 			}
 			if(!-w $self->{_upload_dir}) {
 				delete $self->{_paramref};
-				croak '_upload_dir isn\'t writeable';
+				$self->_warn({
+					warning => '_upload_dir isn\'t writeable'
+				});
+				return;
 			}
 			if($content_type =~ /boundary=(\S+)$/) {
 				@pairs = $self->_multipart_data({
