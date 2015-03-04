@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 16;
+use Test::Most tests => 17;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -18,6 +18,8 @@ COOKIES: {
 	ok($i->get_cookie(cookie_name => 'foo') eq 'bar');
 	ok($i->get_cookie(cookie_name => 'foo') eq 'bar');
 	ok(!defined($i->get_cookie(cookie_name => 'bar')));
+	diag('Ignore message about cookie_name argument not given');
+	ok(!defined($i->get_cookie(cookie_name => undef)));
 
 	$ENV{'HTTP_COOKIE'} = 'fred=wilma; foo=bar';
 	$i = new_ok('CGI::Info');

@@ -63,6 +63,9 @@ sub new {
 	my $proto = shift;
 
 	my $class = ref($proto) || $proto;
+
+	return unless($class);
+
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	return bless {
@@ -146,12 +149,11 @@ sub _find_paths {
                         $self->{_script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
                 }
         } else {
-                my $script_path = $ENV{'SCRIPT_NAME'} ? $ENV{'SCRIPT_NAME'} : $0;
-                if(File::Spec->file_name_is_absolute($script_path)) {
+                if(File::Spec->file_name_is_absolute($0)) {
                         # Called from a command line with a full path
-                        $self->{_script_path} = $script_path;
+                        $self->{_script_path} = $0;
                 } else {
-                        $self->{_script_path} = File::Spec->rel2abs($script_path);
+                        $self->{_script_path} = File::Spec->rel2abs($0);
                 }
         }
 
@@ -272,6 +274,10 @@ sub _find_site_details {
 		}
 	} elsif($ENV{'SERVER_NAME'}) {
 		$self->{_cgi_site} = URI::Heuristic::uf_uristr($ENV{'SERVER_NAME'});
+		if(defined($self->protocol()) && ($self->protocol() ne 'http')) {
+			$self->{_cgi_site} =~ s/^http//;
+			$self->{_cgi_site} = $self->protocol() . $self->{_cgi_site};
+		}
 	} else {
 		require Sys::Hostname;
 		Sys::Hostname->import;
@@ -282,7 +288,7 @@ sub _find_site_details {
 	unless($self->{_site}) {
 		$self->{_site} = $self->{_cgi_site};
 	}
-	if($self->{_site} =~ /^http:\/\/(.+)/) {
+	if($self->{_site} =~ /^https?:\/\/(.+)/) {
 		$self->{_site} = $1;
 	}
 	unless($self->{_cgi_site} =~ /^https?:\/\//) {
@@ -674,18 +680,16 @@ sub param {
 		return $params;
 	}
 	# Is this a permitted argument?
-	if($self->{_allow} && (!exists($self->{_allow}->{$field}))) {
+	if($self->{_allow} && !exists($self->{_allow}->{$field})) {
 		$self->_warn({
 			warning => "param: $field isn't in the allow list"
 		});
 		return;
 	}
 
-	if(!defined($params)) {
-		return;
+	if(defined($params)) {
+		return $params->{$field};
 	}
-
-	return $params->{$field};
 }
 
 # Emit a warning message somewhere
