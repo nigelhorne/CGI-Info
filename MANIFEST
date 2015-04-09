@@ -8,6 +8,7 @@ ignore.txt
 lib/CGI/Info.pm
 t/00-load.t
 t/10-new.t
+t/acop.t
 t/allow.t
 t/boiler.t
 t/carp.t

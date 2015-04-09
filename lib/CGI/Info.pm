@@ -61,7 +61,6 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 
 sub new {
 	my $proto = shift;
-
 	my $class = ref($proto) || $proto;
 
 	return unless($class);
