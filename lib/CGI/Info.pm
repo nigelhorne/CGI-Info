@@ -9,6 +9,7 @@ use strict;
 use Carp;
 use File::Spec;
 use Socket;	# For AF_INET
+use 5.6.1;
 
 =head1 NAME
 
@@ -674,9 +675,8 @@ be thrown:
 sub param {
 	my ($self, $field) = @_;
 
-	my $params = $self->params();
 	if(!defined($field)) {
-		return $params;
+		return $self->params();
 	}
 	# Is this a permitted argument?
 	if($self->{_allow} && !exists($self->{_allow}->{$field})) {
@@ -686,8 +686,8 @@ sub param {
 		return;
 	}
 
-	if(defined($params)) {
-		return $params->{$field};
+	if(defined($self->params())) {
+		return $self->params()->{$field};
 	}
 }
 
@@ -1288,9 +1288,7 @@ sub get_cookie {
 		return;
 	}
 
-	my $jar = $self->{_jar};
-
-	unless($jar) {
+	unless($self->{_jar}) {
 		unless(defined($ENV{'HTTP_COOKIE'})) {
 			return;
 		}
@@ -1298,12 +1296,12 @@ sub get_cookie {
 
 		foreach my $cookie(@cookies) {
 			my ($name, $value) = split(/=/, $cookie);
-			$jar->{$name} = $value;
+			$self->{_jar}->{$name} = $value;
 		}
 	}
 
-	if(exists($jar->{$params{'cookie_name'}})) {
-		return $jar->{$params{'cookie_name'}};
+	if(exists($self->{_jar}->{$params{'cookie_name'}})) {
+		return $self->{_jar}->{$params{'cookie_name'}};
 	}
 	return;	# Return undef
 }
