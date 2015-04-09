@@ -653,7 +653,7 @@ sub params {
 
 Get a single parameter.
 Takes an optional single string parameter which is the argument to return. If
-that parameter is given param() is a wrapper to params() with no arguments.
+that parameter is not given param() is a wrapper to params() with no arguments.
 
 	use CGI::Info;
 	# ...
