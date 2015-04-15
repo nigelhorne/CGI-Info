@@ -64,7 +64,7 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless($class);
+	return unless(defined($class));
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
@@ -742,6 +742,17 @@ sub _multipart_data {
 		return;
 	}
 
+	unless($stdin_data) {
+		while(<STDIN>) {
+			chop(my $line = $_);
+			$line =~ s/[\r\n]//g;
+			$stdin_data .= $line . "\n";
+		}
+		if(!$stdin_data) {
+			return;
+		}
+	}
+
 	my $boundary = $$args{boundary};
 
 	my @pairs;
@@ -751,13 +762,6 @@ sub _multipart_data {
 	my $in_header = 0;
 	my $fout;
 
-	unless($stdin_data) {
-		while(<STDIN>) {
-			chop(my $line = $_);
-			$line =~ s/[\r\n]//g;
-			$stdin_data .= $line . "\n";
-		}
-	}
 	foreach my $line(split(/\n/, $stdin_data)) {
 		if($line =~ /^--\Q$boundary\E--$/) {
 			last;

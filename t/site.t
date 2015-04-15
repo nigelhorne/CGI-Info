@@ -49,25 +49,25 @@ HOSTNAMES: {
 	$ENV{'SERVER_NAME'} = 'www.bandsman.co.uk';
 
 	$i = new_ok('CGI::Info');
-	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');;
+	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path
-	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');;
+	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 
 	$ENV{'SERVER_NAME'} = 'www.bandsman.co.uk';
 	$ENV{'SERVER_PORT'} = 443;
 
 	$i = new_ok('CGI::Info');
-	ok($i->cgi_host_url() eq 'https://www.bandsman.co.uk');;
+	ok($i->cgi_host_url() eq 'https://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path
-	ok($i->cgi_host_url() eq 'https://www.bandsman.co.uk');;
+	ok($i->cgi_host_url() eq 'https://www.bandsman.co.uk');
 
 	$ENV{'SERVER_PORT'} = 80;
 
 	$i = new_ok('CGI::Info');
-	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');;
+	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path
-	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');;
+	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 }
