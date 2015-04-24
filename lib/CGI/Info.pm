@@ -1,7 +1,5 @@
 package CGI::Info;
 
-# TODO: When not running as CGI, allow --robot, --tablet, --search and --phone
-#	to be given to test those environments
 # TODO: remove the expect argument
 
 use warnings;
@@ -355,7 +353,9 @@ CGI::Info helps you to test your script prior to deployment on a website:
 if it is not in a CGI environment (e.g. the script is being tested from the
 command line), the program's command line arguments (a list of key=value pairs)
 are used, if there are no command line arguments then they are read from stdin
-as a list of key=value lines.
+as a list of key=value lines. Also you can give one of --tablet, --search-engine,
+--mobile and --robot to mimick those agents. For example:
+	./script.cgi --mobile name=Nigel
 
 Returns undef if the parameters can't be determined.
 
@@ -470,6 +470,21 @@ sub params {
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
 		if(@ARGV) {
 			@pairs = @ARGV;
+			if(defined($pairs[0])) {
+				if($pairs[0] eq '--robot') {
+					$self->{_is_robot} = 1;
+					shift @pairs;
+				} elsif($pairs[0] eq '--mobile') {
+					$self->{_is_mobile} = 1;
+					shift @pairs;
+				} elsif($pairs[0] eq '--search-engine') {
+					$self->{_is_search_engine} = 1;
+					shift @pairs;
+				} elsif($pairs[0] eq '--tablet') {
+					$self->is_tablet() = 1;
+					shift @pairs;
+				}
+			}
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
 		} elsif(!$self->{_args_read}) {
@@ -478,6 +493,10 @@ sub params {
 			print "Enter key=value pairs - end with quit\n";
 			select($oldfh);
 
+			# Avoid prompting for the arguments more than once
+			# if just 'quit' is entered
+			$self->{_args_read} = 1;
+
 			while(<STDIN>) {
 				chop(my $line = $_);
 				$line =~ s/[\r\n]//g;
@@ -485,9 +504,6 @@ sub params {
 				push(@pairs, $line);
 				$stdin_data .= $line . "\n";
 			}
-			# Avoid prompting for the arguments more than once
-			# if just 'quit' is entered
-			$self->{_args_read} = 1;
 		}
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		unless($ENV{'QUERY_STRING'}) {
@@ -856,6 +872,10 @@ All tablets are mobile, but not all mobile devices are tablets.
 sub is_mobile {
         my $self = shift;
 
+	if(defined($self->{_is_mobile})) {
+		return $self->{_is_mobile};
+	}
+
 	if($self->is_tablet()) {
 		return 1;
 	}
@@ -863,19 +883,23 @@ sub is_mobile {
 	if($ENV{'HTTP_X_WAP_PROFILE'}) {
 		# E.g. Blackberry
 		# TODO: Check the sanity of this variable
+		$self->{_is_mobile} = 1;
 		return 1;
 	}
 
 	if($ENV{'HTTP_USER_AGENT'}) {
 		my $agent = $ENV{'HTTP_USER_AGENT'};
 		if($agent =~ /.+(Android|iPhone).+/) {
+			$self->{_is_mobile} = 1;
 			return 1;
 		}
 
+		# Save loading and calling HTTP::BrowserDetect
 		my $remote = $ENV{'REMOTE_ADDR'};
 		if(defined($remote) && $self->{_cache}) {
 			my $is_mobile = $self->{_cache}->get("is_mobile/$remote/$agent");
 			if(defined($is_mobile)) {
+				$self->{_is_mobile} = $is_mobile;
 				return $is_mobile;
 			}
 		}
@@ -892,6 +916,7 @@ sub is_mobile {
 			if($self->{_cache} && defined($remote)) {
 				$self->{_cache}->set("is_mobile/$remote/$agent", $is_mobile, '1 day');
 			}
+			$self->{_is_mobile} = $is_mobile;
 			return $is_mobile;
 		}
 	}
@@ -906,12 +931,20 @@ Returns a boolean if the website is being viewed on a tablet such as an iPad.
 =cut
 
 sub is_tablet {
+	my $self = shift;
+
+	if(defined($self->{_is_tablet})) {
+		return $self->{_is_tablet};
+	}
+
         if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
 		# TODO: add others when I see some nice user_agents
-		return 1;
-        }
+		$self->{_is_tablet} = 1;
+        } else {
+		$self->{_is_tablet} = 0;
+	}
 
-        return 0;
+	return $self->{_is_tablet};
 }
 
 =head2 as_string

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 132;
+use Test::Most tests => 137;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -385,14 +385,19 @@ EOF
 	delete $ENV{'GATEWAY_INTERFACE'};
 	delete $ENV{'REQUEST_METHOD'};
 	delete $ENV{'QUERY_STRING'};
-	push(@ARGV, 'foo=bar');
-	push(@ARGV, 'fred=wilma');
+	@ARGV = ('foo=bar', 'fred=wilma' );
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params(logger => MyLogger->new())};
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok(!$i->is_mobile());
 
-	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
+	@ARGV = ('--mobile', 'foo=bar', 'fred=wilma' );
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{fred} eq 'wilma');
+	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->is_mobile());
 }
 
 # On some platforms it's failing - find out why
