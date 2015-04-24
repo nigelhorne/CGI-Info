@@ -7,7 +7,7 @@ use strict;
 use Carp;
 use File::Spec;
 use Socket;	# For AF_INET
-use 5.6.1;
+use 5.006_001;
 
 =head1 NAME
 
