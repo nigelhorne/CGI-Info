@@ -995,10 +995,9 @@ sub protocol {
 
 	my $port = $ENV{'SERVER_PORT'};
 	if(defined($port)) {
-		if($port == 80) {
-			return 'http';
-		} elsif($port == 443) {
-			return 'https';
+		my $name = getservbyport($port, 'tcp');
+		if(defined($name) && ($name =~ /https?/)) {
+			return $name;
 		}
 	}
 
@@ -1123,7 +1122,10 @@ Is the visitor a real person or a robot?
 sub is_robot {
 	my $self = shift;
 
-	unless($ENV{'REMOTE_ADDR'} && $ENV{'HTTP_USER_AGENT'}) {
+	my $agent = $ENV{'HTTP_USER_AGENT'};
+	my $remote = $ENV{'REMOTE_ADDR'};
+
+	unless($remote && $agent) {
 		# Probably not running in CGI - assume real person
 		return 0;
 	}
@@ -1132,14 +1134,12 @@ sub is_robot {
 		return $self->{_is_robot};
 	}
 
-	my $agent = $ENV{'HTTP_USER_AGENT'};
 	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com/i) {
 		$self->{_is_robot} = 1;
 		return 1;
 	}
-	my $remote = $ENV{'REMOTE_ADDR'};
 
-	if($self->{_cache} && defined($remote)) {
+	if($self->{_cache}) {
 		my $is_robot = $self->{_cache}->get("is_robot/$remote/$agent");
 		if(defined($is_robot)) {
 			$self->{_is_robot} = $is_robot;
@@ -1147,16 +1147,14 @@ sub is_robot {
 		}
 	}
 
-	if(defined($remote)) {
-		# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-		my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-		if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
-			if($self->{_cache}) {
-				$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
-			}
-			$self->{_is_robot} = 1;
-			return 1;
+	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
+	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
+	if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
+		if($self->{_cache}) {
+			$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
 		}
+		$self->{_is_robot} = 1;
+		return 1;
 	}
 
 	unless($self->{_browser_detect}) {
@@ -1168,7 +1166,7 @@ sub is_robot {
 	if($self->{_browser_detect}) {
 		my $is_robot = $self->{_browser_detect}->robot();
 		if(defined($is_robot)) {
-			if($self->{_cache} && defined($remote)) {
+			if($self->{_cache}) {
 				$self->{_cache}->set("is_robot/$remote/$agent", $is_robot, '1 day');
 			}
 			$self->{_is_robot} = $is_robot;
@@ -1176,7 +1174,7 @@ sub is_robot {
 		}
 	}
 
-	if($self->{_cache} && defined($remote)) {
+	if($self->{_cache}) {
 		$self->{_cache}->set("is_robot/$remote/$agent", 0, '1 day');
 	}
 	$self->{_is_robot} = 0;
@@ -1200,8 +1198,10 @@ Is the visitor a search engine?
 
 sub is_search_engine {
 	my $self = shift;
+	my $remote = $ENV{'REMOTE_ADDR'};
+	my $agent = $ENV{'HTTP_USER_AGENT'};
 
-	unless($ENV{'REMOTE_ADDR'} && $ENV{'HTTP_USER_AGENT'}) {
+	unless($remote && $agent) {
 		# Probably not running in CGI - assume not a search engine
 		return 0;
 	}
@@ -1210,11 +1210,12 @@ sub is_search_engine {
 		return $self->{_is_search_engine};
 	}
 
-	my $remote = $ENV{'REMOTE_ADDR'};
-	my $agent = $ENV{'HTTP_USER_AGENT'};
+	my $key;
 
-	if($self->{_cache} && defined($remote)) {
-		my $is_search = $self->{_cache}->get("is_search/$remote/$agent");
+	if($self->{_cache}) {
+		$key = "is_search/$remote/$agent";
+
+		my $is_search = $self->{_cache}->get($key);
 		if(defined($is_search)) {
 			$self->{_is_search_engine} = $is_search;
 			return $is_search;
@@ -1225,7 +1226,7 @@ sub is_search_engine {
 	# that is easily spoofed
 	if($agent =~ /www\.majestic12\.co\.uk/) {
 		if($self->{_cache}) {
-			$self->{_cache}->set("is_search/$remote/$agent", 1, '1 day');
+			$self->{_cache}->set($key, 1, '1 day');
 		}
 		return 1;
 	}
@@ -1240,25 +1241,24 @@ sub is_search_engine {
 		my $browser = $self->{_browser_detect};
 		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo());
 		if($self->{_cache}) {
-			$self->{_cache}->set("is_search/$remote/$agent", $is_search, '1 day');
+			$self->{_cache}->set($key, $is_search, '1 day');
 		}
 		$self->{_is_search_engine} = $is_search;
 		return $is_search;
 	}
 
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-	if(defined($remote)) {
-		my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-		if($hostname =~ /google\.|msnbot/) {
-			if($self->{_cache}) {
-				$self->{_cache}->set("is_search/$remote/$agent", 1, '1 day');
-			}
-			$self->{_is_search_engine} = 1;
-			return 1;
+	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
+	if($hostname =~ /google\.|msnbot/) {
+		if($self->{_cache}) {
+			$self->{_cache}->set($key, 1, '1 day');
 		}
+		$self->{_is_search_engine} = 1;
+		return 1;
 	}
+
 	if($self->{_cache}) {
-		$self->{_cache}->set("is_search/$remote/$agent", 0, '1 day');
+		$self->{_cache}->set($key, 0, '1 day');
 	}
 	$self->{_is_search_engine} = 0;
 	return 0;
@@ -1371,7 +1371,9 @@ is_tablet() only currently detects the iPad and Windows PCs. Android strings
 don't differ between tablets and smart-phones.
 
 Please report any bugs or feature requests to C<bug-cgi-info at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.  I will be notified, and then you'll
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.
+I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
