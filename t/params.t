@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 137;
+use Test::Most tests => 138;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -398,6 +398,12 @@ EOF
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 	ok($i->is_mobile());
+
+	eval {
+		$i->reset();
+	};
+
+	ok($@ =~ /Reset is a class method/);
 }
 
 # On some platforms it's failing - find out why

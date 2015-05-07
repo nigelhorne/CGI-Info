@@ -146,13 +146,11 @@ sub _find_paths {
 
                         $self->{_script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
                 }
-        } else {
-                if(File::Spec->file_name_is_absolute($0)) {
-                        # Called from a command line with a full path
-                        $self->{_script_path} = $0;
-                } else {
-                        $self->{_script_path} = File::Spec->rel2abs($0);
-                }
+        } elsif(File::Spec->file_name_is_absolute($0)) {
+		# Called from a command line with a full path
+		$self->{_script_path} = $0;
+	} else {
+		$self->{_script_path} = File::Spec->rel2abs($0);
         }
 
 	$self->{_script_path} = $self->_untaint_filename({
@@ -1046,7 +1044,7 @@ sub tmpdir {
 	my $dir;
 
 	if($ENV{'C_DOCUMENT_ROOT'} && (-d $ENV{'C_DOCUMENT_ROOT'})) {
-		$dir = "$ENV{'C_DOCUMENT_ROOT'}/$name";
+		$dir = File::Spec->catdir($ENV{'C_DOCUMENT_ROOT'}, $name);
 		if((-d $dir) && (-w $dir)) {
 			return $self->_untaint_filename({ filename => $dir });
 		}
