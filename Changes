@@ -8,6 +8,7 @@ Revision history for CGI-Info
 	Set minimum version as 5.6.1 since we use the 3 argument open()
 	When running outside CGI, allow one of --tablet, --search-engine,
 		--mobile and --robot to mimick those agents.
+	is_mobile: include code from detectmobilebrowsers.com
 
 0.51	Fri Jan  2 20:34:46 EST 2015
 	Fix breakage on older Perls
