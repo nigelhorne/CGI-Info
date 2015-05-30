@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.53
+	Remove implicit assumption of the build directory
+
 0.52	Sat May 30 08:13:28 EDT 2015
 	Fix problem where mobile Chrome claimed it's a robot when data
 		compression is enabled
