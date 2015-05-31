@@ -479,7 +479,7 @@ sub params {
 					$self->{_is_search_engine} = 1;
 					shift @pairs;
 				} elsif($pairs[0] eq '--tablet') {
-					$self->is_tablet() = 1;
+					$self->{_is_tablet} = 1;
 					shift @pairs;
 				}
 			}
