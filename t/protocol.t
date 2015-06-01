@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 24;
+use Test::Most tests => 25;
 use Test::NoWarnings;
 
 BEGIN {
@@ -38,6 +38,7 @@ PROTOCOL: {
 
 	$ENV{'SERVER_PORT'} = 80;
 	$i = new_ok('CGI::Info');
+	ok(defined($i->protocol()));
 	ok($i->protocol() eq 'http');
 
 	$ENV{'SERVER_PORT'} = 21;
