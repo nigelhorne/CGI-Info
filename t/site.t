@@ -15,7 +15,7 @@ HOSTNAMES: {
         delete $ENV{'SERVER_NAME'};
 	$ENV{'SERVER_PORT'} = 80;
 
-	my $i = new_ok('CGI::Info');
+	my $i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
 
 	my $hostname = hostname;
 
@@ -49,7 +49,7 @@ HOSTNAMES: {
 	delete $ENV{'SCRIPT_URI'};
 	$ENV{'SERVER_NAME'} = 'www.bandsman.co.uk';
 
-	$i = new_ok('CGI::Info');
+	$i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
 	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path
@@ -66,9 +66,28 @@ HOSTNAMES: {
 
 	$ENV{'SERVER_PORT'} = 80;
 
-	$i = new_ok('CGI::Info');
+	$i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
 	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path
 	ok($i->cgi_host_url() eq 'http://www.bandsman.co.uk');
+}
+
+# On some platforms it's failing - find out why
+package MyLogger;
+
+sub new {
+	my ($proto, %args) = @_;
+
+	my $class = ref($proto) || $proto;
+
+	return bless { }, $class;
+}
+
+sub warn {
+	my $self = shift;
+	my $message = shift;
+
+	# Enable this for debugging
+	# ::diag($message);
 }
