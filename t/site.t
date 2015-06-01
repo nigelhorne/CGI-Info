@@ -13,6 +13,7 @@ BEGIN {
 HOSTNAMES: {
         delete $ENV{'HTTP_HOST'};
         delete $ENV{'SERVER_NAME'};
+	$ENV{'SERVER_PORT'} = 80;
 
 	my $i = new_ok('CGI::Info');
 

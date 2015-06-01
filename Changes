@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.54
 	Fix --tablet option
+	protocol() - Warn if the calling protocol can't be determined
 
 0.53	Sat May 30 16:00:49 EDT 2015
 	Remove implicit assumption of the build directory

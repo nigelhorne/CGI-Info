@@ -712,6 +712,12 @@ sub _warn {
 	my $warning = $$params{'warning'};
 
 	return unless($warning);
+	if($self eq __PACKAGE__) {
+		# Called from class method
+		carp($warning);
+		return;
+	}
+	# return if($self eq __PACKAGE__);  # Called from class method
 
 	if($self->{_syslog}) {
 		require Sys::Syslog;
@@ -988,11 +994,11 @@ sub as_string {
 Returns the connection protocol, presumably 'http' or 'https', or undef if
 it can't be determined.
 
-This can be run as a class or object method.
-
 =cut
 
 sub protocol {
+	my $self = shift;
+
 	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^(.+):\/\/.+/)) {
 		return $1;
 	}
@@ -1008,6 +1014,7 @@ sub protocol {
 	if($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
 		return 'http';
 	}
+	$self->_warn({ warning => "Can't determine the calling protocol" });
 	return;
 }
 
