@@ -1006,8 +1006,13 @@ sub protocol {
 	my $port = $ENV{'SERVER_PORT'};
 	if(defined($port)) {
 		my $name = getservbyport($port, 'tcp');
-		if(defined($name) && ($name =~ /https?/)) {
-			return $name;
+		if(defined($name)) {
+			if($name =~ /https?/) {
+				return $name;
+			} elsif($name eq 'www') {
+				# NetBSD and OpenBSD
+				return 'http';
+			}
 		}
 	}
 
