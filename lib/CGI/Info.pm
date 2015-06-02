@@ -546,21 +546,24 @@ sub params {
 			}
 			if(!File::Spec->file_name_is_absolute($self->{_upload_dir})) {
 				$self->_warn({
-					warning => '_upload_dir must be a full pathname'
+					warning => "upload_dir $self->{_upload_dir} isn\'t a full pathname"
 				});
+				delete $self->{_upload_dir};
 				return;
 			}
 			if(!-d $self->{_upload_dir}) {
 				$self->_warn({
-					warning => '_upload_dir isn\'t a directory'
+					warning => "upload_dir $self->{_upload_dir} isn\'t a directory"
 				});
+				delete $self->{_upload_dir};
 				return;
 			}
 			if(!-w $self->{_upload_dir}) {
 				delete $self->{_paramref};
 				$self->_warn({
-					warning => '_upload_dir isn\'t writeable'
+					warning => "upload_dir $self->{_upload_dir} isn\'t writeable"
 				});
+				delete $self->{_upload_dir};
 				return;
 			}
 			if($content_type =~ /boundary=(\S+)$/) {
