@@ -1005,6 +1005,9 @@ sub protocol {
 	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^(.+):\/\/.+/)) {
 		return $1;
 	}
+	if($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
+		return 'http';
+	}
 
 	my $port = $ENV{'SERVER_PORT'};
 	if(defined($port)) {
@@ -1013,15 +1016,18 @@ sub protocol {
 			if($name =~ /https?/) {
 				return $name;
 			} elsif($name eq 'www') {
-				# NetBSD and OpenBSD
+				# e.g. NetBSD and OpenBSD
 				return 'http';
 			}
+			# Return an error, maybe missing something
+		} elsif($port == 80) {
+			# e.g. Solaris
+			return 'http';
+		} elsif($port == 443) {
+			return 'https';
 		}
 	}
 
-	if($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
-		return 'http';
-	}
 	$self->_warn({ warning => "Can't determine the calling protocol" });
 	return;
 }
