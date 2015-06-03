@@ -1,9 +1,9 @@
 Revision history for CGI-Info
 
-0.54
+0.54 Wed Jun  3 13:10:59 EDT 2015
 	Fix --tablet option
 	protocol() - Warn if the calling protocol can't be determined
-	Fix protocol() on OpenBSD and NetBSD
+	Fix protocol() on OpenBSD, Solaris and NetBSD
 	Ensure that the temporary directory is writeable, otherwise tests will
 		fail
 
