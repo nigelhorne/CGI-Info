@@ -1028,7 +1028,9 @@ sub protocol {
 		}
 	}
 
-	$self->_warn({ warning => "Can't determine the calling protocol" });
+	if($ENV{'REMOTE_ADDR'}) {
+		$self->_warn({ warning => "Can't determine the calling protocol" });
+	}
 	return;
 }
 

@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.55
+	protocol() - Don't warn when not running as a CGI script
+
 0.54 Wed Jun  3 13:10:59 EDT 2015
 	Fix --tablet option
 	protocol() - Warn if the calling protocol can't be determined
