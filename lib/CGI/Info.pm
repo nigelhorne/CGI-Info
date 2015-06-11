@@ -4,8 +4,7 @@ package CGI::Info;
 
 use warnings;
 use strict;
-use Carp;
-use File::Spec;
+use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
 use 5.006_001;
 
@@ -15,11 +14,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.54
+Version 0.55
 
 =cut
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 =head1 SYNOPSIS
 
@@ -717,7 +716,7 @@ sub _warn {
 	return unless($warning);
 	if($self eq __PACKAGE__) {
 		# Called from class method
-		carp($warning);
+		Carp::carp($warning);
 		return;
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
@@ -734,7 +733,7 @@ sub _warn {
 	if($self->{_logger}) {
 		$self->{_logger}->warn($warning);
 	} elsif(!defined($self->{_syslog})) {
-		carp($warning);
+		Carp::carp($warning);
 	}
 }
 
@@ -1381,7 +1380,7 @@ sub reset {
 	my $class = shift;
 
 	unless($class eq __PACKAGE__) {
-		carp 'Reset is a class method';
+		Carp::carp 'Reset is a class method';
 		return;
 	}
 
