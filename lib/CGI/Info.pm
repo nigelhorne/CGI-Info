@@ -1186,7 +1186,7 @@ sub is_robot {
 	my $key;
 
 	if($self->{_cache}) {
-		$key = "is_search/$remote/$agent";
+		$key = "is_robot/$remote/$agent";
 		my $is_robot = $self->{_cache}->get($key);
 		if(defined($is_robot)) {
 			$self->{_is_robot} = $is_robot;
