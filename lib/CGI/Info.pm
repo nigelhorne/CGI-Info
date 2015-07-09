@@ -1183,8 +1183,11 @@ sub is_robot {
 		return 1;
 	}
 
+	my $key;
+
 	if($self->{_cache}) {
-		my $is_robot = $self->{_cache}->get("is_robot/$remote/$agent");
+		$key = "is_search/$remote/$agent";
+		my $is_robot = $self->{_cache}->get($key);
 		if(defined($is_robot)) {
 			$self->{_is_robot} = $is_robot;
 			return $is_robot;
@@ -1195,7 +1198,7 @@ sub is_robot {
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 	if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
 		if($self->{_cache}) {
-			$self->{_cache}->set("is_robot/$remote/$agent", 1, '1 day');
+			$self->{_cache}->set($key, 1, '1 day');
 		}
 		$self->{_is_robot} = 1;
 		return 1;
@@ -1211,7 +1214,7 @@ sub is_robot {
 		my $is_robot = $self->{_browser_detect}->robot();
 		if(defined($is_robot)) {
 			if($self->{_cache}) {
-				$self->{_cache}->set("is_robot/$remote/$agent", $is_robot, '1 day');
+				$self->{_cache}->set($key, $is_robot, '1 day');
 			}
 			$self->{_is_robot} = $is_robot;
 			return $is_robot;
@@ -1219,7 +1222,7 @@ sub is_robot {
 	}
 
 	if($self->{_cache}) {
-		$self->{_cache}->set("is_robot/$remote/$agent", 0, '1 day');
+		$self->{_cache}->set($key, 0, '1 day');
 	}
 	$self->{_is_robot} = 0;
 	return 0;
@@ -1310,7 +1313,7 @@ sub is_search_engine {
 
 =head2 browser_type
 
-Returns one of 'web', 'search_engine', 'robot' and 'mobile'.
+Returns one of 'web', 'search', 'robot' and 'mobile'.
 
     # Code to display a different web page for a browser, search engine and
     # smartphone
