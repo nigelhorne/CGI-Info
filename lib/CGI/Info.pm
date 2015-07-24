@@ -576,7 +576,11 @@ sub params {
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
-				read(STDIN, $buffer, $content_length);
+				if(read(STDIN, $buffer, $content_length) != $content_length) {
+					$self->_warn({
+						warning => 'XML failed: something else may have read STDIN'
+					});
+				}
 				$stdin_data = $buffer;
 			}
 
