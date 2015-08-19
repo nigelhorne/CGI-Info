@@ -7,7 +7,7 @@ my $tmpdir = File::Spec->tmpdir();
 if(!-w $tmpdir) {
 	# This will set the CPAN-Testers status to Unknown
 	# TODO: Work out how to set the status to NA
-	die "Your temporary directory ' $tmpdir' isn't writable, fix your configuration and try again";
+	die "Your temporary directory '$tmpdir' isn't writable, fix your configuration and try again";
 }
 
 WriteMakefile(
