@@ -1170,16 +1170,16 @@ Is the visitor a real person or a robot?
 sub is_robot {
 	my $self = shift;
 
+	if(defined($self->{_is_robot})) {
+		return $self->{_is_robot};
+	}
+
 	my $agent = $ENV{'HTTP_USER_AGENT'};
 	my $remote = $ENV{'REMOTE_ADDR'};
 
 	unless($remote && $agent) {
 		# Probably not running in CGI - assume real person
 		return 0;
-	}
-
-	if(defined($self->{_is_robot})) {
-		return $self->{_is_robot};
 	}
 
 	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot/i) {
@@ -1249,16 +1249,17 @@ Is the visitor a search engine?
 
 sub is_search_engine {
 	my $self = shift;
+
+	if(defined($self->{_is_search_engine})) {
+		return $self->{_is_search_engine};
+	}
+
 	my $remote = $ENV{'REMOTE_ADDR'};
 	my $agent = $ENV{'HTTP_USER_AGENT'};
 
 	unless($remote && $agent) {
 		# Probably not running in CGI - assume not a search engine
 		return 0;
-	}
-
-	if(defined($self->{_is_search_engine})) {
-		return $self->{_is_search_engine};
 	}
 
 	my $key;
