@@ -652,8 +652,9 @@ sub params {
 		$value = $self->_sanitise_input($value);
 
 		# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
+		# The second line is removed because of too many false-positives
 		if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
-		   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
+		   # ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
 		   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
 		   ($value =~ /((\%27)|(\'))union/ix) ||
 		   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
