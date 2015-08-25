@@ -354,7 +354,7 @@ as a list of key=value lines. Also you can give one of --tablet, --search-engine
 --mobile and --robot to mimick those agents. For example:
 	./script.cgi --mobile name=Nigel
 
-Returns undef if the parameters can't be determined.
+Returns undef if the parameters can't be determined or if none were given.
 
 If an argument is given twice or more, then the values are put in a comma
 separated string.
@@ -678,6 +678,11 @@ sub params {
 			}
 		}
 	}
+
+	unless(%FORM) {
+		return;
+	}
+
 	if($self->{_logger}) {
 		while(my ($key,$value) = each %FORM) {
 			$self->{_logger}->debug("$key=$value");
@@ -709,6 +714,8 @@ be thrown:
 	};
 	my $bar = $info->param('bar');  # Gives an error message
 
+Returns undef if the requested parameter was not given
+
 =cut
 
 sub param {
@@ -728,6 +735,7 @@ sub param {
 	if(defined($self->params())) {
 		return $self->params()->{$field};
 	}
+	return;
 }
 
 # Emit a warning message somewhere

@@ -24,8 +24,7 @@ PARAMS: {
 	$ENV{'QUERY_STRING'} = '=bar';
 
 	$i = new_ok('CGI::Info');
-	%p = %{$i->params()};
-	ok(!defined($p{fred}));
+	ok(!defined($i->params()));
 	ok($i->as_string() eq '');
 
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';

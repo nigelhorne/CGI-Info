@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 26;
+use Test::Most tests => 23;
 use Test::NoWarnings;
 
 BEGIN {
@@ -39,9 +39,7 @@ ALLOWED: {
 	$i = new_ok('CGI::Info' => [
 		allow => \%allowed
 	]);
-	%p = %{$i->params()};
-	ok(!exists($p{foo}));
-	ok(!exists($p{fred}));
+	ok(!defined($i->params()));
 	ok($i->as_string() eq '');
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval { $i->param('fred') };
@@ -64,8 +62,5 @@ ALLOWED: {
 	$i = new_ok('CGI::Info' => [
 		allow => \%allowed
 	]);
-	%p = %{$i->params()};
-	ok(!exists($p{foo}));
-	ok(!exists($p{fred}));
-	ok($i->as_string() eq '');
+	ok(!defined($i->params()));
 }
