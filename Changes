@@ -3,6 +3,7 @@ Revision history for CGI-Info
 0.57
 	--search-engine and --mobile didn't work
 	Less harsh SQL injection tests, there were too many false positives
+	Tablets are no longer considered mobile phones
 	params now returns undef if no arguments were given
 
 0.56	Sun Aug 16 20:05:27 EDT 2015
