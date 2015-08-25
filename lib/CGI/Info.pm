@@ -905,10 +905,6 @@ sub is_mobile {
 		return $self->{_is_mobile};
 	}
 
-	if($self->is_tablet()) {
-		return 1;
-	}
-
 	if($ENV{'HTTP_X_WAP_PROFILE'}) {
 		# E.g. Blackberry
 		# TODO: Check the sanity of this variable
