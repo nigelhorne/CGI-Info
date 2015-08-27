@@ -1187,7 +1187,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|facebookexternal/i) {
+	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot/i) {
 		$self->{_is_robot} = 1;
 		return 1;
 	}
@@ -1281,7 +1281,7 @@ sub is_search_engine {
 
 	# Don't use HTTP_USER_AGENT to detect more than we really have to since
 	# that is easily spoofed
-	if($agent =~ /www\.majestic12\.co\.uk/) {
+	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
 		if($self->{_cache}) {
 			$self->{_cache}->set($key, 1, '1 day');
 		}
