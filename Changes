@@ -5,6 +5,8 @@ Revision history for CGI-Info
 	Less harsh SQL injection tests, there were too many false positives
 	Tablets are no longer considered mobile phones
 	params now returns undef if no arguments were given
+	Facebookexternal (used to prefetch pages for display)
+		is a robot
 
 0.56	Sun Aug 16 20:05:27 EDT 2015
 	Catch XML read failures

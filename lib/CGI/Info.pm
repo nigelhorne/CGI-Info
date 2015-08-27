@@ -1187,7 +1187,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot/i) {
+	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|facebookexternal/i) {
 		$self->{_is_robot} = 1;
 		return 1;
 	}
