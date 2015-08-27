@@ -1203,16 +1203,6 @@ sub is_robot {
 		}
 	}
 
-	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-	if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
-		if($self->{_cache}) {
-			$self->{_cache}->set($key, 1, '1 day');
-		}
-		$self->{_is_robot} = 1;
-		return 1;
-	}
-
 	unless($self->{_browser_detect}) {
 		if(eval { require HTTP::BrowserDetect; }) {
 			HTTP::BrowserDetect->import();
@@ -1306,7 +1296,9 @@ sub is_search_engine {
 
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
-	if($hostname =~ /google\.|msnbot/) {
+
+	if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
+
 		if($self->{_cache}) {
 			$self->{_cache}->set($key, 1, '1 day');
 		}

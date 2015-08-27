@@ -7,6 +7,7 @@ Revision history for CGI-Info
 	params now returns undef if no arguments were given
 	Pretend Facebookexternal (used to prefetch pages for
 		display) is a search_engine.
+	Don't mark search engines as robots
 
 0.56	Sun Aug 16 20:05:27 EDT 2015
 	Catch XML read failures
