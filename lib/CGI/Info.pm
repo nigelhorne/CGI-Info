@@ -651,24 +651,25 @@ sub params {
 		}
 		$value = $self->_sanitise_input($value);
 
-		# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
-		# The second line is removed because of too many false-positives
-		if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
-		   # ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
-		   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
-		   ($value =~ /((\%27)|(\'))union/ix) ||
-		   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
-			if($self->{_logger}) {
-				$self->{_logger}->warn("SQL injection attempt blocked for '$value'");
+		if($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'GET')) {
+			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
+			if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
+			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
+			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
+			   ($value =~ /((\%27)|(\'))union/ix) ||
+			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
+				if($self->{_logger}) {
+					$self->{_logger}->warn("SQL injection attempt blocked for '$value'");
+				}
+				next;
 			}
-			next;
-		}
-		if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-		   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
-			if($self->{_logger}) {
-				$self->{_logger}->warn("XSS injection attempt blocked for '$value'");
+			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
+			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
+				if($self->{_logger}) {
+					$self->{_logger}->warn("XSS injection attempt blocked for '$value'");
+				}
+				next;
 			}
-			next;
 		}
 		if(length($value) > 0) {
 			if($FORM{$key}) {

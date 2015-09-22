@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.58
+	Reduce attack false positives
+
 0.57
 	--search-engine and --mobile didn't work
 	Less harsh SQL injection tests, there were too many false positives
