@@ -672,7 +672,8 @@ sub params {
 			}
 		}
 		if(length($value) > 0) {
-			if($FORM{$key}) {
+			# Don't add if it's already there
+			if($FORM{$key} && ($FORM{$key} ne $value)) {
 				$FORM{$key} .= ",$value";
 			} else {
 				$FORM{$key} = $value;

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 138;
+use Test::Most tests => 142;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -54,6 +54,14 @@ PARAMS: {
 	# Reading twice should yield the same result
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar,=baz');
+
+	# Don't add if it's already there
+	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=bar';
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{foo} eq 'bar');
+	ok($p{fred} eq 'wilma');
+	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'foo=&fred=wilma';
 	$i = new_ok('CGI::Info');

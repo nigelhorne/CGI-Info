@@ -1,9 +1,8 @@
 Revision history for CGI-Info
 
-0.58
-	Reduce attack false positives
-
 0.57
+	Reduce attack false positives
+	Don't add an argument if it's already there
 	--search-engine and --mobile didn't work
 	Less harsh SQL injection tests, there were too many false positives
 	Tablets are no longer considered mobile phones
