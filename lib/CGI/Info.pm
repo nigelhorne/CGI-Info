@@ -487,8 +487,8 @@ sub params {
 			@pairs = split(/\n/, $stdin_data);
 		} elsif(!$self->{_args_read}) {
 			my $oldfh = select(STDOUT);
-			print "Entering debug mode\n";
-			print "Enter key=value pairs - end with quit\n";
+			print "Entering debug mode\n",
+				"Enter key=value pairs - end with quit\n";
 			select($oldfh);
 
 			# Avoid prompting for the arguments more than once
