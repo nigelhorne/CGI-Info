@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.57
+0.57	Sun Oct 25 15:43:05 EDT 2015
 	Reduce attack false positives
 	Don't add an argument if it's already there
 	--search-engine and --mobile didn't work
