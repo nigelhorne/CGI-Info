@@ -6,6 +6,7 @@ use warnings;
 use strict;
 use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
+use Log::Any qw($log);
 use 5.006_001;
 
 =head1 NAME
@@ -688,7 +689,8 @@ sub params {
 
 	if($self->{_logger}) {
 		while(my ($key,$value) = each %FORM) {
-			$self->{_logger}->debug("$key=$value");
+			# $self->{_logger}->debug("$key=$value");
+			$log->debug("$key=$value");
 		}
 	}
 
