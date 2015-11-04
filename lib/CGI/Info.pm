@@ -386,7 +386,7 @@ be stored.
 Takes optional parameter logger, an object which is used for warnings and
 traces.
 This logger object is an object that understands warn() and trace() messages,
-such as a L<Log::Log4perl> object.
+such as a L<Log::Log4perl> or L<Log::Any> object.
 
 The allow, expect, logger and upload_dir arguments can also be passed to the
 constructor.
