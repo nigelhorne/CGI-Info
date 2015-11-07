@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 32;
+use Test::Most tests => 33;
 use Test::NoWarnings;
 
 BEGIN {
@@ -69,6 +69,7 @@ ALLOWED: {
 	%p = %{$i->params(allow => \%allowed)};
 	ok($p{foo} eq '123');
 	ok(!exists($p{fred}));
+	ok(!exists($p{'admin'}));
 	eval { $i->param('admin') };
 	ok($@ =~ /admin isn't in the allow list at/);
 	ok($i->param('foo') eq '123');
