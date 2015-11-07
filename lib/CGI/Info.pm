@@ -443,11 +443,11 @@ the params element 'XML', thus:
 sub params {
 	my $self = shift;
 
-	if(defined($self->{_paramref})) {
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	if((defined($self->{_paramref})) && ((!defined($args{'allow'})) || defined($self->{_allow}) && ($args{'allow'} eq $self->{_allow}))) {
 		return $self->{_paramref};
 	}
-
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(defined($args{allow})) {
 		$self->{_allow} = $args{allow};
@@ -637,6 +637,9 @@ sub params {
 		if($self->{_allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{_allow}->{$key})) {
+				if($self->{_logger}) {
+					$self->{_logger}->debug("discard $key");
+				}
 				next;
 			}
 

@@ -1,5 +1,16 @@
 Revision history for CGI-Info
 
+0.58
+	Support allowed list of arguments changing, this is useful for -
+		$my action = $info->param('action');
+		my %allowed;
+		if($action eq 'action1') {
+			%allowed = ('foo' => qr(\d+));
+		} else {
+			%allowed = ('bar' => qr(\d+));
+		}
+		my $params = $info->params(allowed => \%allowed);
+			
 0.57	Sun Oct 25 15:43:05 EDT 2015
 	Reduce attack false positives
 	Don't add an argument if it's already there

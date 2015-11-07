@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 23;
+use Test::Most tests => 32;
 use Test::NoWarnings;
 
 BEGIN {
@@ -53,6 +53,24 @@ ALLOWED: {
 	%p = %{$i->params()};
 	ok($p{foo} eq '123');
 	ok(!exists($p{fred}));
+	ok($i->param('foo') eq '123');
+	eval { $i->param('fred') };
+	ok($@ =~ /fred isn't in the allow list at/);
+	ok($i->as_string() eq 'foo=123');
+
+	#---------------------
+	# What if the allowed parameters become more restrictive, that can
+	#	happen when a client did a peek then sets the allowed
+
+	$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma&admin=1';
+	$i = new_ok('CGI::Info');
+	ok($i->param('fred') eq 'wilma');
+	ok($i->param('admin') == 1);
+	%p = %{$i->params(allow => \%allowed)};
+	ok($p{foo} eq '123');
+	ok(!exists($p{fred}));
+	eval { $i->param('admin') };
+	ok($@ =~ /admin isn't in the allow list at/);
 	ok($i->param('foo') eq '123');
 	eval { $i->param('fred') };
 	ok($@ =~ /fred isn't in the allow list at/);
