@@ -1435,7 +1435,7 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-HTTP::BrowserDetect
+L<HTTP::BrowserDetect>
 
 =head1 SUPPORT
 
@@ -1467,7 +1467,6 @@ L<http://search.cpan.org/dist/CGI-Info/>
 =back
 
 
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
