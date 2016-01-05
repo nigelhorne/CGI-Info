@@ -664,7 +664,11 @@ sub params {
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{_logger}) {
-					$self->{_logger}->warn("SQL injection attempt blocked for '$value'");
+					if($ENV{'REMOTE_ADDR'}) {
+						$self->{_logger}->warn($ENV{'REMOTE_ADDR'}, ": SQL injection attempt blocked for '$value'");
+					} else {
+						$self->{_logger}->warn("SQL injection attempt blocked for '$value'");
+					}
 				}
 				next;
 			}
@@ -1471,7 +1475,7 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2015 Nigel Horne.
+Copyright 2010-2016 Nigel Horne.
 
 This program is released under the following licence: GPL
 
