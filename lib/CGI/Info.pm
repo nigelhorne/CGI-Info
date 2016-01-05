@@ -1407,7 +1407,7 @@ sub get_cookie {
 =head2 reset
 
 Class method to reset the class.
-You should never call this.
+You should do this in an FCGI environment before instantiating, but nowhere else.
 
 =cut
 
