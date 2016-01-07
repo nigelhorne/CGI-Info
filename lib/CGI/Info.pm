@@ -467,7 +467,7 @@ sub params {
 	my %FORM;
 
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
-		if(@ARGV) {
+		if(defined(@ARGV)) {
 			@pairs = @ARGV;
 			if(defined($pairs[0])) {
 				if($pairs[0] eq '--robot') {
