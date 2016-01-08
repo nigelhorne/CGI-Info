@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.59
 	Log the IP address of client attempting SQL injection
+	H::B says robot() returns undef if it's not a robot; but sometimes it returns 0
 
 0.58	Sat Dec 26 10:12:47 EST 2015
 	Support allowed list of arguments changing, this is useful for -

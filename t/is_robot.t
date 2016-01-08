@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 21;
+use Test::Most tests => 24;
 use Test::NoWarnings;
 use Data::Dumper;
 
@@ -56,10 +56,19 @@ ROBOT: {
 	ok($i->is_robot() == 1);
 	ok($i->browser_type() eq 'robot');
 
+	$ENV{'REMOTE_ADDR'} = '82.94.176.140';
+	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/4.0 (compatible;  Vagabondo/4.0; webcrawler at wise-guys dot nl; http://webagent.wise-guys.nl/; http://www.wise-guys.nl/)';
+	$i = new_ok('CGI::Info' => [
+		logger => MyLogger->new()
+	]);
+	ok($i->is_robot() == 1);
+	ok($i->browser_type() eq 'robot');
+
 	$ENV{'REMOTE_ADDR'} = '74.92.149.57';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.7; en-US; rv:1.9.2.20) Gecko/20110803 Firefox/3.6.20';
 	$i = new_ok('CGI::Info' => [
 		cache => $cache,
+		logger => MyLogger->new()
 	]);
 	ok($i->is_robot() == 0);
 	SKIP: {
@@ -71,4 +80,53 @@ ROBOT: {
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Linux; Android 4.4.4; SAMSUNG-SGH-I337 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.89 Mobile Safari/537.36';
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 0);
+}
+
+package MyLogger;
+
+sub new {
+	my ($proto, %args) = @_;
+
+	my $class = ref($proto) || $proto;
+
+	return bless { }, $class;
+}
+
+sub error {
+	my $self = shift;
+	my $message = shift;
+
+	::diag($message);
+}
+
+sub warn {
+	my $self = shift;
+	my $message = shift;
+
+	::diag($message);
+}
+
+sub info {
+	my $self = shift;
+	my $message = shift;
+
+	::diag($message);
+}
+
+sub trace {
+	my $self = shift;
+	my $message = shift;
+
+	if($ENV{'TEST_VERBOSE'}) {
+		::diag($message);
+	}
+}
+
+sub debug {
+	my $self = shift;
+	my $message = shift;
+
+	if($ENV{'TEST_VERBOSE'}) {
+		::diag($message);
+	}
 }

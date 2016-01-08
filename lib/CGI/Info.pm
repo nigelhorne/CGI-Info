@@ -1223,7 +1223,15 @@ sub is_robot {
 	}
 	if($self->{_browser_detect}) {
 		my $is_robot = $self->{_browser_detect}->robot();
-		if(defined($is_robot)) {
+		if(defined($is_robot) && $self->{_logger}) {
+			$self->{_logger}->debug("HTTP::BrowserDetect '$ENV{HTTP_USER_AGENT}' returns $is_robot");
+		}
+		$is_robot = (defined($is_robot) && ($is_robot)) ? 1 : 0;
+		if($self->{_logger}) {
+			$self->{_logger}->debug("is_robot: $is_robot");
+		}
+			
+		if($is_robot) {
 			if($self->{_cache}) {
 				$self->{_cache}->set($key, $is_robot, '1 day');
 			}
