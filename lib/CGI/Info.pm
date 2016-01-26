@@ -254,6 +254,9 @@ sub host_name {
 sub _find_site_details {
 	my $self = shift;
 
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Entering _find_site_details');
+	}
 	if($self->{_site} && $self->{_cgi_site}) {
 		return;
 	}
@@ -299,6 +302,9 @@ sub _find_site_details {
 		$self->_warn({
 			warning => 'Could not determine site name'
 		});
+	}
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Leaving _find_site_details');
 	}
 }
 
