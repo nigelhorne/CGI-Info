@@ -598,6 +598,8 @@ sub params {
 
 			return \%FORM;
 		} else {
+			# TODO: Design a way to tell the caller to send HTTP
+			# status 405
 			$self->_warn({
 				warning => "POST: Invalid or unsupported content type: $content_type",
 			});
