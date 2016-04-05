@@ -41,6 +41,7 @@ ROBOT: {
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)';
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 1);
+diag($i->browser_type());
 	ok($i->browser_type() eq 'search');
 
 	$ENV{'REMOTE_ADDR'} = '119.63.196.107';

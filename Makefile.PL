@@ -33,7 +33,7 @@ WriteMakefile(
 	'Carp' => 0,
 	'Socket' => 0,
 	'List::Member' => 0,
-	'HTTP::BrowserDetect' => 1.42,	# Include baidu etc.
+	'HTTP::BrowserDetect' => 3.10,	# Include bingbot
 	'File::Basename' => 0,
 	'String::Clean::XSS' => 0,
 	'Log::Any' => 0,

@@ -911,8 +911,7 @@ sub _untaint_filename
 {
 	my ($self, $args) = @_;
 
-	my $filename = $$args{filename};
-	if($filename =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
+	if($$args{filename} =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
 		return $1;
 	}
 	# return undef;
@@ -1314,7 +1313,7 @@ sub is_search_engine {
 	}
 	if($self->{_browser_detect}) {
 		my $browser = $self->{_browser_detect};
-		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo());
+		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo() || $browser->bingbot());
 		if($self->{_cache}) {
 			$self->{_cache}->set($key, $is_search, '1 day');
 		}
