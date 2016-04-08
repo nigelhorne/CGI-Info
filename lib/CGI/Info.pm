@@ -657,7 +657,9 @@ sub params {
 			# Do we allow any value, or must it be validated?
 			if(defined($self->{_allow}->{$key})) {
 				if($value !~ $self->{_allow}->{$key}) {
-					$self->{_logger}->debug("block $key = $value");
+					if($self->{_logger}) {
+						$self->{_logger}->debug("block $key = $value");
+					}
 					next;
 				}
 			}
