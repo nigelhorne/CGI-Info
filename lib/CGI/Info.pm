@@ -649,7 +649,7 @@ sub params {
 			# Is this a permitted argument?
 			if(!exists($self->{_allow}->{$key})) {
 				if($self->{_logger}) {
-					$self->{_logger}->debug("discard $key");
+					$self->{_logger}->info("discard $key");
 				}
 				next;
 			}
@@ -658,7 +658,7 @@ sub params {
 			if(defined($self->{_allow}->{$key})) {
 				if($value !~ $self->{_allow}->{$key}) {
 					if($self->{_logger}) {
-						$self->{_logger}->debug("block $key = $value");
+						$self->{_logger}->info("block $key = $value");
 					}
 					next;
 				}
