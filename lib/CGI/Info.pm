@@ -416,8 +416,11 @@ constructor.
 	# ...
 	my $info = CGI::Info->new();
 	my $allowed = {
-		'foo' => qr(\d+),
-		'bar' => undef
+		'foo' => qr(^\d*$),	# foo must be a number, or empty
+		'bar' => undef,
+		'xyzzy' => qr(^[\w\s-]+$),	# must be alphanumeric
+						# to prevent XSS, and non-empty
+						# as a sanity check
 	};
 	my $paramsref = $info->params(allow => $allowed);
 	# or
@@ -654,6 +657,7 @@ sub params {
 			# Do we allow any value, or must it be validated?
 			if(defined($self->{_allow}->{$key})) {
 				if($value !~ $self->{_allow}->{$key}) {
+					$self->{_logger}->debug("block $key = $value");
 					next;
 				}
 			}
