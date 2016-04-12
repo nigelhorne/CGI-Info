@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.59
+0.59	Tue Apr 12 17:38:03 EDT 2016
 	Log the IP address of client attempting SQL injection
 	H::B says robot() returns undef if it's not a robot; but sometimes it returns 0
 	Bump minimum HTTP::Browserdetect to ensure bingbot is found

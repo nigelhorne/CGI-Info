@@ -15,11 +15,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.58
+Version 0.59
 
 =cut
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 =head1 SYNOPSIS
 
@@ -358,7 +358,7 @@ if it is not in a CGI environment (e.g. the script is being tested from the
 command line), the program's command line arguments (a list of key=value pairs)
 are used, if there are no command line arguments then they are read from stdin
 as a list of key=value lines. Also you can give one of --tablet, --search-engine,
---mobile and --robot to mimick those agents. For example:
+--mobile and --robot to mimic those agents. For example:
 
 	./script.cgi --mobile name=Nigel
 
@@ -1243,7 +1243,7 @@ sub is_robot {
 		if($self->{_logger}) {
 			$self->{_logger}->debug("is_robot: $is_robot");
 		}
-			
+
 		if($is_robot) {
 			if($self->{_cache}) {
 				$self->{_cache}->set($key, $is_robot, '1 day');
@@ -1268,9 +1268,9 @@ Is the visitor a search engine?
 
 	my $info = CGI::Info->new();
 	if($info->is_search_engine()) {
-	  # display generic information about yourself
+		# display generic information about yourself
 	} else {
-	  # allow the user to pick and choose something to display
+		# allow the user to pick and choose something to display
 	}
 
 =cut
@@ -1331,7 +1331,6 @@ sub is_search_engine {
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
 	if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
-
 		if($self->{_cache}) {
 			$self->{_cache}->set($key, 1, '1 day');
 		}
