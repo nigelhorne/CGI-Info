@@ -1217,6 +1217,17 @@ sub is_robot {
 		return 1;
 	}
 
+	if(my $referrer = $ENV{'HTTP_REFERER'}) {
+		if(($referrer =~ /^http:\/\/keywords-monitoring-your-success.com\/try.php/) ||
+		   ($referrer =~ /^http:\/\/free-video-tool.com\//)) {
+			if($self->{_logger}) {
+				$self->{_logger}->debug("is_robot: blocked trawler");
+			}
+			$self->{_is_robot} = 1;
+			return 1;
+		}
+	}
+
 	my $key;
 
 	if($self->{_cache}) {
@@ -1264,14 +1275,14 @@ sub is_robot {
 
 Is the visitor a search engine?
 
-	use CGI::Info;
+    use CGI::Info;
 
-	my $info = CGI::Info->new();
-	if($info->is_search_engine()) {
-		# display generic information about yourself
-	} else {
-		# allow the user to pick and choose something to display
-	}
+    my $info = CGI::Info->new();
+    if($info->is_search_engine()) {
+	# display generic information about yourself
+    } else {
+	# allow the user to pick and choose something to display
+    }
 
 =cut
 
