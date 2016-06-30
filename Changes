@@ -1,6 +1,8 @@
 Revision history for CGI-Info
 
 0.60
+	Added tests that the framework to allow CGI scripts to be tested from
+		the command line work
 	Added Travis and Coveralls integration
 	Mark some SEO scanners as robots
 
