@@ -519,7 +519,7 @@ sub params {
 		}
 		if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
 			$self->_warn({
-				warning => 'Multipart/formdata not supported for GET'
+				warning => 'Multipart/form-data not supported for GET'
 			});
 		}
 		@pairs = split(/&/, $ENV{'QUERY_STRING'});
@@ -543,10 +543,10 @@ sub params {
 			}
 			@pairs = split(/&/, $buffer);
 
-			if($ENV{'QUERY_STRING'}) {
-				my @getpairs = split(/&/, $ENV{'QUERY_STRING'});
-				push(@pairs, @getpairs);
-			}
+			# if($ENV{'QUERY_STRING'}) {
+				# my @getpairs = split(/&/, $ENV{'QUERY_STRING'});
+				# push(@pairs, @getpairs);
+			# }
 		} elsif($content_type =~ /multipart\/form-data/i) {
 			if(!defined($self->{_upload_dir})) {
 				$self->_warn({
@@ -1218,13 +1218,51 @@ sub is_robot {
 	}
 
 	if(my $referrer = $ENV{'HTTP_REFERER'}) {
-		if(($referrer =~ /^http:\/\/keywords-monitoring-your-success.com\/try.php/) ||
-		   ($referrer =~ /^http:\/\/free-video-tool.com\//)) {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("is_robot: blocked trawler");
+		# https://agency.ohow.co/google-analytics-implementation-audit/google-analytics-historical-spam-list/
+		my @crawler_lists = (
+			'http://fix-website-errors.com',
+			'http://keywords-monitoring-your-success.com',
+			'http://free-video-tool.com',
+			'http://magnet-to-torrent.com',
+			'http://torrent-to-magnet.com',
+			'http://dogsrun.net',
+			'http://###.responsive-test.net',
+			'http://uptime.com',
+			'http://uptimechecker.com',
+			'http://top1-seo-service.com',
+			'http://fast-wordpress-start.com',
+			'http://wordpress-crew.net',
+			'http://dbutton.net',
+			'http://justprofit.xyz',
+			'http://video--production.com',
+			'http://buttons-for-website.com',
+			'http://buttons-for-your-website.com',
+			'http://success-seo.com',
+			'http://videos-for-your-business.com',
+			'http://semaltmedia.com',
+			'http://dailyrank.net',
+			'http://uptimebot.net',
+			'http://sitevaluation.org',
+			'http://100dollars-seo.com',
+			'http://forum69.info',
+			'http://partner.semalt.com',
+			'http://best-seo-offer.com',
+			'http://best-seo-solution.com',
+			'http://semalt.semalt.com',
+			'http://semalt.com',
+			'http://7makemoneyonline.com',
+			'http://anticrawler.org',
+			'http://baixar-musicas-gratis.com',
+			'http://descargar-musica-gratis.net',
+		);
+		foreach my $url(@crawler_lists) {
+			if($referrer =~ /^$url/) {
+				if($self->{_logger}) {
+					$self->{_logger}->debug("is_robot: blocked trawler $url");
+				}
+				$self->{_is_robot} = 1;
+				return 1;
 			}
-			$self->{_is_robot} = 1;
-			return 1;
 		}
 	}
 

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 142;
+use Test::Most tests => 161;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -190,9 +190,21 @@ EOF
 	unlink($filename);
 	close $fin;
 
+	$ENV{'REQUEST_METHOD'} = 'GET';
+	CGI::Info->reset();	# Force stdin re-read
+	$i = new_ok('CGI::Info');
+	$i = new_ok('CGI::Info' => [
+		upload_dir => $tmpdir
+	]);
+	$ENV{'QUERY_STRING'} = 'foo=bar';
+	eval { %p = $i->params() };
+	ok($@ =~ /Multipart.+ not supported for GET/);
+	delete $ENV{'QUERY_STRING'};
+
 	open ($fin, '<', \$input);
 	local *STDIN = $fin;
 
+	$ENV{'REQUEST_METHOD'} = 'POST';
 	CGI::Info->reset();	# Force stdin re-read
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params(upload_dir => $tmpdir)};
@@ -410,6 +422,31 @@ EOF
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 	ok($i->is_mobile());
 
+	@ARGV = ('--tablet', 'foo=bar', 'fred=wilma' );
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{fred} eq 'wilma');
+	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok(!$i->is_mobile());
+	ok($i->is_tablet());
+
+	@ARGV = ('--search-engine', 'foo=bar', 'fred=wilma' );
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{fred} eq 'wilma');
+	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok(!$i->is_mobile());
+	ok($i->is_search_engine());
+
+	@ARGV = ('--robot', 'foo=bar', 'fred=wilma' );
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	ok($p{fred} eq 'wilma');
+	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok(!$i->is_mobile());
+	ok(!$i->is_search_engine());
+	ok($i->is_robot());
+
 	eval {
 		$i->reset();
 	};
@@ -432,6 +469,7 @@ sub debug {
 	my $self = shift;
 	my $message = shift;
 
-	# Enable this for debugging
-	# ::diag($message);
+	if($ENV{'TEST_VERBOSE'}) {
+		::diag($message);
+	}
 }

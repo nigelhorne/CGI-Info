@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 24;
+use Test::Most tests => 26;
 use Test::NoWarnings;
 use Data::Dumper;
 
@@ -81,6 +81,13 @@ diag($i->browser_type());
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Linux; Android 4.4.4; SAMSUNG-SGH-I337 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.89 Mobile Safari/537.36';
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 0);
+
+	$ENV{'HTTP_REFERER'} = 'http://free-video-tool.com';
+	$i = new_ok('CGI::Info' => [
+		cache => $cache,
+		logger => MyLogger->new()
+	]);
+	ok($i->is_robot() == 1);
 }
 
 package MyLogger;
