@@ -1254,6 +1254,9 @@ sub is_robot {
 			'http://anticrawler.org',
 			'http://baixar-musicas-gratis.com',
 			'http://descargar-musica-gratis.net',
+
+			# Mine
+			'http://www.seokicks.de/robot.html',
 		);
 		foreach my $url(@crawler_lists) {
 			if($referrer =~ /^$url/) {
