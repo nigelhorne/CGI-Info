@@ -383,7 +383,7 @@ This is useful to help to block attacks on your site.
 Expect is a reference to a list of arguments that you expect to see and pass on.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
-It's use is deprecated, use allow instead.
+Its use is deprecated, use allow instead.
 Expect will be removed in a later version.
 
 Upload_dir is a string containing a directory where files being uploaded are to
@@ -645,7 +645,6 @@ sub params {
 
 		$key = $self->_sanitise_input($key);
 
-		if($self->{_allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{_allow}->{$key})) {
 				if($self->{_logger}) {
@@ -738,6 +737,7 @@ be thrown:
 	my $allowed = {
 		'foo' => qr(\d+),
 	};
+	my $xyzzy = $info->params(allow => $allowed);
 	my $bar = $info->param('bar');  # Gives an error message
 
 Returns undef if the requested parameter was not given
