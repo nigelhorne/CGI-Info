@@ -645,6 +645,7 @@ sub params {
 
 		$key = $self->_sanitise_input($key);
 
+		if($self->{_allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{_allow}->{$key})) {
 				if($self->{_logger}) {
