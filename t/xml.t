@@ -2,8 +2,10 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 9;
+use Test::Most tests => 10;
 use Test::NoWarnings;
+
+eval 'use autodie qw(:all)';	# Test for open/close failures
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -32,5 +34,6 @@ XML: {
 	isa_ok($i, 'CGI::Info');
 	my $p = $i->params();
 	ok(exists($p->{XML}));
+	ok($p{XML} eq $xml);	# Fails on Perl 5.6.2
 	ok($i->as_string() eq "XML=$xml");
 }

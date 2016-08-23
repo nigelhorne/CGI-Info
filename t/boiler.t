@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::Most tests => 3;
 
+eval 'use autodie qw(:all)';	# Test for open/close failures
+
 sub not_in_file_ok {
     my ($filename, %regex) = @_;
     open( my $fh, '<', $filename )

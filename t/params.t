@@ -6,6 +6,8 @@ use Test::Most tests => 161;
 use Test::NoWarnings;
 use File::Spec;
 
+eval 'use autodie qw(:all)';	# Test for open/close failures
+
 BEGIN {
 	use_ok('CGI::Info');
 }

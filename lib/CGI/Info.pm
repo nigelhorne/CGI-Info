@@ -9,6 +9,8 @@ use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
 
+use namespace::clean;
+
 =head1 NAME
 
 CGI::Info - Information about the CGI environment
@@ -437,8 +439,8 @@ constructor.
 		}
 	}
 
-If the request is an XML request, CGI::Info will put the request into
-the params element 'XML', thus:
+If the request is an XML request (i.e. the content type of the POST is text/xml),
+CGI::Info will put the request into the params element 'XML', thus:
 
 	use CGI::Info;
 	...
