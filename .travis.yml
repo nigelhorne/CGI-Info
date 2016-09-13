@@ -16,6 +16,7 @@ before_install:
 
 install:
   - cpanm --installdeps --notest Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Carp Test::Taint
+  - cpanm -v --installdeps --notest .
 
 script:
   perl Makefile.PL && make && cover -test -report coveralls
