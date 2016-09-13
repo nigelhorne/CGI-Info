@@ -1,6 +1,7 @@
 Revision history for CGI-Info
 
 0.60
+	Added Appveryor support to CI test on Windows
 	Added tests that the framework to allow CGI scripts to be tested from
 		the command line work
 	Added Travis and Coveralls integration
