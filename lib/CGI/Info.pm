@@ -1443,6 +1443,8 @@ sub browser_type {
 Returns a cookie's value, or undef if no name is given, or the requested
 cookie isn't in the jar.
 
+Deprecated - use cookie() instead.
+
 	use CGI::Info;
 
 	my $info = CGI::Info->new();
@@ -1475,6 +1477,47 @@ sub get_cookie {
 
 	if(exists($self->{_jar}->{$params{'cookie_name'}})) {
 		return $self->{_jar}->{$params{'cookie_name'}};
+	}
+	return;	# Return undef
+}
+
+=head2 cookie
+
+Returns a cookie's value, or undef if no name is given, or the requested
+cookie isn't in the jar.
+API is the same as "param", it will replace the "get_cookie" method in the future.
+
+	use CGI::Info;
+
+	my $info = CGI::Info->new();
+	my $name = $info->get_cookie(cookie_name => 'name');
+	print "Your name is $name\n";
+=cut
+
+sub cookie {
+	my ($self, $field) = @_;
+
+	if(!defined($field)) {
+		$self->_warn({
+			warning => 'what cookie do you want?'
+		});
+		return;
+	}
+
+	unless($self->{_jar}) {
+		unless(defined($ENV{'HTTP_COOKIE'})) {
+			return;
+		}
+		my @cookies = split(/; /, $ENV{'HTTP_COOKIE'});
+
+		foreach my $cookie(@cookies) {
+			my ($name, $value) = split(/=/, $cookie);
+			$self->{_jar}->{$name} = $value;
+		}
+	}
+
+	if(exists($self->{_jar}->{$field})) {
+		return $self->{_jar}->{$field};
 	}
 	return;	# Return undef
 }
