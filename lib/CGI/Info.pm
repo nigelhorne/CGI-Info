@@ -512,7 +512,7 @@ sub params {
 				$line =~ s/[\r\n]//g;
 				last if $line eq 'quit';
 				push(@pairs, $line);
-				$stdin_data .= $line . "\n";
+				$stdin_data .= "$line\n";
 			}
 		}
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
@@ -828,7 +828,7 @@ sub _multipart_data {
 		while(<STDIN>) {
 			chop(my $line = $_);
 			$line =~ s/[\r\n]//g;
-			$stdin_data .= $line . "\n";
+			$stdin_data .= "$line\n";
 		}
 		if(!$stdin_data) {
 			return;
@@ -1261,14 +1261,12 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
-		foreach my $url(@crawler_lists) {
-			if($referrer =~ /^$url/) {
-				if($self->{_logger}) {
-					$self->{_logger}->debug("is_robot: blocked trawler $url");
-				}
-				$self->{_is_robot} = 1;
-				return 1;
+		if(grep(/^$referrer/, @crawler_lists)) {
+			if($self->{_logger}) {
+				$self->{_logger}->debug("is_robot: blocked trawler $referrer");
 			}
+			$self->{_is_robot} = 1;
+			return 1;
 		}
 	}
 
@@ -1276,8 +1274,7 @@ sub is_robot {
 
 	if($self->{_cache}) {
 		$key = "is_robot/$remote/$agent";
-		my $is_robot = $self->{_cache}->get($key);
-		if(defined($is_robot)) {
+		if(defined(my $is_robot = $self->{_cache}->get($key))) {
 			$self->{_is_robot} = $is_robot;
 			return $is_robot;
 		}

@@ -2,9 +2,9 @@
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Info/badge)](https://dependencyci.com/github/nigelhorne/CGI-Info)
 
-# NAME
+# CGI::Info
 
-CGI::Info - Information about the CGI environment
+Information about the CGI environment
 
 # VERSION
 
