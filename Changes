@@ -1,6 +1,8 @@
 Revision history for CGI-Info
 
 0.60
+	Handle JSON POST data
+	AUTOLOAD parameters
 	Added the cookie() method
 	Added Appveyor support to CI test on Windows
 	Added tests that the framework to allow CGI scripts to be tested from
@@ -30,7 +32,7 @@ Revision history for CGI-Info
 	Don't add an argument if it's already there
 	--search-engine and --mobile didn't work
 	Less harsh SQL injection tests, there were too many false positives
-	Tablets are no longer considered mobile phones
+	Tabletsare no longer considered mobile phones
 	params now returns undef if no arguments were given
 	Pretend Facebookexternal (used to prefetch pages for
 		display) is a search_engine.

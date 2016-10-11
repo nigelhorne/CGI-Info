@@ -8,6 +8,7 @@ use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
+use JSON::Parse;
 
 use namespace::clean;
 
@@ -602,6 +603,23 @@ sub params {
 			$self->{_paramref} = \%FORM;
 
 			return \%FORM;
+		} elsif($content_type =~ /application\/json/i) {
+			my $buffer;
+			if($stdin_data) {
+				$buffer = $stdin_data;
+			} else {
+				if(read(STDIN, $buffer, $content_length) != $content_length) {
+					$self->_warn({
+						warning => 'read failed: something else may have read STDIN'
+					});
+				}
+				$stdin_data = $buffer;
+				JSON::Parse::assert_valid_json($buffer);
+				my $paramref = JSON::Parse::parse_json($buffer);
+				foreach my $key(keys(%{$paramref})) {
+					push @pairs, "$key=" . $paramref->{$key};
+				}
+			}
 		} else {
 			my $buffer;
 			if($stdin_data) {
@@ -1547,6 +1565,19 @@ sub reset {
 	}
 
 	$stdin_data = undef;
+}
+
+sub AUTOLOAD {
+	our $AUTOLOAD;
+	my $param = $AUTOLOAD;
+
+	$param =~ s/.*:://;
+
+	return if($param eq 'DESTROY');
+
+	my $self = shift;
+
+	return $self->param($param);
 }
 
 =head1 AUTHOR

@@ -41,6 +41,7 @@ WriteMakefile(
 	'File::Basename' => 0,
 	'String::Clean::XSS' => 0,
 	'Log::Any' => 0,
+	'JSON::Parse' => 0,
 	# 'String::EscapeCage' => 0.02,
 	'Class::Autouse' => 0,
     },
