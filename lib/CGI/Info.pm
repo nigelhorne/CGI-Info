@@ -603,8 +603,20 @@ sub params {
 
 			return \%FORM;
 		} else {
+			my $buffer;
+			if($stdin_data) {
+				$buffer = $stdin_data;
+			} else {
+				if(read(STDIN, $buffer, $content_length) != $content_length) {
+					$self->_warn({
+						warning => 'read failed: something else may have read STDIN'
+					});
+				}
+				$stdin_data = $buffer;
+			}
+
 			$self->_warn({
-				warning => "POST: Invalid or unsupported content type: $content_type",
+				warning => "POST: Invalid or unsupported content type: $content_type: $buffer",
 			});
 		}
 	} elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
