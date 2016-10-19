@@ -10,6 +10,7 @@ Revision history for CGI-Info
 	Added Travis and Coveralls integration
 	Mark some SEO scanners as robots
 	On unknown input, debug what it is
+	Added seznambot as a search engine
 
 0.59	Tue Apr 12 17:38:03 EDT 2016
 	Log the IP address of client attempting SQL injection

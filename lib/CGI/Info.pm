@@ -1399,9 +1399,11 @@ sub is_search_engine {
 			$self->{_browser_detect} = HTTP::BrowserDetect->new($agent);
 		}
 	}
-	if($self->{_browser_detect}) {
-		my $browser = $self->{_browser_detect};
+	if(my $browser = $self->{_browser_detect}) {
 		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo() || $browser->bingbot());
+		if((!$is_search) && $agent =~ /SeznamBot\//) {
+			$is_search = 1;
+		}
 		if($self->{_cache}) {
 			$self->{_cache}->set($key, $is_search, '1 day');
 		}

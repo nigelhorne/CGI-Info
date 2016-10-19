@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 24;
+use Test::Most tests => 27;
 use Test::NoWarnings;
 
 BEGIN {
@@ -63,6 +63,13 @@ SEARCH: {
 
 	$ENV{'REMOTE_ADDR'} = '66.249.73.149';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+
+	$i = new_ok('CGI::Info');
+	ok($i->is_search_engine() == 1);
+	ok($i->browser_type() eq 'search');
+
+	$ENV{'REMOTE_ADDR'} = '66.249.73.149';
+	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)';
 
 	$i = new_ok('CGI::Info');
 	ok($i->is_search_engine() == 1);
