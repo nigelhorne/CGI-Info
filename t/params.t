@@ -37,8 +37,7 @@ PARAMS: {
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'name=nigel+horne';
-	$i = new_ok('CGI::Info');
-	%p = %{$i->params()};
+	%p = %{new_ok('CGI::Info')->params()};
 	ok($p{name} eq 'nigel horne');
 
 	$ENV{'QUERY_STRING'} = 'name=nigel%2Bhorne';
