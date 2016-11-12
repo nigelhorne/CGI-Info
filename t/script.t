@@ -2,10 +2,11 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 56;
+use Test::Most tests => 61;
 use File::Spec;
 use Cwd;
 use Test::NoWarnings;
+use Tie::Filehandle::Preempt::Stdin;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -201,4 +202,14 @@ PATHS: {
 		ok($i->script_dir() =~ /\/CGI-Info/);
 		ok($i->script_path() =~ /\/.+bar\.pl$/);
 	}
+
+	my $object = tie *STDIN,
+		'Tie::Filehandle::Preempt::Stdin',
+		("fred=wilma\n", "quit\n");
+	$i = new_ok('CGI::Info');
+	my %p = %{$i->params()};
+	ok($p{fred} eq 'wilma');
+	ok(!defined($p{barney}));
+	ok($i->fred() eq 'wilma');
+	ok(!defined($i->barney()));
 }

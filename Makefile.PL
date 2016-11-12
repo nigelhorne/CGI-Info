@@ -28,6 +28,7 @@ WriteMakefile(
 	# 'Test::Kwalitee' => 0,
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,
+	'Tie::Filehandle::Preempt::Stdin' => 0,
     },
     PREREQ_PM => {
 	'URI::Heuristic' => 0,
