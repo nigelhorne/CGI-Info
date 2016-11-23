@@ -52,15 +52,13 @@ PARAMS: {
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar,\\=baz;fred=wilma');
 
-	# Reading twice should yield the same result
 	%p = %{$i->params()};
-	ok($p{foo} eq 'bar,=baz');
+	is($p{foo}, 'bar,=baz', 'Reading twice should yield the same result');
 
-	# Don't add if it's already there
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=bar';
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
-	ok($p{foo} eq 'bar');
+	is($p{foo}, 'bar', "Don't add if it's already there");
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
