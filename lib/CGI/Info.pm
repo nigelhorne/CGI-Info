@@ -18,11 +18,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.59
+Version 0.60
 
 =cut
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 =head1 SYNOPSIS
 
@@ -1448,6 +1448,7 @@ Returns one of 'web', 'search', 'robot' and 'mobile'.
     if((!-f $filename) || (!-r $filename)) {
 	die "Can't open $filename";
     }
+    my $template = Template->new();
     $template->process($filename, {}) || die $template->error();
 
 =cut
