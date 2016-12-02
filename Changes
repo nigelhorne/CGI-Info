@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.61	Thu  1 Dec 21:46:44 EST 2016
+	Missed bin/* from the MANIFEST
+
 0.60	Thu Dec  1 14:42:37 EST 2016
 	Handle JSON POST data
 	AUTOLOAD parameters

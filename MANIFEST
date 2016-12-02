@@ -1,17 +1,18 @@
 Changes
-MANIFEST
-Makefile.PL
+ignore.txt
 LICENCE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
 README
 README.md
-ignore.txt
+bin/info.pl
+bin/testjson.pl
 lib/CGI/Info.pm
-info.pl
-testjson.pl
 t/00-load.t
 t/10-new.t
-t/apoc.t
 t/allow.t
+t/apoc.t
 t/bin.t
 t/boiler.t
 t/carp.t
@@ -53,4 +54,3 @@ t/unused.t
 t/used.t
 t/vars.t
 t/xml.t
-META.yml                                 Module meta-data (added by MakeMaker)

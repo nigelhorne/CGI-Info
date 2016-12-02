@@ -8,7 +8,7 @@ Information about the CGI environment
 
 # VERSION
 
-Version 0.59
+Version 0.61
 
 # SYNOPSIS
 
@@ -334,6 +334,7 @@ Returns one of 'web', 'search', 'robot' and 'mobile'.
     if((!-f $filename) || (!-r $filename)) {
         die "Can't open $filename";
     }
+    my $template = Template->new();
     $template->process($filename, {}) || die $template->error();
 
 ## get\_cookie
