@@ -82,6 +82,7 @@ sub new {
 		_logger => $args{logger},
 		_syslog => $args{syslog},
 		_cache => $args{cache},	# e.g. CHI
+		_status => 200,
 	}, $class;
 }
 
@@ -531,6 +532,13 @@ sub params {
 			return;
 		}
 		my $content_length = $ENV{'CONTENT_LENGTH'};
+		if($content_length > 512 * 1042) {	# Set maximum posts
+			# TODO: Design a way to tell the caller to send HTTP
+			# status 413
+			$self->{_status} = 413;
+			$self->_warn({ warning => 'Large upload prohibited' });
+			return;
+		}
 
 		if((!defined($content_type)) || ($content_type =~ /application\/x-www-form-urlencoded/)) {
 			my $buffer;
@@ -642,6 +650,7 @@ sub params {
 	} else {
 		# TODO: Design a way to tell the caller to send HTTP
 		# status 405
+		$self->{_status} = 405;
 		$self->_warn({
 			warning => 'Use POST, GET or HEAD'
 		});
@@ -1550,6 +1559,18 @@ sub cookie {
 		return $self->{_jar}->{$field};
 	}
 	return;	# Return undef
+}
+
+=head2 status
+
+Returns the status of the object, 200 for OK, otherwise an HTTP error code
+
+=cut
+
+sub status {
+	my $self = shift;
+
+	return $self->{_status};
 }
 
 =head2 reset

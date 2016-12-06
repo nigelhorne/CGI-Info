@@ -1,5 +1,9 @@
 Revision history for CGI-Info
 
+0.62
+	Added status() method
+	Set maximum file upload size to 512K
+
 0.61	Thu  1 Dec 21:46:44 EST 2016
 	Missed bin/* from the MANIFEST
 

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 18;
+use Test::Most tests => 19;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -28,6 +28,7 @@ COOKIES: {
 	ok($i->get_cookie({cookie_name => 'fred'}) eq 'wilma');
 	ok(!defined($i->get_cookie(cookie_name => 'bar')));
 	ok(!defined($i->get_cookie({cookie_name => 'bar'})));
+	ok(!defined($i->get_cookie({cookie_name => undef})));
 
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval {

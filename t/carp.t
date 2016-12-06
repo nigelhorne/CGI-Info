@@ -15,6 +15,7 @@ if($@) {
 		$ENV{'REQUEST_METHOD'} = 'FOO';
 		my $i = new_ok('CGI::Info');
 		$i->params();
+		ok($i->status() == 405);
 	}
 	# Doesn't work - I mean it fails this test even though the carp is done
 	# does_carp_that_matches(\&foo, qr/Use POST, GET or HEAD/);
