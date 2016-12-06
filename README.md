@@ -363,6 +363,10 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
         my $name = $info->get_cookie(cookie_name => 'name');
         print "Your name is $name\n";
 
+## status
+
+Returns the status of the object, 200 for OK, otherwise an HTTP error code
+
 ## reset
 
 Class method to reset the class.
