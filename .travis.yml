@@ -12,7 +12,7 @@ perl:
   - "5.12"
 
 before_install:
-  cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Carp Test::Taint Test::Carp
+  cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
 
 install:
   - cpanm -v --installdeps --notest .
