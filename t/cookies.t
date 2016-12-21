@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 19;
+use Test::Most tests => 20;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -24,7 +24,8 @@ COOKIES: {
 	$ENV{'HTTP_COOKIE'} = 'fred=wilma; foo=bar';
 	$i = new_ok('CGI::Info');
 	ok($i->get_cookie(cookie_name => 'foo') eq 'bar');
-	ok($i->get_cookie(cookie_name => 'fred') eq 'wilma');
+	ok($i->get_cookie('fred') eq 'wilma');
+	ok($i->cookie('fred') eq 'wilma');
 	ok($i->get_cookie({cookie_name => 'fred'}) eq 'wilma');
 	ok(!defined($i->get_cookie(cookie_name => 'bar')));
 	ok(!defined($i->get_cookie({cookie_name => 'bar'})));

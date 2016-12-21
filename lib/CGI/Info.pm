@@ -1489,11 +1489,21 @@ Deprecated - use cookie() instead.
 	my $info = CGI::Info->new();
 	my $name = $info->get_cookie(cookie_name => 'name');
 	print "Your name is $name\n";
+	my $address = $info->get_cookie('address');
+	print "Your address is $address\n";
 =cut
 
 sub get_cookie {
 	my $self = shift;
-	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %params;
+	
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(@_ % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'cookie_name'} = shift;
+	}
 
 	if(!defined($params{'cookie_name'})) {
 		$self->_warn({
@@ -1529,7 +1539,7 @@ API is the same as "param", it will replace the "get_cookie" method in the futur
 	use CGI::Info;
 
 	my $info = CGI::Info->new();
-	my $name = $info->get_cookie(cookie_name => 'name');
+	my $name = $info->get_cookie(name);
 	print "Your name is $name\n";
 =cut
 
