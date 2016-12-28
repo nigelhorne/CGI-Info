@@ -211,7 +211,7 @@ EOF
 	ok($p{country} eq '44');
 	ok($p{datafile} =~ /^hello.txt_.+/);
 	$filename = File::Spec->catfile($tmpdir, $p{datafile});
-	ok(-e $filename);
+	ok(-e $filename) || diag("$filename doesn't exist");
 	ok(-r $filename);
 	unlink($filename);
 	close $fin;
