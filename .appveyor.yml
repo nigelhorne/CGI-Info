@@ -1,7 +1,7 @@
 version: 1.0.{build}
 
 install:
-  - cinst StrawberryPerl
+  - cinst StrawberryPerl --allow-empty-checksums
   - path C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
   - mkdir %APPVEYOR_BUILD_FOLDER%\tmp
   - set TMPDIR=%APPVEYOR_BUILD_FOLDER%\tmp
