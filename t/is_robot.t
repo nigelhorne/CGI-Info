@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 26;
+use Test::Most tests => 28;
 use Test::NoWarnings;
 use Data::Dumper;
 
@@ -50,12 +50,14 @@ diag($i->browser_type());
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 1);
 	ok($i->browser_type() eq 'search');
+	ok($i->baidu() == 1);
 
 	$ENV{'REMOTE_ADDR'} = '207.241.237.233';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; archive.org_bot +http://www.archive.org/details/archive.org_bot)';
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 1);
 	ok($i->browser_type() eq 'robot');
+	ok($i->baidu() == 0);
 
 	$ENV{'REMOTE_ADDR'} = '82.94.176.140';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/4.0 (compatible;  Vagabondo/4.0; webcrawler at wise-guys dot nl; http://webagent.wise-guys.nl/; http://www.wise-guys.nl/)';

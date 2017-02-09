@@ -987,8 +987,7 @@ sub is_mobile {
 		return 1;
 	}
 
-	if($ENV{'HTTP_USER_AGENT'}) {
-		my $agent = $ENV{'HTTP_USER_AGENT'};
+	if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
 		if($agent =~ /.+(Android|iPhone).+/) {
 			$self->{_is_mobile} = 1;
 			return 1;
@@ -1583,6 +1582,31 @@ sub status {
 	return $self->{_status};
 }
 
+=head2 baidu
+
+Is the remote end Baidu?
+
+=cut
+
+sub baidu {
+	my $self = shift;
+
+	if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
+		unless($self->{_browser_detect}) {
+			if(eval { require HTTP::BrowserDetect; }) {
+				HTTP::BrowserDetect->import();
+				$self->{_browser_detect} = HTTP::BrowserDetect->new($agent);
+			}
+		}
+
+		if($self->{_browser_detect}) {
+			return $self->{_browser_detect}->baidu();
+		}
+	}
+
+	return 0;
+}
+
 =head2 reset
 
 Class method to reset the class.
@@ -1662,12 +1686,9 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 =back
 
-
-
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Nigel Horne.
+Copyright 2010-2017 Nigel Horne.
 
 This program is released under the following licence: GPL
 

@@ -9,7 +9,7 @@ Information about the CGI environment
 
 # VERSION
 
-Version 0.61
+Version 0.62
 
 # SYNOPSIS
 
@@ -350,6 +350,8 @@ Deprecated - use cookie() instead.
         my $info = CGI::Info->new();
         my $name = $info->get_cookie(cookie_name => 'name');
         print "Your name is $name\n";
+        my $address = $info->get_cookie('address');
+        print "Your address is $address\n";
 
 ## cookie
 
@@ -360,12 +362,16 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
         use CGI::Info;
 
         my $info = CGI::Info->new();
-        my $name = $info->get_cookie(cookie_name => 'name');
+        my $name = $info->get_cookie(name);
         print "Your name is $name\n";
 
 ## status
 
 Returns the status of the object, 200 for OK, otherwise an HTTP error code
+
+## baidu
+
+Is the remote end baidu?
 
 ## reset
 
@@ -417,6 +423,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Nigel Horne.
+Copyright 2010-2017 Nigel Horne.
 
 This program is released under the following licence: GPL
