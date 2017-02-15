@@ -44,6 +44,7 @@ WriteMakefile(
 	'JSON::Parse' => 0,
 	# 'String::EscapeCage' => 0.02,
 	'Class::Autouse' => 0,
+	'namespace::clean' => 0,
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'CGI-Info-*' },
