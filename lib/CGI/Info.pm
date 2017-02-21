@@ -1299,7 +1299,7 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
-		if(grep(/^$referrer/, @crawler_lists)) {
+		if(($referrer =~ /\)/) || (grep(/^$referrer/, @crawler_lists))) {
 			if($self->{_logger}) {
 				$self->{_logger}->debug("is_robot: blocked trawler $referrer");
 			}
@@ -1580,31 +1580,6 @@ sub status {
 	my $self = shift;
 
 	return $self->{_status};
-}
-
-=head2 baidu
-
-Is the remote end Baidu?
-
-=cut
-
-sub baidu {
-	my $self = shift;
-
-	if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
-		unless($self->{_browser_detect}) {
-			if(eval { require HTTP::BrowserDetect; }) {
-				HTTP::BrowserDetect->import();
-				$self->{_browser_detect} = HTTP::BrowserDetect->new($agent);
-			}
-		}
-
-		if($self->{_browser_detect}) {
-			return $self->{_browser_detect}->baidu();
-		}
-	}
-
-	return 0;
 }
 
 =head2 reset

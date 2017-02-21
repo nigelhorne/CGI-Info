@@ -1,8 +1,5 @@
 Revision history for CGI-Info
 
-0.63
-	Added the baidu method, for CGI::Allow
-
 0.62	Wed 21 Dec 09:28:36 EST 2016
 	Added status() method
 	Set maximum file upload size to 512K

@@ -50,14 +50,12 @@ diag($i->browser_type());
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 1);
 	ok($i->browser_type() eq 'search');
-	ok($i->baidu() == 1);
 
 	$ENV{'REMOTE_ADDR'} = '207.241.237.233';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; archive.org_bot +http://www.archive.org/details/archive.org_bot)';
 	$i = new_ok('CGI::Info');
 	ok($i->is_robot() == 1);
 	ok($i->browser_type() eq 'robot');
-	ok($i->baidu() == 0);
 
 	$ENV{'REMOTE_ADDR'} = '82.94.176.140';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/4.0 (compatible;  Vagabondo/4.0; webcrawler at wise-guys dot nl; http://webagent.wise-guys.nl/; http://www.wise-guys.nl/)';
@@ -85,6 +83,13 @@ diag($i->browser_type());
 	ok($i->is_robot() == 0);
 
 	$ENV{'HTTP_REFERER'} = 'http://free-video-tool.com';
+	$i = new_ok('CGI::Info' => [
+		cache => $cache,
+		logger => MyLogger->new()
+	]);
+	ok($i->is_robot() == 1);
+
+	$ENV{'HTTP_REFERER'} = 'http://0.tqn.com/d/d/spae.gif)';
 	$i = new_ok('CGI::Info' => [
 		cache => $cache,
 		logger => MyLogger->new()
