@@ -447,7 +447,7 @@ CGI::Info will put the request into the params element 'XML', thus:
 	use CGI::Info;
 	...
 	my $info = CGI::Info->new();
-	my $paramsref = $info->params();
+	my $paramsref = $info->params();	# See BUGS below
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
 
