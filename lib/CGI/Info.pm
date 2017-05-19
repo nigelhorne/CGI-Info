@@ -1628,6 +1628,11 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+params() returns a ref which means that calling routines can change the hash
+for other routines.
+Take a local copy before making amendments to the table if you don't want unexpected
+things to happen.
+
 =head1 SEE ALSO
 
 L<HTTP::BrowserDetect>
@@ -1637,7 +1642,6 @@ L<HTTP::BrowserDetect>
 You can find documentation for this module with the perldoc command.
 
     perldoc CGI::Info
-
 
 You can also look for information at:
 
@@ -1666,7 +1670,6 @@ L<http://search.cpan.org/dist/CGI-Info/>
 Copyright 2010-2017 Nigel Horne.
 
 This program is released under the following licence: GPL
-
 
 =cut
 
