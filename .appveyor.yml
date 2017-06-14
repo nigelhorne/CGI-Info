@@ -14,4 +14,4 @@ build_script:
   - perl Makefile.PL
 
 test_script:
-  - dmake test
+  - gmake test

@@ -725,14 +725,14 @@ sub params {
 						$self->{_logger}->warn("SQL injection attempt blocked for '$value'");
 					}
 				}
-				next;
+				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
 				if($self->{_logger}) {
 					$self->{_logger}->warn("XSS injection attempt blocked for '$value'");
 				}
-				next;
+				return;
 			}
 		}
 		if(length($value) > 0) {
@@ -1356,8 +1356,7 @@ Is the visitor a search engine?
 
     use CGI::Info;
 
-    my $info = CGI::Info->new();
-    if($info->is_search_engine()) {
+    if(CGI::Info->new()->is_search_engine()) {
 	# display generic information about yourself
     } else {
 	# allow the user to pick and choose something to display
@@ -1485,10 +1484,10 @@ Deprecated - use cookie() instead.
 
 	use CGI::Info;
 
-	my $info = CGI::Info->new();
-	my $name = $info->get_cookie(cookie_name => 'name');
+	my $i = CGI::Info->new();
+	my $name = $i->get_cookie(cookie_name => 'name');
 	print "Your name is $name\n";
-	my $address = $info->get_cookie('address');
+	my $address = $i->get_cookie('address');
 	print "Your address is $address\n";
 =cut
 
@@ -1537,8 +1536,7 @@ API is the same as "param", it will replace the "get_cookie" method in the futur
 
 	use CGI::Info;
 
-	my $info = CGI::Info->new();
-	my $name = $info->get_cookie(name);
+	my $name = CGI::Info->new()->get_cookie(name);
 	print "Your name is $name\n";
 =cut
 
@@ -1673,4 +1671,4 @@ This program is released under the following licence: GPL
 
 =cut
 
-1; # End of CGI::Info
+1;
