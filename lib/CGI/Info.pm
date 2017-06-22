@@ -1080,6 +1080,9 @@ sub as_string {
 			$rc = "$_=$value";
 		}
 	}
+	if($rc && $self->{_logger}) {
+		$self->{_logger}->debug("is_string: returning '$rc'");
+	}
 
 	return defined($rc) ? $rc : '';
 }
