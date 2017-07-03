@@ -57,8 +57,8 @@ Takes optional parameter cache, an object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
-Takes optional parameter max_upload, which is the maximum file size you can upload (0 for no limit),
-the default is 512M
+Takes optional parameter max_upload, which is the maximum file size you can upload
+(-1 for no limit), the default is 512MB.
 
 =cut
 
@@ -537,7 +537,7 @@ sub params {
 			return;
 		}
 		my $content_length = $ENV{'CONTENT_LENGTH'};
-		if($content_length > $self->{_max_upload_size}) {	# Set maximum posts
+		if(($self->{_max_upload_size} >= 0) && ($content_length > $self->{_max_upload_size})) {	# Set maximum posts
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
 			$self->{_status} = 413;
