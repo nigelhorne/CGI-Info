@@ -650,10 +650,10 @@ sub params {
 				warning => "POST: Invalid or unsupported content type: $content_type: $buffer",
 			});
 		}
-	} elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
-		return;
-	} elsif($ENV{'REQUEST_METHOD'} eq 'DELETE') {
-		return;
+	# } elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
+		# return;
+	# } elsif($ENV{'REQUEST_METHOD'} eq 'DELETE') {
+		# return;
 	} else {
 		# TODO: Design a way to tell the caller to send HTTP
 		# status 405
