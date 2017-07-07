@@ -1,6 +1,7 @@
 #!perl -w
 
-# This test fails with Test::Sript 1.19, though is fine before then.
+# This test fails with Test::Sript 1.19_[23], though is fine before then,
+# and seems OK with 1.19.4
 # See https://github.com/plicease/Test-Script/issues/23
 
 use strict;
