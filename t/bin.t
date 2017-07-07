@@ -1,5 +1,8 @@
 #!perl -w
 
+# This test fails with Test::Sript 1.19, though is fine before then.
+# See https://github.com/plicease/Test-Script/issues/23
+
 use strict;
 
 use Test::Most tests => 23;
