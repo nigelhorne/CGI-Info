@@ -48,8 +48,10 @@ Creates a CGI::Info object.
 It takes four optional arguments allow, logger, expect and upload_dir,
 which are documented in the params() method.
 
-Takes an optional boolean parameter syslog, to log messages to
+Takes an optional parameter syslog, to log messages to
 L<Sys::Syslog>.
+It can be a boolean to enable/disable logging to syslog, or a reference
+to a hash to be given to Sys::Syslog::setlogsock.
 
 Takes optional parameter logger, an object which is used for warnings
 
@@ -831,6 +833,9 @@ sub _warn {
 		require Sys::Syslog;
 
 		Sys::Syslog->import();
+		if(ref($self->{_syslog} eq 'HASH')) {
+			Sys::Syslog::setlogsock($self->{_syslog});
+		}
 		openlog($self->script_name(), 'cons,pid', 'user');
 		syslog('warning', $warning);
 		closelog();

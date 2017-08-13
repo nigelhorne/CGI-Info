@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.64
+	Added mechanism to speak to setlogsock - useful for Dreamhost customers
+
 0.63	Wed Jul  5 20:57:31 EDT 2017
 	When preventing SQL injection or XSS, don't return any parameters, since
 		it's best to assume everything is poisoned
