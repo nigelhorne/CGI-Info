@@ -1595,6 +1595,28 @@ sub status {
 	return $self->{_status};
 }
 
+=head2 set_logger
+
+Sometimes you don't know what the logger is until you've instantiated the class.
+This function fixes the catch22 situation.
+
+=cut
+
+sub set_logger {
+	my $self = shift;
+	my %params;
+
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(@_ % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'logger'} = shift;
+	}
+
+	$self->{_logger} = $params{'logger'};
+}
+
 =head2 reset
 
 Class method to reset the class.
