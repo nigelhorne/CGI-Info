@@ -1,10 +1,8 @@
 Revision history for CGI-Info
 
-0.65
-	Added set_logger
-
 0.64
 	Added mechanism to speak to setlogsock - useful for Dreamhost customers
+	Added set_logger
 
 0.63	Wed Jul  5 20:57:31 EDT 2017
 	When preventing SQL injection or XSS, don't return any parameters, since
