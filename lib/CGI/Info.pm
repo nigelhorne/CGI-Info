@@ -536,6 +536,7 @@ sub params {
 		@pairs = split(/&/, $ENV{'QUERY_STRING'});
 	} elsif($ENV{'REQUEST_METHOD'} eq 'POST') {
 		if(!defined($ENV{'CONTENT_LENGTH'})) {
+			$self->{_status} = 411;
 			return;
 		}
 		my $content_length = $ENV{'CONTENT_LENGTH'};
