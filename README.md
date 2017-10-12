@@ -9,7 +9,7 @@ Information about the CGI environment
 
 # VERSION
 
-Version 0.63
+Version 0.64
 
 # SYNOPSIS
 
@@ -371,6 +371,11 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
 ## status
 
 Returns the status of the object, 200 for OK, otherwise an HTTP error code
+
+## set\_logger
+
+Sometimes you don't know what the logger is until you've instantiated the class.
+This function fixes the catch22 situation.
 
 ## reset
 
