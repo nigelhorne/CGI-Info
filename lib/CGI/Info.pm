@@ -658,8 +658,8 @@ sub params {
 		# return;
 	} else {
 		# TODO: Design a way to tell the caller to send HTTP
-		# status 405
-		$self->{_status} = 405;
+		# status 501
+		$self->{_status} = 501;
 		$self->_warn({
 			warning => 'Use POST, GET or HEAD'
 		});
