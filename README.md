@@ -2,6 +2,7 @@
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Info/badge)](https://dependencyci.com/github/nigelhorne/CGI-Info)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
+[![CPAN](https://img.shiods.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
 
 # CGI::Info
 
