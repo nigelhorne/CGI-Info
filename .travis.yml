@@ -13,6 +13,9 @@ perl:
   - "5.14"
   - "5.12"
 
+before_script:
+  - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
+
 before_install:
   cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
 
@@ -21,3 +24,6 @@ install:
 
 script:
   perl Makefile.PL && make && cover -test -report coveralls
+
+after_sucess:
+  - cover -report codecov
