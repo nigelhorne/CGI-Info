@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.65
 	Send 501 on unknown request, not 405
+	Bump minimum version of File::Spec
 
 0.64	Thu Oct 12 10:30:18 EDT 2017
 	Added mechanism to speak to setlogsock - useful for Dreamhost customers
