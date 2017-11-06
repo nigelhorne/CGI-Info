@@ -1512,7 +1512,7 @@ Deprecated - use cookie() instead.
 sub get_cookie {
 	my $self = shift;
 	my %params;
-	
+
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(@_ % 2 == 0) {
