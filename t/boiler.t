@@ -20,7 +20,7 @@ sub not_in_file_ok {
 			}
 		}
 	}
-	close $fin;
+	close $fh;
 
 	if (%violated) {
 		fail("$filename contains boilerplate text");
