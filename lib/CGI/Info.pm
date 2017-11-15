@@ -8,6 +8,7 @@ use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
+use Cwd;
 use JSON::Parse;
 
 use namespace::clean;
@@ -934,6 +935,9 @@ sub _multipart_data {
 							filename => $filename
 						});
 
+						# Don't do this since it taints the string and I can't work out how to untaint it
+						# my $full_path = Cwd::realpath(File::Spec->catfile($self->{_upload_dir}, $filename));
+						# $full_path =~ m/^(\/[\w\.]+)$/;
 						my $full_path = File::Spec->catfile($self->{_upload_dir}, $filename);
 						unless(open($fout, '>', $full_path)) {
 							$self->_warn({
