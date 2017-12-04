@@ -8,7 +8,9 @@ use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
+use Cwd;
 use JSON::Parse;
+use List::MoreUtils;	# Can go when expect goes
 
 use namespace::clean;
 
@@ -75,6 +77,10 @@ sub new {
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
+		warn 'expect must be a reference to an array';
+		return;
+	}
 	return bless {
 		# _script_name => undef,
 		# _script_path => undef,
@@ -473,7 +479,11 @@ sub params {
 		$self->{_allow} = $args{allow};
 	}
 	if(defined($args{expect})) {
-		$self->{_expect} = $args{expect};
+		if(ref($args{expect}) eq 'ARRAY') {
+			$self->{_expect} = $args{expect};
+		} else {
+			$self->_warn({ warning => 'expect must be a reference to an array' });
+		}
 	}
 	if(defined($args{upload_dir})) {
 		$self->{_upload_dir} = $args{upload_dir};
@@ -672,11 +682,6 @@ sub params {
 		return;
 	}
 
-	# Can go when expect has been removed
-	if($self->{_expect}) {
-		require List::Member;
-		List::Member->import();
-	}
 	require String::Clean::XSS;
 	String::Clean::XSS->import();
 	# require String::EscapeCage;
@@ -718,7 +723,7 @@ sub params {
 			}
 		}
 
-		if($self->{_expect} && (member($key, @{$self->{_expect}}) == nota_member())) {
+		if($self->{_expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{_expect}})) {
 			next;
 		}
 		$value = $self->_sanitise_input($value);
@@ -934,6 +939,9 @@ sub _multipart_data {
 							filename => $filename
 						});
 
+						# Don't do this since it taints the string and I can't work out how to untaint it
+						# my $full_path = Cwd::realpath(File::Spec->catfile($self->{_upload_dir}, $filename));
+						# $full_path =~ m/^(\/[\w\.]+)$/;
 						my $full_path = File::Spec->catfile($self->{_upload_dir}, $filename);
 						unless(open($fout, '>', $full_path)) {
 							$self->_warn({
@@ -1317,7 +1325,7 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
-		if(($referrer =~ /\)/) || (grep(/^$referrer/, @crawler_lists))) {
+		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
 			if($self->{_logger}) {
 				$self->{_logger}->debug("is_robot: blocked trawler $referrer");
 			}
@@ -1512,7 +1520,7 @@ Deprecated - use cookie() instead.
 sub get_cookie {
 	my $self = shift;
 	my %params;
-	
+
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(@_ % 2 == 0) {
