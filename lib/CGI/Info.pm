@@ -292,7 +292,7 @@ sub _find_site_details {
 		require Sys::Hostname;
 		Sys::Hostname->import;
 
-		$self->{_cgi_site} = Sys::Hostname->hostname;
+		$self->{_cgi_site} = Sys::Hostname::hostname();
 	}
 
 	unless($self->{_site}) {

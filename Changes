@@ -1,6 +1,7 @@
 Revision history for CGI-Info
 
 0.65
+	Fix breakage on 5.27.5 and beyond (Github issue 7)
 	Send 501 on unknown request, not 405
 	Bump minimum version of File::Spec
 
