@@ -1,5 +1,8 @@
 package MyLogger;
 
+use strict;
+use warnings;
+
 sub new {
 	my ($proto, %args) = @_;
 
@@ -11,21 +14,21 @@ sub new {
 # sub error {
 	# my $self = shift;
 	# my $message = shift;
-# 
+#
 	# ::diag($message);
 # }
 
 # sub warn {
 	# my $self = shift;
 	# my $message = shift;
-# 
+#
 	# ::diag($message);
 # }
 
 # sub info {
 	# my $self = shift;
 	# my $message = shift;
-# 
+#
 	# ::diag($message);
 # }
 
