@@ -95,7 +95,7 @@ sub new {
 		_logger => $args{logger},
 		_syslog => $args{syslog},
 		_cache => $args{cache},	# e.g. CHI
-		_status => 200,
+		# _status => 200,
 	}, $class;
 }
 
@@ -1603,7 +1603,7 @@ Returns the status of the object, 200 for OK, otherwise an HTTP error code
 sub status {
 	my $self = shift;
 
-	return $self->{_status};
+	return $self->{_status} || 200;
 }
 
 =head2 set_logger

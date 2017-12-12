@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use File::Spec 3.4;
 
 my $tmpdir = File::Spec->tmpdir();
@@ -19,7 +19,7 @@ WriteMakefile(
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
 	PL_FILES	=> {},
-	BUILD_REQUIRES => {
+	TEST_REQUIRES => {
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Script' => 1.12,
@@ -27,6 +27,7 @@ WriteMakefile(
 		# 'Test::Kwalitee' => 0,
 		'autodie' => 0,
 		'IPC::System::Simple' => 0,
+		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	},
 	PREREQ_PM => {
