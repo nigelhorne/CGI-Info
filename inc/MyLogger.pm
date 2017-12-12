@@ -8,26 +8,26 @@ sub new {
 	return bless { }, $class;
 }
 
-sub error {
-	my $self = shift;
-	my $message = shift;
+# sub error {
+	# my $self = shift;
+	# my $message = shift;
+# 
+	# ::diag($message);
+# }
 
-	::diag($message);
-}
+# sub warn {
+	# my $self = shift;
+	# my $message = shift;
+# 
+	# ::diag($message);
+# }
 
-sub warn {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
-}
-
-sub info {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
-}
+# sub info {
+	# my $self = shift;
+	# my $message = shift;
+# 
+	# ::diag($message);
+# }
 
 sub trace {
 	my $self = shift;
