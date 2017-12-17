@@ -49,9 +49,9 @@ WriteMakefile(
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean		=> { FILES => 'CGI-Info-*' },
-	META_ADD => {
-		provides => {}
-	},
+	# META_ADD => {
+		# provides => {}
+	# },
 	META_MERGE		=> {
 		'meta-spec' => { version => 2 },
 		resources => {
