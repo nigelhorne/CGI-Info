@@ -5,7 +5,7 @@ use warnings;
 use Test::Most tests => 28;
 use Test::NoWarnings;
 use Data::Dumper;
-use lib 'inc';
+use lib 't/lib';
 use MyLogger;
 
 BEGIN {

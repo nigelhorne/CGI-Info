@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::Most tests => 5;
 use Test::NoWarnings;
-use lib 'inc';
+use lib 't/lib';
 use MyLogger;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures

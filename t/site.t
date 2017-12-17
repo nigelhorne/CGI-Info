@@ -5,7 +5,7 @@ use warnings;
 use Test::Most tests => 25;
 use Test::NoWarnings;
 use Sys::Hostname;
-use lib 'inc';
+use lib 't/lib';
 use MyLogger;
 
 BEGIN {

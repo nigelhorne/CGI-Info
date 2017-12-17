@@ -6,7 +6,6 @@ use Test::Most tests => 12;
 use Test::NoWarnings;
 use Test::Warn;
 
-
 BEGIN {
 	use_ok('CGI::Info');
 }
