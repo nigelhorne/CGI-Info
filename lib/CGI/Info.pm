@@ -491,6 +491,9 @@ sub params {
 	if(defined($args{logger})) {
 		$self->{_logger} = $args{logger};
 	}
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Entering params');
+	}
 
 	my @pairs;
 	my $content_type = $ENV{'CONTENT_TYPE'};
@@ -877,8 +880,14 @@ sub _sanitise_input {
 sub _multipart_data {
 	my ($self, $args) = @_;
 
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Entering _multipart_data');
+	}
 	my $total_bytes = $$args{length};
 
+	if($self->{_logger}) {
+		$self->{_logger}->trace("_multipart_data: total_bytes = $total_bytes");
+	}
 	if($total_bytes == 0) {
 		return;
 	}
