@@ -316,9 +316,7 @@ sub _find_site_details {
 		$self->{_cgi_site} = "$protocol://" . $self->{_cgi_site};
 	}
 	unless($self->{_site} && $self->{_cgi_site}) {
-		$self->_warn({
-			warning => 'Could not determine site name'
-		});
+		$self->_warn('Could not determine site name');
 	}
 	if($self->{_logger}) {
 		$self->{_logger}->trace('Leaving _find_site_details');
@@ -482,7 +480,7 @@ sub params {
 		if(ref($args{expect}) eq 'ARRAY') {
 			$self->{_expect} = $args{expect};
 		} else {
-			$self->_warn({ warning => 'expect must be a reference to an array' });
+			$self->_warn('expect must be a reference to an array');
 		}
 	}
 	if(defined($args{upload_dir})) {
@@ -542,9 +540,7 @@ sub params {
 			return;
 		}
 		if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
-			$self->_warn({
-				warning => 'Multipart/form-data not supported for GET'
-			});
+			$self->_warn('Multipart/form-data not supported for GET');
 		}
 		@pairs = split(/&/, $ENV{'QUERY_STRING'});
 	} elsif($ENV{'REQUEST_METHOD'} eq 'POST') {
@@ -557,7 +553,7 @@ sub params {
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
 			$self->{_status} = 413;
-			$self->_warn({ warning => 'Large upload prohibited' });
+			$self->_warn('Large upload prohibited');
 			return;
 		}
 
@@ -567,9 +563,7 @@ sub params {
 				$buffer = $stdin_data;
 			} else {
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
-					$self->_warn({
-						warning => 'POST failed: something else may have read STDIN'
-					});
+					$self->_warn('POST failed: something else may have read STDIN');
 				}
 				$stdin_data = $buffer;
 			}
@@ -828,9 +822,18 @@ sub param {
 
 # Emit a warning message somewhere
 sub _warn {
-	my ($self, $params) = @_;
+	my $self = shift;
 
-	my $warning = $$params{'warning'};
+	my %params;
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(scalar(@_) % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'warning'} = shift;
+	}
+
+	my $warning = $params{'warning'};
 
 	return unless($warning);
 	if($self eq __PACKAGE__) {
@@ -936,13 +939,9 @@ sub _multipart_data {
 				if($field =~ /filename="(.+)?"/) {
 					my $filename = $1;
 					unless(defined($filename)) {
-						$self->_warn({
-							warning => 'No upload filename given'
-						});
+						$self->_warn('No upload filename given');
 					} elsif($filename =~ /[\\\/\|]/) {
-						$self->_warn({
-							warning => "Disallowing invalid filename: $filename"
-						});
+						$self->_warn("Disallowing invalid filename: $filename");
 					} else {
 						$filename = $self->_create_file_name({
 							filename => $filename
@@ -953,9 +952,7 @@ sub _multipart_data {
 						# $full_path =~ m/^(\/[\w\.]+)$/;
 						my $full_path = File::Spec->catfile($self->{_upload_dir}, $filename);
 						unless(open($fout, '>', $full_path)) {
-							$self->_warn({
-								warning => "Can't open $full_path"
-							});
+							$self->_warn("Can't open $full_path");
 						}
 						$writing_file = 1;
 						push(@pairs, "$key=$filename");
@@ -1156,7 +1153,7 @@ sub protocol {
 	}
 
 	if($ENV{'REMOTE_ADDR'}) {
-		$self->_warn({ warning => "Can't determine the calling protocol" });
+		$self->_warn("Can't determine the calling protocol");
 	}
 	return;
 }
@@ -1539,9 +1536,7 @@ sub get_cookie {
 	}
 
 	if(!defined($params{'cookie_name'})) {
-		$self->_warn({
-			warning => 'cookie_name argument not given'
-		});
+		$self->_warn('cookie_name argument not given');
 		return;
 	}
 
@@ -1579,9 +1574,7 @@ sub cookie {
 	my ($self, $field) = @_;
 
 	if(!defined($field)) {
-		$self->_warn({
-			warning => 'what cookie do you want?'
-		});
+		$self->_warn('what cookie do you want?');
 		return;
 	}
 
@@ -1722,7 +1715,7 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2017 Nigel Horne.
+Copyright 2010-2018 Nigel Horne.
 
 This program is released under the following licence: GPL
 
