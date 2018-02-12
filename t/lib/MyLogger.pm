@@ -50,4 +50,13 @@ sub debug {
 	}
 }
 
+sub AUTOLOAD {
+	our $AUTOLOAD;
+	my $param = $AUTOLOAD;
+
+	unless($param eq 'MyLogger::DESTROY') {
+		::diag("Need to define $param");
+	}
+}
+
 1;
