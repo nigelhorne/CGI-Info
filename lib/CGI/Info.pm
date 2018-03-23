@@ -1,6 +1,7 @@
 package CGI::Info;
 
 # TODO: remove the expect argument
+# TODO: add Test::Distribution
 
 use warnings;
 use strict;
