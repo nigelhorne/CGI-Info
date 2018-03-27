@@ -3,6 +3,7 @@
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Info/badge)](https://dependencyci.com/github/nigelhorne/CGI-Info)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
 
 # CGI::Info
 
@@ -10,7 +11,7 @@ Information about the CGI environment
 
 # VERSION
 
-Version 0.66
+Version 0.67
 
 # SYNOPSIS
 
@@ -433,6 +434,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2017 Nigel Horne.
+Copyright 2010-2018 Nigel Horne.
 
 This program is released under the following licence: GPL
