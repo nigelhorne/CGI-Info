@@ -12,12 +12,22 @@ perl:
   - "5.16"
   - "5.14"
   - "5.12"
+  - "5.24-shrplib"
+  - "5.22-shrplib"
+  - "5.20-shrplib"
+  - "5.18-shrplib"
 
 before_script:
   - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
 
 before_install:
   cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - source ~/travis-perl-helpers/init --auto
+  - build-perl
+  - perl -V
+  - build-dist
+  - cd $BUILD_DIR
 
 install:
   - cpanm -v --installdeps --notest .
@@ -27,3 +37,7 @@ script:
 
 after_sucess:
   - cover -report codecov
+
+matrix:
+  allow_features:
+    - perl: blead
