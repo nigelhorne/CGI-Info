@@ -45,5 +45,5 @@ script:
   # perl Makefile.PL && make && cover -test -report coveralls
   - prove -l -j$(test-jobs) $(test-files)
 
-after_sucess:
+after_success:
   - coverage-report
