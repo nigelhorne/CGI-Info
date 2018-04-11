@@ -20,7 +20,7 @@ perl:
 matrix:
   allow_features:
     - perl: blead
- include:
+  include:
     - perl: 5.18
       env: COVERAGE=1
 
