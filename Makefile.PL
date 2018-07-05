@@ -29,6 +29,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
+		'WWW::RT::CPAN' => 0
 	},
 	PREREQ_PM => {
 		'URI::Heuristic' => 0,
