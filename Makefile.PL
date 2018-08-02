@@ -20,6 +20,7 @@ WriteMakefile(
 	  : ()),
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
+		'Test::Exception' => 0.42,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Script' => 1.12,
