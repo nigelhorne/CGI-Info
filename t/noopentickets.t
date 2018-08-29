@@ -15,7 +15,7 @@ NOBUGS: {
 			} elsif(my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => 'CGI-Info')}) {
 				ok($rc[0] == 200);
 				ok($rc[1] eq 'OK');
-				my @tickets = @{$rc[2]};
+				my @tickets = $rc[2] ? @{$rc[2]} : ();
 
 				if(scalar(@tickets)) {
 					foreach my $ticket(@tickets) {
