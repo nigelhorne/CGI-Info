@@ -11,6 +11,7 @@ install:
   - 'echo End install at: & time /t'
 
 build_script:
+  - set AUTOMATED_TESTING=1
   - perl Makefile.PL
 
 test_script:
