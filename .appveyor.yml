@@ -27,9 +27,9 @@ install:
   - cmd: mkdir %APPVEYOR_BUILD_FOLDER%\tmp
   - cmd: set TMPDIR=%APPVEYOR_BUILD_FOLDER%\tmp
   - cpan App::cpanminus
-  - cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -n
+  - cmd: cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -n
   - cpanm --installdeps .
-  - 'echo End install at: & time /t'
+  - cmd: 'echo End install at: & time /t'
 
 build_script:
   - set AUTOMATED_TESTING=1
