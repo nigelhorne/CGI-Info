@@ -199,6 +199,7 @@ PATHS: {
 			ok($i->script_path() =~ /\\.+bar\.pl$/);
 		}
 	} else {
+		diag('script_dir: ', $i->script_dir());
 		ok($i->script_dir() =~ /\/CGI-Info/);
 		ok($i->script_path() =~ /\/.+bar\.pl$/);
 	}
