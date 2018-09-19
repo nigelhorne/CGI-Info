@@ -1,13 +1,34 @@
 version: 1.0.{build}
 
+image:
+  - Visual Sudio 2015
+  - Ubuntu
+
+environment:
+  PERL5LIB: /home/appveyor/perl5/lib/perl5
+
+platform: x64
+
+branches:
+  only:
+    - master
+
+skip_tags: true
+
 install:
-  - cinst StrawberryPerl --allow-empty-checksums
-  - path C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
-  - mkdir %APPVEYOR_BUILD_FOLDER%\tmp
-  - set TMPDIR=%APPVEYOR_BUILD_FOLDER%\tmp
+  - cmd: if not exist "C:\strawberry" cinst StrawberryPerl --allow-empty-checksums
+  - cmd: path C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - cmd: cd C:\projects\%APPVEYOR_PROJECT_NAME%
+  - sh: sudo apt-get update -q
+  - sh: sudo apt-get install build-essential git libssl-dev
+  - sh: sudo apt-get install -y perl
+  - sh: export PATH=/home/appveyor/perl5/bin:%PATH
   - perl -V
+  - cmd: mkdir %APPVEYOR_BUILD_FOLDER%\tmp
+  - cmd: set TMPDIR=%APPVEYOR_BUILD_FOLDER%\tmp
   - cpan App::cpanminus
   - cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -n
+  - cpanm --installdeps .
   - 'echo End install at: & time /t'
 
 build_script:
@@ -15,4 +36,5 @@ build_script:
   - perl Makefile.PL
 
 test_script:
-  - gmake test
+  - cmd: qmake test
+  - sh: make test
