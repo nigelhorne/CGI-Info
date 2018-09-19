@@ -1,7 +1,7 @@
 version: 1.0.{build}
 
 image:
-  - Visual Sudio 2015
+  - Visual Studio 2015
   - Ubuntu
 
 environment:
