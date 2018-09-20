@@ -7,7 +7,7 @@ image:
 
 environment:
   PERL5LIB: /home/appveyor/perl5/lib/perl5
-  AUTOMATEST_TESTING: 1
+  AUTOMATED_TESTING: 1
 
 platform: x64
 
