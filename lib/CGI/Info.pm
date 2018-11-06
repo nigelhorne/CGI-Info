@@ -1700,10 +1700,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Info>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Info>
@@ -1718,7 +1714,7 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 Copyright 2010-2018 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 
