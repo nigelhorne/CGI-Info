@@ -691,7 +691,7 @@ sub params {
 
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 		$key =~ tr/+/ /;
-		if($value) {
+		if(defined($value)) {
 			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 			$value =~ tr/+/ /;
 		} else {
