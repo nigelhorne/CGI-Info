@@ -17,13 +17,13 @@ perl:
   - "5.18-shrplib"
 
 matrix:
-  allow_failures:
-    - perl: "blead"
   include:
     - perl: 5.18
       env: COVERAGE=1
+  allow_failures:
+    - perl: "blead"
 
-sudo: false
+# sudo: false
 
 before_install:
   - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
