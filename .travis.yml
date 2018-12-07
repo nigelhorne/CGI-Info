@@ -8,44 +8,18 @@ perl:
   - "5.24"
   - "5.22"
   - "5.20"
+  - "5.18"
   - "5.16"
   - "5.14"
   - "5.12"
-  - "5.24-shrplib"
-  - "5.22-shrplib"
-  - "5.20-shrplib"
-  - "5.18-shrplib"
 
-matrix:
-  include:
-    - perl: 5.18
-      env: COVERAGE=1
-  allow_failures:
-    - perl: "blead"
-
-# sudo: false
+sudo: false
 
 before_install:
-  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
-  - source ~/travis-perl-helpers/init
-  - build-perl
-  - perl -V
-  - build-dist
-  - cd $BUILD_DIR
+  cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
 
 install:
-  - sudo apt-get update -q
-  - cpan-install --deps
-  - cpan-install --coverage
-  - cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
-
-before_script:
-  - coverage-setup
+  - cpanm -v --installdeps --notest .
 
 script:
-  # perl Makefile.PL && make && cover -test -report coveralls
-  - prove -l -j$(test-jobs) $(test-files)
-
-after_success:
-  - coverage-report
-  - cover -test -report coveralls
+  perl Makefile.PL && make && cover -test -report coveralls
