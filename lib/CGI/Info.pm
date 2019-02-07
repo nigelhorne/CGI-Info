@@ -8,7 +8,7 @@ use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
-use Cwd;
+# use Cwd;
 use JSON::Parse;
 use List::MoreUtils;	# Can go when expect goes
 
