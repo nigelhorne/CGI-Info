@@ -1,7 +1,7 @@
 Revision history for CGI-Info
 
 0.70
-	Allow logdir() to be called as a class method
+	Allow logdir() and tmpdir() to be called as a class methods
 
 0.69	Sat  9 Mar 19:28:32 EST 2019
 	Added logdir()

@@ -1197,6 +1197,10 @@ sub tmpdir {
 
 	my $dir;
 
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
+
 	if($ENV{'C_DOCUMENT_ROOT'} && (-d $ENV{'C_DOCUMENT_ROOT'})) {
 		$dir = File::Spec->catdir($ENV{'C_DOCUMENT_ROOT'}, $name);
 		if((-d $dir) && (-w $dir)) {
