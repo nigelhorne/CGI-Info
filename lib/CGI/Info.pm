@@ -1268,6 +1268,10 @@ sub logdir {
 	my $self = shift;
 	my $dir = shift;
 
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
+
 	if(defined($dir)) {
 		# No sanity testing is done
 		return $self->{_logdir} = $dir;

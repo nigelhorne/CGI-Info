@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.70
+	Allow logdir() to be called as a class method
+
 0.69	Sat  9 Mar 19:28:32 EST 2019
 	Added logdir()
 
