@@ -686,7 +686,7 @@ sub params {
 	# String::EscapeCage->import();
 
 	foreach my $arg (@pairs) {
-		my($key, $value) = split(/=/, $arg);
+		my($key, $value) = split(/=/, $arg, 2);
 
 		next unless($key);
 
@@ -726,7 +726,7 @@ sub params {
 		}
 		$value = $self->_sanitise_input($value);
 
-		if($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'GET')) {
+		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
 			if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
 			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
