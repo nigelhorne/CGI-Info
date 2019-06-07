@@ -732,6 +732,7 @@ sub params {
 			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
 			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
+			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{_logger}) {
 					if($ENV{'REMOTE_ADDR'}) {
