@@ -8,6 +8,7 @@ image:
 environment:
   PERL5LIB: /home/appveyor/perl5/lib/perl5
   AUTOMATED_TESTING: 1
+  DEBIAN_FRONTEND: noninteractive
 
 platform: x64
 
@@ -22,8 +23,7 @@ install:
   - cmd: path C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
   # - cmd: cd C:\projects\%APPVEYOR_PROJECT_NAME%
   - sh: sudo apt-get update -q -y
-  - sh: sudo apt-get install -y build-essential git libssl-dev
-  - sh: sudo apt-get install -y perl
+  - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y --force-yes build-essential git libssl-dev perl
   - sh: export PATH=/home/appveyor/perl5/bin:$PATH
   - perl -V
   - cmd: mkdir %APPVEYOR_BUILD_FOLDER%\tmp
