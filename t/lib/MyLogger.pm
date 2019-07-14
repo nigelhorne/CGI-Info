@@ -43,10 +43,9 @@ sub trace {
 
 sub debug {
 	my $self = shift;
-	my $message = shift;
 
 	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
+		::diag(@_);
 	}
 }
 
