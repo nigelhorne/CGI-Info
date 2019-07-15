@@ -15,13 +15,15 @@ perl:
   - "5.14"
   - "5.12"
 
-# sudo: false
+sudo: false
 
 before_install:
-  cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
+  # - sudo apt-get update -q
+  # - sudo apt-get install sqlite3 libdbi-perl libdbd-sqlite3-perl
 
 install:
-  - cpanm -v --notest --installdeps --notest .
+  - cpanm -v --installdeps --notest .
+  - cpanm -v -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
 
 script:
   perl Makefile.PL && make && cover -test -report coveralls
