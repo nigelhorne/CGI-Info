@@ -14,13 +14,28 @@ perl:
   - "5.14"
   - "5.12"
 
-sudo: false
+# sudo: false
 
 before_install:
   cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp
 
 install:
-  - cpanm -v --installdeps --notest .
+  - cpanm -v --notest --installdeps --notest .
 
 script:
   perl Makefile.PL && make && cover -test -report coveralls
+
+jobs:
+  include:
+    - stage: Windows
+      os: windows
+      language: shell
+      before_install:
+        - cinst -y strawberryperl
+        - export "PATH=/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+      install:
+        - cpanm --notest --installdeps .
+      script:
+        - perl Makefile.PL
+        - gmake
+        - gmake test
