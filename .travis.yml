@@ -3,6 +3,8 @@ os:
   - linux
   # - osx
 
+env: AUTOMATED_TESTING=1
+
 perl:
   - "5.30"
   - "5.28"
