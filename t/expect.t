@@ -36,7 +36,7 @@ PARAMS: {
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar,baz');
 
-	warning_is { 
+	warning_is {
 		$i = CGI::Info->new(expect => 'scalar');
 	} 'expect must be a reference to an array';
 }
