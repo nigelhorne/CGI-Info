@@ -1,7 +1,12 @@
 language: perl
+
 os:
   - linux
   # - osx
+
+arch:
+ - amd64
+ - arm64
 
 env: AUTOMATED_TESTING=1
 
