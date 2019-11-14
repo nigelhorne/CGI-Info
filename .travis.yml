@@ -6,7 +6,7 @@ os:
 
 arch:
  - amd64
- - arm64
+ # - arm64	# Gets 404 error
 
 env: AUTOMATED_TESTING=1
 
