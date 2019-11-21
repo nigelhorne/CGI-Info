@@ -23,8 +23,8 @@ jobs:
         run: perl -V
       - name: Install Dependencies
         run: |
-	  cpan -i App::cpanminus
-	  cpanm -iq File::Spec ExtUtils::MakeMaker
-	  cpanm -iq --installdeps --notest .
+          cpan -i App::cpanminus
+          cpanm -iq File::Spec ExtUtils::MakeMaker
+          cpanm -iq --installdeps --notest .
       - name: Run Tests
         run: prove -l t
