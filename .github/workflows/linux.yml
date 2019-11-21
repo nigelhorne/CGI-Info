@@ -29,6 +29,6 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        run: cpanm -i File::Spec && cpanm -v --installdeps --notest .
+        run: cpanm -i File::Spec Extutils::MakeMaker && cpanm -v --installdeps --notest .
       - name: Run Tests
         run: prove -l t
