@@ -23,6 +23,7 @@ jobs:
         run: |
           cpan -i File::Spec ExtUtils::MakeMaker
           cpan -i App::cpanminus
+          /usr/local/Cellar/perl/5.30.0/bin/cpanm -v -n Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp Test::Pod::Coverage
           /usr/local/Cellar/perl/5.30.0/bin/cpanm -iq --installdeps --notest .
       - name: Run Tests
         run: prove -l t
