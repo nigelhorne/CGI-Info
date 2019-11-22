@@ -23,6 +23,6 @@ jobs:
         run: |
           cpan -i File::Spec ExtUtils::MakeMaker
           cpan -i App::cpanminus
-          cpan -iq --installdeps --notest .
+          /usr/local/Cellar/perl/5.30.0/bin/cpanm -iq --installdeps --notest .
       - name: Run Tests
         run: prove -l t
