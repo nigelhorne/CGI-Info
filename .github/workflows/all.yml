@@ -13,8 +13,9 @@ jobs:
         with:
           perl-version: ${{ matrix.perl }}
       - run: perl -V
-      - run: |
-        cpanm -iq File::Spec ExtUtils::MakeMaker
-        cpanm -q -n Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp Test::Pod::Coverage
-        cpanm -iq --installdeps --notest .
+      - name: Install Dependencies
+        run: |
+          cpanm -iq File::Spec ExtUtils::MakeMaker
+          cpanm -q -n Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp Test::Pod::Coverage
+          cpanm -iq --installdeps --notest .
       - run: prove -lv t
