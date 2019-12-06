@@ -213,7 +213,7 @@ Returns the file system directory containing the script.
 
 	my $info = CGI::Info->new();
 
-	print 'HTML files are normally stored in ' .  $info->script_dir() . '/' . File::Spec->updir() . "\n";
+	print 'HTML files are normally stored in ', $info->script_dir(), '/', File::Spec->updir(), "\n";
 
 =cut
 
