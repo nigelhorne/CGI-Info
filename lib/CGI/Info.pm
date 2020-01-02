@@ -1566,7 +1566,7 @@ sub get_cookie {
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(@_ % 2 == 0) {
+	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
 		$params{'cookie_name'} = shift;
@@ -1658,7 +1658,7 @@ sub set_logger {
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(@_ % 2 == 0) {
+	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
 		$params{'logger'} = shift;
