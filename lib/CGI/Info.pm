@@ -9,7 +9,8 @@ use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
 # use Cwd;
-use JSON::Parse;
+# use JSON::Parse;
+use JSON;
 use List::MoreUtils;	# Can go when expect goes
 use Sys::Path;
 
@@ -638,8 +639,9 @@ sub params {
 					});
 				}
 				$stdin_data = $buffer;
-				JSON::Parse::assert_valid_json($buffer);
-				my $paramref = JSON::Parse::parse_json($buffer);
+				# JSON::Parse::assert_valid_json($buffer);
+				# my $paramref = JSON::Parse::parse_json($buffer);
+				my $paramref = decode_json($buffer);
 				foreach my $key(keys(%{$paramref})) {
 					push @pairs, "$key=" . $paramref->{$key};
 				}

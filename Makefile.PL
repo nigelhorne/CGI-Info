@@ -43,7 +43,7 @@ WriteMakefile(
 		'File::Basename' => 0,
 		'String::Clean::XSS' => 0,
 		'Log::Any' => 0,
-		'JSON::Parse' => 0,
+		'JSON' => 0,
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		# 'String::EscapeCage' => 0.02,
 		'Class::Autouse' => 0,
@@ -70,7 +70,7 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/CGI-Info/issues',
 				url => 'https://github.com/nigelhorne/CGI-Info/issues',
 			}
-		
+
 		},
 	},
 	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
