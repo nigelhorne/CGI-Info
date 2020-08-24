@@ -1,3 +1,4 @@
+---
 language: perl
 
 os:
@@ -5,10 +6,12 @@ os:
   # - osx
 
 arch:
- - amd64
- # - arm64	# Gets 404 error
+  - amd64
+  # - arm64	# Gets 404 error
 
-env: AUTOMATED_TESTING=1
+env:
+  - AUTOMATED_TESTING=1
+  - PERL_CPANM_OPT="--notest --force --skip-satisfied"
 
 perl:
   - "5.30"
