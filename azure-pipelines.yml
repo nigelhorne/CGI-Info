@@ -6,14 +6,14 @@ resources:
       endpoint: houseabsolute/ci-perl-helpers
 
 stages:
-  - template: templates/build.yml@ci-perl-helpers
-  - template: templates/linux.yml@ci-perl-helpers
+  - template: templates/helpers/build.yml@ci-perl-helpers
+  - template: templates/helpers/linux.yml@ci-perl-helpers
     parameters:
       test_xt: true
       use_default_perls: true
-  - template: templates/macos.yml@ci-perl-helpers
+  - template: templates/helpers/macos.yml@ci-perl-helpers
     parameters:
       use_default_perls: true
-  - template: templates/windows.yml@ci-perl-helpers
+  - template: templates/helpers/windows.yml@ci-perl-helpers
     parameters:
       use_default_perls: true
