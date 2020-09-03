@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 12;
+use Test::Most tests => 14;
 use Test::NoWarnings;
 use Test::Warn;
 
@@ -37,6 +37,10 @@ PARAMS: {
 	ok($p{foo} eq 'bar,baz');
 
 	warning_is {
-		$i = CGI::Info->new(expect => 'scalar');
+		my $foo = CGI::Info->new(expect => 'scalar');
+	} 'expect must be a reference to an array';
+
+	warning_is {
+		my $foo = new_ok('CGI::Info')->params(expect => 'scalar');
 	} 'expect must be a reference to an array';
 }
