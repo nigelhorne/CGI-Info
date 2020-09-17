@@ -981,16 +981,14 @@ sub _multipart_data {
 	return @pairs;
 }
 
-sub _create_file_name
-{
+sub _create_file_name {
 	my ($self, $args) = @_;
 
 	return $$args{filename} . '_' . time;
 }
 
 # Untaint a filename. Regex from CGI::Untaint::Filenames
-sub _untaint_filename
-{
+sub _untaint_filename {
 	my ($self, $args) = @_;
 
 	if($$args{filename} =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
