@@ -33,6 +33,7 @@ WriteMakefile(
 	},
 	PREREQ_PM => {
 		'URI::Heuristic' => 0,
+		'Sub::Private' => 0,
 		'Sys::Hostname' => 0,
 		'File::Spec' => 0,
 		'Cwd' => 0,
