@@ -1737,6 +1737,10 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
 
+=item * CPAN Testers' Matrix
+
+L<http://cpantesters.org/distro/C/CGI-Infohtml>
+
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Info>
