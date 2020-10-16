@@ -38,7 +38,7 @@ It takes four optional arguments allow, logger, expect and upload\_dir,
 which are documented in the params() method.
 
 Takes an optional parameter syslog, to log messages to
-[Sys::Syslog](https://metacpan.org/pod/Sys::Syslog).
+[Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
@@ -90,7 +90,7 @@ Returns the file system directory containing the script.
 
         my $info = CGI::Info->new();
 
-        print 'HTML files are normally stored in ' .  $info->script_dir() . '/' . File::Spec->updir() . "\n";
+        print 'HTML files are normally stored in ', $info->script_dir(), '/', File::Spec->updir(), "\n";
 
 ## host\_name
 
@@ -138,7 +138,7 @@ Returns undef if the parameters can't be determined or if none were given.
 If an argument is given twice or more, then the values are put in a comma
 separated string.
 
-The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/pod/CGI::Untaint).
+The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/pod/CGI%3A%3AUntaint).
 
 Takes four optional parameters: allow, expect, logger and upload\_dir.
 The parameters are passed in a hash, or a reference to a hash.
@@ -163,7 +163,7 @@ be stored.
 Takes optional parameter logger, an object which is used for warnings and
 traces.
 This logger object is an object that understands warn() and trace() messages,
-such as a [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl) or [Log::Any](https://metacpan.org/pod/Log::Any) object.
+such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object.
 
 The allow, expect, logger and upload\_dir arguments can also be passed to the
 constructor.
@@ -266,7 +266,7 @@ it can't be determined.
 Returns the name of a directory that you can use to create temporary files
 in.
 
-The routine is preferable to ["tmpdir" in File::Spec](https://metacpan.org/pod/File::Spec#tmpdir) since CGI programs are
+The routine is preferable to ["tmpdir" in File::Spec](https://metacpan.org/pod/File%3A%3ASpec#tmpdir) since CGI programs are
 often running on shared servers.  Having said that, tmpdir will fall back
 to File::Spec->tmpdir() if it can't find somewhere better.
 
@@ -410,7 +410,7 @@ things to happen.
 
 # SEE ALSO
 
-[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP::BrowserDetect)
+[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 
 # SUPPORT
 
@@ -420,13 +420,29 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/release/CGI-Info](https://metacpan.org/release/CGI-Info)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info](https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/CGI-Info](http://cpants.cpanauthors.org/dist/CGI-Info)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=CGI-Info](http://matrix.cpantesters.org/?dist=CGI-Info)
 
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/CGI-Info](http://cpanratings.perl.org/d/CGI-Info)
+
+- CPAN Testers Dependencies
+
+    [http://deps.cpantesters.org/?module=CGI::Info](http://deps.cpantesters.org/?module=CGI::Info)
 
 - Search CPAN
 

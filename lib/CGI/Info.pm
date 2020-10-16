@@ -1733,17 +1733,29 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/CGI-Info>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/CGI-Info>
 
 =item * CPAN Testers' Matrix
 
-L<http://cpantesters.org/distro/C/CGI-Infohtml>
+L<http://matrix.cpantesters.org/?dist=CGI-Info>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Info>
+
+=item * CPAN Testers Dependencies
+
+L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =item * Search CPAN
 
