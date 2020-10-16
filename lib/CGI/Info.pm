@@ -1604,7 +1604,7 @@ API is the same as "param", it will replace the "get_cookie" method in the futur
 
 	use CGI::Info;
 
-	my $name = CGI::Info->new()->get_cookie(name);
+	my $name = CGI::Info->new()->cookie(name);
 	print "Your name is $name\n";
 =cut
 

@@ -21,10 +21,13 @@ __END__
 AnnoCPAN
 CGI
 CPAN
+CPANTS
 FCGI
 GPL
 Init
 ISPs
+logdir
+MetaCPAN
 POSTing
 RT
 cgi
