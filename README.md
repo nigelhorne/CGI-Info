@@ -4,7 +4,7 @@
 [![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
-[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-Info.png")](http://cpants.cpanauthors.org/dist/CGI-Info)
+[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-Info.png)](http://cpants.cpanauthors.org/dist/CGI-Info)
 
 # NAME
 
