@@ -55,3 +55,6 @@ jobs:
         - perl Makefile.PL
         - gmake
         - gmake test
+
+after_failure:
+  - cat /home/travis/.cpanm/work/*/build.log
