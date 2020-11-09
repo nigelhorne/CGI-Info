@@ -1,6 +1,7 @@
 Revision history for CGI-Info
 
 0.71
+	Added t/fixme.t
 	Use JSON module instead of JSON::Parse as the latter has dropped support for Solaris
 
 0.70	Fri  7 Jun 12:39:52 EDT 2019
