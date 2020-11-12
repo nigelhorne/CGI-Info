@@ -19,13 +19,13 @@ if(not $ENV{AUTHOR_TESTING}) {
 	$ENV{'REQUEST_METHOD'} = 'GET';
 	$ENV{'QUERY_STRING'} = 'fred=wilma';
 
+	# $Devel::FIXME::REPAIR_INC = 1;
+
 	use_ok('CGI::Info');
 
 	if($@) {
 		plan skip_all => 'Test::Warnings required for finding FIXMEs';
 	} else {
-		# $Devel::FIXME::REPAIR_INC = 1;
-
 		# ok($messages[0] !~ /lib\/CGI\/Info.pm/);
 		ok(scalar(@messages) == 0);
 
