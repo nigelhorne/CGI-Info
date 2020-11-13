@@ -1757,10 +1757,6 @@ L<http://cpanratings.perl.org/d/CGI-Info>
 
 L<http://deps.cpantesters.org/?module=CGI::Info>
 
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/CGI-Info/>
-
 =back
 
 =head1 LICENSE AND COPYRIGHT
