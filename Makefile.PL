@@ -18,6 +18,9 @@ WriteMakefile(
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
+	'LIBS' => [''],   # e.g., '-lm'
+	'DEFINE' => '',     # e.g., '-DHAVE_SOMETHING'
+	'INC' => '',     # e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'Test::Exception' => 0.42,
@@ -30,8 +33,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
-	},
-	PREREQ_PM => {
+	}, PREREQ_PM => {
 		'URI::Heuristic' => 0,
 		'Sub::Private' => 0,
 		'Sys::Hostname' => 0,
