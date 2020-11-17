@@ -44,6 +44,7 @@
 \.#
 \.rej$
 \.yml$
+\.swp$
 
 # Avoid OS-specific files/dirs
 # Mac OSX metadata
@@ -59,9 +60,8 @@
 ^MYMETA\.
 #!end included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
 
-
 \.travis\.yml
 \.appveyor\.yml
 \.releaserc
 \.lwpcookies
-HTML-.*
+CGI-.*
