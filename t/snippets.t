@@ -14,9 +14,11 @@ eval 'use Test::Pod::Snippets';
 if($@) {
 	plan(skip_all => 'Test::Pod::Snippets required for testing POD code snippets');
 } else {
-	my $tps = Test::Pod::Snippets->new;
+	my $tps = Test::Pod::Snippets->new();
 
 	my @modules = qw/ CGI::Info /;
 
-	$tps->runtest( module => $_, testgroup => 1 ) for @modules;
+	$tps->runtest(module => $_, testgroup => 1) for @modules;
+
+	done_testing();
 }
