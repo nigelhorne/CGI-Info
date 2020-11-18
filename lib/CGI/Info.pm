@@ -126,52 +126,52 @@ sub script_name {
 }
 
 sub _find_paths {
-        my $self = shift;
+	my $self = shift;
 
 	require File::Basename;
 	File::Basename->import();
 
-        if($ENV{'SCRIPT_NAME'}) {
-                $self->{_script_name} = File::Basename::basename($ENV{'SCRIPT_NAME'});
-        } else {
-                $self->{_script_name} = File::Basename::basename($0);
-        }
+	if($ENV{'SCRIPT_NAME'}) {
+		$self->{_script_name} = File::Basename::basename($ENV{'SCRIPT_NAME'});
+	} else {
+		$self->{_script_name} = File::Basename::basename($0);
+	}
 	$self->{_script_name} = $self->_untaint_filename({
 		filename => $self->{_script_name}
 	});
 
-        if($ENV{'SCRIPT_FILENAME'}) {
-                $self->{_script_path} = $ENV{'SCRIPT_FILENAME'};
-        } elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
-                my $script_name = $ENV{'SCRIPT_NAME'};
-                if(substr($script_name, 0, 1) eq '/') {
-                        # It's usually the case, e.g. /cgi-bin/foo.pl
-                        $script_name = substr($script_name, 1);
-                }
-                $self->{_script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
-        } elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
-                if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) &&
-                   (-r $ENV{'SCRIPT_NAME'})) {
-                        # Called from a command line with a full path
-                        $self->{_script_path} = $ENV{'SCRIPT_NAME'};
-                } else {
-                        require Cwd;
-                        Cwd->import;
+	if($ENV{'SCRIPT_FILENAME'}) {
+		$self->{_script_path} = $ENV{'SCRIPT_FILENAME'};
+	} elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
+		my $script_name = $ENV{'SCRIPT_NAME'};
+		if(substr($script_name, 0, 1) eq '/') {
+			# It's usually the case, e.g. /cgi-bin/foo.pl
+			$script_name = substr($script_name, 1);
+		}
+		$self->{_script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
+	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
+		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) &&
+		   (-r $ENV{'SCRIPT_NAME'})) {
+			# Called from a command line with a full path
+			$self->{_script_path} = $ENV{'SCRIPT_NAME'};
+		} else {
+			require Cwd;
+			Cwd->import;
 
-                        my $script_name = $ENV{'SCRIPT_NAME'};
-                        if(substr($script_name, 0, 1) eq '/') {
-                                # It's usually the case, e.g. /cgi-bin/foo.pl
-                                $script_name = substr($script_name, 1);
-                        }
+			my $script_name = $ENV{'SCRIPT_NAME'};
+			if(substr($script_name, 0, 1) eq '/') {
+				# It's usually the case, e.g. /cgi-bin/foo.pl
+				$script_name = substr($script_name, 1);
+			}
 
-                        $self->{_script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
-                }
-        } elsif(File::Spec->file_name_is_absolute($0)) {
+			$self->{_script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
+		}
+	} elsif(File::Spec->file_name_is_absolute($0)) {
 		# Called from a command line with a full path
 		$self->{_script_path} = $0;
 	} else {
 		$self->{_script_path} = File::Spec->rel2abs($0);
-        }
+	}
 
 	$self->{_script_path} = $self->_untaint_filename({
 		filename => $self->{_script_path}
@@ -1006,7 +1006,7 @@ All tablets are mobile, but not all mobile devices are tablets.
 =cut
 
 sub is_mobile {
-        my $self = shift;
+	my $self = shift;
 
 	if(defined($self->{_is_mobile})) {
 		return $self->{_is_mobile};
@@ -1074,10 +1074,10 @@ sub is_tablet {
 		return $self->{_is_tablet};
 	}
 
-        if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
+	if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
 		# TODO: add others when I see some nice user_agents
 		$self->{_is_tablet} = 1;
-        } else {
+	} else {
 		$self->{_is_tablet} = 0;
 	}
 
