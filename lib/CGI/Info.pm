@@ -1636,12 +1636,16 @@ sub cookie {
 
 =head2 status
 
-Returns the status of the object, 200 for OK, otherwise an HTTP error code
+Sets or returns the status of the object, 200 for OK, otherwise an HTTP error code
 
 =cut
 
 sub status {
 	my $self = shift;
+	
+	if(my $status = shift) {
+		$self->{_status} = $status;
+	}
 
 	return $self->{_status} || 200;
 }
