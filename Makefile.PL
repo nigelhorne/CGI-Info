@@ -69,9 +69,9 @@ WriteMakefile(
 			},
 			bugtracker => {
 				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
-				# mailto => 'bug-CGI-Info@rt.cpan.org'
 				web => 'https://github.com/nigelhorne/CGI-Info/issues',
 				url => 'https://github.com/nigelhorne/CGI-Info/issues',
+				mailto => 'bug-CGI-Info@rt.cpan.org'
 			}
 		},
 	},
