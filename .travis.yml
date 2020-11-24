@@ -38,7 +38,7 @@ before_install:
   - cpanm -v -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp Test::Pod::Coverage
 
 install:
-  - cpanm -v --installdeps --notest .
+  - cpanm -qin --skip-satisfied --installdeps --notest .
 
 script:
   perl Makefile.PL && make && cover -test -report coveralls
