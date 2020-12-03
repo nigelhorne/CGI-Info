@@ -1,3 +1,4 @@
+---
 on:
   push:
     branches:
@@ -10,8 +11,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ['windows-latest', 'macos-latest', 'ubuntu-latest']
-        perl: [ '5.30', '5.28' ]
+        os:
+          - macos-latest
+          - ubuntu-16.04
+          - ubuntu-18.04
+          - ubuntu-20.04
+          - windows-2019
+          - windows-2016
+        perl: ['5.30', '5.28']
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
