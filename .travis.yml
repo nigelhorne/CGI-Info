@@ -11,9 +11,10 @@ arch:
   - s390x
   # - arm64	# Gets 404 error
 
-env:
-  - AUTOMATED_TESTING=1
-  - PERL_CPANM_OPT="--notest --force --skip-satisfied"
+# env:
+  # - AUTOMATED_TESTING=1
+  # - PERL_CPANM_OPT="--notest --force --skip-satisfied"
+env: AUTOMATED_TESTING=1 PERL_CPANM_OPT="--notest --force --skip-satisfied"
 
 perl:
   - "5.30"
