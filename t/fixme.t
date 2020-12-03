@@ -8,29 +8,28 @@ use Test::Most;
 
 my @messages;
 
-if(not $ENV{AUTHOR_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-} else {
+if($ENV{AUTHOR_TESTING}) {
 	is($INC{'Devel/FIXME.pm'}, undef, "Devel::FIXME isn't loaded yet");
 	
-	use_ok('Devel::FIXME');
-
-	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
-	$ENV{'REQUEST_METHOD'} = 'GET';
-	$ENV{'QUERY_STRING'} = 'fred=wilma';
-
-	# $Devel::FIXME::REPAIR_INC = 1;
-
-	use_ok('CGI::Info');
-
+	eval 'use Devel::FIXME';
 	if($@) {
-		plan skip_all => 'Test::Warnings required for finding FIXMEs';
+		plan(skip_all => 'Devel::FIXME not installed');
 	} else {
+		$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+		$ENV{'REQUEST_METHOD'} = 'GET';
+		$ENV{'QUERY_STRING'} = 'fred=wilma';
+
+		# $Devel::FIXME::REPAIR_INC = 1;
+
+		use_ok('CGI::Info');
+
 		# ok($messages[0] !~ /lib\/CGI\/Info.pm/);
 		ok(scalar(@messages) == 0);
 
-		done_testing(4);
+		done_testing(3);
 	}
+} else {
+	plan(skip_all => 'Author tests not required for installation');
 }
 
 sub Devel::FIXME::rules {
