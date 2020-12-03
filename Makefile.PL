@@ -66,8 +66,7 @@ WriteMakefile(
 				url => 'git://github.com/nigelhorne/CGI-Info.git',
 				web => 'https://github.com/nigelhorne/CGI-Info',
 				repository => 'https://github.com/nigelhorne/CGI-Info',
-			},
-			bugtracker => {
+			}, bugtracker => {
 				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
 				web => 'https://github.com/nigelhorne/CGI-Info/issues',
 				url => 'https://github.com/nigelhorne/CGI-Info/issues',
