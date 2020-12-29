@@ -17,6 +17,8 @@ use Sys::Path;
 
 use namespace::clean;
 
+sub _sanitise_input($);
+
 =head1 NAME
 
 CGI::Info - Information about the CGI environment
@@ -702,7 +704,7 @@ sub params {
 			$value = '';
 		}
 
-		$key = $self->_sanitise_input($key);
+		$key = _sanitise_input($key);
 
 		if($self->{_allow}) {
 			# Is this a permitted argument?
@@ -727,7 +729,7 @@ sub params {
 		if($self->{_expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{_expect}})) {
 			next;
 		}
-		$value = $self->_sanitise_input($value);
+		$value = _sanitise_input($value);
 
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
@@ -867,8 +869,7 @@ sub _warn {
 	}
 }
 
-sub _sanitise_input {
-	my $self = shift;
+sub _sanitise_input($) {
 	my $arg = shift;
 
 	# Remove hacking attempts and spaces
@@ -1181,7 +1182,7 @@ Tmpdir allows a reference of the options to be passed.
 
 	my $info = CGI::Info->new();
 	my $dir = $info->tmpdir(default => '/var/tmp');
-	my $dir = $info->tmpdir({ default => '/var/tmp' });
+	$dir = $info->tmpdir({ default => '/var/tmp' });
 
 	# or
 
@@ -1303,7 +1304,7 @@ Is the visitor a real person or a robot?
 
 	my $info = CGI::Info->new();
 	unless($info->is_robot()) {
-	  # update site visitor statistics
+	 # update site visitor statistics
 	}
 
 =cut
@@ -1642,7 +1643,7 @@ Sets or returns the status of the object, 200 for OK, otherwise an HTTP error co
 
 sub status {
 	my $self = shift;
-	
+
 	if(my $status = shift) {
 		$self->{_status} = $status;
 	}
