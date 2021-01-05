@@ -2,13 +2,21 @@
 
 use strict;
 use warnings;
-use Test::More;
+use Test::Most;
 
-if($ENV{'AUTHOR_TESTING'}) {
-	eval 'use Test::EOF';
-	plan(skip_all => 'Test::EOF required to test for correct end of file flag') if $@;
-
-	all_perl_files_ok({ minimum_newlines => 1, maximum_newlines => 4 });
-
-	done_testing();
+BEGIN {
+	if($ENV{AUTHOR_TESTING}) {
+		eval {
+			require Test::EOF;
+		};
+		if($@) {
+			plan(skip_all => 'Test::EOF not installed');
+		} else {
+			import Test::EOF;
+			all_perl_files_ok({ minimum_newlines => 1, maximum_newlines => 4 });
+			done_testing();
+		}
+	} else {
+		plan(skip_all => 'Author tests not required for installation');
+	}
 }
