@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
-use 5.006_001;
+use 5.008;
 use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
