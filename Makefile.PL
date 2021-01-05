@@ -59,7 +59,7 @@ WriteMakefile(
 	# META_ADD => {
 		# provides => {}
 	# },
-	META_MERGE		=> {
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
