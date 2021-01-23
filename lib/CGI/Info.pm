@@ -1705,6 +1705,8 @@ sub AUTOLOAD {
 
 	my $self = shift;
 
+	return if(ref($self) ne __PACKAGE__);
+
 	return $self->param($param);
 }
 
