@@ -35,12 +35,12 @@ WriteMakefile(
 		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	}, PREREQ_PM => {
+		'Carp' => 0,
 		'URI::Heuristic' => 0,
 		'Sub::Private' => 0,
 		'Sys::Hostname' => 0,
 		'File::Spec' => 0,
 		'Cwd' => 0,
-		'Carp' => 0,
 		'Socket' => 0,
 		'List::MoreUtils' => 0,
 		'HTTP::BrowserDetect' => 3.10,	# Include bingbot
