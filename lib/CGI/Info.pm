@@ -4,7 +4,8 @@ package CGI::Info;
 
 use warnings;
 use strict;
-use Class::Autouse qw{Carp File::Spec};
+use Carp;
+use File::Spec;
 use Socket;	# For AF_INET
 use 5.008;
 use Log::Any qw($log);
@@ -80,7 +81,7 @@ sub new {
 
 	# Use CGI::Info->new(), not CGI::Info::new()
 	if(!defined($class)) {
-		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		return;
 	}
 
@@ -591,14 +592,14 @@ sub params {
 			}
 			if(!File::Spec->file_name_is_absolute($self->{_upload_dir})) {
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn\'t a full pathname"
+					warning => "upload_dir $self->{_upload_dir} isn't a full pathname"
 				});
 				delete $self->{_upload_dir};
 				return;
 			}
 			if(!-d $self->{_upload_dir}) {
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn\'t a directory"
+					warning => "upload_dir $self->{_upload_dir} isn't a directory"
 				});
 				delete $self->{_upload_dir};
 				return;
@@ -606,7 +607,7 @@ sub params {
 			if(!-w $self->{_upload_dir}) {
 				delete $self->{_paramref};
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn\'t writeable"
+					warning => "upload_dir $self->{_upload_dir} isn't writeable"
 				});
 				delete $self->{_upload_dir};
 				return;
@@ -849,7 +850,7 @@ sub _warn {
 	return unless($warning);
 	if($self eq __PACKAGE__) {
 		# Called from class method
-		Carp::carp($warning);
+		carp($warning);
 		return;
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
@@ -869,7 +870,7 @@ sub _warn {
 	if($self->{_logger}) {
 		$self->{_logger}->warn($warning);
 	} elsif(!defined($self->{_syslog})) {
-		Carp::carp($warning);
+		carp($warning);
 	}
 }
 
@@ -1294,7 +1295,7 @@ sub logdir {
 			last;
 		}
 	}
-	Carp::carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
+	carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
 	$self->{_logdir} ||= $dir;
 
 	return $dir;
@@ -1688,7 +1689,7 @@ sub reset {
 	my $class = shift;
 
 	unless($class eq __PACKAGE__) {
-		Carp::carp 'Reset is a class method';
+		carp('Reset is a class method');
 		return;
 	}
 
