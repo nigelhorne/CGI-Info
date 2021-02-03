@@ -13,7 +13,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.70
+Version 0.71
 
 # SYNOPSIS
 
@@ -283,7 +283,7 @@ Tmpdir allows a reference of the options to be passed.
 
         my $info = CGI::Info->new();
         my $dir = $info->tmpdir(default => '/var/tmp');
-        my $dir = $info->tmpdir({ default => '/var/tmp' });
+        $dir = $info->tmpdir({ default => '/var/tmp' });
 
         # or
 
@@ -313,7 +313,7 @@ Is the visitor a real person or a robot?
 
         my $info = CGI::Info->new();
         unless($info->is_robot()) {
-          # update site visitor statistics
+         # update site visitor statistics
         }
 
 ## is\_search\_engine
@@ -373,12 +373,12 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
 
         use CGI::Info;
 
-        my $name = CGI::Info->new()->get_cookie(name);
+        my $name = CGI::Info->new()->cookie(name);
         print "Your name is $name\n";
 
 ## status
 
-Returns the status of the object, 200 for OK, otherwise an HTTP error code
+Sets or returns the status of the object, 200 for OK, otherwise an HTTP error code
 
 ## set\_logger
 
@@ -446,12 +446,8 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=CGI::Info](http://deps.cpantesters.org/?module=CGI::Info)
 
-- Search CPAN
-
-    [http://search.cpan.org/dist/CGI-Info/](http://search.cpan.org/dist/CGI-Info/)
-
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2019 Nigel Horne.
+Copyright 2010-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
