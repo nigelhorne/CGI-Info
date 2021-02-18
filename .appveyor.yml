@@ -1,3 +1,4 @@
+---
 version: 1.0.{build}
 
 image:
@@ -33,7 +34,7 @@ install:
   - cmd: mkdir %APPVEYOR_BUILD_FOLDER%\tmp
   - cmd: set TMPDIR=%APPVEYOR_BUILD_FOLDER%\tmp
   - cpan App::cpanminus
-  - cmd: cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -n
+  - cmd: cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -qin --skip-satisfied
   - cpanm -qin --skip-satisfied --installdeps .
   - cmd: 'echo End install at: & time /t'
 
