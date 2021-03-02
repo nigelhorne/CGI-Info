@@ -1652,6 +1652,16 @@ sub status {
 	if(my $status = shift) {
 		$self->{_status} = $status;
 	}
+	if(!defined($self->{_status})) {
+		if(defined(my $method = $ENV{'REQUEST_METHOD'})) {
+			if(($method eq 'OPTIONS') || ($method eq 'DELETE')) {
+				return 405;
+			} elsif(($method eq 'POST') && !defined($ENV{'CONTENT_LENGTH'})) {
+				return 411;
+			}
+		}
+		return 200;
+	}
 
 	return $self->{_status} || 200;
 }
