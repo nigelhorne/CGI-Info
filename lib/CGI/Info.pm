@@ -870,7 +870,7 @@ sub _warn {
 	if($self->{_logger}) {
 		$self->{_logger}->warn($warning);
 	} elsif(!defined($self->{_syslog})) {
-		carp($warning);
+		Carp::carp($warning);
 	}
 }
 
