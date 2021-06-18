@@ -23,6 +23,7 @@ WriteMakefile(
 	'INC' => '',     # e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
+		'LWP::UserAgent' => 0,
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::Exception' => 0.42,
