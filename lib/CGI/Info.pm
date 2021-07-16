@@ -546,13 +546,15 @@ sub params {
 			}
 		}
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-		unless($ENV{'QUERY_STRING'}) {
+		if(my $query = $ENV{'QUERY_STRING'}) {
+			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
+				$self->_warn('Multipart/form-data not supported for GET');
+			}
+			$query =~ s/\\u0026/\&/g;
+			@pairs = split(/&/, $query);
+		} else {
 			return;
 		}
-		if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
-			$self->_warn('Multipart/form-data not supported for GET');
-		}
-		@pairs = split(/&/, $ENV{'QUERY_STRING'});
 	} elsif($ENV{'REQUEST_METHOD'} eq 'POST') {
 		if(!defined($ENV{'CONTENT_LENGTH'})) {
 			$self->{_status} = 411;
