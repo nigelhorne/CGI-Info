@@ -1377,6 +1377,7 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
+		$referrer =~ s/\\/_/g;
 		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
 			if($self->{_logger}) {
 				$self->{_logger}->debug("is_robot: blocked trawler $referrer");
