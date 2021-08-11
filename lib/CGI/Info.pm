@@ -1689,6 +1689,8 @@ sub set_logger {
 	}
 
 	$self->{_logger} = $params{'logger'};
+
+	return $self;
 }
 
 =head2 reset
