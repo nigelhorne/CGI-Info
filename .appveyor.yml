@@ -37,8 +37,6 @@ install:
   - cmd: cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -qin --skip-satisfied
   - cpanm -qin --skip-satisfied --installdeps .
   - cmd: 'echo End install at: & time /t'
-  - perl -S cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
-  - perl -S report-prereqs --with-develop
 
 build_script:
   - perl Makefile.PL
