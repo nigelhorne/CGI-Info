@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.72
 	More sensible default statuses when params() has yet to be called
+	Ensure \u0026 is interpreted as &
 
 0.71	Wed Feb  3 15:14:13 EST 2021
 	Added t/fixme.t
