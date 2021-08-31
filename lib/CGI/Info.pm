@@ -466,7 +466,7 @@ If the request is an XML request (i.e. the content type of the POST is text/xml)
 CGI::Info will put the request into the params element 'XML', thus:
 
 	use CGI::Info;
-	...
+	# ...
 	my $info = CGI::Info->new();
 	my $paramsref = $info->params();	# See BUGS below
 	my $xml = $$paramsref{'XML'};
