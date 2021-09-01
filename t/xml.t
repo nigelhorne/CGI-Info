@@ -5,7 +5,7 @@ use warnings;
 use Test::Most tests => 10;
 use Test::NoWarnings;
 
-eval 'use autodie qw(:all)';	# Test for open/close failures
+eval { use autodie qw(:all) };	# Test for open/close failures
 
 BEGIN {
 	use_ok('CGI::Info');
