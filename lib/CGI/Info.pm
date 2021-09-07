@@ -1146,8 +1146,7 @@ sub protocol {
 
 	my $port = $ENV{'SERVER_PORT'};
 	if(defined($port)) {
-		my $name = getservbyport($port, 'tcp');
-		if(defined($name)) {
+		if(defined(my $name = getservbyport($port, 'tcp'))) {
 			if($name =~ /https?/) {
 				return $name;
 			} elsif($name eq 'www') {
