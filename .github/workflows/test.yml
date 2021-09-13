@@ -33,7 +33,7 @@ jobs:
           cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker
           cpanm -iqn --skip-satisfied Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
-        env:
-          AUTHOR_TESTING: 1
       - name: Run Tests
         run: prove -l -b t
+        env:
+          AUTHOR_TESTING: 1
