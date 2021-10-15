@@ -11,7 +11,7 @@ use 5.008;
 use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
-use JSON;
+use JSON::MaybeXS;
 use List::MoreUtils;	# Can go when expect goes
 # use Sub::Private;
 use Sys::Path;
