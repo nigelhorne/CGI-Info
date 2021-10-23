@@ -6,7 +6,7 @@ use warnings;
 use Test::Most;
 
 if($ENV{AUTHOR_TESTING} ) {
-	eval 'use Test::Spelling::Comment 0.002';
+	eval { use Test::Spelling::Comment 0.002 };
 	if($@) {
 		plan(skip_all => 'Test::Spelling::Comment required for testing comment spelling');
 	} else {
