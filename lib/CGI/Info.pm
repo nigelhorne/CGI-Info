@@ -1552,13 +1552,14 @@ cookie isn't in the jar.
 
 Deprecated - use cookie() instead.
 
-	use CGI::Info;
+    use CGI::Info;
 
-	my $i = CGI::Info->new();
-	my $name = $i->get_cookie(cookie_name => 'name');
-	print "Your name is $name\n";
-	my $address = $i->get_cookie('address');
-	print "Your address is $address\n";
+    my $i = CGI::Info->new();
+    my $name = $i->get_cookie(cookie_name => 'name');
+    print "Your name is $name\n";
+    my $address = $i->get_cookie('address');
+    print "Your address is $address\n";
+
 =cut
 
 sub get_cookie {
@@ -1602,10 +1603,11 @@ Returns a cookie's value, or undef if no name is given, or the requested
 cookie isn't in the jar.
 API is the same as "param", it will replace the "get_cookie" method in the future.
 
-	use CGI::Info;
+    use CGI::Info;
 
-	my $name = CGI::Info->new()->cookie(name);
-	print "Your name is $name\n";
+    my $name = CGI::Info->new()->cookie('name');
+    print "Your name is $name\n";
+
 =cut
 
 sub cookie {
