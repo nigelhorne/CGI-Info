@@ -226,8 +226,7 @@ sub script_dir {
 		$self->_find_paths();
 	}
 
-	# Don't use File::Spec->splitpath() since that can leave in the trailing
-	# slash
+	# Don't use File::Spec->splitpath() since that can leave the trailing slash
 	if($^O eq 'MSWin32') {
 		if($self->{script_path} =~ /(.+)\\.+?$/) {
 			return $1;
