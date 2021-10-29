@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.73
+	Attempt to fix https://www.cpantesters.org/cpan/report/6db47260-389e-11ec-bc66-57723b537541
+
 0.72	Thu Oct 28 09:08:43 EDT 2021
 	More sensible default statuses when params() has yet to be called
 	Ensure \u0026 is interpreted as &
