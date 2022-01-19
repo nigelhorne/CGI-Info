@@ -13,7 +13,7 @@ if($ENV{AUTHOR_TESTING}) {
 
 	eval 'use Devel::FIXME';
 	if($@) {
-		diag('Devel::FIXME required for looking for FIXMEs');
+		diag('Devel::FIXME needed to test for FIXMEs');
 		done_testing(1);
 	} else {
 		$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
