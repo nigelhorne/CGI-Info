@@ -1,4 +1,6 @@
 ---
+# See https://github.com/actions/virtual-environments
+
 on:
   push:
     branches:
@@ -13,11 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-latest
-          - ubuntu-18.04
+          - macos-11
+          - macos-10.15
           - ubuntu-20.04
+          - ubuntu-18.04
+          - windows-2022
           - windows-2019
-          - windows-2016
         perl: ['5.34', '5.32', '5.30', '5.28', '5.22']
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
