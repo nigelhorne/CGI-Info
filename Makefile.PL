@@ -19,8 +19,8 @@ WriteMakefile(
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
 	'LIBS' => [''],   # e.g., '-lm'
-	'DEFINE' => '',     # e.g., '-DHAVE_SOMETHING'
-	'INC' => '',     # e.g., '-I/usr/include/other'
+	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
+	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'LWP::UserAgent' => 0,

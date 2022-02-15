@@ -79,10 +79,11 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	# Use CGI::Info->new(), not CGI::Info::new()
 	if(!defined($class)) {
-		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
+		# Using CGI::Info->new(), not CGI::Info::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+		$class = __PACKAGE__;
 	}
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
