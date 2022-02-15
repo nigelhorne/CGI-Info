@@ -14,10 +14,12 @@ arch:
 env: AUTOMATED_TESTING=1 PERL_CPANM_OPT="--notest --force --skip-satisfied"
 
 perl:
+  - "5.32"
   - "5.30"
-  - "5.28" # Travis gets 404 errors trying to find some older perls
+  # Travis gets 404 errors trying to find some older perls
+  - "5.28"
   - "5.26"
-  - "5.24"
+  # - "5.24"
   # - "5.22"
   # - "5.20"
   # - "5.18"
@@ -31,9 +33,7 @@ perl:
 sudo: false
 
 # before_install:
-  # # - sudo apt-get update -q
-  # # - sudo apt-get install sqlite3 libdbi-perl libdbd-sqlite3-perl
-  # - cpanm -qin --skip-satisfied Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp Test::Pod::Coverage
+#   - cpanm -qin --skip-satisfied Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp Test::Pod::Coverage
 
 before_install:
   - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
