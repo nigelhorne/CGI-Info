@@ -1013,6 +1013,13 @@ sub is_mobile {
 		return $self->{is_mobile};
 	}
 
+	# Support Sec-CH-UA-Mobile
+	if(my $ch_ua_mobile = $ENV{'HTTP_SEC_CH_UA_MOBILE'}) {
+		if($ch_ua_mobile eq '?1') {
+			$self->{is_mobile} = 1;
+			return 1;
+		}
+	}
 	if($ENV{'HTTP_X_WAP_PROFILE'}) {
 		# E.g. Blackberry
 		# TODO: Check the sanity of this variable
