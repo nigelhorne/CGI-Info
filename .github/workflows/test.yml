@@ -1,6 +1,7 @@
 ---
 # See https://github.com/actions/virtual-environments
 
+name: Test Code
 on:
   push:
     branches:
