@@ -83,6 +83,8 @@ sub new {
 		# Using CGI::Info->new(), not CGI::Info::new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
+
+		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	}
 
