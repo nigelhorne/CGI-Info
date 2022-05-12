@@ -76,8 +76,7 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = $_[0];
 
 	if(!defined($class)) {
 		# Using CGI::Info->new(), not CGI::Info::new()
@@ -86,12 +85,16 @@ sub new {
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless $class, ref($class);
 	}
 
+	shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
-		warn 'expect must be a reference to an array';
+		warn __PACKAGE__, ': expect must be a reference to an array';
 		return;
 	}
 
