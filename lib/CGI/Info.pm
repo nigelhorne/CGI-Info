@@ -78,6 +78,14 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 sub new {
 	my $class = $_[0];
 
+	shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
+		warn __PACKAGE__, ': expect must be a reference to an array';
+		return;
+	}
+
 	if(!defined($class)) {
 		# Using CGI::Info->new(), not CGI::Info::new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
@@ -87,15 +95,7 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(ref($class)) {
 		# clone the given object
-		return bless $class, ref($class);
-	}
-
-	shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-
-	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
-		warn __PACKAGE__, ': expect must be a reference to an array';
-		return;
+		return bless { %{$class}, %args }, ref($class);
 	}
 
 	my %defaults = (
