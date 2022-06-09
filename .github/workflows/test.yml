@@ -48,8 +48,8 @@ jobs:
             ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
           elif [ ${{ runner.os }} == 'Windows' ]; then
             which perl
-            which prove
             make test
+            which prove
           fi
         shell: bash
         env:
