@@ -20,7 +20,6 @@ t/carp.t
 t/changes.t
 t/comment-spelling.t
 t/cookies.t
-t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
@@ -48,6 +47,7 @@ t/noplan.t
 t/param.t
 t/params.t
 t/pod-cm.t
+t/pod-coverage.t
 t/pod-spelling.t
 t/pod.t
 t/port.t
