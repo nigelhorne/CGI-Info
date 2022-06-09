@@ -54,6 +54,7 @@ jobs:
             chmod +x codecov
             ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
           elif [ ${{ runner.os }} == 'Windows' ]; then
+            cpanm -iqn --skip-satisfied Devel::Cover::DB
             make test
             cover -test
             cover -report codecov
