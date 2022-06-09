@@ -49,7 +49,7 @@ jobs:
             ./codecov
           fi
         shell: bash
-        post:
+        after_success:
           - cover -report codecov
         env:
           AUTHOR_TESTING: 1
