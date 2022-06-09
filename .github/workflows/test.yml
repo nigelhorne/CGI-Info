@@ -49,6 +49,7 @@ jobs:
           elif [ ${{ runner.os }} == 'Windows' ]; then
             which perl
             which prove
+            make test
           fi
         shell: bash
         env:
