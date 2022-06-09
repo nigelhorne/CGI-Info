@@ -33,18 +33,23 @@ jobs:
       - run: perl -V
       - name: Install Dependencies
         run: |
-          cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker
+          cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Devel::Cover::Report::Codecov
           cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Run Tests
         run: |
           prove -l -b t
+          cover -test
           echo ${{ runner.os }}
+          which perl
+          which prove
           if [ ${{ runner.os }} == 'Linux' ]; then
             curl -Os https://uploader.codecov.io/latest/linux/codecov
             chmod +x codecov
             ./codecov
           fi
         shell: bash
+        post:
+          - cover -report codecov
         env:
           AUTHOR_TESTING: 1
