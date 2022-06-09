@@ -46,6 +46,9 @@ jobs:
             curl -Os https://uploader.codecov.io/latest/linux/codecov
             chmod +x codecov
             ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
+          elif [ ${{ runner.os }} == 'Linux' ]; then
+            which perl
+            which prove
           fi
         shell: bash
         env:
