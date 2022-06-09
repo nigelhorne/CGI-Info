@@ -37,6 +37,13 @@ jobs:
           cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Run Tests
-        run: prove -l -b t
+        run: |
+          prove -l -b t
+          if [ runner.os == 'Linux' ]; then
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            chmod +x codecov
+            ./codecov
+          fi
+        shell: bash
         env:
           AUTHOR_TESTING: 1
