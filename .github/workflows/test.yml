@@ -40,6 +40,7 @@ jobs:
         run: |
           prove -l -b t
           cover -test
+          cover -report codecov
           echo ${{ runner.os }}
           which perl
           which prove
@@ -49,7 +50,5 @@ jobs:
             ./codecov
           fi
         shell: bash
-        after_success:
-          - cover -report codecov
         env:
           AUTHOR_TESTING: 1
