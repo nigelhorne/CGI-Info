@@ -46,7 +46,7 @@ jobs:
             curl -Os https://uploader.codecov.io/latest/linux/codecov
             chmod +x codecov
             ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
-          elif [ ${{ runner.os }} == 'MacOS' ]; then
+          elif [ ${{ runner.os }} == 'macOS' ]; then
             prove -l -b t
             cover -test
             cover -report codecov
