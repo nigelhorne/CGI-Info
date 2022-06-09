@@ -39,7 +39,8 @@ jobs:
       - name: Run Tests
         run: |
           prove -l -b t
-          if [ runner.os == 'Linux' ]; then
+          echo ${{ runner.os }}
+          if [ ${{ runner.os }} == 'Linux' ]; then
             curl -Os https://uploader.codecov.io/latest/linux/codecov
             chmod +x codecov
             ./codecov
