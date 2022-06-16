@@ -36,7 +36,6 @@ jobs:
       - name: Run Tests
         run: |
           choco --no-progress install codecov
-          make test
           cover -test
           cover -report codecov
           curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
