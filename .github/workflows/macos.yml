@@ -35,7 +35,6 @@ jobs:
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Run Tests
         run: |
-          prove -l -b t
           cover -test
           cover -report codecov
           curl -Os https://uploader.codecov.io/latest/macos/codecov
