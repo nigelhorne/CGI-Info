@@ -39,7 +39,7 @@ jobs:
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Run Tests
         run: |
-	  choco install codecov
+          choco install codecov
           cpanm -iqn --skip-satisfied Devel::Cover::DB
           make test
           cover -test
