@@ -39,29 +39,13 @@ jobs:
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Run Tests
         run: |
-          if [ ${{ runner.os }} == 'Linux' ]; then
-            prove -l -b t
-            cover -test
-            cover -report codecov
-            curl -Os https://uploader.codecov.io/latest/linux/codecov
-            chmod +x codecov
-            ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
-          elif [ ${{ runner.os }} == 'macOS' ]; then
-            prove -l -b t
-            cover -test
-            cover -report codecov
-            curl -Os https://uploader.codecov.io/latest/macos/codecov
-            chmod +x codecov
-            ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
-          elif [ ${{ runner.os }} == 'Windows' ]; then
-            cpanm -iqn --skip-satisfied ExtUtils::MakeMaker Pod::Man Devel::Cover::DB
-            make test
-            cover -test
-            cover -report codecov
-            curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
-            ./codecov.exe -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
-          fi
-        shell: bash
+	  choco install codecov
+          cpanm -iqn --skip-satisfied Devel::Cover::DB
+          make test
+          cover -test
+          cover -report codecov
+          curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
+          ./codecov.exe -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
         env:
           AUTHOR_TESTING: 1
           CODECOV_TOKEN: fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
