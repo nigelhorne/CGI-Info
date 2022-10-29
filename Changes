@@ -1,6 +1,7 @@
 Revision history for CGI-Info
 
 0.74
+	Added python-requests/2.27.1 as a robot
 	Use latest Github Actions environment
 	Support Sec-CH-UA-Mobile
 	Calling new on an object now returns a clone rather than setting the defaults in the new object
