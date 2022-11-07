@@ -20,7 +20,7 @@ jobs:
         - name: openbsd
           version: '7.1'
           pkginstall: pkg_add p5-ExtUtils-MakeMaker
-  
+ 
   steps:
     - uses: actions/checkout@main
       with:
