@@ -10,32 +10,31 @@ on:
       - '*'
   pull_request:
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - name: freebsd
-            version: '13.0'
-            pkginstall: pkg install -y p5-ExtUtils-MakeMaker
-          - name: openbsd
-            version: '7.1'
-            pkginstall: pkg_add p5-ExtUtils-MakeMaker
-    name: Perl ${{ matrix.perl-version }} on ${{ matrix.os }}
-    
-    steps:
-      - uses: actions/checkout@main
-        with:
-          submodules: recursive
-      - name: Test on ${{ matrix.os.name }}
-        uses: cross-platform-actions/action@master
-        with:
-          operating_system: ${{ matrix.os.name }}
-          version: ${{ matrix.os.version }}
-          shell: bash
-          run: |
-            sudo ${{ matrix.os.pkginstall }}
-            curl -L https://cpanmin.us | sudo perl - --verbose --notest --installdeps --with-configure --with-develop .
-            perl Makefile.PL
-            make
-            prove -wlvmb t
+  strategy:
+    fail-fast: false
+    matrix:
+      os:
+        - name: freebsd
+          version: '13.0'
+          pkginstall: pkg install -y p5-ExtUtils-MakeMaker
+        - name: openbsd
+          version: '7.1'
+          pkginstall: pkg_add p5-ExtUtils-MakeMaker
+  name: Perl ${{ matrix.perl-version }} on ${{ matrix.os }}
+  
+  steps:
+    - uses: actions/checkout@main
+      with:
+        submodules: recursive
+    - name: Test on ${{ matrix.os.name }}
+      uses: cross-platform-actions/action@master
+      with:
+        operating_system: ${{ matrix.os.name }}
+        version: ${{ matrix.os.version }}
+        shell: bash
+        run: |
+          sudo ${{ matrix.os.pkginstall }}
+          curl -L https://cpanmin.us | sudo perl - --verbose --notest --installdeps --with-configure --with-develop .
+          perl Makefile.PL
+          make
+          prove -wlvmb t
