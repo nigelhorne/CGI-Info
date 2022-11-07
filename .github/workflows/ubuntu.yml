@@ -1,5 +1,6 @@
 ---
-# See https://github.com/actions/virtual-environments
+# see https://github.com/FGasper/perl-github-action-tips
+# and https://github.com/actions/virtual-environments
 
 name: Test Code on Ubuntu
 on:
@@ -29,10 +30,6 @@ jobs:
         with:
           submodules: recursive
       - uses: codecov/codecov-action@v2
-      - name: Setup perl
-        uses: shogo82148/actions-setup-perl@v1
-        with:
-          perl-version: ${{ matrix.perl-version }}
       - run: perl -V
       - name: Install Dependencies
         run: |
