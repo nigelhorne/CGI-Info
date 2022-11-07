@@ -18,8 +18,8 @@ jobs:
         os:
           - ubuntu-20.04
           - ubuntu-22.04
-        perl: ['5.36', '5.34', '5.32', '5.30', '5.28', '5.22', '5.20', '5.18', '5.16', '5.14', '5.12', '5.10']
-    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
+        perl-version: ['5.36', '5.34', '5.32', '5.30', '5.28', '5.22', '5.20', '5.18', '5.16', '5.14', '5.12', '5.10']
+    name: Perl ${{ matrix.perl-version }} on ${{ matrix.os }}
 
     container:
       image: perldocker/perl-tester:${{ matrix.perl-version }}
@@ -27,12 +27,12 @@ jobs:
     steps:
       - uses: actions/checkout@main
         with:
-            submodules: recursive
+          submodules: recursive
       - uses: codecov/codecov-action@v2
       - name: Setup perl
         uses: shogo82148/actions-setup-perl@v1
         with:
-          perl-version: ${{ matrix.perl }}
+          perl-version: ${{ matrix.perl-version }}
       - run: perl -V
       - name: Install Dependencies
         run: |
@@ -45,8 +45,8 @@ jobs:
           cover -report codecov
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
-          ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
+          ./codecov -t ${{ secrets.CODCONV_TOKEN }}
         shell: bash
         env:
           AUTHOR_TESTING: 1
-          CODECOV_TOKEN: fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
+          CODECOV_TOKEN: ${{ secrets.CODCONV_TOKEN }}
