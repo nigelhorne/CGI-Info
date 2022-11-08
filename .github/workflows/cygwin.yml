@@ -1,5 +1,6 @@
 ---
 # See https://github.com/FGasper/perl-github-action-tips
+# See also https://github.com/egor-tensin/setup-cygwin/issues/9
 
 name: Test Code on Cygwin
 on:
@@ -22,10 +23,7 @@ jobs:
         uses: egor-tensin/setup-cygwin@master
         with:
           platform: x64
-          # packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ libcrypt-devel libnsl-devel bash
-      # https://github.com/egor-tensin/setup-cygwin/issues/9
-      - name: Setup apps (cygwin)
-        run: C:\tools\cygwin\cygwinsetup.exe --quiet-mode --no-desktop --no-startmenu --root C:\tools\cygwin\ --local-package-dir C:\tools\cygwin\packages --site "http://mirrors.kernel.org/sourceware/cygwin/" --packages perl_base perl-ExtUtils-MakeMaker make gcc-g++ libcrypt-devel libnsl-devel bash
+          packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ libcrypt-devel libnsl-devel bash
       - uses: actions/checkout@main
         with:
           submodules: recursive
