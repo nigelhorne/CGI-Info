@@ -1,7 +1,7 @@
 ---
 # See https://github.com/actions/virtual-environments
 
-name: Test Code on Windows
+name: Test Code on Cygwin
 on:
   push:
     branches:
