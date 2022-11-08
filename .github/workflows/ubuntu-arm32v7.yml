@@ -1,7 +1,7 @@
 ---
 # see https://github.com/actions/virtual-environments
 
-name: Test Code on Ubuntu on S390X
+name: Test Code on Ubuntu on ARM32
 on:
   push:
     branches:
