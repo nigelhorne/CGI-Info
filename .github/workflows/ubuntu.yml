@@ -42,7 +42,7 @@ jobs:
           cover -report codecov
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
-          ./codecov -t ${{ secrets.CODCONV_TOKEN }}
+          ./codecov -t ${{ secrets.CODECOV_TOKEN }}
         shell: bash
         env:
-          CODECOV_TOKEN: ${{ secrets.CODCONV_TOKEN }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
