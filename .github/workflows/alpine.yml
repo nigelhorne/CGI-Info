@@ -22,7 +22,7 @@ jobs:
         run: |
           apk update
           apk upgrade
-          apk add perl perl-app-cpanminus
+          apk add perl perl-app-cpanminus make
           perl -V
           cpanm -ivn ExtUtils::MakeMaker
           cpanm -iv --installdeps --notest .
