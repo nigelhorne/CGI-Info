@@ -20,7 +20,7 @@ jobs:
       - name: Install Dependencies
         run: |
           apk add perl-app-cpanminus
-          cpanm -iqn --skip-satisfied --installdeps --notest .
+          cpanm -iv --installdeps --notest .
           perl Makefile.PL
           make
       - name: Run Tests
