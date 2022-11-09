@@ -17,9 +17,11 @@ jobs:
       image: alpine
 
     steps:
-      run: |
-        apk add perl-app-cpanminus
-        cpanm -iqn --skip-satisfied --installdeps --notest .
-        perl Makefile.PL
-        make
-        prove -wlvmb t
+      - name: Install Dependencies
+        run: |
+          apk add perl-app-cpanminus
+          cpanm -iqn --skip-satisfied --installdeps --notest .
+          perl Makefile.PL
+          make
+      - name: Run Tests
+          prove -wlvmb t
