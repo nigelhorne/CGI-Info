@@ -20,6 +20,8 @@ jobs:
       - name: Install Dependencies
         continue-on-error: true
         run: |
+          ls -ld /tmp /var/tmp
+          env
           apk update
           apk upgrade
           apk add perl perl-app-cpanminus make
