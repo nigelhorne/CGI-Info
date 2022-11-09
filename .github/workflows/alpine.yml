@@ -21,7 +21,7 @@ jobs:
         continue-on-error: true
         run: |
           perl -V
-          apk add perl-app-cpanminus
+          apk add perl perl-app-cpanminus
           cpanm -iv --installdeps --notest .
       - name: Make module
         run: |
