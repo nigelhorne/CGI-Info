@@ -24,4 +24,4 @@ jobs:
           perl Makefile.PL
           make
       - name: Run Tests
-          run: prove -wlvmb t
+        run: prove -wlvmb t
