@@ -1,0 +1,25 @@
+---
+# see https://github.com/FGasper/perl-github-action-tips
+
+name: Test Code on Alpine Linux
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: alpine
+
+    steps:
+      run: |
+        apk add perl-app-cpanminus
+        cpanm -iqn --skip-satisfied --installdeps --notest .
+        perl Makefile.PL
+        make
+        prove -wlvmb t
