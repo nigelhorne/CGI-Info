@@ -22,8 +22,9 @@ jobs:
         run: |
           apk update
           apk upgrade
-          apk add perl perl-app-cpanminus perl-extutils-makemaker
+          apk add perl perl-app-cpanminus
           perl -V
+          cpanm -ivn ExtUtils::MakeMaker
           cpanm -iv --installdeps --notest .
       - name: Make module
         run: |
