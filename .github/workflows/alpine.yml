@@ -20,7 +20,7 @@ jobs:
       - name: Install Dependencies
         continue-on-error: true
         run: |
-          apk add perl perl-app-cpanminus
+          apk add perl perl-app-cpanminus perl-extutils-makemaker
           perl -V
           cpanm -iv --installdeps --notest .
       - name: Make module
