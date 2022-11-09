@@ -18,10 +18,9 @@ jobs:
 
     steps:
       - name: Install Dependencies
-      - run: perl -V
-      - name: Install Dependencies
         continue-on-error: true
         run: |
+          perl -V
           apk add perl-app-cpanminus
           cpanm -iv --installdeps --notest .
       - name: Make module
