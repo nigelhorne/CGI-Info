@@ -18,6 +18,7 @@ jobs:
 
     steps:
       - name: Install Dependencies
+        continue-on-error: true
         run: |
           apk add perl-app-cpanminus
           cpanm -iv --installdeps --notest . || (find ~ -name build.log | xargs cat)
