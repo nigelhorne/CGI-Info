@@ -20,7 +20,7 @@ jobs:
       - name: Install Dependencies
         run: |
           apk add perl-app-cpanminus
-          cpanm -iv --installdeps --notest . || find ~ -name build.log | xargs cat
+          cpanm -iv --installdeps --notest . || (find ~ -name build.log | xargs cat)
           perl Makefile.PL
           make
       - name: Run Tests
