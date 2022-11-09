@@ -20,8 +20,6 @@ jobs:
       - name: Install Dependencies
         continue-on-error: true
         run: |
-          ls -ld /tmp /var/tmp
-          env
           apk update
           apk upgrade
           apk add perl perl-app-cpanminus make
@@ -31,7 +29,7 @@ jobs:
       - name: Make module
         run: |
           find ~ -name build.log | xargs cat
-          perl Makefile.PL
+          perl Makefile.PL 2>&1
           make
       - name: Run Tests
         run: prove -wlvmb t
