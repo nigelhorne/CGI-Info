@@ -29,9 +29,7 @@ jobs:
       - name: Make module
         run: |
           find ~ -name build.log | xargs cat
-          pwd
-          find .. -print
-          perl Makefile.PL 2>&1
+          perl Makefile.PL
           make
       - name: Run Tests
         run: prove -wlvmb t
