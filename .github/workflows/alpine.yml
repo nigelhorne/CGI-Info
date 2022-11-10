@@ -30,7 +30,7 @@ jobs:
         run: |
           find ~ -name build.log | xargs cat
           pwd
-          find . -print
+          find .. -print
           perl Makefile.PL 2>&1
           make
       - name: Run Tests
