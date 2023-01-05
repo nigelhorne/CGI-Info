@@ -26,11 +26,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 =cut
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 =head1 SYNOPSIS
 
@@ -1794,7 +1794,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 Nigel Horne.
+Copyright 2010-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
