@@ -29,6 +29,8 @@ jobs:
       - name: Make module
         run: |
           find ~ -name build.log | xargs cat
+          ls -l
+          pwd
           perl Makefile.PL
           make
       - name: Run Tests
