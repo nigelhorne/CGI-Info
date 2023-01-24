@@ -39,8 +39,8 @@ jobs:
           cover -report codecov
           curl -Os https://uploader.codecov.io/latest/macos/codecov
           chmod +x codecov
-          ./codecov -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
+          ./codecov -t ${{ secrets.CODECOV_TOKEN }}
         shell: bash
         env:
           AUTHOR_TESTING: 1
-          CODECOV_TOKEN: fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

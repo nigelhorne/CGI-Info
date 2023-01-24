@@ -42,4 +42,4 @@ jobs:
           ./codecov.exe -t fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
         env:
           AUTHOR_TESTING: 1
-          CODECOV_TOKEN: fe086bb5-1d90-491c-b5b4-48cbf5bedfb5
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
