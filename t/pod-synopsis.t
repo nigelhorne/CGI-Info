@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+Test::Most;
 
 if($ENV{AUTHOR_TESTING}) {
 	eval 'use Test::Synopsis';
