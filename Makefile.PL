@@ -27,7 +27,6 @@ WriteMakefile(
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::Exception' => 0.42,
-		'Test::Requires' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Script' => 1.12,
