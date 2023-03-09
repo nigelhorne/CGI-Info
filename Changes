@@ -5,7 +5,7 @@ Revision history for CGI-Info
 	Added NetcraftSurveyAgent as a robot
 	Added Expanse as a robot
 	Added t/pod-synopsis.t
-	Refactored t/unused.t
+	Refactored t/unused.t and t/10-compile.t
 
 0.74	Wed Jan  4 22:16:12 EST 2023
 	Added python-requests/2.27.1 as a robot

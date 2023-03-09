@@ -9,7 +9,7 @@ if($ENV{AUTHOR_TESTING}) {
 		eval 'use warnings::unused 0.04';
 	};
 	if($@) {
-		plan(skip_all => 'warnings::unused needed for test');
+		plan(skip_all => 'warnings::unused needed for test for unused variables');
 	} else {
 		use_ok('CGI::Info');
 		new_ok('CGI::Info');
