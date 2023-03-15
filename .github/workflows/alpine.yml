@@ -25,19 +25,17 @@ jobs:
           apk add perl perl-app-cpanminus make gzip git
           perl -V
           cpanm -ivn ExtUtils::MakeMaker File::Spec
-          cd /__w/CGI-Info/CGI-Info
+          cd $GITHUB_WORKSPACE
           git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
-          cd /__w/CGI-Info/CGI-Info/CGI-Info
-          find .
+          cd CGI-Info
           cpanm -iv --installdeps --notest .
       - name: Make module
         run: |
           # find ~ -name build.log | xargs cat
-          echo TULIP
-          env
-          echo SUZANNE
-          pwd
+          cd $GITHUB_WORKSPACE/CGI-Info
           perl Makefile.PL
           make
       - name: Run Tests
-        run: prove -wlvmb t
+        run: |
+          cd $GITHUB_WORKSPACE/CGI-Info
+          prove -wlvmb t
