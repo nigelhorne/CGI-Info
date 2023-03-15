@@ -32,8 +32,10 @@ jobs:
           cpanm -iv --installdeps --notest .
       - name: Make module
         run: |
-          find ~ -name build.log | xargs cat
-          ls -l
+          # find ~ -name build.log | xargs cat
+          echo TULIP
+          env
+          echo SUZANNE
           pwd
           perl Makefile.PL
           make
