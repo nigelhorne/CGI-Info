@@ -24,7 +24,7 @@ jobs:
           apk upgrade
           apk add perl perl-app-cpanminus make gzip git
           perl -V
-          cpanm -ivn ExtUtils::MakeMaker File::Spec
+          cpanm -ivn ExtUtils::MakeMaker File::Spec Test::Harness
           cd $GITHUB_WORKSPACE
           git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           cd CGI-Info
