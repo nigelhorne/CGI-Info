@@ -13,12 +13,12 @@ WriteMakefile(
 	NAME		=> 'CGI::Info',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	VERSION_FROM	=> 'lib/CGI/Info.pm',
-	ABSTRACT_FROM	   => 'lib/CGI/Info.pm',
+	ABSTRACT_FROM	=> 'lib/CGI/Info.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
-	'LIBS' => [''],   # e.g., '-lm'
+	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
