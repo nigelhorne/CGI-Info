@@ -38,8 +38,6 @@ jobs:
       - name: Run Tests
         run: |
           cd $GITHUB_WORKSPACE
-          echo TULIP
-          env
           make test AUTHOR_TESTING=1
         env:
           AUTHOR_TESTING: 1
