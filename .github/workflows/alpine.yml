@@ -24,7 +24,7 @@ jobs:
           apk upgrade
           apk add perl perl-app-cpanminus make gzip
           perl -V
-          find ~ -name CGI\* 2> /dev/null
+          find / -name CGI\* 2> /dev/null
           cpanm -ivn ExtUtils::MakeMaker File::Spec
           find . -name Makefile.PL
           cpanm -iv --installdeps --notest .
