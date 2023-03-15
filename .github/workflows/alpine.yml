@@ -24,7 +24,7 @@ jobs:
           apk upgrade
           apk add perl perl-app-cpanminus make gzip git
           perl -V
-          cpanm -ivn ExtUtils::MakeMaker File::Spec Test::Harness
+          cpanm -ivn ExtUtils::MakeMaker File::Spec
           cd $GITHUB_WORKSPACE
           git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           cd CGI-Info
@@ -38,4 +38,8 @@ jobs:
       - name: Run Tests
         run: |
           cd $GITHUB_WORKSPACE/CGI-Info
-          prove -wlvmb t
+          echo TULIP
+          env
+          make test AUTHOR_TESTING=1
+        env:
+          AUTHOR_TESTING: 1
