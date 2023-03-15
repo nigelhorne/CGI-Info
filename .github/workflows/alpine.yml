@@ -26,7 +26,7 @@ jobs:
           perl -V
           cpanm -ivn ExtUtils::MakeMaker File::Spec
           git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
-          cd /__w/CGI-Info
+          cd /__w/CGI-Info/CGI-Info
           find .
           cpanm -iv --installdeps --notest .
       - name: Make module
