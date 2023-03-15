@@ -22,7 +22,7 @@ jobs:
         run: |
           apk update
           apk upgrade
-          apk add perl perl-app-cpanminus make gzip
+          apk add perl perl-app-cpanminus make gzip git
           perl -V
           cpanm -ivn ExtUtils::MakeMaker File::Spec
           git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
