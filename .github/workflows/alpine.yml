@@ -26,8 +26,9 @@ jobs:
           apk add perl perl-app-cpanminus make gzip git
           perl -V
           cpanm -iqn ExtUtils::MakeMaker File::Spec Test::Most
-          cpanm -iqn Sub::Identify
+          cpanm -iqn Sub::Identify Log::Any
           cpanm -iqn Sub::Private LWP::UserAgent Test::CleanNamespaces
+          ls -l
           # cd $RUNNER_WORKSPACE
           # git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           # cd $GITHUB_WORKSPACE
