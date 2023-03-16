@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 24;
+use Test::Most tests => 25;
 use Test::NoWarnings;
 use Sys::Hostname;
 use lib 't/lib';
@@ -26,6 +26,8 @@ HOSTNAMES: {
 
 	# Check rereading returns the same value
 	ok($i->host_name() eq $hostname);
+
+	ok(defined($i->domain_name()));
 
 	if($i->host_name() =~ /^www\.(.+)/) {
 		cmp_ok($i->domain_name(), 'eq', $1, 'domain_name strips leading "www"');
