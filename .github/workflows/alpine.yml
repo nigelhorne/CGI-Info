@@ -24,11 +24,11 @@ jobs:
           apk upgrade
           apk add perl perl-app-cpanminus make gzip git
           perl -V
-          cpanm -ivn ExtUtils::MakeMaker File::Spec
+          cpanm -iqn ExtUtils::MakeMaker File::Spec
           # cd $RUNNER_WORKSPACE
           # git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           # cd $GITHUB_WORKSPACE
-          cpanm -iv --installdeps --notest .
+          cpanm -iqn --installdeps --notest .
       - name: Make module
         run: |
           # # find ~ -name build.log | xargs cat
