@@ -28,9 +28,9 @@ HOSTNAMES: {
 	ok($i->host_name() eq $hostname);
 
 	if($i->host_name() =~ /^www\.(.+)/) {
-		ok($i->domain_name() eq $1);
+		cmp_ok($i->domain_name(), 'eq', $1, 'domain_name strips leading "www"');
 	} else {
-		ok($i->domain_name() eq $hostname);
+		cmp_ok($i->domain_name(), 'eq', $hostname, "domain name is hostname when we don't start with 'www'");
 	}
 
 	$ENV{'HTTP_HOST'} = 'www.example.com';

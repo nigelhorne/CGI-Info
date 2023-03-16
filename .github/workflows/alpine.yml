@@ -28,7 +28,7 @@ jobs:
           # cd $RUNNER_WORKSPACE
           # git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           # cd $GITHUB_WORKSPACE
-          cpanm -iqn --installdeps --notest .
+          cpanm -ivn --installdeps .
       - name: Make module
         run: |
           # # find ~ -name build.log | xargs cat
