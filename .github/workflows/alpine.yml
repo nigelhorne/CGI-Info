@@ -17,32 +17,31 @@ jobs:
       image: alpine
 
     steps:
-      - uses: actions/checkout@main
+      # - uses: actions/checkout@main
       - name: Install Dependencies
         continue-on-error: true
         run: |
-          echo TULIP
-          env
           apk update
           apk upgrade
           apk add perl perl-app-cpanminus make gzip git
           perl -V
-          cpanm -iqn ExtUtils::MakeMaker File::Spec Test::Most
-          cpanm -iqn Sub::Identify Log::Any
-          cpanm -iqn Sub::Private LWP::UserAgent Test::CleanNamespaces
-          # cd $RUNNER_WORKSPACE
-          # git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
-          # cd $GITHUB_WORKSPACE
+          # cpanm -iqn ExtUtils::MakeMaker File::Spec Test::Most
+          # cpanm -iqn Sub::Identify Log::Any
+          # cpanm -iqn Sub::Private LWP::UserAgent Test::CleanNamespaces
+          cd $RUNNER_WORKSPACE
+          git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
+          cd $GITHUB_WORKSPACE
+          cpanm -iqn ExtUtils::MakeMaker File::Spec
           cpanm -ivn --installdeps .
       - name: Make module
         run: |
-          # # find ~ -name build.log | xargs cat
-          # cd $GITHUB_WORKSPACE
+          # find ~ -name build.log | xargs cat
+          cd $GITHUB_WORKSPACE
           perl Makefile.PL
           make
       - name: Run Tests
         run: |
-          # cd $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE
           make test AUTHOR_TESTING=1
         env:
           AUTHOR_TESTING: 1

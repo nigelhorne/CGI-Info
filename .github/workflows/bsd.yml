@@ -35,7 +35,7 @@ jobs:
           shell: bash
           run: |
             echo TULIP
-            hostname
+            sudo hostname example.com
             sudo ${{ matrix.os.pkginstall }}
             curl -L https://cpanmin.us | sudo perl - --notest --installdeps --with-configure --with-develop .
             sudo chown -R runner:runner .
