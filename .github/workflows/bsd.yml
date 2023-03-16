@@ -34,11 +34,11 @@ jobs:
           version: ${{ matrix.os.version }}
           shell: bash
           run: |
+            echo TULIP
+            hostname
             sudo ${{ matrix.os.pkginstall }}
             curl -L https://cpanmin.us | sudo perl - --notest --installdeps --with-configure --with-develop .
             sudo chown -R runner:runner .
             perl Makefile.PL
-            echo TULIP
-            hostname
             make
             prove -wlvmb t
