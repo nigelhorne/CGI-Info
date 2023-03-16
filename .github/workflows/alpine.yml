@@ -19,12 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@main
       - name: Install Dependencies
+        continue-on-error: true
         run: |
           apk update
           apk upgrade
           apk add perl perl-app-cpanminus make gzip git
           perl -V
-          cpanm -iqn ExtUtils::MakeMaker File::Spec Sub::Identify
+          cpanm -iqn ExtUtils::MakeMaker File::Spec
+          cpanm -iv Sub::Identify
           cpanm -iqn Sub::Private LWP::UserAgent Test::CleanNamespaces
           # cd $RUNNER_WORKSPACE
           # git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git

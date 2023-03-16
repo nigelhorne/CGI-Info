@@ -39,4 +39,5 @@ jobs:
             sudo chown -R runner:runner .
             perl Makefile.PL
             make
+            hostname
             prove -wlvmb t
