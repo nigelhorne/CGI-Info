@@ -38,6 +38,7 @@ jobs:
             curl -L https://cpanmin.us | sudo perl - --notest --installdeps --with-configure --with-develop .
             sudo chown -R runner:runner .
             perl Makefile.PL
-            make
+            echo TULIP
             hostname
+            make
             prove -wlvmb t
