@@ -26,7 +26,7 @@ jobs:
           perl -V
           cpanm -ivn ExtUtils::MakeMaker File::Spec
           cd $RUNNER_WORKSPACE
-          git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
+          git clone -recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           cd $GITHUB_WORKSPACE
           cpanm -iv --installdeps --notest .
       - name: Make module
