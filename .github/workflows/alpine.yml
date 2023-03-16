@@ -32,7 +32,7 @@ jobs:
           git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           cd $GITHUB_WORKSPACE
           cpanm -iqn ExtUtils::MakeMaker File::Spec
-          cpanm -ivn --installdeps .
+          cpanm -iqn --installdeps .
       - name: Make module
         run: |
           # find ~ -name build.log | xargs cat
