@@ -306,7 +306,9 @@ sub _find_site_details {
 		require Sys::Hostname;
 		Sys::Hostname->import;
 
+		$self->_warn('Falling back to using hostname');
 		$self->{cgi_site} = Sys::Hostname::hostname();
+		$self->_warn('hostname is ', $self->{'cgi_site'});
 	}
 
 	unless($self->{site}) {
