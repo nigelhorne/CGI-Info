@@ -18,8 +18,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@main
-        with:
-          submodules: recursive
       - name: Install Dependencies
         run: |
           apk update
