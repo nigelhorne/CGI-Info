@@ -150,9 +150,9 @@ sub _find_paths {
 		$self->{script_path} = $ENV{'SCRIPT_FILENAME'};
 	} elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
 		my $script_name = $ENV{'SCRIPT_NAME'};
-		if(substr($script_name, 0, 1) eq '/') {
+		if($script_name =~ /^\/(.+)/) {
 			# It's usually the case, e.g. /cgi-bin/foo.pl
-			$script_name = substr($script_name, 1);
+			$script_name = $1;
 		}
 		$self->{script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
 	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
@@ -165,9 +165,9 @@ sub _find_paths {
 			Cwd->import;
 
 			my $script_name = $ENV{'SCRIPT_NAME'};
-			if(substr($script_name, 0, 1) eq '/') {
+			if($script_name =~ /^\/(.+)/) {
 				# It's usually the case, e.g. /cgi-bin/foo.pl
-				$script_name = substr($script_name, 1);
+				$script_name = $1;
 			}
 
 			$self->{script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);

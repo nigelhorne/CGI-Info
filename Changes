@@ -1,6 +1,7 @@
 Revision history for CGI-Info
 
 0.75
+	Remove most calls to substr
 	Added Mediatoolkitbot as a robot
 	Added NetcraftSurveyAgent as a robot
 	Added Expanse as a robot
