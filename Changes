@@ -8,6 +8,7 @@ Revision history for CGI-Info
 	Added t/pod-synopsis.t
 	Refactored t/unused.t and t/10-compile.t
 	Fixed Github Actions on Alpine Linux, FreeBSD and OpenBSD
+	Label AmazonBot as a search engine
 
 0.74	Wed Jan  4 22:16:12 EST 2023
 	Added python-requests/2.27.1 as a robot
