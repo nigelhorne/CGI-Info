@@ -755,6 +755,7 @@ sub params {
 						$self->{logger}->warn("SQL injection attempt blocked for '$value'");
 					}
 				}
+				$self->status(403);
 				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
@@ -762,6 +763,14 @@ sub params {
 				if($self->{logger}) {
 					$self->{logger}->warn("XSS injection attempt blocked for '$value'");
 				}
+				$self->status(403);
+				return;
+			}
+			if($value eq '../') {
+				if($self->{logger}) {
+					$self->{logger}->warn("Blocked directory traversal attack for $key");
+				}
+				$self->status(403);
 				return;
 			}
 		}
@@ -1664,8 +1673,7 @@ sub status {
 
 	if(my $status = shift) {
 		$self->{status} = $status;
-	}
-	if(!defined($self->{status})) {
+	} elsif(!defined($self->{status})) {
 		if(defined(my $method = $ENV{'REQUEST_METHOD'})) {
 			if(($method eq 'OPTIONS') || ($method eq 'DELETE')) {
 				return 405;
