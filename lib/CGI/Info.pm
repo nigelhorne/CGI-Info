@@ -747,6 +747,7 @@ sub params {
 			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
+			   ($value =~ /\sAND\s1=1/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{logger}) {
 					if($ENV{'REMOTE_ADDR'}) {
@@ -1793,10 +1794,6 @@ L<http://cpants.cpanauthors.org/dist/CGI-Info>
 =item * CPAN Testers' Matrix
 
 L<http://matrix.cpantesters.org/?dist=CGI-Info>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-Info>
 
 =item * CPAN Testers Dependencies
 
