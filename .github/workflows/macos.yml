@@ -33,14 +33,19 @@ jobs:
           cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Devel::Cover::Report::Codecov Test::Harness
           cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
+      # - name: Run Tests
+        # run: |
+          # cover -test
+          # cover -report codecov
+          # curl -Os https://uploader.codecov.io/latest/macos/codecov
+          # chmod +x codecov
+          # ./codecov -t ${{ secrets.CODECOV_TOKEN }}
+        # shell: bash
+        # env:
+          # AUTHOR_TESTING: 1
+          # CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Run Tests
-        run: |
-          cover -test
-          cover -report codecov
-          curl -Os https://uploader.codecov.io/latest/macos/codecov
-          chmod +x codecov
-          ./codecov -t ${{ secrets.CODECOV_TOKEN }}
+        run: prove -l -b t
         shell: bash
         env:
           AUTHOR_TESTING: 1
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
