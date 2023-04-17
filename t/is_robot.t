@@ -23,13 +23,12 @@ ROBOT: {
 
 		CHI->import;
 	};
-		my $hash = {};
+	my $hash = {};
 	if($@) {
 		diag("CHI not installed");
 		$cache = undef;
 	} else {
 		diag("Using CHI $CHI::VERSION");
-		# my $hash = {};
 		$cache = CHI->new(driver => 'Memory', datastore => $hash);
 	}
 
