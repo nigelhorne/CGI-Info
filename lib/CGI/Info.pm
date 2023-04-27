@@ -1787,10 +1787,6 @@ L<https://metacpan.org/release/CGI-Info>
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
 
-=item * CPANTS
-
-L<http://cpants.cpanauthors.org/dist/CGI-Info>
-
 =item * CPAN Testers' Matrix
 
 L<http://matrix.cpantesters.org/?dist=CGI-Info>
