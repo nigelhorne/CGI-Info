@@ -46,3 +46,4 @@ jobs:
           make test AUTHOR_TESTING=1
         env:
           AUTHOR_TESTING: 1
+          AUTOMATED_TESTING: 1
