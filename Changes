@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.76
 	Marked serpstatbot as a robot
+	Only load JSON::MaybeXS when needed
 
 0.75	Sat Apr 15 14:44:30 EDT 2023
 	Remove most calls to substr

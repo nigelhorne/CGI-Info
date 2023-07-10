@@ -11,7 +11,6 @@ use 5.008;
 use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
-use JSON::MaybeXS;
 use List::MoreUtils;	# Can go when expect goes
 # use Sub::Private;
 use Sys::Path;
@@ -645,6 +644,9 @@ sub params {
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
+				require JSON::MaybeXS;
+				JSON::MaybeXS->import();
+
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
 					$self->_warn({
 						warning => 'read failed: something else may have read STDIN'
