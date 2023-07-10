@@ -1,0 +1,41 @@
+---
+# See https://github.com/actions/virtual-environments
+
+name: Test Code on Windows using Strawberry Perl
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+          - windows-2019
+        perl: ['5.34', '5.32', '5.30', '5.28']
+    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: codecov/codecov-action@v3
+      - name: Setup perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          distribution: strawberry
+      - run: perl -V
+      - name: Install Dependencies
+        run: |
+          cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Devel::Cover::Report::Codecov Test::Harness
+          cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
+          cpanm -iqn --skip-satisfied --installdeps --notest .
+      - name: Run Tests
+        run: prove -lv t
+        env:
+          AUTHOR_TESTING: 1
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
