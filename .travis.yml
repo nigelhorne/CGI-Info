@@ -14,6 +14,7 @@ arch:
 env: AUTOMATED_TESTING=1 PERL_CPANM_OPT="--notest --force --skip-satisfied"
 
 perl:
+  - '5.38'
   - '5.36'
   - '5.34'
   - '5.32'
