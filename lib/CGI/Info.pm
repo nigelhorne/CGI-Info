@@ -644,6 +644,9 @@ sub params {
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
+				require JSON::PP;	# Fix overload problems
+				JSON::PP->import();
+
 				require JSON::MaybeXS;
 				JSON::MaybeXS->import();
 
