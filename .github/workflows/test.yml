@@ -9,6 +9,8 @@ on:
     tags-ignore:
       - '*'
   pull_request:
+  schedule:
+    - cron: '12 23 2 * *'
 jobs:
   build:
     runs-on: ${{ matrix.os }}
