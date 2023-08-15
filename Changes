@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.77
+	Reduce the size of the cache
+
 0.76	Tue Aug  8 20:43:57 EDT 2023
 	Marked serpstatbot as a robot
 	Only load JSON::MaybeXS when needed

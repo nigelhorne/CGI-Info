@@ -1063,10 +1063,8 @@ sub is_mobile {
 		# Save loading and calling HTTP::BrowserDetect
 		my $remote = $ENV{'REMOTE_ADDR'};
 		if(defined($remote) && $self->{cache}) {
-			my $is_mobile = $self->{cache}->get("is_mobile/$remote/$agent");
-			if(defined($is_mobile)) {
-				$self->{is_mobile} = $is_mobile;
-				return $is_mobile;
+			if(my $type = $self->{cache}->get("$remote/$agent")) {
+				return $self->{is_mobile} = ($type eq 'mobile');
 			}
 		}
 
@@ -1079,11 +1077,10 @@ sub is_mobile {
 		if($self->{browser_detect}) {
 			my $device = $self->{browser_detect}->device();
 			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
-			if($self->{cache} && defined($remote)) {
-				$self->{cache}->set("is_mobile/$remote/$agent", $is_mobile, '1 day');
+			if($is_mobile && $self->{cache} && defined($remote)) {
+				$self->{cache}->set("$remote/$agent", 'mobile', '1 day');
 			}
-			$self->{is_mobile} = $is_mobile;
-			return $is_mobile;
+			return $self->{is_mobile} = $is_mobile;
 		}
 	}
 
@@ -1356,6 +1353,8 @@ sub is_robot {
 		return 1;
 	}
 
+	my $key = "$remote/$agent";
+
 	if(my $referrer = $ENV{'HTTP_REFERER'}) {
 		# https://agency.ohow.co/google-analytics-implementation-audit/google-analytics-historical-spam-list/
 		my @crawler_lists = (
@@ -1402,18 +1401,19 @@ sub is_robot {
 			if($self->{logger}) {
 				$self->{logger}->debug("is_robot: blocked trawler $referrer");
 			}
+			if($self->{cache}) {
+				$self->{cache}->set($key, 'robot', '1 day');
+			}
 			$self->{is_robot} = 1;
 			return 1;
 		}
 	}
 
-	my $key;
-
 	if($self->{cache}) {
-		$key = "is_robot/$remote/$agent";
-		if(defined(my $is_robot = $self->{cache}->get($key))) {
-			$self->{is_robot} = $is_robot;
-			return $is_robot;
+		if(defined($remote) && $self->{cache}) {
+			if(my $type = $self->{cache}->get("$remote/$agent")) {
+				return $self->{is_robot} = ($type eq 'robot');
+			}
 		}
 	}
 
@@ -1435,7 +1435,7 @@ sub is_robot {
 
 		if($is_robot) {
 			if($self->{cache}) {
-				$self->{cache}->set($key, $is_robot, '1 day');
+				$self->{cache}->set($key, 'robot', '1 day');
 			}
 			$self->{is_robot} = $is_robot;
 			return $is_robot;
@@ -1443,7 +1443,7 @@ sub is_robot {
 	}
 
 	if($self->{cache}) {
-		$self->{cache}->set($key, 0, '1 day');
+		$self->{cache}->set($key, 'unknown', '1 day');
 	}
 	$self->{is_robot} = 0;
 	return 0;
@@ -1481,12 +1481,11 @@ sub is_search_engine {
 	my $key;
 
 	if($self->{cache}) {
-		$key = "is_search/$remote/$agent";
-
-		my $is_search = $self->{cache}->get($key);
-		if(defined($is_search)) {
-			$self->{is_search_engine} = $is_search;
-			return $is_search;
+		$key = "$remote/$agent";
+		if(defined($remote) && $self->{cache}) {
+			if(my $type = $self->{cache}->get("$remote/$agent")) {
+				return $self->{is_search} = ($type eq 'search');
+			}
 		}
 	}
 
@@ -1494,7 +1493,7 @@ sub is_search_engine {
 	# that is easily spoofed
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
 		if($self->{cache}) {
-			$self->{cache}->set($key, 1, '1 day');
+			$self->{cache}->set($key, 'search', '1 day');
 		}
 		return 1;
 	}
@@ -1510,11 +1509,10 @@ sub is_search_engine {
 		if((!$is_search) && $agent =~ /SeznamBot\//) {
 			$is_search = 1;
 		}
-		if($self->{cache}) {
-			$self->{cache}->set($key, $is_search, '1 day');
+		if($is_search && $self->{cache}) {
+			$self->{cache}->set($key, 'search', '1 day');
 		}
-		$self->{is_search_engine} = $is_search;
-		return $is_search;
+		return $self->{is_search_engine} = $is_search;
 	}
 
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
@@ -1522,15 +1520,12 @@ sub is_search_engine {
 
 	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot/) && ($hostname !~ /^google-proxy/)) {
 		if($self->{cache}) {
-			$self->{cache}->set($key, 1, '1 day');
+			$self->{cache}->set($key, 'search', '1 day');
 		}
 		$self->{is_search_engine} = 1;
 		return 1;
 	}
 
-	if($self->{cache}) {
-		$self->{cache}->set($key, 0, '1 day');
-	}
 	$self->{is_search_engine} = 0;
 	return 0;
 }
