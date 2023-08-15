@@ -1348,7 +1348,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot/i) {
+	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor 1.0/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
