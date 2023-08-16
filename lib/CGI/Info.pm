@@ -1790,7 +1790,7 @@ You can also look for information at:
 
 =item * MetaCPAN
 
-L<https://metacpan.org/release/CGI-Info>
+L<https://metacpan.org/dist/CGI-Info>
 
 =item * RT: CPAN's request tracker
 
