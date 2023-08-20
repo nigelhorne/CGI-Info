@@ -1348,7 +1348,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /)) {
+	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;
 		if($self->{logger}) {
