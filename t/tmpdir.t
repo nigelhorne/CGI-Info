@@ -32,7 +32,7 @@ PATHS: {
 
 	$i = new_ok('CGI::Info');
 	$dir = $i->tmpdir(default => '/non-existant-path');
-	ok(CGI::Info->tmpdir(default => '/non-existant-path') eq $dir);
+	cmp_ok(CGI::Info->tmpdir(default => '/non-existant-path'), 'eq', $dir, 'sets tmpdir works at class level');
 	ok($dir eq '/non-existant-path');
 
 	$i = new_ok('CGI::Info');
