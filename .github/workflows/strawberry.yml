@@ -31,11 +31,10 @@ jobs:
       - run: perl -V
       - name: Install Dependencies
         run: |
-          cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Devel::Cover::Report::Codecov Test::Harness
-          cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
+          cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Test::Harness
+          cpanm -iqn --skip-satisfied Test::Script Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Run Tests
-        run: prove -lv t
+        run: prove -l t
         env:
-          AUTHOR_TESTING: 1
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          AUTOMATIC_TESTING: 1
