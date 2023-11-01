@@ -857,7 +857,7 @@ sub _warn {
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$params{'warning'} = shift;
 	}
 
@@ -1606,7 +1606,7 @@ sub get_cookie {
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$params{'cookie_name'} = shift;
 	}
 
@@ -1712,7 +1712,7 @@ sub set_logger {
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$params{'logger'} = shift;
 	}
 
