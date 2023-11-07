@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.79
 	Better arg count checking
+	Mark techiaith.cymru as a robot
 
 0.78	Fri Oct  6 13:59:51 EDT 2023
 	Set HTTP status to 403 on HTTP_USER_AGENT SQL injection attack
