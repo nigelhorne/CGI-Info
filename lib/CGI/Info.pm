@@ -744,7 +744,9 @@ sub params {
 
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
-			if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
+			# Facebook FBCLID can have "--"
+			# if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
+			if(($value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
 			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
 			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
