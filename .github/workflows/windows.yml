@@ -30,7 +30,6 @@ jobs:
       - run: perl -V
       - name: Install Dependencies
         run: |
-          cpanm -iv Clone
           cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Devel::Cover::Report::Codecov Test::Harness
           cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Taint Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
