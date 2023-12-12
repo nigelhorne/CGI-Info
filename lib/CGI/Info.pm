@@ -1532,7 +1532,7 @@ sub is_search_engine {
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
-	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot/) && ($hostname !~ /^google-proxy/)) {
+	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}
