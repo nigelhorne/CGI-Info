@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 61;
+use Test::Most tests => 63;
 use File::Spec;
 use Cwd;
 use Test::NoWarnings;
@@ -212,4 +212,10 @@ PATHS: {
 	ok(!defined($p{barney}));
 	ok($i->fred() eq 'wilma');
 	ok(!defined($i->barney()));
+
+	$ENV{'SCRIPT_FILENAME'} = '/tulip';
+	delete $ENV{'SCRIPT_NAME'};
+	delete $ENV{'DOCUMENT_ROOT'};
+	$i = new_ok('CGI::Info');
+	cmp_ok($i->script_path(), 'eq', '/tulip', 'SCRIPT_FILENAME is read from the environment');
 }
