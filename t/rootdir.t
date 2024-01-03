@@ -43,8 +43,8 @@ ROOTDIR: {
 
 	$ENV{'DOCUMENT_ROOT'} = '/';
 	$i = new_ok('CGI::Info');
-	$dir = $i->rootdir();
-	ok($dir eq '/');
+	$dir = $i->root_dir();
+	cmp_ok($dir, 'eq', '/', 'Recognises DOCUMENT_ROOT');
 
 	delete $ENV{'DOCUMENT_ROOT'};
 	$ENV{'C_DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir(), 'xyzzy');

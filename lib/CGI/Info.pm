@@ -1293,13 +1293,13 @@ sub rootdir {
 
 =head2 root_dir
 
-Synonym of rootdir(), for compatability with L<CHI>.
+Synonym of rootdir(), for compatibility with L<CHI>.
 
 =cut
 
 sub root_dir
 {
-	if($_[0]) {
+	if($_[0] && ref($_[0])) {
 		my $self = shift;
 
 		return $self->rootdir(@_);
