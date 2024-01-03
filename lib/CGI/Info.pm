@@ -1291,6 +1291,22 @@ sub rootdir {
 	return $script_name;
 }
 
+=head2 root_dir
+
+Synonym of rootdir(), for compatability with L<CHI>.
+
+=cut
+
+sub root_dir
+{
+	if($_[0]) {
+		my $self = shift;
+
+		return $self->rootdir(@_);
+	}
+	return __PACKAGE__->rootdir(@_);
+}
+
 =head2 logdir
 
 Gets and sets the name of a directory that you can use to store logs in.
@@ -1810,7 +1826,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2023 Nigel Horne.
+Copyright 2010-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

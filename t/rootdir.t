@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 25;
+use Test::Most tests => 27;
 use File::Spec;
 use Test::NoWarnings;
 
@@ -25,7 +25,9 @@ ROOTDIR: {
 	}
 
 	ok(CGI::Info->rootdir() eq $dir);
+	ok(CGI::Info->root_dir() eq $dir);
 	ok(CGI::Info::rootdir() eq $dir);
+	ok(CGI::Info::root_dir() eq $dir);
 
 	$ENV{'DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir(), 'xyzzy');
 	$dir = CGI::Info->rootdir();
