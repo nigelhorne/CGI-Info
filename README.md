@@ -12,7 +12,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.78
+Version 0.79
 
 # SYNOPSIS
 
@@ -300,6 +300,10 @@ This can be run as a class or object method.
 
         print CGI::Info->rootdir();
 
+## root\_dir
+
+Synonym of rootdir(), for compatibility with [CHI](https://metacpan.org/pod/CHI).
+
 ## logdir
 
 Gets and sets the name of a directory that you can use to store logs in.
@@ -423,7 +427,7 @@ You can also look for information at:
 
 - MetaCPAN
 
-    [https://metacpan.org/release/CGI-Info](https://metacpan.org/release/CGI-Info)
+    [https://metacpan.org/dist/CGI-Info](https://metacpan.org/dist/CGI-Info)
 
 - RT: CPAN's request tracker
 
@@ -439,6 +443,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2023 Nigel Horne.
+Copyright 2010-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
