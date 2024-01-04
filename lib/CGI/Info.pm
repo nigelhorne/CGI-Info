@@ -383,7 +383,8 @@ CGI::Info helps you to test your script prior to deployment on a website:
 if it is not in a CGI environment (e.g. the script is being tested from the
 command line), the program's command line arguments (a list of key=value pairs)
 are used, if there are no command line arguments then they are read from stdin
-as a list of key=value lines. Also you can give one of --tablet, --search-engine,
+as a list of key=value lines.
+Also you can give one of --tablet, --search-engine,
 --mobile and --robot to mimic those agents. For example:
 
 	./script.cgi --mobile name=Nigel
