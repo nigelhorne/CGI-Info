@@ -1,11 +1,16 @@
 Revision history for CGI-Info
 
+0.80
+	Added document_root() as a synonym to rootdir()
+		For compatability with Apache
+
 0.79	Wed Jan  3 14:25:42 EST 2024
 	Better arg count checking
 	Mark techiaith.cymru as a robot
 	Facebook FBCLID can have "--" which can cause false positives
 	Mark ChatGPT as a search engine
-	Added root_dir() as synonym to rootdir() - that's the naming that CHI uses
+	Added root_dir() as synonym to rootdir()
+		That's the naming that CHI uses
 
 0.78	Fri Oct  6 13:59:51 EDT 2023
 	Set HTTP status to 403 on HTTP_USER_AGENT SQL injection attack

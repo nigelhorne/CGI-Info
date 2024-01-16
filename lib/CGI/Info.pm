@@ -1308,6 +1308,22 @@ sub root_dir
 	return __PACKAGE__->rootdir(@_);
 }
 
+=head2 document_root
+
+Synonym of rootdir(), for compatibility with Apache.
+
+=cut
+
+sub document_root
+{
+	if($_[0] && ref($_[0])) {
+		my $self = shift;
+
+		return $self->rootdir(@_);
+	}
+	return __PACKAGE__->rootdir(@_);
+}
+
 =head2 logdir
 
 Gets and sets the name of a directory that you can use to store logs in.
