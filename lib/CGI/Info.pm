@@ -1308,13 +1308,13 @@ sub root_dir
 	return __PACKAGE__->rootdir(@_);
 }
 
-=head2 document_root
+=head2 documentroot
 
 Synonym of rootdir(), for compatibility with Apache.
 
 =cut
 
-sub document_root
+sub documentroot
 {
 	if($_[0] && ref($_[0])) {
 		my $self = shift;

@@ -28,8 +28,8 @@ ROOTDIR: {
 	ok(CGI::Info->root_dir() eq $dir);
 	ok(CGI::Info::rootdir() eq $dir);
 	ok(CGI::Info::root_dir() eq $dir);
-	ok(CGI::Info::document_root() eq $dir);
-	ok(CGI::Info::document_root() eq $dir);
+	ok(CGI::Info::documentroot() eq $dir);
+	ok(CGI::Info::documentroot() eq $dir);
 
 	$ENV{'DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir(), 'xyzzy');
 	$dir = CGI::Info->rootdir();
@@ -39,7 +39,7 @@ ROOTDIR: {
 	delete $ENV{'C_DOCUMENT_ROOT'};
 	$ENV{'DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir(), 'xyzzy');
 	$i = new_ok('CGI::Info');
-	$dir = $i->document_root();
+	$dir = $i->documentroot();
 	ok(-r $dir);
 	ok(-d $dir);
 

@@ -1,7 +1,7 @@
 Revision history for CGI-Info
 
 0.80
-	Added document_root() as a synonym to rootdir()
+	Added documentroot() as a synonym to rootdir()
 		For compatability with Apache
 
 0.79	Wed Jan  3 14:25:42 EST 2024
