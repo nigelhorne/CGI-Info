@@ -443,9 +443,9 @@ constructor.
 	# ...
 	my $info = CGI::Info->new();
 	my $allowed = {
-		'foo' => qr(^\d*$),	# foo must be a number, or empty
-		'bar' => undef,
-		'xyzzy' => qr(^[\w\s-]+$),	# must be alphanumeric
+		foo => qr/^\d*$/,	# foo must be a number, or empty
+		bar => undef,
+		xyzzy => qr/^[\w\s-]+$/,	# must be alphanumeric
 						# to prevent XSS, and non-empty
 						# as a sanity check
 	};
@@ -822,7 +822,7 @@ be thrown:
 
 	use CGI::Info;
 	my $allowed = {
-		'foo' => qr(\d+),
+		foo => qr/\d+/
 	};
 	my $xyzzy = $info->params(allow => $allowed);
 	my $bar = $info->param('bar');  # Gives an error message
