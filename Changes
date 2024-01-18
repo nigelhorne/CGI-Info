@@ -4,6 +4,7 @@ Revision history for CGI-Info
 	Added documentroot() as a synonym to rootdir()
 		For compatability with Apache
 	Allow "use lib CGI::Info::script_dir() . '../lib';"
+	Mark Facebook as a search engine, not a robot
 
 0.79	Wed Jan  3 14:25:42 EST 2024
 	Better arg count checking

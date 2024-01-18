@@ -1471,6 +1471,16 @@ sub is_robot {
 		}
 	}
 
+	# Don't use HTTP_USER_AGENT to detect more than we really have to since
+	# that is easily spoofed
+	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
+		# Mark Facebook as a search engine, not a robot
+		if($self->{cache}) {
+			$self->{cache}->set($key, 'search', '1 day');
+		}
+		return 0;
+	}
+
 	unless($self->{browser_detect}) {
 		if(eval { require HTTP::BrowserDetect; }) {
 			HTTP::BrowserDetect->import();
