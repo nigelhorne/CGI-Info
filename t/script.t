@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 63;
+use Test::Most tests => 64;
 use File::Spec;
 use Cwd;
 use Test::NoWarnings;
@@ -22,6 +22,7 @@ PATHS: {
 	ok($i->script_path() =~ /.+script\.t$/);
 	ok($i->script_name() eq 'script.t');
 	ok($i->script_path() eq File::Spec->catfile($i->script_dir(), $i->script_name()));
+	ok($i->script_path() eq File::Spec->catfile(CGI::Info::script_dir(), $i->script_name()));
 	# Check calling twice return path
 	ok($i->script_name() eq 'script.t');
 

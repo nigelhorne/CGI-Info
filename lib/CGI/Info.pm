@@ -222,10 +222,17 @@ Returns the file system directory containing the script.
 
 	print 'HTML files are normally stored in ', $info->script_dir(), '/', File::Spec->updir(), "\n";
 
+	# or
+	use lib CGI::Info::script_dir() . '../lib';
+
 =cut
 
 sub script_dir {
 	my $self = shift;
+
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
 
 	unless($self->{script_path}) {
 		$self->_find_paths();
