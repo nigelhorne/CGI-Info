@@ -30,7 +30,9 @@ jobs:
       - run: perl -V
       - run: cpan App::cpanminus
       - name: Install Dependencies
-        run: cd $GITHUB_WORKSPACE; cpanm --verbose --notest --installdeps --with-configure --with-develop .
+        run: |
+          cd $GITHUB_WORKSPACE; cpanm --verbose --notest --installdeps --with-configure --with-develop .
+          find ~ -name build.log | xargs cat
       - name: perl Makefile.PL
         run: cd $GITHUB_WORKSPACE; perl Makefile.PL
       - name: make
