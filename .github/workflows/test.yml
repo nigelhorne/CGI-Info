@@ -46,3 +46,4 @@ jobs:
         run: prove -l -b t
         env:
           AUTHOR_TESTING: 1
+          AUTOMATED_TESTING: 1
