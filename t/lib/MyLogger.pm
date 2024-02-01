@@ -53,7 +53,7 @@ sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $param = $AUTOLOAD;
 
-	unless($param eq 'MyLogger::DESTROY') {
+	if($param ne 'MyLogger::DESTROY') {
 		::diag("Need to define $param");
 	}
 }
