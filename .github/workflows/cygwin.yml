@@ -31,7 +31,7 @@ jobs:
       - run: cpan App::cpanminus
       - name: Install Dependencies
         run: |
-          cd $GITHUB_WORKSPACE; cpan -iqn Test::Carp JSON::MaybeXS LWP::UserAgent
+          cd $GITHUB_WORKSPACE; cpanm -iqn Test::Carp JSON::MaybeXS LWP::UserAgent
           cd $GITHUB_WORKSPACE; cpanm --verbose --notest --installdeps --with-configure --with-develop .
           find ~ -name build.log | xargs cat
       - name: perl Makefile.PL
