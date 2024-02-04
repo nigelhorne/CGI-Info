@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::Needs qw(Test::DependentModules);
-use Test::DependentModules qw(test_modules);
+use Test::Needs 'Test::DependentModules';
+use Test::DependentModules 'test_modules';
 use Test::Most;
 
 my @modules = ('CGI::Lingua');
