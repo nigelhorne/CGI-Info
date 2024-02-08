@@ -155,8 +155,7 @@ sub _find_paths {
 		}
 		$self->{script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
 	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
-		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) &&
-		   (-r $ENV{'SCRIPT_NAME'})) {
+		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) && (-r $ENV{'SCRIPT_NAME'})) {
 			# Called from a command line with a full path
 			$self->{script_path} = $ENV{'SCRIPT_NAME'};
 		} else {
@@ -1370,7 +1369,7 @@ Is the visitor a real person or a robot?
 
 	my $info = CGI::Info->new();
 	unless($info->is_robot()) {
-	 # update site visitor statistics
+		# update site visitor statistics
 	}
 
 =cut
