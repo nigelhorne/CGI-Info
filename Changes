@@ -4,6 +4,7 @@ Revision history for CGI-Info
 	Use Test::Needs
 	Added t/version.t
 	Added t/tabs.t
+	Mark ias_crawler as a robot
 
 0.80	Fri Jan 19 08:05:29 EST 2024
 	Added documentroot() as a synonym to rootdir()
