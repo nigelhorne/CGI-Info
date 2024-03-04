@@ -1401,7 +1401,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|ias_crawler/i) {
+	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|ias_crawler|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1555,6 +1555,7 @@ sub is_search_engine {
 	# Don't use HTTP_USER_AGENT to detect more than we really have to since
 	# that is easily spoofed
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
+		# Mark Facebook as a search engine, not a robot
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}
