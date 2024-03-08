@@ -75,9 +75,7 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
 
 sub new {
-	my $class = $_[0];
-
-	shift;
+	my $class = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
