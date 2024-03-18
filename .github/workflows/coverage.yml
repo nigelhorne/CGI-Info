@@ -16,7 +16,7 @@ jobs:
     container:
       image: perl:stable
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: cpanm --quiet --notest --installdeps .
       - run: cpanm --quiet --notest App::Yath Devel::Cover Devel::Cover::Report::Coveralls
       - run: PERL5OPT=-MDevel::Cover yath test --qvf t/
