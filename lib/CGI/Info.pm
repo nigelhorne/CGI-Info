@@ -1688,7 +1688,8 @@ sub get_cookie {
 
 Returns a cookie's value, or undef if no name is given, or the requested
 cookie isn't in the jar.
-API is the same as "param", it will replace the "get_cookie" method in the future.
+API is the same as "param",
+it will replace the "get_cookie" method in the future.
 
     use CGI::Info;
 
@@ -1725,7 +1726,9 @@ sub cookie {
 
 =head2 status
 
-Sets or returns the status of the object, 200 for OK, otherwise an HTTP error code
+Sets or returns the status of the object,
+200 for OK,
+otherwise an HTTP error code
 
 =cut
 
@@ -1775,7 +1778,8 @@ sub set_logger {
 =head2 reset
 
 Class method to reset the class.
-You should do this in an FCGI environment before instantiating, but nowhere else.
+You should do this in an FCGI environment before instantiating,
+but nowhere else.
 
 =cut
 
