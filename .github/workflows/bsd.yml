@@ -18,7 +18,7 @@ jobs:
         os:
           - name: freebsd
             version: '13.0'
-            pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-List-MoreUtils p5-Log-Any p5-JSON-MaybeXS p5-libwww p5-Test-Most p5-Test-Warn p5-HTTP-BrowserDetect p5-Test-Needs p5-Class-Autouse p5-IPC-System-Simple p5-Test-Compile p5-Test-Script p5-namespace-clean
+            pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-List-MoreUtils p5-Log-Any p5-JSON-MaybeXS p5-libwww p5-Test-Most p5-Test-Warn p5-HTTP-BrowserDetect p5-Test-Needs p5-Class-Autouse p5-IPC-System-Simple p5-Test-Compile p5-Test-Script p5-namespace-clean p5-Test-NoWarnings
           - name: openbsd
             version: '7.1'
             pkginstall: pkg_add p5-List-MoreUtils p5-Log-Any p5-JSON-MaybeXS p5-libwww
@@ -36,6 +36,7 @@ jobs:
             sudo hostname example.com
             sudo ${{ matrix.os.pkginstall }}
             curl -L https://cpanmin.us | sudo perl - --notest --installdeps --with-configure --with-develop .
+            sudo cpan -i String::Clean::XSS Tie::Filehandle::Preempt::Stdin
             sudo chown -R runner:runner .
             AUTOMATED_TESTING=1 perl Makefile.PL
             AUTOMATED_TESTING=1 make
