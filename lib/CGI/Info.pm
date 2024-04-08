@@ -711,11 +711,11 @@ sub params {
 
 		next unless($key);
 
-		$key =~ s/%00//g;
+		$key =~ s/%00//g;	# Strip NUL byte poison
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 		$key =~ tr/+/ /;
 		if(defined($value)) {
-			$value =~ s/%00//g;
+			$value =~ s/%00//g;	# Strip NUL byte poison
 			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 			$value =~ tr/+/ /;
 		} else {
