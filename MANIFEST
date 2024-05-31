@@ -40,6 +40,7 @@ t/logdir.t
 t/manifest.t
 t/metrics.t
 t/minimum.t
+t/modules-used.t
 t/namespaces.t
 t/no404s.t
 t/noopentickets.t
@@ -66,7 +67,6 @@ t/taint.t
 t/tmpdir.t
 t/untaint.t
 t/unused.t
-t/used.t
 t/vars.t
 t/version.t
 t/xml.t
