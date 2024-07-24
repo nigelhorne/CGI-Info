@@ -17,7 +17,7 @@ jobs:
       matrix:
         os:
           - name: freebsd
-            version: '14'
+            version: '14.1'
             pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-List-MoreUtils p5-Log-Any p5-JSON-MaybeXS p5-libwww p5-Test-Most p5-Test-Warn p5-HTTP-BrowserDetect p5-Test-Needs p5-Class-Autouse p5-IPC-System-Simple p5-Test-Compile p5-Test-Script p5-namespace-clean p5-Test-NoWarnings
           - name: openbsd
             version: '7.5'
