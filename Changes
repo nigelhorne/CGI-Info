@@ -4,6 +4,7 @@ Revision history for CGI-Info
 	Mark ClaudeBot as a robot
 	Mark YaK/1.0 as a robot
 	Mark trendictionbot as a robot
+	Added helper routine _get_params() and use it
 
 0.81	Tue Apr  9 10:08:29 EDT 2024
 	Use Test::Needs

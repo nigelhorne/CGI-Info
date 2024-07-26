@@ -483,27 +483,27 @@ CGI::Info will put the request into the params element 'XML', thus:
 sub params {
 	my $self = shift;
 
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = $self->_get_params(undef, @_);
 
-	if((defined($self->{paramref})) && ((!defined($args{'allow'})) || defined($self->{allow}) && ($args{'allow'} eq $self->{allow}))) {
+	if((defined($self->{paramref})) && ((!defined($params->{'allow'})) || defined($self->{allow}) && ($params->{'allow'} eq $self->{allow}))) {
 		return $self->{paramref};
 	}
 
-	if(defined($args{allow})) {
-		$self->{allow} = $args{allow};
+	if(defined($params->{allow})) {
+		$self->{allow} = $params->{allow};
 	}
-	if(defined($args{expect})) {
-		if(ref($args{expect}) eq 'ARRAY') {
-			$self->{expect} = $args{expect};
+	if(defined($params->{expect})) {
+		if(ref($params->{expect}) eq 'ARRAY') {
+			$self->{expect} = $params->{expect};
 		} else {
 			$self->_warn('expect must be a reference to an array');
 		}
 	}
-	if(defined($args{upload_dir})) {
-		$self->{upload_dir} = $args{upload_dir};
+	if(defined($params->{upload_dir})) {
+		$self->{upload_dir} = $params->{upload_dir};
 	}
-	if(defined($args{logger})) {
-		$self->{logger} = $args{logger};
+	if(defined($params->{logger})) {
+		$self->{logger} = $params->{logger};
 	}
 	if($self->{logger}) {
 		$self->{logger}->trace('Entering params');
@@ -862,16 +862,9 @@ sub param {
 sub _warn {
 	my $self = shift;
 
-	my %params;
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
-	} elsif(scalar(@_) == 1) {
-		$params{'warning'} = shift;
-	}
+	my $params = $self->_get_params('warning', @_);
 
-	my $warning = $params{'warning'};
+	my $warning = $params->{'warning'};
 
 	return unless($warning);
 	if($self eq __PACKAGE__) {
@@ -898,6 +891,28 @@ sub _warn {
 	} elsif(!defined($self->{syslog})) {
 		Carp::carp($warning);
 	}
+}
+
+# Helper routine to parse the arguments given to a function,
+#	allowing the caller to call the function in anyway that they want
+#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
+#	when called _get_params('arg', @_);
+sub _get_params
+{
+	my $self = shift;
+	my $default = shift;
+
+	my %rc;
+
+	if(ref($_[0]) eq 'HASH') {
+		%rc = %{$_[0]};
+	} elsif(scalar(@_) % 2 == 0) {
+		%rc = @_;
+	} elsif((scalar(@_) == 1) && defined($default)) {
+		$rc{$default} = shift;
+	}
+
+	return \%rc;
 }
 
 sub _sanitise_input($) {
@@ -1225,7 +1240,6 @@ Tmpdir allows a reference of the options to be passed.
 
 sub tmpdir {
 	my $self = shift;
-	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $name = 'tmp';
 	if($^O eq 'MSWin32') {
@@ -1237,6 +1251,7 @@ sub tmpdir {
 	if(!ref($self)) {
 		$self = __PACKAGE__->new();
 	}
+	my $params = $self->_get_params(undef, @_);
 
 	if($ENV{'C_DOCUMENT_ROOT'} && (-d $ENV{'C_DOCUMENT_ROOT'})) {
 		$dir = File::Spec->catdir($ENV{'C_DOCUMENT_ROOT'}, $name);
@@ -1254,7 +1269,7 @@ sub tmpdir {
 			return $self->_untaint_filename({ filename => $dir });
 		}
 	}
-	return $params{default} ? $params{default} : File::Spec->tmpdir();
+	return $params->{default} ? $params->{default} : File::Spec->tmpdir();
 }
 
 =head2 rootdir
@@ -1653,17 +1668,9 @@ Deprecated - use cookie() instead.
 
 sub get_cookie {
 	my $self = shift;
-	my %params;
+	my $params = $self->_get_params('cookie_name', @_);
 
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
-	} elsif(scalar(@_) == 1) {
-		$params{'cookie_name'} = shift;
-	}
-
-	if(!defined($params{'cookie_name'})) {
+	if(!defined($params->{'cookie_name'})) {
 		$self->_warn('cookie_name argument not given');
 		return;
 	}
@@ -1680,8 +1687,8 @@ sub get_cookie {
 		}
 	}
 
-	if(exists($self->{jar}->{$params{'cookie_name'}})) {
-		return $self->{jar}->{$params{'cookie_name'}};
+	if(exists($self->{jar}->{$params->{'cookie_name'}})) {
+		return $self->{jar}->{$params->{'cookie_name'}};
 	}
 	return;	# Return undef
 }
@@ -1762,17 +1769,9 @@ This function fixes the catch22 situation.
 
 sub set_logger {
 	my $self = shift;
-	my %params;
+	my $params = $self->_get_params('logger', @_);
 
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
-	} elsif(scalar(@_) == 1) {
-		$params{'logger'} = shift;
-	}
-
-	$self->{logger} = $params{'logger'};
+	$self->{logger} = $params->{'logger'};
 
 	return $self;
 }
