@@ -483,7 +483,7 @@ CGI::Info will put the request into the params element 'XML', thus:
 sub params {
 	my $self = shift;
 
-	my $params = $self->_get_params(undef, @_);
+	my $params = $self->_get_params('params', undef, @_);
 
 	if((defined($self->{paramref})) && ((!defined($params->{'allow'})) || defined($self->{allow}) && ($params->{'allow'} eq $self->{allow}))) {
 		return $self->{paramref};
@@ -862,7 +862,7 @@ sub param {
 sub _warn {
 	my $self = shift;
 
-	my $params = $self->_get_params('warning', @_);
+	my $params = $self->_get_params('_warn', 'warning', @_);
 
 	my $warning = $params->{'warning'};
 
@@ -896,10 +896,11 @@ sub _warn {
 # Helper routine to parse the arguments given to a function,
 #	allowing the caller to call the function in anyway that they want
 #	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
+#	when called _get_params('foo', 'arg', @_);
 sub _get_params
 {
 	my $self = shift;
+	my $func = shift;
 	my $default = shift;
 
 	my %rc;
@@ -908,8 +909,14 @@ sub _get_params
 		%rc = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%rc = @_;
-	} elsif((scalar(@_) == 1) && defined($default)) {
-		$rc{$default} = shift;
+	} elsif(scalar(@_) == 1) {
+		if(defined($default)) {
+			$rc{$default} = shift;
+		} else {
+			Carp::croak('Usage: ', __PACKAGE__, "->$func($default => " . '$val)');
+		}
+	} elsif((scalar(@_) == 0) && defined($default)) {
+		Carp::croak('Usage: ', __PACKAGE__, "->$func($default => " . '$val)');
 	}
 
 	return \%rc;
@@ -1251,7 +1258,7 @@ sub tmpdir {
 	if(!ref($self)) {
 		$self = __PACKAGE__->new();
 	}
-	my $params = $self->_get_params(undef, @_);
+	my $params = $self->_get_params('tmpdir', undef, @_);
 
 	if($ENV{'C_DOCUMENT_ROOT'} && (-d $ENV{'C_DOCUMENT_ROOT'})) {
 		$dir = File::Spec->catdir($ENV{'C_DOCUMENT_ROOT'}, $name);
@@ -1668,7 +1675,7 @@ Deprecated - use cookie() instead.
 
 sub get_cookie {
 	my $self = shift;
-	my $params = $self->_get_params('cookie_name', @_);
+	my $params = $self->_get_params('_get_cookie', 'cookie_name', @_);
 
 	if(!defined($params->{'cookie_name'})) {
 		$self->_warn('cookie_name argument not given');
@@ -1769,7 +1776,7 @@ This function fixes the catch22 situation.
 
 sub set_logger {
 	my $self = shift;
-	my $params = $self->_get_params('logger', @_);
+	my $params = $self->_get_params('set_logger', 'logger', @_);
 
 	$self->{logger} = $params->{'logger'};
 
