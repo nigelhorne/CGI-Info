@@ -74,8 +74,10 @@ Takes optional parameter max_upload, which is the maximum file size you can uplo
 our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
 
-sub new {
-	my $class = shift;
+sub new
+{
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
