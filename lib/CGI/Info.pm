@@ -919,7 +919,7 @@ sub _get_params
 		} else {
 			my @c = caller(1);
 			my $func = $c[3];	# calling function name
-			Carp::croak('Usage: ', __PACKAGE__, "->$func($default => " . '$val)');
+			Carp::croak('Usage: ', __PACKAGE__, "->$func()");
 		}
 	} elsif((scalar(@_) == 0) && defined($default)) {
 		my @c = caller(1);
