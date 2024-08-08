@@ -10,7 +10,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.81
+Version 0.82
 
 # SYNOPSIS
 
