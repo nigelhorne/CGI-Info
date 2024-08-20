@@ -76,8 +76,7 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 
 sub new
 {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {

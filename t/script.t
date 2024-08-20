@@ -1,4 +1,4 @@
-#!perl -Tw
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ PATHS: {
 	my $i = new_ok('CGI::Info');
 	ok(File::Spec->file_name_is_absolute($i->script_path()));
 	ok($i->script_path() =~ /.+script\.t$/);
-	ok($i->script_name() eq 'script.t');
+	cmp_ok($i->script_name(), 'eq', 'script.t', 'script_name() works');
 	ok($i->script_path() eq File::Spec->catfile($i->script_dir(), $i->script_name()));
 	ok($i->script_path() eq File::Spec->catfile(CGI::Info::script_dir(), $i->script_name()));
 	# Check calling twice return path
