@@ -28,8 +28,8 @@ install:
   - cmd: if not exist "C:\strawberry" cinst StrawberryPerl --allow-empty-checksums
   - cmd: path C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
   # - cmd: cd C:\projects\%APPVEYOR_PROJECT_NAME%
-  # Currently fails on http://apt.postgresql.org/pub/repos/apt bionic-pgdg Release
-  # - sh: sudo apt update -q -y
+  Currently fails on http://apt.postgresql.org/pub/repos/apt bionic-pgdg Release
+  - sh: sudo apt update -q -y
   - sh: sudo DEBIAN_FRONTEND=noninteractive apt install -q -y --force-yes build-essential git libssl-dev perl liblog-any-perl
   - sh: export PATH=/home/appveyor/perl5/bin:$PATH
   - perl -V
