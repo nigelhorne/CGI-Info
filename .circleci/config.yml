@@ -44,7 +44,7 @@ jobs:
           name: Run tests
           # command: echo 'replace me with real tests!' && false
           environment:
-            PATH: ~/perl5/bin:$PATH
+            PATH: ~/perl5/bin:/bin:/usr/bin
             AUTOMATED_TESTING: 1
             AUTHOR_TESTING: 1
           command: |
