@@ -9,9 +9,34 @@ jobs:
   test:
     docker:
       - image: cimg/base:stable
+
     steps:
       - checkout
       # Replace this with a real test runner invocation
+      - run:
+          name: Install Perl
+          command: |
+            sudo apt-get update && \
+            sudo apt-get upgrade && \
+            sudo apt-get install --assume-yes --quiet \
+              --no-install-suggests --no-install-recommends \
+              perl cpanminus
+      - run:
+          name: Perl version
+          command: perl --version
+      - run:
+          name: App::cpanminus version
+          command: cpanm --version
+      - run:
+          name: Configure local Perl lib path
+          command: |
+            cpanm --local-lib=~/perl5 local::lib && \
+            eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib) && \
+            echo 'export PERL5LIB=/home/atom/perl5/lib/perl5' >> $BASH_ENV && \
+            echo 'export PERL_LOCAL_LIB_ROOT=/home/atom/perl5' >> $BASH_ENV && \
+            echo 'export PERL_MB_OPT="--install_base \"/home/atom/perl5\""' >> $BASH_ENV && \
+            echo 'export PERL_MM_OPT=INSTALL_BASE=/home/atom/perl5' >> $BASH_ENV && \
+            echo 'export PATH="/home/atom/perl5/bin:$PATH"' >> $BASH_ENV
       - run:
           name: Run tests
           # command: echo 'replace me with real tests!' && false
