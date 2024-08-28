@@ -47,8 +47,8 @@ jobs:
           # command: echo 'replace me with real tests!' && false
           command: |
             make test
-            cover -test
-            cover -report codecov
+            # cover -test
+            # cover -report codecov
   build:
     docker:
       - image: cimg/base:stable
