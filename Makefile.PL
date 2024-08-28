@@ -44,7 +44,6 @@ WriteMakefile(
 		# 'Sub::Private' => 0,
 		'Sys::Hostname' => 0,
 		'File::Spec' => 3.4,
-		'File::HomeDir' => 0,
 		'Cwd' => 0,
 		'Socket' => 0,
 		'List::MoreUtils' => 0,
