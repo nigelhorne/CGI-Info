@@ -22,8 +22,8 @@ jobs:
       - name: Set up Cygwin
         uses: egor-tensin/setup-cygwin@master
         with:
-          packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ libcrypt-devel libnsl-devel bash
-      - uses: actions/checkout@main
+          packages: perl perl-ExtUtils-MakeMaker make gcc-g++ libcrypt-devel libnsl-devel bash
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - run: perl -V
