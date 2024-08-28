@@ -1,3 +1,5 @@
+---
+
 # Couldn't automatically generate a config from your source code.
 # This is a generic template to serve as a base for your custom config
 # See: https://circleci.com/docs/configuration-reference
@@ -13,7 +15,7 @@ jobs:
       - run:
           name: Run tests
           # command: echo 'replace me with real tests!' && false
-	  command: cpanm -iqn --installdeps . && perl Makefile.PL && make test
+          command: cpanm -iqn --installdeps . && perl Makefile.PL && make test
   build:
     docker:
       - image: cimg/base:stable
