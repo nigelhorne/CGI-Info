@@ -12,7 +12,8 @@ jobs:
       # Replace this with a real test runner invocation
       - run:
           name: Run tests
-          command: echo 'replace me with real tests!' && false
+          # command: echo 'replace me with real tests!' && false
+	  command: cpanm -iqn --installdeps . && perl Makefile.PL && make test
   build:
     docker:
       - image: cimg/base:stable
