@@ -1,5 +1,5 @@
 ---
-# https://github.com/codecov/example-perl
+
 # https://github.com/AtomLinter/atom-linter-perlcritic/blob/master/.circleci/config.yml
 
 # Couldn't automatically generate a config from your source code.
@@ -11,6 +11,7 @@ jobs:
   test:
     docker:
       - image: cimg/base:stable
+
     steps:
       - checkout
       # Replace this with a real test runner invocation
@@ -21,7 +22,7 @@ jobs:
             sudo apt-get upgrade && \
             sudo apt-get install --assume-yes --quiet \
               --no-install-suggests --no-install-recommends \
-              perl cpanminus libtest-needs-perl libtest-most-perl
+              perl cpanminus
       - run:
           name: Perl version
           command: perl --version
@@ -29,58 +30,47 @@ jobs:
           name: App::cpanminus version
           command: cpanm --version
       - run:
-          name: Install dependencies
-          command: |
-            curl -L https://cpanmin.us | perl - App::cpanminus
-            cpanm --local-lib=~/perl5 local::lib && echo "eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)" >> ~/.bashrc
-            cpanm -iqn ExtUtils::MakeMaker
-            cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov Log::Any
-            cpanm -iqn --skip-satisfied --installdeps --notest .
+          name: Prepare testing environment
+          command: sudo cpanm -iqn Test::Most Test::Needs
+      - run:
+          name: Install dependancies
+          command: sudo cpanm -iqn --installdeps .
       - run:
           name: Make Module
-          # command: sudo chown -R circleci . && ls -la && pwd && perl Makefile.PL && make
-          command: perl Makefile.PL && make
+          command: sudo chown -R circleci . && ls -la && pwd && perl Makefile.PL && make
       - run:
           name: Run tests
           # command: echo 'replace me with real tests!' && false
-          environment:
-            # PATH: ~/perl5/bin:/bin:/usr/bin
-            AUTOMATED_TESTING: 1
-            AUTHOR_TESTING: 1
-          command: |
-            make test
-            cover -test
-            cover -report codecov
-
-  # build:
-  #   docker:
-  #     - image: cimg/base:stable
-  #   steps:
-  #     - checkout
-  #     # Replace this with steps to build a package, or executable
-  #     - run:
-  #         name: Build an artifact
-  #         command: touch example.txt
-  #     - store_artifacts:
-  #         path: example.txt
-  # deploy:
-  #   docker:
-  #     - image: cimg/base:stable
-  #   steps:
-  #   #   Replace this with steps to deploy to users
-  #     - run:
-  #         name: deploy
-  #         command: '#e.g. ./deploy.sh'
-  #     - run:
-  #         name: found github actions config
-  #         command: ':'
+          command: make test
+  build:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      # Replace this with steps to build a package, or executable
+      - run:
+          name: Build an artifact
+          command: touch example.txt
+      - store_artifacts:
+          path: example.txt
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      # Replace this with steps to deploy to users
+      - run:
+          name: deploy
+          command: '#e.g. ./deploy.sh'
+      - run:
+          name: found github actions config
+          command: ':'
 workflows:
   example:
     jobs:
       - test
-      # - build:
-      #     requires:
-      #       - test
-      # - deploy:
-      #     requires:
-      #       - test
+      - build:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - test
