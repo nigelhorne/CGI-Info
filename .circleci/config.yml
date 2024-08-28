@@ -8,16 +8,14 @@
 # Stacks detected: cicd:github-actions:.github/workflows
 version: 2.1
 jobs:
-  machine:
-    environment:
-      PATH: ~/perl5/bin:$PATH
-      AUTOMATED_TESTING: 1
-      AUTHOR_TESTING: 1
-
   test:
     docker:
       - image: cimg/base:stable
-
+    machine:
+      environment:
+        PATH: ~/perl5/bin:$PATH
+        AUTOMATED_TESTING: 1
+        AUTHOR_TESTING: 1
     steps:
       - checkout
       # Replace this with a real test runner invocation
