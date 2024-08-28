@@ -27,7 +27,7 @@ jobs:
       - run:
           name: App::cpanminus version
           command: cpanm --version
-      # - run:
+      - run:
           name: Configure local Perl lib path
           command: |
             cpanm --local-lib=~/perl5 local::lib && \
