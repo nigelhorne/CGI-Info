@@ -31,17 +31,24 @@ jobs:
           command: cpanm --version
       - run:
           name: Prepare testing environment
-          command: sudo cpanm -iqn Test::Most Test::Needs
+          command: sudo cpanm -iqn Test::Most Test::Needs Devel::Cover::Report::Codecov
       - run:
           name: Install dependancies
           command: sudo cpanm -iqn --installdeps .
       - run:
           name: Make Module
-          command: sudo chown -R circleci . && ls -la && pwd && perl Makefile.PL && make
+          command: sudo chown -R circleci . && perl Makefile.PL && make
       - run:
           name: Run tests
+          environment:
+            # PATH: ~/perl5/bin:/bin:/usr/bin
+            AUTOMATED_TESTING: 1
+            AUTHOR_TESTING: 1
           # command: echo 'replace me with real tests!' && false
-          command: make test
+          command: |
+            make test
+            cover -test
+            cover -report codecov
   build:
     docker:
       - image: cimg/base:stable
