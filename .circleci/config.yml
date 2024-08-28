@@ -1,5 +1,7 @@
 ---
 
+# https://github.com/AtomLinter/atom-linter-perlcritic/blob/master/.circleci/config.yml
+
 # Couldn't automatically generate a config from your source code.
 # This is a generic template to serve as a base for your custom config
 # See: https://circleci.com/docs/configuration-reference
@@ -36,11 +38,22 @@ jobs:
             echo 'export PERL_LOCAL_LIB_ROOT=/home/circleci/perl5' ~/.bashrc && \
             echo 'export PERL_MB_OPT="--install_base \"/home/circleci/perl5\""' >> ~/.bashrc && \
             echo 'export PERL_MM_OPT=INSTALL_BASE=/home/circleci/perl5' >> ~/.bashrc && \
-            echo 'export PATH="/home/circleci/perl5/bin:$PATH"' >> ~/.bashrc
+            echo 'export PATH="/home/circleci/perl5/bin:$PATH"' >> ~/.bashrc && \
+            echo AUTOMATED_TESTING=1 >> ~/.bashrc && \
+            echo AUTHOR_TESTING=1 >> ~/.bashrc
+      - run:
+          name: Prepare testing environment
+          command: cpanm -iqn Test::Most Test::Needs
+      - run:
+          name: Install dependancies
+          command: cpanm -iqn --installdeps
+      - run:
+          name: Make Module
+          command: cpanm -iqn --installdeps . && perl Makefile.PL
       - run:
           name: Run tests
           # command: echo 'replace me with real tests!' && false
-          command: cpanm -iqn --installdeps . && perl Makefile.PL && make test
+          command: make test
   build:
     docker:
       - image: cimg/base:stable
