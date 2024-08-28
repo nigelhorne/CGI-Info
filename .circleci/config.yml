@@ -11,11 +11,6 @@ jobs:
   test:
     docker:
       - image: cimg/base:stable
-    machine:
-      environment:
-        PATH: ~/perl5/bin:$PATH
-        AUTOMATED_TESTING: 1
-        AUTHOR_TESTING: 1
     steps:
       - checkout
       # Replace this with a real test runner invocation
@@ -48,6 +43,10 @@ jobs:
       - run:
           name: Run tests
           # command: echo 'replace me with real tests!' && false
+          environment:
+            PATH: ~/perl5/bin:$PATH
+            AUTOMATED_TESTING: 1
+            AUTHOR_TESTING: 1
           command: |
             make test
             cover -test
