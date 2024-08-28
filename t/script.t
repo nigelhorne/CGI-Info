@@ -198,11 +198,10 @@ PATHS: {
 	if($^O eq 'MSWin32') {
 		TODO: {
 			local $TODO = 'Script_dir test needs to be done on Windows';
-			like($i->script_dir(), qr/\/CGI-Info/i, 'Check script_dir looks right');
+			like($i->script_dir(), qr/$home/, 'Check script_dir looks right');
 			ok($i->script_path() =~ /\\.+bar\.pl$/);
 		}
 	} else {
-		# like($i->script_dir(), qr/\/CGI-Info/i, 'Check script_dir looks right');
 		like($i->script_dir(), qr/$home/, 'Check script_dir looks right');
 		ok($i->script_path() =~ /\/.+bar\.pl$/);
 	}

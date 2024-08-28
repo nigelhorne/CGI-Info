@@ -3,6 +3,7 @@ Revision history for CGI-Info
 0.08
 	Mark Go-http-client as a robot
 	Support CircleCI
+	Fix t/script.t which failed on some platforms
 
 0.82	Thu Aug  8 07:51:02 EDT 2024
 	Mark ClaudeBot as a robot
