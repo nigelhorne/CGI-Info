@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::Most tests => 64;
 use File::Spec;
-use File::HomeDir;
 use Cwd;
 use Test::NoWarnings;
 use Tie::Filehandle::Preempt::Stdin;
@@ -194,15 +193,17 @@ PATHS: {
 	delete $ENV{'DOCUMENT_ROOT'};
 	$i = new_ok('CGI::Info');
 	ok($i->script_name() eq 'bar.pl');
-	my $home = File::HomeDir->my_home();
+	my $dir = Cwd::getcwd();
 	if($^O eq 'MSWin32') {
 		TODO: {
 			local $TODO = 'Script_dir test needs to be done on Windows';
-			like($i->script_dir(), qr/$home/, 'Check script_dir looks right');
+			# like($i->script_dir(), qr/$dir/, 'Check script_dir looks right');
+			cmp_ok($i->script_dir(), 'eq', $dir, 'Check script_dir looks right');
 			ok($i->script_path() =~ /\\.+bar\.pl$/);
 		}
 	} else {
-		like($i->script_dir(), qr/$home/, 'Check script_dir looks right');
+		# like($i->script_dir(), qr/$dir/, 'Check script_dir looks right');
+		cmp_ok($i->script_dir(), 'eq', $dir, 'Check script_dir looks right');
 		ok($i->script_path() =~ /\/.+bar\.pl$/);
 	}
 
