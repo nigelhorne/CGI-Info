@@ -46,10 +46,10 @@ jobs:
           command: cpanm -iqn Test::Most Test::Needs
       - run:
           name: Install dependancies
-          command: cpanm -iqn --installdeps
+          command: cpanm -iqn --installdeps .
       - run:
           name: Make Module
-          command: cpanm -iqn --installdeps . && perl Makefile.PL
+          command: perl Makefile.PL && make
       - run:
           name: Run tests
           # command: echo 'replace me with real tests!' && false
