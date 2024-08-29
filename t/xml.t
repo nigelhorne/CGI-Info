@@ -23,7 +23,8 @@ XML: {
 	local *STDIN = $fin;
 
 	my $i = new_ok('CGI::Info');
-	my %p = %{$i->params({ expect => ['XML'] })};
+	# my %p = %{$i->params({ expect => ['XML'] })};
+	my %p = %{$i->params({ allow => {'XML' => undef } })};
 	ok(exists($p{XML}));
 	is($p{XML}, $xml);	# Fails on Perl 5.6.2
 	is($i->as_string(), "XML=$xml");

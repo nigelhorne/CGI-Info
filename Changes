@@ -5,6 +5,7 @@ Revision history for CGI-Info
 	Support CircleCI
 	Fix t/script.t which failed on some platforms
 	Use gtar to create a distribution on Macs
+	Mark 'expect' as deprecated
 
 0.82	Thu Aug  8 07:51:02 EDT 2024
 	Mark ClaudeBot as a robot

@@ -1,6 +1,7 @@
 package CGI::Info;
 
 # TODO: remove the expect argument
+# TODO:	look into params::check or params::validate and/or giving a subroutine for the allow parameter to params()
 
 use warnings;
 use strict;
@@ -79,9 +80,12 @@ sub new
 	my $class = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
-		warn __PACKAGE__, ': expect must be a reference to an array';
-		return;
+	if($args{expect}) {
+		if(ref($args{expect}) ne 'ARRAY') {
+			warn __PACKAGE__, ': expect must be a reference to an array';
+			return;
+		}
+		warn __PACKAGE__, ': expect is deprecated, use allow instead';
 	}
 
 	if(!defined($class)) {
@@ -449,7 +453,7 @@ constructor.
 	my $info = CGI::Info->new();
 	my $allowed = {
 		foo => qr/^\d*$/,	# foo must be a number, or empty
-		bar => undef,
+		bar => undef,		# bar can be given and be any value
 		xyzzy => qr/^[\w\s-]+$/,	# must be alphanumeric
 						# to prevent XSS, and non-empty
 						# as a sanity check
@@ -496,6 +500,7 @@ sub params {
 	if(defined($params->{expect})) {
 		if(ref($params->{expect}) eq 'ARRAY') {
 			$self->{expect} = $params->{expect};
+			$self->_warn('expect is deprecated, use allow instead');
 		} else {
 			$self->_warn('expect must be a reference to an array');
 		}
@@ -868,6 +873,7 @@ sub _warn {
 	my $warning = $params->{'warning'};
 
 	return unless($warning);
+
 	if($self eq __PACKAGE__) {
 		# Called from class method
 		carp($warning);
