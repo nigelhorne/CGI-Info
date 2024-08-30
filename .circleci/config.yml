@@ -72,7 +72,7 @@ jobs:
           name: found github actions config
           command: ':'
 workflows:
-  example:
+  test:
     jobs:
       - test
       - build:
