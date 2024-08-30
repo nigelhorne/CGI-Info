@@ -45,7 +45,7 @@ WriteMakefile(
 		'strict' => 0,
 		'warnings' => 0,
 		'IPC::System::Simple' => 0,
-		'Taint::Runttime' => 0,
+		'Taint::Runtime' => 0,
 		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	}, PREREQ_PM => {
