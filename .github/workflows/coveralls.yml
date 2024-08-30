@@ -17,9 +17,24 @@ jobs:
       image: perl:stable
     steps:
       - uses: actions/checkout@v4
-      - run: cpanm --quiet --notest --installdeps .
-      - run: cpanm --quiet --notest App::Yath Devel::Cover Devel::Cover::Report::Coveralls UUID
-      - run: PERL5OPT="-MDevel::Cover" yath test --qvf t/
-      - run: cover -report coveralls
+      # - run: cpanm --quiet --notest --installdeps .
+      # - run: cpanm --quiet --notest App::Yath Devel::Cover Devel::Cover::Report::Coveralls UUID
+      # - run: PERL5OPT="-MDevel::Cover" yath test --qvf t/
+      - name: Install Dependencies
+        run: |
+          cpanm --quiet --notest --installdeps .
+          cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Coveralls
+      - name: Build module
+        run: |
+          perl Makefile.PL
+          make
+        env:
+          AUTHOR_TESTING: 1
+          AUTOMATED_TESTING: 1
+      - name: Submit coveralls
+        run: |
+          cover -test
+          cover -report coveralls
+          # ./codecov -t ${{ secrets.COVERALLS_TOKEN }} -f cover_db/codecov.json
         env:
           GITHUB_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
