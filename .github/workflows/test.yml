@@ -41,7 +41,13 @@ jobs:
           perl Makefile.PL
           make
       - name: Run Tests
-        run: prove -l -b t
+        # run: prove -l -b t
+        run: |
+          cover -test
+          cover -report codecov
+          curl -Os https://uploader.codecov.io/latest/macos/codecov
+          chmod +x codecov
+          ./codecov -t ${{ secrets.CODECOV_TOKEN }}
         env:
           AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
