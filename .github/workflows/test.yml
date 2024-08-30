@@ -51,3 +51,4 @@ jobs:
         env:
           AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
