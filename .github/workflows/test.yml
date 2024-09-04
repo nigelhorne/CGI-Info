@@ -33,22 +33,25 @@ jobs:
       - run: perl -V
       - name: Install Dependencies
         run: |
-          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover::Report::Codecov
+          cpanm -iqn ExtUtils::MakeMaker Test::Most
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Make Module
         run: |
           # find . -name build.log | xargs cat
           perl Makefile.PL
           make
-      - name: Run Tests
-        # run: prove -l -b t
-        run: |
-          cover -test
-          cover -report codecov
-          curl -Os https://uploader.codecov.io/latest/macos/codecov
-          chmod +x codecov
-          ./codecov -t ${{ secrets.CODECOV_TOKEN }}
         env:
           AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Run Tests
+        run: prove -l -b t
+        # run: |
+        #   cover -test
+        #   cover -report codecov
+        #   curl -Os https://uploader.codecov.io/latest/macos/codecov
+        #   chmod +x codecov
+        #   ./codecov -t ${{ secrets.CODECOV_TOKEN }}
+        env:
+          AUTHOR_TESTING: 1
+          AUTOMATED_TESTING: 1
+          # CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
