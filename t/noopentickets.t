@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use Test::Most tests => 4;
-use constant SITE =>'https://api.github.com/repos/nigelhorne/CGI-Info/issues';
-use constant URL =>'api.github.com';
+use constant URL => 'https://api.github.com/repos/nigelhorne/CGI-Info/issues';
+use constant SITE =>'api.github.com';
 
 RT: {
 	# RT system, deprecated
@@ -50,6 +50,7 @@ GITHUB: {
 				} else {
 					my $s = IO::Socket::INET->new(
 						PeerAddr => SITE,
+						PeerPort => 'http(80)',
 						Timeout => 5
 					);
 					if($s) {
@@ -74,8 +75,8 @@ GITHUB: {
 							fail('Failed to get data');
 						}
 					} else {
-						diag("Can't connect to ", SITE);
-						skip("Can't connect to " . SITE, 1);
+						diag("Can't connect to ", SITE, ": $IO::Socket::errstr");
+						skip("Can't connect to " . SITE . ": $IO::Socket::errstr", 1);
 					}
 				}
 			}
