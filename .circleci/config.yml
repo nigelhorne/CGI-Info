@@ -31,7 +31,7 @@ jobs:
           command: cpanm --version
       - run:
           name: Prepare testing environment
-          command: sudo cpanm -iqn Test::Most Test::Needs Devel::Cover::Report::Codecov
+          command: sudo cpanm -iqn Test::Most Test::Needs
       - run:
           name: Install dependancies
           command: sudo cpanm -iqn --installdeps .
