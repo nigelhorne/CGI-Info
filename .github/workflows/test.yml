@@ -33,7 +33,7 @@ jobs:
       - run: perl -V
       - name: Install Dependencies
         run: |
-          cpanm -iqn ExtUtils::MakeMaker Test::Most
+          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover::Report::Codecov
           cpanm -iqn --skip-satisfied --installdeps --notest .
       - name: Make Module
         run: |
