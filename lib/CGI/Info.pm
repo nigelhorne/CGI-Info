@@ -916,7 +916,7 @@ sub _get_params
 
 	my %rc;
 
-	if(scalar(@_) % 2 == 0) {
+	if((scalar(@_) % 2) == 0) {
 		%rc = @_;
 	} elsif(scalar(@_) == 1) {
 		if(defined($default)) {
