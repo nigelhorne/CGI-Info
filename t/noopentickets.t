@@ -71,8 +71,9 @@ GITHUB: {
 							}
 							cmp_ok(scalar(@issues), '==', 0, 'There are no opentickets');
 						} else {
-							diag(URL, ': failed to get data');
-							fail('Failed to get data');
+							diag(URL, ': failed to get data - ignoring');
+							# fail('Failed to get data');
+							skip(URL . ': failed to get data - ignoring', 1);
 						}
 					} else {
 						diag("Can't connect to ", SITE, ": $IO::Socket::errstr");
