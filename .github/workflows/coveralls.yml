@@ -20,6 +20,11 @@ jobs:
       # - run: cpanm --quiet --notest --installdeps .
       # - run: cpanm --quiet --notest App::Yath Devel::Cover Devel::Cover::Report::Coveralls UUID
       # - run: PERL5OPT="-MDevel::Cover" yath test --qvf t/
+      - name: Install Programs
+        run: |
+	  apt-get update
+	  apt-get -y upgrade
+          apt-get -y install liblwp-protocol-https-perl cpanminus libhtml-parser-perl
       - name: Install Dependencies
         run: |
           cpanm --quiet --notest --installdeps .
