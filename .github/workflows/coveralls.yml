@@ -24,7 +24,7 @@ jobs:
         run: |
           apt-get update
           apt-get -y upgrade
-          apt-get -y install libwww-perl liblwp-protocol-https-perl cpanminus libdevel-cover-perl libmodule-build
+          apt-get -y install libwww-perl liblwp-protocol-https-perl cpanminus libdevel-cover-perl libmodule-build-perl
       - name: Install Dependencies
         run: |
           cpanm -ivn --installdeps .
@@ -34,7 +34,6 @@ jobs:
           perl Makefile.PL
           make
         env:
-          AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
       - name: Submit coveralls
         run: |
