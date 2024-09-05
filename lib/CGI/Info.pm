@@ -906,7 +906,7 @@ sub _warn {
 #	when called _get_params('arg', @_);
 sub _get_params
 {
-	my $self = shift;
+	shift;
 	my $default = shift;
 
 	if(ref($_[0]) eq 'HASH') {
