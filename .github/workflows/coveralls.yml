@@ -27,8 +27,9 @@ jobs:
           apt-get -y install libwww-perl liblwp-protocol-https-perl cpanminus libdevel-cover-perl libmodule-build-perl
       - name: Install Dependencies
         run: |
+          cpanm --reinstall App::cpanminus
           cpanm -ivn --installdeps .
-          cpanm -ivn Devel::Cover::Report::Coveralls
+          cpanm --mirror https://cpan.org -ivn Devel::Cover::Report::Coveralls
       - name: Build module
         run: |
           perl Makefile.PL
