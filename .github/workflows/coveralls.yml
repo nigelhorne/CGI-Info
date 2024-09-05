@@ -24,11 +24,11 @@ jobs:
         run: |
           apt-get update
           apt-get -y upgrade
-          apt-get -y install liblwp-protocol-https-perl cpanminus libdevel-cover-perl
+          apt-get -y install libwww-perl liblwp-protocol-https-perl cpanminus libdevel-cover-perl libmodule-build
       - name: Install Dependencies
         run: |
           cpanm -ivn --installdeps .
-          cpanm -ivn Module::Build Devel::Cover::Report::Coveralls
+          cpanm -ivn Devel::Cover::Report::Coveralls
       - name: Build module
         run: |
           perl Makefile.PL
