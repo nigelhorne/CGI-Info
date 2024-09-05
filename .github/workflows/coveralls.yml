@@ -28,8 +28,8 @@ jobs:
       - name: Install Dependencies
         run: |
           cpanm --reinstall App::cpanminus
-          cpanm -ivn --installdeps .
-          cpanm --mirror https://cpan.org -ivn Devel::Cover::Report::Coveralls
+          cpanm -iqn --installdeps .
+          cpanm --mirror https://cpan.org -iqn Devel::Cover::Report::Coveralls
       - name: Build module
         run: |
           perl Makefile.PL
@@ -38,8 +38,10 @@ jobs:
           AUTOMATED_TESTING: 1
       - name: Submit coveralls
         run: |
+          git config --global --add safe.directory /__w/CGI-Info/CGI-Info
           cover -test
           cover -report coveralls
           # ./codecov -t ${{ secrets.COVERALLS_TOKEN }} -f cover_db/codecov.json
         env:
           GITHUB_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+          AUTOMATED_TESTING: 1
