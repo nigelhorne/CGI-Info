@@ -11,7 +11,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.82
+Version 0.83
 
 # SYNOPSIS
 
@@ -192,7 +192,7 @@ constructor.
         my $info = CGI::Info->new();
         my $allowed = {
                 foo => qr/^\d*$/,       # foo must be a number, or empty
-                bar => undef,
+                bar => undef,           # bar can be given and be any value
                 xyzzy => qr/^[\w\s-]+$/,        # must be alphanumeric
                                                 # to prevent XSS, and non-empty
                                                 # as a sanity check
