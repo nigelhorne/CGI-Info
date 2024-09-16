@@ -1,5 +1,9 @@
 Revision history for CGI-Info
 
+0.84
+	Intercept SQL Injection
+		entry=-4346" OR 1749\=1749 AND "dgiO"\="dgiO;page=people
+
 0.83	Sun  8 Sep 08:52:23 EDT 2024
 	Mark Go-http-client as a robot
 	Support CircleCI

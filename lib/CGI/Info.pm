@@ -765,6 +765,7 @@ sub params {
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /\sAND\s1=1/ix) ||
+			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{logger}) {
