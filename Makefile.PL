@@ -35,6 +35,7 @@ WriteMakefile(
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,

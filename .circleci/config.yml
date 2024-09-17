@@ -34,9 +34,18 @@ jobs:
           command: sudo cpanm -iqn Test::Most Test::Needs
       - run:
           name: Install dependancies
-          command: sudo cpanm -iqn --installdeps .
+          environment:
+            # PATH: ~/perl5/bin:/bin:/usr/bin
+            AUTOMATED_TESTING: 1
+            NO_NETWORK_TESTING: 1
+          command: sudo cpanm -ivn --installdeps . || sudo cat /root/.cpan/work/*/build.log
       - run:
           name: Make Module
+          environment:
+            # PATH: ~/perl5/bin:/bin:/usr/bin
+            AUTOMATED_TESTING: 1
+            NO_NETWORK_TESTING: 1
+            NONINTERACTIVE_TESTING: 1
           command: sudo chown -R circleci . && perl Makefile.PL && make
       - run:
           name: Run tests
@@ -44,6 +53,7 @@ jobs:
             # PATH: ~/perl5/bin:/bin:/usr/bin
             AUTOMATED_TESTING: 1
             AUTHOR_TESTING: 1
+            NONINTERACTIVE_TESTING: 1
           # command: echo 'replace me with real tests!' && false
           command: |
             make test

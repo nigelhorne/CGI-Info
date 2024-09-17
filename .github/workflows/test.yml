@@ -41,6 +41,7 @@ jobs:
         env:
           AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
         run: |
           # find . -name build.log | xargs cat
           perl Makefile.PL
@@ -49,6 +50,8 @@ jobs:
         env:
           AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
           # CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: prove -l -b t
         # run: |
