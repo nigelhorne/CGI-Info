@@ -41,6 +41,7 @@ jobs:
         env:
           AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
           NONINTERACTIVE_TESTING: 1
         run: |
           # find . -name build.log | xargs cat
