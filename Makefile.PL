@@ -9,13 +9,13 @@ if(!-w $tmpdir) {
 	exit(0);
 }
 
-my $distargs = {
+my $dist = {
 	COMPRESS => 'gzip -9f',
 	SUFFIX => 'gz'
 };
 
 if($^O eq 'darwin') {
-	$distargs->{'TAR'} = 'gtar';
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
@@ -67,7 +67,7 @@ WriteMakefile(
 		'Class::Autouse' => 0,
 		'namespace::clean' => 0,
 		'Sys::Path' => 0,
-	}, dist => $distargs,
+	}, dist => $dist,
 	clean		=> { FILES => 'CGI-Info-*' },
 	# META_ADD => {
 		# provides => {}
