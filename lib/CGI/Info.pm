@@ -82,7 +82,7 @@ sub new
 
 	if($args{expect}) {
 		if(ref($args{expect}) ne 'ARRAY') {
-			warn __PACKAGE__, ': expect must be a reference to an array';
+			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
 			return;
 		}
 		warn __PACKAGE__, ': expect is deprecated, use allow instead';
