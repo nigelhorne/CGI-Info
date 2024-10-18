@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 179;
+use Test::Most tests => 181;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -96,6 +96,7 @@ PARAMS: {
 	$i = new_ok('CGI::Info');
 	ok(!defined($i->params()));
 	ok($i->as_string() eq '');
+	cmp_ok($i->status(), '==', 403, 'SQL Injection generates 403 code');
 
 	# Seen in vwf.log
 	$ENV{'QUERY_STRING'} = 'entry=-4346" OR 1749\=1749 AND "dgiO"\="dgiO;page=people';
@@ -103,6 +104,7 @@ PARAMS: {
 	ok(!defined($i->params()));
 	ok(!defined($i->entry()));
 	ok($i->as_string() eq '');
+	cmp_ok($i->status(), '==', 403, 'SQL Injection generates 403 code');
 
 	$ENV{'QUERY_STRING'} = '<script>alert(123)</script>=wilma';
 	$i = new_ok('CGI::Info');

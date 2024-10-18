@@ -43,6 +43,10 @@ CGI::Info attempts to remove that.
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
 things when you're not running the program in a CGI environment.
 
+CGI::Info also provides a simple web application firewall.
+Whilst you shouldn't rely on it alone to provide security to your website,
+it is another layer and every little helps.
+
     use CGI::Info;
     my $info = CGI::Info->new();
     # ...
