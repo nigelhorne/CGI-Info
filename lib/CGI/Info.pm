@@ -740,6 +740,7 @@ sub params {
 				if($self->{logger}) {
 					$self->{logger}->info("discard $key");
 				}
+				$self->status(422);
 				next;
 			}
 
@@ -749,6 +750,7 @@ sub params {
 					if($self->{logger}) {
 						$self->{logger}->info("block $key = $value");
 					}
+					$self->status(422);
 					next;
 				}
 			}

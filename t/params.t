@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 181;
+use Test::Most tests => 185;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -489,4 +489,26 @@ EOF
 	};
 
 	ok($@ =~ /Reset is a class method/);
+
+	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+	$ENV{'REQUEST_METHOD'} = 'GET';
+	$ENV{'QUERY_STRING'} = 'country=/etc/passwd&page=by_location';
+	delete $ENV{'CONTENT_TYPE'};
+	delete $ENV{'CONTENT_LENGTH'};
+	$i = new_ok('CGI::Info');
+
+	my $allow = {
+		'entry' => undef,
+		'country' => qr/^[A-Z\s]+$/i,	# Must start with a letter
+		'county' => qr/^[A-Z\s]+$/i,
+		'string' => undef,
+		'page' => 'by_location',
+		'lang' => qr/^[A-Z][A-Z]/i,
+	};
+
+	my %params = %{$i->params({ allow => $allow })};
+
+	cmp_ok($params{'page'}, 'eq', 'by_location', 'allow lets through legal parameters');
+	is($params{'country'}, undef, 'allow blocks illegal parameters');
+	cmp_ok($i->status(), '==', 422, 'HTTP Unprocessable Content');
 }

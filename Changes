@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.85
+	Send back HTTP code 422 when argument fails "allow"
+
 0.84	Fri Oct 18 08:21:05 EDT 2024
 	Intercept SQL Injection
 		entry=-4346" OR 1749\=1749 AND "dgiO"\="dgiO;page=people
