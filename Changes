@@ -3,6 +3,7 @@ Revision history for CGI-Info
 0.85
 	Send back HTTP code 422 when argument fails "allow"
 	Added come comments and small optimisations
+	new(): Use Scalar::Util to verify it's an object
 
 0.84	Fri Oct 18 08:21:05 EDT 2024
 	Intercept SQL Injection

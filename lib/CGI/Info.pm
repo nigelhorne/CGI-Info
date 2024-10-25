@@ -7,6 +7,7 @@ use warnings;
 use strict;
 use Carp;
 use File::Spec;
+use Scalar::Util;
 use Socket;	# For AF_INET
 use 5.008;
 use Log::Any qw($log);
@@ -101,7 +102,7 @@ sub new
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
+	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
@@ -918,7 +919,7 @@ sub _get_params
 	my $num_args = scalar @_;
 
 	# Populate %rc based on the number and type of arguments
-	if($num_args == 1 && defined $default) {
+	if(($num_args == 1) && (defined $default)) {
 		%rc = ($default => shift);
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;

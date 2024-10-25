@@ -51,6 +51,7 @@ WriteMakefile(
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'Scalar::Util' => 0,
 		'URI::Heuristic' => 0,
 		# 'Sub::Private' => 0,
 		'Sys::Hostname' => 0,
@@ -66,7 +67,7 @@ WriteMakefile(
 		# 'String::EscapeCage' => 0.02,
 		'Class::Autouse' => 0,
 		'namespace::clean' => 0,
-		'Sys::Path' => 0,
+		'Sys::Path' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'CGI-Info-*' },
 	# META_ADD => {
