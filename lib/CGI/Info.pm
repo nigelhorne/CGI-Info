@@ -920,13 +920,14 @@ sub _get_params
 
 	# Populate %rc based on the number and type of arguments
 	if(($num_args == 1) && (defined $default)) {
-		%rc = ($default => shift);
+		# %rc = ($default => shift);
+		return { $default => shift };
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
 	} elsif($num_args == 1) {
-		Carp::croak("Usage: ", __PACKAGE__, "->", (caller(1))[3], "()");
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	} elsif($num_args == 0 && defined $default) {
-		Carp::croak("Usage: ", __PACKAGE__, "->", (caller(1))[3], "($default => \$val)");
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
 	}
 
 	return \%rc;
@@ -1812,19 +1813,22 @@ sub reset {
 	$stdin_data = undef;
 }
 
-sub AUTOLOAD {
+sub AUTOLOAD
+{
 	our $AUTOLOAD;
-	my $param = $AUTOLOAD;
-
-	$param =~ s/.*:://;
-
-	return if($param eq 'DESTROY');
-
 	my $self = shift;
 
-	return if(ref($self) ne __PACKAGE__);
+	# Extract the method name from the AUTOLOAD variable
+	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
 
-	return $self->param($param);
+	# Skip if called on destruction
+	return if $method eq 'DESTROY';
+
+	# Ensure the method is called on the correct package object
+	return unless ref($self) eq __PACKAGE__;
+
+	# Delegate to the param method
+	return $self->param($method);
 }
 
 =head1 AUTHOR
