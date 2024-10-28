@@ -144,8 +144,7 @@ sub script_name
 sub _find_paths {
 	my $self = shift;
 
-	require File::Basename;
-	File::Basename->import();
+	require File::Basename && File::Basname->import() unless File::Basename->can('basename');
 
 	# Determine script name
 	my $script_name = $ENV{'SCRIPT_NAME'} // $0;
@@ -168,8 +167,7 @@ sub _find_paths {
 			# Called from a command line with a full path
 			$self->{script_path} = $ENV{'SCRIPT_NAME'};
 		} else {
-			require Cwd;
-			Cwd->import();
+			require Cwd unless Cwd->can('abs_path');
 
 			$script_name = $ENV{'SCRIPT_NAME'};
 			if($script_name =~ /^\/(.+)/) {
@@ -284,63 +282,44 @@ sub host_name {
 	return $self->{site};
 }
 
-sub _find_site_details {
+sub _find_site_details
+{
 	my $self = shift;
 
-	if($self->{logger}) {
-		$self->{logger}->trace('Entering _find_site_details');
-	}
-	if($self->{site} && $self->{cgi_site}) {
-		return;
-	}
+	# Log entry if logger is present
+	$self->{logger} && $self->{logger}->trace('Entering _find_site_details');
+	return if $self->{site} && $self->{cgi_site};
 
-	require URI::Heuristic;
-	URI::Heuristic->import;
+	# Import necessary modules
+	require URI::Heuristic unless URI::Heuristic->can('uf_uristr');
+	require Sys::Hostname unless Sys::Hostname->can('hostname');
 
-	if($ENV{'HTTP_HOST'}) {
-		$self->{cgi_site} = URI::Heuristic::uf_uristr($ENV{'HTTP_HOST'});
+	# Determine cgi_site using environment variables or hostname
+	if (my $host = $ENV{'HTTP_HOST'} || $ENV{'SERVER_NAME'}) {
+		$self->{cgi_site} = URI::Heuristic::uf_uristr($host);
 		# Remove trailing dots from the name.  They are legal in URLs
 		# and some sites link using them to avoid spoofing (nice)
-		if($self->{cgi_site} =~ /(.*)\.+$/) {
-			$self->{cgi_site} = $1;
-		}
-	} elsif($ENV{'SERVER_NAME'}) {
-		$self->{cgi_site} = URI::Heuristic::uf_uristr($ENV{'SERVER_NAME'});
-		if(defined($self->protocol()) && ($self->protocol() ne 'http')) {
-			$self->{cgi_site} =~ s/^http//;
-			$self->{cgi_site} = $self->protocol() . $self->{cgi_site};
+		$self->{cgi_site} =~ s/(.*)\.+$/$1/;  # Trim trailing dots
+
+		if($ENV{'SERVER_NAME'} && ($host eq $ENV{'SERVER_NAME'}) && (my $protocol = $self->protocol()) && $self->protocol() ne 'http') {
+			$self->{cgi_site} =~ s/^http/$protocol/;
 		}
 	} else {
-		require Sys::Hostname;
-		Sys::Hostname->import;
-
-		if($self->{logger}) {
-			$self->{logger}->debug('Falling back to using hostname');
-		}
-
+		$self->{logger} && $self->{logger}->debug('Falling back to using hostname');
 		$self->{cgi_site} = Sys::Hostname::hostname();
 	}
 
-	unless($self->{site}) {
-		$self->{site} = $self->{cgi_site};
-	}
-	if($self->{site} =~ /^https?:\/\/(.+)/) {
-		$self->{site} = $1;
-	}
-	unless($self->{cgi_site} =~ /^https?:\/\//) {
-		my $protocol = $self->protocol();
+	# Set site details if not already defined
+	$self->{site} ||= $self->{cgi_site};
+	$self->{site} =~ s/^https?:\/\/(.+)/$1/;
+	$self->{cgi_site} = ($self->protocol() || 'http') . '://' . $self->{cgi_site}
+		unless $self->{cgi_site} =~ /^https?:\/\//;
 
-		unless($protocol) {
-			$protocol = 'http';
-		}
-		$self->{cgi_site} = "$protocol://" . $self->{cgi_site};
-	}
-	unless($self->{site} && $self->{cgi_site}) {
-		$self->_warn('Could not determine site name');
-	}
-	if($self->{logger}) {
-		$self->{logger}->trace('Leaving _find_site_details');
-	}
+	# Warn if site details could not be determined
+	$self->_warn('Could not determine site name') unless $self->{site} && $self->{cgi_site};
+
+	# Log exit
+	$self->{logger} && $self->{logger}->trace('Leaving _find_site_details');
 }
 
 =head2 domain_name
