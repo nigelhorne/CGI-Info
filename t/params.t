@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 185;
+use Test::Most tests => 189;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -79,6 +79,14 @@ PARAMS: {
 	ok($p{fred} eq 'wilma');
 	cmp_ok($i->foo(), 'eq', 'bar', 'Test AUTOLOAD');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
+
+	$ENV{'QUERY_STRING'} = 'page=submit&country=Singapore&county=';
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	diag(Data::Dumper->new([\%p])->Dump()) if($ENV{'TEST_VERBOSE'});
+	cmp_ok(scalar(keys %p), '==', 2, 'Ignored county=');
+	cmp_ok($p{'page'}, 'eq', 'submit', 'Parsed page=submit');
+	cmp_ok($p{'country'}, 'eq', 'Singapore', 'Parsed country=Singapore');
 
 	# Catch XSS attempts
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=<script>alert(123)</script>';
