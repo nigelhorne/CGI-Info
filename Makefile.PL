@@ -77,15 +77,15 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
+				repository => 'https://github.com/nigelhorne/CGI-Info',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/CGI-Info.git',
 				web => 'https://github.com/nigelhorne/CGI-Info',
-				repository => 'https://github.com/nigelhorne/CGI-Info',
 			}, bugtracker => {
+				mailto => 'bug-CGI-Info@rt.cpan.org'
+				url => 'https://github.com/nigelhorne/CGI-Info/issues',
 				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
 				web => 'https://github.com/nigelhorne/CGI-Info/issues',
-				url => 'https://github.com/nigelhorne/CGI-Info/issues',
-				mailto => 'bug-CGI-Info@rt.cpan.org'
 			}
 		},
 	},
