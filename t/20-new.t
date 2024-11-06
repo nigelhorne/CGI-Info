@@ -3,7 +3,7 @@
 use strict;
 
 # use lib 'lib';
-use Test::Most tests => 6;
+use Test::Most tests => 7;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -20,4 +20,5 @@ cmp_ok($info->{max_upload_size}, '==', 1024 * 1024, 'direct key-value pairs');
 
 # Test cloning behavior by calling new() on an existing object
 my $info2 = $info->new({ allow => [ 'gif' ], upload_dir => '/var/uploads' });
-cmp_ok($info2->{upload_dir}, 'eq', '/var/uploads', 'clone');
+cmp_ok($info2->{max_upload_size}, '==', 1024 * 1024, 'clone keeps old args');
+cmp_ok($info2->{upload_dir}, 'eq', '/var/uploads', 'clone adds new args');
