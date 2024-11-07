@@ -6,7 +6,7 @@ use strict;
 use Test::Most tests => 7;
 
 BEGIN {
-	use_ok('CGI::Info');
+	use_ok('CGI::Info')
 }
 
 isa_ok(CGI::Info->new(), 'CGI::Info', 'Creating CGI::Info object');
