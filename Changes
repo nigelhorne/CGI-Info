@@ -6,6 +6,7 @@ Revision history for CGI-Info
 	new(): Use Scalar::Util to verify it's an object
 	Refactor AUTOLOAD
 	Avoid re-importing modules
+	Refactor status() and add more tests
 
 0.84	Fri Oct 18 08:21:05 EDT 2024
 	Intercept SQL Injection

@@ -1739,23 +1739,26 @@ otherwise an HTTP error code
 =cut
 
 sub status {
-	my $self = shift;
+    my $self = shift;
+    my $status = shift;
 
-	if(my $status = shift) {
-		$self->{status} = $status;
-	} elsif(!defined($self->{status})) {
-		if(defined(my $method = $ENV{'REQUEST_METHOD'})) {
-			if(($method eq 'OPTIONS') || ($method eq 'DELETE')) {
-				return 405;
-			} elsif(($method eq 'POST') && !defined($ENV{'CONTENT_LENGTH'})) {
-				return 411;
-			}
-		}
-		return 200;
-	}
+    # Set status if provided
+    return $self->{status} = $status if defined $status;
 
-	return $self->{status} || 200;
+    # Determine status based on request method if status is not set
+    unless (defined $self->{status}) {
+        my $method = $ENV{'REQUEST_METHOD'};
+        
+        return 405 if $method && ($method eq 'OPTIONS' || $method eq 'DELETE');
+        return 411 if $method && ($method eq 'POST' && !defined $ENV{'CONTENT_LENGTH'});
+        
+        return 200;
+    }
+
+    # Return current status or 200 by default
+    return $self->{status} || 200;
 }
+
 
 =head2 set_logger
 
