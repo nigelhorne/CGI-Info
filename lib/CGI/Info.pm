@@ -1139,32 +1139,22 @@ generating keys for a cache.
 
 =cut
 
-sub as_string {
+sub as_string
+{
 	my $self = shift;
 
-	unless($self->params()) {
-		return '';
-	}
+	my $params = $self->params() || return '';
 
-	my %f = %{$self->params()};
+	my $rc = join ';', map {
+		my $value = $params->{$_};
+			$value =~ s/\\/\\\\/g;
+			$value =~ s/(;|=)/\\$1/g;
+			"$_=$value"
+		} sort keys %$params;
 
-	my $rc;
+	$self->{logger}->debug("as_string: returning '$rc'") if($rc && $self->{logger});
 
-	foreach (sort keys %f) {
-		my $value = $f{$_};
-		$value =~ s/\\/\\\\/g;
-		$value =~ s/(;|=)/\\$1/g;
-		if(defined($rc)) {
-			$rc .= ";$_=$value";
-		} else {
-			$rc = "$_=$value";
-		}
-	}
-	if($rc && $self->{logger}) {
-		$self->{logger}->debug("is_string: returning '$rc'");
-	}
-
-	return defined($rc) ? $rc : '';
+	return $rc;
 }
 
 =head2 protocol
