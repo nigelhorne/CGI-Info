@@ -1184,8 +1184,7 @@ sub protocol {
 		return 'http';
 	}
 
-	my $port = $ENV{'SERVER_PORT'};
-	if(defined($port)) {
+	if(my $port = $ENV{'SERVER_PORT'}) {
 		if(defined(my $name = getservbyport($port, 'tcp'))) {
 			if($name =~ /https?/) {
 				return $name;
@@ -1707,27 +1706,21 @@ it will replace the "get_cookie" method in the future.
 sub cookie {
 	my ($self, $field) = @_;
 
+	# Validate field argument
 	if(!defined($field)) {
 		$self->_warn('what cookie do you want?');
 		return;
 	}
 
-	unless($self->{jar}) {
-		unless(defined($ENV{'HTTP_COOKIE'})) {
-			return;
-		}
-		my @cookies = split(/; /, $ENV{'HTTP_COOKIE'});
-
-		foreach my $cookie(@cookies) {
-			my ($name, $value) = split(/=/, $cookie);
-			$self->{jar}->{$name} = $value;
+	# Load cookies if not already loaded
+	unless ($self->{jar}) {
+		if (defined $ENV{'HTTP_COOKIE'}) {
+			$self->{jar} = { map { split(/=/, $_, 2) } split(/; /, $ENV{'HTTP_COOKIE'}) };
 		}
 	}
 
-	if(exists($self->{jar}->{$field})) {
-		return $self->{jar}->{$field};
-	}
-	return;	# Return undef
+	# Return the cookie value if it exists, otherwise return undef
+	return $self->{jar}{$field};
 }
 
 =head2 status
@@ -1738,27 +1731,27 @@ otherwise an HTTP error code
 
 =cut
 
-sub status {
-    my $self = shift;
-    my $status = shift;
+sub status
+{
+	my $self = shift;
+	my $status = shift;
 
-    # Set status if provided
-    return $self->{status} = $status if defined $status;
+	# Set status if provided
+	return $self->{status} = $status if defined $status;
 
-    # Determine status based on request method if status is not set
-    unless (defined $self->{status}) {
-        my $method = $ENV{'REQUEST_METHOD'};
-        
-        return 405 if $method && ($method eq 'OPTIONS' || $method eq 'DELETE');
-        return 411 if $method && ($method eq 'POST' && !defined $ENV{'CONTENT_LENGTH'});
-        
-        return 200;
-    }
+	# Determine status based on request method if status is not set
+	unless (defined $self->{status}) {
+		my $method = $ENV{'REQUEST_METHOD'};
 
-    # Return current status or 200 by default
-    return $self->{status} || 200;
+		return 405 if $method && ($method eq 'OPTIONS' || $method eq 'DELETE');
+		return 411 if $method && ($method eq 'POST' && !defined $ENV{'CONTENT_LENGTH'});
+
+		return 200;
+	}
+
+	# Return current status or 200 by default
+	return $self->{status} || 200;
 }
-
 
 =head2 set_logger
 
