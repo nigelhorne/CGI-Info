@@ -1666,27 +1666,21 @@ sub get_cookie {
 	my $self = shift;
 	my $params = $self->_get_params('cookie_name', @_);
 
+	# Validate field argument
 	if(!defined($params->{'cookie_name'})) {
 		$self->_warn('cookie_name argument not given');
 		return;
 	}
 
+	# Load cookies if not already loaded
 	unless($self->{jar}) {
-		unless(defined($ENV{'HTTP_COOKIE'})) {
-			return;
-		}
-		my @cookies = split(/; /, $ENV{'HTTP_COOKIE'});
-
-		foreach my $cookie(@cookies) {
-			my ($name, $value) = split(/=/, $cookie);
-			$self->{jar}->{$name} = $value;
+		if(defined $ENV{'HTTP_COOKIE'}) {
+			$self->{jar} = { map { split(/=/, $_, 2) } split(/; /, $ENV{'HTTP_COOKIE'}) };
 		}
 	}
 
-	if(exists($self->{jar}->{$params->{'cookie_name'}})) {
-		return $self->{jar}->{$params->{'cookie_name'}};
-	}
-	return;	# Return undef
+	# Return the cookie value if it exists, otherwise return undef
+	return $self->{jar}->{$params->{'cookie_name'}};
 }
 
 =head2 cookie
@@ -1713,8 +1707,8 @@ sub cookie {
 	}
 
 	# Load cookies if not already loaded
-	unless ($self->{jar}) {
-		if (defined $ENV{'HTTP_COOKIE'}) {
+	unless($self->{jar}) {
+		if(defined $ENV{'HTTP_COOKIE'}) {
 			$self->{jar} = { map { split(/=/, $_, 2) } split(/; /, $ENV{'HTTP_COOKIE'}) };
 		}
 	}
