@@ -62,7 +62,13 @@ Bar
 -------xyz--
 EOF
 		local $ENV{'CONTENT_LENGTH'} = length($input);
-		does_carp_that_matches(sub { new_ok('CGI::Info')->params(upload_dir => '/') }, qr/ isn't writeable$/);
+		if(-w '/') {
+			diag('/ is writeable');
+			ok(1);
+			ok(1);
+		} else {
+			does_carp_that_matches(sub { new_ok('CGI::Info')->params(upload_dir => '/') }, qr/ isn't writeable$/);
+		}
 		does_carp_that_matches(sub { new_ok('CGI::Info')->params(upload_dir => 't/carp.t') }, qr/ isn't a full pathname$/);
 		does_carp_that_matches(sub { new_ok('CGI::Info')->params(upload_dir => '/t/carp.t') }, qr/ isn't a directory$/);
 		# new_ok('CGI::Info')->params(upload_dir => '/t/carp.t');
