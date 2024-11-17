@@ -63,6 +63,7 @@ Bar
 EOF
 		local $ENV{'CONTENT_LENGTH'} = length($input);
 		if(-w '/') {
+			# GitHub actions images run as root
 			diag('/ is writeable');
 			ok(1);
 			ok(1);
