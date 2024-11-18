@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
       - run: perl -V
       - name: Install Dependencies
         run: |
