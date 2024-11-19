@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.86
+	Ensure correct message is logged on SQL injection attempt
+
 0.85	Sun Nov 17 09:49:52 EST 2024
 	Send back HTTP code 422 when argument fails "allow"
 	Added come comments and small optimisations
