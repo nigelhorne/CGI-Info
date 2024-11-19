@@ -863,6 +863,8 @@ sub _warn {
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
 
+	push @{$self->{'warnings'}}, { warning => $warning };
+
 	if($self->{syslog}) {
 		require Sys::Syslog;
 
@@ -1735,6 +1737,19 @@ sub status
 
 	# Return current status or 200 by default
 	return $self->{status} || 200;
+}
+
+=head2 warnings
+
+Returns the warnings that the object has generated
+
+=cut
+
+sub warnings
+{
+	my $self = shift;
+
+	return $self->{'warnings'};
 }
 
 =head2 set_logger

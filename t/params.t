@@ -517,7 +517,7 @@ EOF
 			sub warn { shift; $mess = join(' ' , @_) }
 		}
 
-		my $info = new_ok('CGI::Info' => );
+		my $info = new_ok('CGI::Info');
 		my $params = $info->params(logger => MockLogger->new());
 		like($mess, qr/SQL injection attempt blocked/, 'Correct message when blocking SQL injection');
 
