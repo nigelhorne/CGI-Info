@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.86
+0.86	Mon Nov 25 09:17:30 EST 2024
 	Ensure correct message is logged on SQL injection attempt
 	Remember warnings in the warnings array - added warnings() method
 
