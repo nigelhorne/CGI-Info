@@ -325,23 +325,19 @@ sub _find_site_details
 =head2 domain_name
 
 Domain_name is the name of the controlling domain for this website.
-Usually it will be similar to host_name, but will lack the http:// prefix.
+Usually it will be similar to host_name, but will lack the http:// or www prefixes.
 
 =cut
 
 sub domain_name {
 	my $self = shift;
 
-	if($self->{domain}) {
-		return $self->{domain};
-	}
+	return $self->{domain} if $self->{domain};
+
 	$self->_find_site_details();
 
-	if($self->{site}) {
-		$self->{domain} = $self->{site};
-		if($self->{domain} =~ /^www\.(.+)/) {
-			$self->{domain} = $1;
-		}
+	if(my $site = $self->{site}) {
+		$self->{domain} = ($site =~ /^www\.(.+)/) ? $1 : $site;
 	}
 
 	return $self->{domain};

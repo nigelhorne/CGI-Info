@@ -11,7 +11,7 @@ on:
   pull_request:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    big-endian: ubuntu-latest
 
     steps:
       - name: Get the qemu container
