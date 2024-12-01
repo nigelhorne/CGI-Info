@@ -859,6 +859,7 @@ sub _warn {
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
 
+	# FIXME: add caller's function
 	push @{$self->{'warnings'}}, { warning => $warning };
 
 	if($self->{syslog}) {
@@ -1738,6 +1739,14 @@ sub status
 =head2 warnings
 
 Returns the warnings that the object has generated as a ref to an array of hashes.
+
+    my @warnings;
+    if(my $w = $info->warnings()) {
+        @warnings = map { $_->{'warning'} } @{$w};
+    } else {
+        @warnings = ();
+    }
+    print STDERR join(';', @warnings), "\n";
 
 =cut
 
