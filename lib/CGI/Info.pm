@@ -1737,7 +1737,7 @@ sub status
 
 =head2 warnings
 
-Returns the warnings that the object has generated
+Returns the warnings that the object has generated as a ref to an array of hashes.
 
 =cut
 
