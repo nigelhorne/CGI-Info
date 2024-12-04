@@ -874,8 +874,12 @@ sub _warn {
 		closelog();
 	}
 
-	if($self->{logger}) {
-		$self->{logger}->warn($warning);
+	if(my $logger = $self->{logger}) {
+		if(ref($logger) eq 'CODE') {
+			$logger->({ level => 'warn', message => [ $warning ] });
+		} else {
+			$logger->warn($warning);
+		}
 	} elsif(!defined($self->{syslog})) {
 		Carp::carp($warning);
 	}
