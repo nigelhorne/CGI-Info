@@ -716,9 +716,7 @@ sub params {
 			# Do we allow any value, or must it be validated?
 			if(defined($self->{allow}->{$key})) {
 				if($value !~ $self->{allow}->{$key}) {
-					if($self->{logger}) {
-						$self->{logger}->info("block $key = $value");
-					}
+					$self->_info("block $key = $value");
 					$self->status(422);
 					next;
 				}
@@ -743,28 +741,22 @@ sub params {
 			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
-				if($self->{logger}) {
-					if($ENV{'REMOTE_ADDR'}) {
-						$self->{logger}->warn($ENV{'REMOTE_ADDR'}, ": SQL injection attempt blocked for '$value'");
-					} else {
-						$self->{logger}->warn("SQL injection attempt blocked for '$value'");
-					}
+				if($ENV{'REMOTE_ADDR'}) {
+					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$value'");
+				} else {
+					$self->_warn("SQL injection attempt blocked for '$value'");
 				}
 				$self->status(403);
 				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
-				if($self->{logger}) {
-					$self->{logger}->warn("XSS injection attempt blocked for '$value'");
-				}
+				$self->_warn("XSS injection attempt blocked for '$value'");
 				$self->status(403);
 				return;
 			}
 			if($value eq '../') {
-				if($self->{logger}) {
-					$self->{logger}->warn("Blocked directory traversal attack for $key");
-				}
+				$self->_warn("Blocked directory traversal attack for $key");
 				$self->status(403);
 				return;
 			}
@@ -785,8 +777,7 @@ sub params {
 
 	if($self->{logger}) {
 		while(my ($key,$value) = each %FORM) {
-			$self->{logger}->debug("$key=$value");
-			$log->debug("$key=$value");
+			$self->_debug("$key=$value");
 		}
 	}
 
@@ -890,14 +881,12 @@ sub _sanitise_input($) {
 sub _multipart_data {
 	my ($self, $args) = @_;
 
-	if($self->{logger}) {
-		$self->{logger}->trace('Entering _multipart_data');
-	}
+	$self->_trace('Entering _multipart_data');
+
 	my $total_bytes = $$args{length};
 
-	if($self->{logger}) {
-		$self->{logger}->trace("_multipart_data: total_bytes = $total_bytes");
-	}
+	$self->_debug("_multipart_data: total_bytes = $total_bytes");
+
 	if($total_bytes == 0) {
 		return;
 	}
@@ -1110,7 +1099,7 @@ sub as_string
 			"$_=$value"
 		} sort keys %$params;
 
-	$self->{logger}->debug("as_string: returning '$rc'") if($rc && $self->{logger});
+	$self->_trace("as_string: returning '$rc'") if($rc);
 
 	return $rc;
 }
@@ -1352,12 +1341,10 @@ sub is_robot {
 	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;
-		if($self->{logger}) {
-			if($ENV{'REMOTE_ADDR'}) {
-				$self->{logger}->warn($ENV{'REMOTE_ADDR'}, ": SQL injection attempt blocked for '$agent'");
-			} else {
-				$self->{logger}->warn("SQL injection attempt blocked for '$agent'");
-			}
+		if($ENV{'REMOTE_ADDR'}) {
+			$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$agent'");
+		} else {
+			$self->_warn("SQL injection attempt blocked for '$agent'");
 		}
 		return 1;
 	}
@@ -1411,9 +1398,8 @@ sub is_robot {
 		);
 		$referrer =~ s/\\/_/g;
 		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
-			if($self->{logger}) {
-				$self->{logger}->debug("is_robot: blocked trawler $referrer");
-			}
+			$self->_debug("is_robot: blocked trawler $referrer");
+
 			if($self->{cache}) {
 				$self->{cache}->set($key, 'robot', '1 day');
 			}
@@ -1448,13 +1434,11 @@ sub is_robot {
 	}
 	if($self->{browser_detect}) {
 		my $is_robot = $self->{browser_detect}->robot();
-		if(defined($is_robot) && $self->{logger}) {
-			$self->{logger}->debug("HTTP::BrowserDetect '$ENV{HTTP_USER_AGENT}' returns $is_robot");
+		if(defined($is_robot)) {
+			$self->_debug("HTTP::BrowserDetect '$ENV{HTTP_USER_AGENT}' returns $is_robot");
 		}
 		$is_robot = (defined($is_robot) && ($is_robot)) ? 1 : 0;
-		if($self->{logger}) {
-			$self->{logger}->debug("is_robot: $is_robot");
-		}
+		$self->_debug("is_robot: $is_robot");
 
 		if($is_robot) {
 			if($self->{cache}) {

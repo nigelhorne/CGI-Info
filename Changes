@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 0.87
 	Test warnings()
+	Allow the logger to be a ref to code
 
 0.86	Mon Nov 25 09:17:30 EST 2024
 	Ensure correct message is logged on SQL injection attempt
