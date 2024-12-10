@@ -286,8 +286,9 @@ sub _find_site_details
 {
 	my $self = shift;
 
-	# Log entry if logger is present
-	$self->{logger} && $self->{logger}->trace('Entering _find_site_details');
+	# Log entry to the routine
+	$self->_trace('Entering _find_site_details');
+
 	return if $self->{site} && $self->{cgi_site};
 
 	# Import necessary modules
@@ -305,7 +306,7 @@ sub _find_site_details
 			$self->{cgi_site} =~ s/^http/$protocol/;
 		}
 	} else {
-		$self->{logger} && $self->{logger}->debug('Falling back to using hostname');
+		$self->_debug('Falling back to using hostname');
 		$self->{cgi_site} = Sys::Hostname::hostname();
 	}
 
@@ -316,10 +317,10 @@ sub _find_site_details
 		unless $self->{cgi_site} =~ /^https?:\/\//;
 
 	# Warn if site details could not be determined
-	$self->_warn('Could not determine site name') unless $self->{site} && $self->{cgi_site};
+	$self->_warn('Could not determine site name') unless($self->{site} && $self->{cgi_site});
 
 	# Log exit
-	$self->{logger} && $self->{logger}->trace('Leaving _find_site_details');
+	$self->_trace('Leaving _find_site_details');
 }
 
 =head2 domain_name
@@ -403,7 +404,8 @@ be stored.
 Takes optional parameter logger, an object which is used for warnings and
 traces.
 This logger object is an object that understands warn() and trace() messages,
-such as a L<Log::Log4perl> or L<Log::Any> object.
+such as a L<Log::Log4perl> or L<Log::Any> object,
+or a reference to code.
 
 The allow, expect, logger and upload_dir arguments can also be passed to the
 constructor.
@@ -486,9 +488,7 @@ sub params {
 	if(defined($params->{logger})) {
 		$self->{logger} = $params->{logger};
 	}
-	if($self->{logger}) {
-		$self->{logger}->trace('Entering params');
-	}
+	$self->_trace('Entering params');
 
 	my @pairs;
 	my $content_type = $ENV{'CONTENT_TYPE'};
@@ -708,9 +708,7 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				if($self->{logger}) {
-					$self->{logger}->info("discard $key");
-				}
+				$self->_info("discard $key");
 				$self->status(422);
 				next;
 			}
@@ -840,49 +838,6 @@ sub param {
 		return $self->params()->{$field};
 	}
 	return;
-}
-
-# Emit a warning message somewhere
-sub _warn {
-	my $self = shift;
-
-	my $params = $self->_get_params('warning', @_);
-
-	my $warning = $params->{'warning'};
-
-	return unless($warning);
-
-	if($self eq __PACKAGE__) {
-		# Called from class method
-		carp($warning);
-		return;
-	}
-	# return if($self eq __PACKAGE__);  # Called from class method
-
-	# FIXME: add caller's function
-	push @{$self->{'warnings'}}, { warning => $warning };
-
-	if($self->{syslog}) {
-		require Sys::Syslog;
-
-		Sys::Syslog->import();
-		if(ref($self->{syslog} eq 'HASH')) {
-			Sys::Syslog::setlogsock($self->{syslog});
-		}
-		openlog($self->script_name(), 'cons,pid', 'user');
-		syslog('warning', $warning);
-		closelog();
-	}
-
-	if(my $logger = $self->{logger}) {
-		if(ref($logger) eq 'CODE') {
-			$logger->({ level => 'warn', message => [ $warning ] });
-		} else {
-			$logger->warn($warning);
-		}
-	} elsif(!defined($self->{syslog})) {
-		Carp::carp($warning);
-	}
 }
 
 # Helper routine to parse the arguments given to a function,
@@ -1775,6 +1730,77 @@ sub set_logger {
 	$self->{logger} = $params->{'logger'};
 
 	return $self;
+}
+
+# Helper routines for logger()
+sub _log {
+	my ($self, $level, @messages) = @_;
+
+	if(my $logger = $self->{'logger'}) {
+		if(ref($logger) eq 'CODE') {
+			$logger->({ level => $level, message => \@messages });
+		} else {
+			$logger->$level(@messages);
+		}
+	}
+}
+
+sub _debug {
+	my $self = shift;
+	$self->_log('debug', @_);
+}
+
+sub _info {
+	my $self = shift;
+	$self->_log('info', @_);
+}
+
+sub _trace {
+	my $self = shift;
+	$self->_log('trace', @_);
+}
+
+# Emit a warning message somewhere
+sub _warn {
+	my $self = shift;
+
+	my $params = $self->_get_params('warning', @_);
+
+	my $warning = $params->{'warning'};
+
+	return unless($warning);
+
+	if($self eq __PACKAGE__) {
+		# Called from class method
+		carp($warning);
+		return;
+	}
+	# return if($self eq __PACKAGE__);  # Called from class method
+
+	# FIXME: add caller's function
+	push @{$self->{'warnings'}}, { warning => $warning };
+
+	if($self->{syslog}) {
+		require Sys::Syslog;
+
+		Sys::Syslog->import();
+		if(ref($self->{syslog} eq 'HASH')) {
+			Sys::Syslog::setlogsock($self->{syslog});
+		}
+		openlog($self->script_name(), 'cons,pid', 'user');
+		syslog('warning', $warning);
+		closelog();
+	}
+
+	if(my $logger = $self->{logger}) {
+		if(ref($logger) eq 'CODE') {
+			$logger->({ level => 'warn', message => [ $warning ] });
+		} else {
+			$logger->warn($warning);
+		}
+	} elsif(!defined($self->{syslog})) {
+		Carp::carp($warning);
+	}
 }
 
 =head2 reset
