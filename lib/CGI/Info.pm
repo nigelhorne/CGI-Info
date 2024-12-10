@@ -1010,6 +1010,7 @@ sub is_mobile {
 			return 1;
 		}
 	}
+
 	if($ENV{'HTTP_X_WAP_PROFILE'}) {
 		# E.g. Blackberry
 		# TODO: Check the sanity of this variable
@@ -1043,9 +1044,11 @@ sub is_mobile {
 				$self->{browser_detect} = HTTP::BrowserDetect->new($agent);
 			}
 		}
+
 		if($self->{browser_detect}) {
 			my $device = $self->{browser_detect}->device();
-			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
+			# Without the ?1:0 it will set to the empty string not 0
+			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i)) ? 1 : 0;
 			if($is_mobile && $self->{cache} && defined($remote)) {
 				$self->{cache}->set("$remote/$agent", 'mobile', '1 day');
 			}
