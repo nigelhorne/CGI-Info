@@ -87,7 +87,7 @@ sub new
 	# Handle hash or hashref arguments
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	if($args{expect}) {
+	if(defined($args{expect})) {
 		if(ref($args{expect}) ne 'ARRAY') {
 			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
 			return;
@@ -96,10 +96,11 @@ sub new
 	}
 
 	if(!defined($class)) {
-		# Using CGI::Info->new(), not CGI::Info::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-
+		if((scalar keys %args) > 0) {
+			# Using CGI::Info->new(), not CGI::Info::new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
@@ -400,6 +401,7 @@ Expect will be removed in a later version.
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
+It must be a writeable directory in the temporary area.
 
 Takes optional parameter logger, an object which is used for warnings and
 traces.
@@ -579,6 +581,12 @@ sub params {
 				});
 				return;
 			}
+
+			# Validate 'upload_dir'
+			# Ensure the upload directory is safe and accessible
+			# - Check permissions
+			# - Validate path to prevent directory traversal attacks
+			# TODO: Consider using a temporary directory for uploads and moving them later
 			if(!File::Spec->file_name_is_absolute($self->{upload_dir})) {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't a full pathname"
@@ -597,6 +605,14 @@ sub params {
 				delete $self->{paramref};
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't writeable"
+				});
+				delete $self->{upload_dir};
+				return;
+			}
+			my $tmpdir = $self->tmpdir();
+			if($self->{'upload_dir'} !~ /^\Q$tmpdir\E/) {
+				$self->_warn({
+					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't somewhere in the temporary area $tmpdir"
 				});
 				delete $self->{upload_dir};
 				return;
