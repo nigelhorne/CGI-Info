@@ -1769,8 +1769,9 @@ sub _warn {
 
 	my $params = $self->_get_params('warning', @_);
 
+	# Validate input parameters
+	return unless($params && (ref($params) eq 'HASH'));
 	my $warning = $params->{'warning'};
-
 	return unless($warning);
 
 	if($self eq __PACKAGE__) {
@@ -1783,6 +1784,7 @@ sub _warn {
 	# FIXME: add caller's function
 	push @{$self->{'warnings'}}, { warning => $warning };
 
+	# Handle syslog-based logging
 	if($self->{syslog}) {
 		require Sys::Syslog;
 
@@ -1795,6 +1797,7 @@ sub _warn {
 		closelog();
 	}
 
+	# Handle logger-based logging
 	if(my $logger = $self->{logger}) {
 		if(ref($logger) eq 'CODE') {
 			$logger->({ level => 'warn', message => [ $warning ] });
@@ -1802,6 +1805,7 @@ sub _warn {
 			$logger->warn($warning);
 		}
 	} elsif(!defined($self->{syslog})) {
+		# Fallback to Carp warnings
 		Carp::carp($warning);
 	}
 }
