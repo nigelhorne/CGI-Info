@@ -27,11 +27,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.86
+Version 0.87
 
 =cut
 
-our $VERSION = '0.86';
+our $VERSION = '0.87';
 
 =head1 SYNOPSIS
 
@@ -847,7 +847,8 @@ sub param {
 	return;
 }
 
-# Helper routine to parse the arguments given to a function,
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
 #	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
 #	when called _get_params('arg', @_);

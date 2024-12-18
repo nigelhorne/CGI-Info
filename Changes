@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.87
+0.87	Wed Dec 18 11:06:09 EST 2024
 	Test warnings()
 	Allow the logger to be a ref to code
 	Fix is_mobile() default return code
