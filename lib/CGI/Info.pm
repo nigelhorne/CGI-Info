@@ -85,7 +85,15 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args;
+	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
+		%args = %{$_[0]};
+	} elsif((@_ % 2) == 0) {
+		%args = @_;
+	} else {
+		carp(__PACKAGE__, ': Invalid arguments passed to new()');
+		return;
+	}
 
 	if(defined($args{expect})) {
 		if(ref($args{expect}) ne 'ARRAY') {
@@ -873,6 +881,10 @@ sub _get_params
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
 
 	return \%rc;
