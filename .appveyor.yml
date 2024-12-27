@@ -39,7 +39,7 @@ install:
   - cmd: set TMPDIR=%APPVEYOR_BUILD_FOLDER%\tmp
   - cpan App::cpanminus
   - cmd: cpan -i Test::Needs Test::Most
-  - cmd: cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -qin --skip-satisfied
+  - cmd: cpanm -q --showdeps --with-develop --with-suggests . | findstr /v "^perl\>" | cpanm -qin
   - cpanm -qin --skip-satisfied --installdeps .
   - cmd: 'echo End install at: & time /t'
 
