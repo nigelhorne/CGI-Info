@@ -25,6 +25,10 @@ sub _sanitise_input($);
 
 CGI::Info - Information about the CGI environment
 
+=head1 DESCRIPTION
+
+CGI::Info gets information about the system that a CGI script is running on.
+
 =head1 VERSION
 
 Version 0.87
@@ -1915,7 +1919,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2024 Nigel Horne.
+Copyright 2010-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

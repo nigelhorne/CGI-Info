@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 use File::Spec 3.4;
 
 my $tmpdir = File::Spec->tmpdir();
@@ -10,8 +10,8 @@ if(!-w $tmpdir) {
 }
 
 my $dist = {
-	COMPRESS => 'gzip -9f',
-	SUFFIX => 'gz'
+	COMPRESS => 'gzip -9f',	# Compress tarball using gzip
+	SUFFIX => 'gz',	# File suffix for tarball
 };
 
 if($^O eq 'darwin') {
@@ -51,6 +51,7 @@ WriteMakefile(
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Scalar::Util' => 0,
 		'URI::Heuristic' => 0,
 		# 'Sub::Private' => 0,
