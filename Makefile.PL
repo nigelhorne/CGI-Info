@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use File::Spec 3.4;
+use File::Spec;
 
 my $tmpdir = File::Spec->tmpdir();
 if(!-w $tmpdir) {

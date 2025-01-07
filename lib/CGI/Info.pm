@@ -157,7 +157,7 @@ sub script_name
 sub _find_paths {
 	my $self = shift;
 
-	require File::Basename && File::Basname->import() unless File::Basename->can('basename');
+	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
 
 	# Determine script name
 	my $script_name = $ENV{'SCRIPT_NAME'} // $0;
@@ -658,8 +658,9 @@ sub params {
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
-				require JSON::MaybeXS;
-				JSON::MaybeXS->import();
+				require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
+				# require JSON::MaybeXS;
+				# JSON::MaybeXS->import();
 
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
 					$self->_warn({
