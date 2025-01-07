@@ -1927,3 +1927,5 @@ This program is released under the following licence: GPL2
 =cut
 
 1;
+
+__END__
