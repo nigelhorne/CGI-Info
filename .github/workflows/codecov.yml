@@ -40,10 +40,10 @@ jobs:
       #     curl -Os https://uploader.codecov.io/latest/linux/codecov
       #     chmod +x codecov
       - name: Submit codecov
-        run: |
-          cover -test
-          cover -report codecov
-          # ./codecov -t ${{ secrets.CODECOV_TOKEN }} -f cover_db/codecov.json
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           AUTOMATED_TESTING: 1
+        run: |
+          CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} cover -test
+          CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} cover -report codecov
+          ./codecov -t ${{ secrets.CODECOV_TOKEN }} -f cover_db/codecov.json
