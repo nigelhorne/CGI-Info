@@ -109,7 +109,7 @@ sub new
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
-			# Using CGI::Info->new(), not CGI::Info::new()
+			# Using CGI::Info:new(), not CGI::Info->new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
