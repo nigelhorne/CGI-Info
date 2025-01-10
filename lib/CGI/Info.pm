@@ -13,7 +13,7 @@ use 5.008;
 use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
-use List::MoreUtils;	# Can go when expect goes
+use List::Util ();	# Can go when expect goes
 # use Sub::Private;
 use Sys::Path;
 
@@ -752,7 +752,7 @@ sub params {
 			}
 		}
 
-		if($self->{expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{expect}})) {
+		if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
 			next;
 		}
 		$value = _sanitise_input($value);
@@ -1434,7 +1434,7 @@ sub is_robot {
 			'http://www.seokicks.de/robot.html',
 		);
 		$referrer =~ s/\\/_/g;
-		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
+		if(($referrer =~ /\)/) || (List::Util::any { $_ =~ /^$referrer/ } @crawler_lists)) {
 			$self->_debug("is_robot: blocked trawler $referrer");
 
 			if($self->{cache}) {
