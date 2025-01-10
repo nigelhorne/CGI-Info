@@ -39,16 +39,21 @@ our $VERSION = '0.87';
 
 =head1 SYNOPSIS
 
+The CGI::Info module,
+is a Perl library designed to provide information about the environment in which a CGI script operates.
+It aims to eliminate hard-coded script details,
+enhancing code readability and portability.
+Additionally, it offers a simple web application firewall to add a layer of security.
+
 All too often Perl programs have information such as the script's name
 hard-coded into their source.
-Generally speaking, hard-coding is bad style since it can make programs
-difficult to read and it reduces readability and portability.
+Generally speaking,
+hard-coding is bad style since it can make programs difficult to read and it reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
 things when you're not running the program in a CGI environment.
 
-CGI::Info also provides a simple web application firewall.
 Whilst you shouldn't rely on it alone to provide security to your website,
 it is another layer and every little helps.
 
@@ -132,8 +137,9 @@ sub new
 
 =head2 script_name
 
-Returns the name of the CGI script.
-This is useful for POSTing, thus avoiding putting hardcoded paths into forms
+Retrieves the name of the executing CGI script.
+This is useful for POSTing,
+thus avoiding hard-coded paths into forms.
 
 	use CGI::Info;
 
