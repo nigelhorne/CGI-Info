@@ -59,7 +59,7 @@ WriteMakefile(
 		'File::Spec' => 3.4,
 		'Cwd' => 0,
 		'Socket' => 0,
-		'List::MoreUtils' => 0,
+		'List::Util' => 1.33,
 		'HTTP::BrowserDetect' => 3.10,	# Include bingbot
 		'File::Basename' => 0,
 		'String::Clean::XSS' => 0,
