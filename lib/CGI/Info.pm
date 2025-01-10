@@ -166,35 +166,36 @@ sub _find_paths {
 	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
 
 	# Determine script name
-	my $script_name = $ENV{'SCRIPT_NAME'} // $0;
+	my $script_name = $self->_get_env('SCRIPT_NAME') // $0;
 	$self->{script_name} = $self->_untaint_filename({
 		filename => File::Basename::basename($script_name)
 	});
 
 	# Determine script path
-	if($ENV{'SCRIPT_FILENAME'}) {
-		$self->{script_path} = $ENV{'SCRIPT_FILENAME'};
-	} elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
-		$script_name = $ENV{'SCRIPT_NAME'};
+	if(my $script_path = $self->_get_env('SCRIPT_FILENAME')) {
+		$self->{script_path} = $script_path;
+	} elsif($script_name = $self->_get_env('SCRIPT_NAME')) {
+		if(my $document_root = $self->_get_env('DOCUMENT_ROOT')) {
+			$script_name = $self->_get_env('SCRIPT_NAME');
 
-		# It's usually the case, e.g. /cgi-bin/foo.pl
-		$script_name =~ s{^/}{};
+			# It's usually the case, e.g. /cgi-bin/foo.pl
+			$script_name =~ s{^/}{};
 
-		$self->{script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT'}, $script_name);
-	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
-		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) && (-r $ENV{'SCRIPT_NAME'})) {
-			# Called from a command line with a full path
-			$self->{script_path} = $ENV{'SCRIPT_NAME'};
+			$self->{script_path} = File::Spec->catfile($document_root, $script_name);
 		} else {
-			require Cwd unless Cwd->can('abs_path');
+			if(File::Spec->file_name_is_absolute($script_name) && (-r $script_name)) {
+				# Called from a command line with a full path
+				$self->{script_path} = $script_name;
+			} else {
+				require Cwd unless Cwd->can('abs_path');
 
-			$script_name = $ENV{'SCRIPT_NAME'};
-			if($script_name =~ /^\/(.+)/) {
-				# It's usually the case, e.g. /cgi-bin/foo.pl
-				$script_name = $1;
+				if($script_name =~ /^\/(.+)/) {
+					# It's usually the case, e.g. /cgi-bin/foo.pl
+					$script_name = $1;
+				}
+
+				$self->{script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
 			}
-
-			$self->{script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
 		}
 	} elsif(File::Spec->file_name_is_absolute($0)) {
 		# Called from a command line with a full path
@@ -1832,6 +1833,23 @@ sub _warn {
 		# Fallback to Carp warnings
 		Carp::carp($warning);
 	}
+}
+
+# Ensure all environment variables are sanitized and validated before use.
+# Use regular expressions to enforce strict input formats.
+
+sub _get_env
+{
+	my ($self, $var) = @_;
+
+	return unless defined $ENV{$var};
+
+	# Strict sanitization: allow alphanumeric and limited special characters
+	if($ENV{$var} =~ /^[\w\.\-\/]+$/) {
+		return $ENV{$var};
+	}
+	$self->_warn("Invalid value in environment variable: $var");
+	return undef;
 }
 
 =head2 reset

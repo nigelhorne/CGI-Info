@@ -3,6 +3,7 @@ Revision history for CGI-Info
 0.88
 	Improved arg checking
 	Merge https://github.com/nigelhorne/CGI-Info/pull/21 (plicease)
+	Added _get_env()
 
 0.87	Wed Dec 18 11:06:09 EST 2024
 	Test warnings()
