@@ -15,7 +15,7 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 # VERSION
 
-Version 0.87
+Version 0.88
 
 # SYNOPSIS
 

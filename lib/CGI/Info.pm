@@ -31,11 +31,11 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 =head1 VERSION
 
-Version 0.87
+Version 0.88
 
 =cut
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 =head1 SYNOPSIS
 
@@ -118,6 +118,7 @@ sub new
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
+
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
