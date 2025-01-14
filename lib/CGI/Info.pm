@@ -1846,10 +1846,11 @@ sub _get_env
 	return unless defined $ENV{$var};
 
 	# Strict sanitization: allow alphanumeric and limited special characters
-	if($ENV{$var} =~ /^[\w\.\-\/\\]+$/) {
+	if($ENV{$var} =~ /^[\w\.\-\/:\\]+$/) {
 		return $ENV{$var};
 	}
 	$self->_warn("Invalid value in environment variable: $var");
+
 	return undef;
 }
 
