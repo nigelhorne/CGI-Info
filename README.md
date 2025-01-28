@@ -1,3 +1,6 @@
+CGI-Info
+========
+
 -[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
 -[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main)
@@ -15,7 +18,7 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 # VERSION
 
-Version 0.88
+Version 0.89
 
 # SYNOPSIS
 

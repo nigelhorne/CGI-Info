@@ -31,11 +31,11 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 =head1 VERSION
 
-Version 0.88
+Version 0.89
 
 =cut
 
-our $VERSION = '0.88';
+our $VERSION = '0.89';
 
 =head1 SYNOPSIS
 
@@ -96,10 +96,13 @@ sub new
 	# Handle hash or hashref arguments
 	my %args;
 	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
+		# If the first argument is a hash reference, dereference it
 		%args = %{$_[0]};
 	} elsif((@_ % 2) == 0) {
+		# If there is an even number of arguments, treat them as key-value pairs
 		%args = @_;
 	} else {
+		# If there is an odd number of arguments, treat it as an error
 		carp(__PACKAGE__, ': Invalid arguments passed to new()');
 		return;
 	}
@@ -745,7 +748,7 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				$self->_info("discard $key");
+				$self->_info("Discard unallowed argument '$key'");
 				$self->status(422);
 				next;
 			}
@@ -753,7 +756,7 @@ sub params {
 			# Do we allow any value, or must it be validated?
 			if(defined($self->{allow}->{$key})) {
 				if($value !~ $self->{allow}->{$key}) {
-					$self->_info("block $key = $value");
+					$self->_info("Block $key = $value");
 					$self->status(422);
 					next;
 				}
