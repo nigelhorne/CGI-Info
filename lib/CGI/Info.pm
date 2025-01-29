@@ -1569,8 +1569,11 @@ sub is_search_engine {
 	}
 	if(my $browser = $self->{browser_detect}) {
 		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo() || $browser->bingbot());
-		if((!$is_search) && $agent =~ /SeznamBot\//) {
-			$is_search = 1;
+		if(!$is_search) {
+			if(($agent =~ /SeznamBot\//) ||
+			   ($agent =~ /Googlebot\//)) {
+				$is_search = 1;
+			}
 		}
 		if($is_search && $self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
