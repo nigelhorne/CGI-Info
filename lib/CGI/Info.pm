@@ -485,6 +485,8 @@ CGI::Info will put the request into the params element 'XML', thus:
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
 
+Carp if logger is not set and we detect something serious:w
+
 =cut
 
 sub params {
@@ -781,23 +783,28 @@ sub params {
 			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
+				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
 					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$value'");
 				} else {
 					$self->_warn("SQL injection attempt blocked for '$value'");
 				}
-				$self->status(403);
 				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
-				$self->_warn("XSS injection attempt blocked for '$value'");
 				$self->status(403);
+				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
 			}
-			if($value eq '../') {
-				$self->_warn("Blocked directory traversal attack for $key");
+			if($value =~ /\.\.\//) {
 				$self->status(403);
+				$self->_warn("Blocked directory traversal attack for '$key'");
+				return;
+			}
+			if($value =~ /mustleak\.com\//) {
+				$self->status(403);
+				$self->_warn("Blocked mustleak attack for '$key'");
 				return;
 			}
 		}
@@ -1711,7 +1718,7 @@ sub status
 	my $status = shift;
 
 	# Set status if provided
-	return $self->{status} = $status if defined $status;
+	return $self->{status} = $status if(defined($status));
 
 	# Determine status based on request method if status is not set
 	unless (defined $self->{status}) {
@@ -1805,7 +1812,7 @@ sub _warn {
 
 	if($self eq __PACKAGE__) {
 		# Called from class method
-		carp($warning);
+		Carp::carp($warning);
 		return;
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
