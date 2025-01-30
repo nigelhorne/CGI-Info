@@ -1838,11 +1838,7 @@ sub _warn {
 
 	# Handle logger-based logging
 	if(my $logger = $self->{logger}) {
-		if(ref($logger) eq 'CODE') {
-			$logger->({ level => 'warn', message => [ $warning ] });
-		} else {
-			$logger->warn($warning);
-		}
+		$self->_log('warn', $warning);
 	} elsif(!defined($self->{syslog})) {
 		# Fallback to Carp warnings
 		Carp::carp($warning);
@@ -1851,7 +1847,6 @@ sub _warn {
 
 # Ensure all environment variables are sanitized and validated before use.
 # Use regular expressions to enforce strict input formats.
-
 sub _get_env
 {
 	my ($self, $var) = @_;
