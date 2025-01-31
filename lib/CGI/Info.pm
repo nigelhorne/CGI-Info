@@ -1780,7 +1780,13 @@ sub _log {
 
 	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
-			$logger->({ level => $level, message => \@messages });
+			$logger->({
+				class => ref($self) // __PACKAGE__,
+				function => (caller(2))[3],
+				line => (caller(1))[2],
+				level => $level,
+				message => \@messages
+			});
 		} else {
 			$logger->$level(@messages);
 		}
