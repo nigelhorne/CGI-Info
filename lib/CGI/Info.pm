@@ -426,11 +426,11 @@ Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
 It must be a writeable directory in the temporary area.
 
-Takes optional parameter logger, an object which is used for warnings and
-traces.
-This logger object is an object that understands warn() and trace() messages,
+Takes an optional parameter logger, which is used for warnings and traces.
+It can be an object that understands warn() and trace() messages,
 such as a L<Log::Log4perl> or L<Log::Any> object,
-or a reference to code.
+a reference to code,
+or a filename.
 
 The allow, expect, logger and upload_dir arguments can also be passed to the
 constructor.
@@ -1775,11 +1775,13 @@ sub set_logger {
 }
 
 # Helper routines for logger()
-sub _log {
+sub _log
+{
 	my ($self, $level, @messages) = @_;
 
 	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
+			# Code reference
 			$logger->({
 				class => ref($self) // __PACKAGE__,
 				function => (caller(2))[3],
@@ -1787,7 +1789,14 @@ sub _log {
 				level => $level,
 				message => \@messages
 			});
+		} elsif(!ref($logger)) {
+			# File
+			if(open(my $fout, '>>', $logger)) {
+				print $fout uc($level), ': ', ref($self) // __PACKAGE__, ' ', (caller(2))[3], (caller(1))[2], join(' ', @messages), "\n";
+				close $fout;
+			}
 		} else {
+			# Object
 			$logger->$level(@messages);
 		}
 	}
