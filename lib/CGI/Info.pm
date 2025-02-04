@@ -31,11 +31,11 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 =head1 VERSION
 
-Version 0.89
+Version 0.90
 
 =cut
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 =head1 SYNOPSIS
 
@@ -1760,6 +1760,8 @@ sub warnings
 
 =head2 set_logger
 
+Sets the class, code reference, or file that will be used for logging.
+
 Sometimes you don't know what the logger is until you've instantiated the class.
 This function fixes the catch22 situation.
 
@@ -1919,6 +1921,9 @@ sub AUTOLOAD
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
+
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
 
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
 don't differ between tablets and smart-phones.
