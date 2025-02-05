@@ -485,7 +485,13 @@ CGI::Info will put the request into the params element 'XML', thus:
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
 
-Carp if logger is not set and we detect something serious:w
+Carp if logger is not set and we detect something serious.
+
+Blocks some attacks,
+such as SQL and XSS injections,
+mustleak and directory traversals.
+this creating a primitive web application firewall (WAF).
+Warning - this is an extra layer, not a replacement for your other security layer.
 
 =cut
 
@@ -790,6 +796,17 @@ sub params {
 					$self->_warn("SQL injection attempt blocked for '$value'");
 				}
 				return;
+			}
+			if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
+				if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
+					$self->status(403);
+					if($ENV{'REMOTE_ADDR'}) {
+						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$agent'");
+					} else {
+						$self->_warn("SQL injection attempt blocked for '$agent'");
+					}
+					return 1;
+				}
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
@@ -1397,6 +1414,7 @@ sub is_robot {
 		return 0;
 	}
 
+	# See also params()
 	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;

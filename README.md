@@ -241,7 +241,13 @@ CGI::Info will put the request into the params element 'XML', thus:
         my $xml = $$paramsref{'XML'};
         # ... parse and process the XML request in $xml
 
-Carp if logger is not set and we detect something serious:w
+Carp if logger is not set and we detect something serious.
+
+Blocks some attacks,
+such as SQL and XSS injections,
+mustleak and directory traversals.
+this creating a primitive web application firewall (WAF).
+Warning - this is an extra layer, not a replacement for your other security layer.
 
 ## param
 
@@ -346,6 +352,10 @@ Is the visitor a real person or a robot?
         unless($info->is_robot()) {
                 # update site visitor statistics
         }
+
+If the client is seen to be attempting an SQL injection,
+set the HTTP status to 403,
+and return 1.
 
 ## is\_search\_engine
 
