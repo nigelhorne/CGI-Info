@@ -489,8 +489,8 @@ Carp if logger is not set and we detect something serious.
 
 Blocks some attacks,
 such as SQL and XSS injections,
-mustleak and directory traversals.
-this creating a primitive web application firewall (WAF).
+mustleak and directory traversals,
+thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layer.
 
 =cut
