@@ -1376,6 +1376,10 @@ Is the visitor a real person or a robot?
 		# update site visitor statistics
 	}
 
+If the client is seen to be attempting an SQL injection,
+set the HTTP status to 403,
+and return 1.
+
 =cut
 
 sub is_robot {
