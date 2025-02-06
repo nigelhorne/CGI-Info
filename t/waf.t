@@ -141,4 +141,4 @@ subtest 'Command Line Parameters' => sub {
 	ok($info->is_mobile, 'Mobile flag set from command line');
 };
 
-done_testing;
+done_testing();
