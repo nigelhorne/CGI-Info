@@ -14,7 +14,7 @@ my $upload_dir = tempdir(CLEANUP => 1);
 
 subtest 'Allowed Parameters' => sub {
 	local %ENV = (
-	GATEWAY_INTERFACE => 'CGI/1.1',
+		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'GET',
 		QUERY_STRING => 'allowed_param=123&disallowed_param=evil',
 	);
@@ -27,12 +27,12 @@ subtest 'Allowed Parameters' => sub {
 		{ allowed_param => '123' },
 		'Only allowed parameters are present'
 	);
-	is($info->status(), 422, 'Status is not OK when disallowed params are used');
+	cmp_ok($info->status(), '==', 422, 'Status is not OK when disallowed params are used');
 };
 
 subtest 'SQL Injection Detection' => sub {
 	local %ENV = (
-	GATEWAY_INTERFACE => 'CGI/1.1',
+		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'GET',
 		QUERY_STRING => 'username=nigel%27+OR+%271%27%3D%271',
 	);
@@ -46,7 +46,7 @@ subtest 'SQL Injection Detection' => sub {
 
 subtest 'XSS Sanitization' => sub {
 	local %ENV = (
-	GATEWAY_INTERFACE => 'CGI/1.1',
+		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'GET',
 		QUERY_STRING => 'comment=<script>alert("xss")</script>',
 	);
@@ -65,7 +65,7 @@ subtest 'XSS Sanitization' => sub {
 
 subtest 'Directory Traversal Prevention' => sub {
 	local %ENV = (
-	GATEWAY_INTERFACE => 'CGI/1.1',
+		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'GET',
 		QUERY_STRING => 'file=../../etc/passwd',
 	);
@@ -79,7 +79,7 @@ subtest 'Directory Traversal Prevention' => sub {
 
 subtest 'Upload Directory Validation' => sub {
 	local %ENV = (
-	GATEWAY_INTERFACE => 'CGI/1.1',
+		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'POST',
 		CONTENT_TYPE => 'multipart/form-data; boundary=12345',
 		CONTENT_LENGTH => 100,
@@ -102,7 +102,7 @@ subtest 'Upload Directory Validation' => sub {
 
 subtest 'Parameter Sanitization' => sub {
 	local %ENV = (
-	GATEWAY_INTERFACE => 'CGI/1.1',
+		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'GET',
 		QUERY_STRING => 'key%00=evil%00data&value=valid+data',
 	);
@@ -116,7 +116,7 @@ subtest 'Parameter Sanitization' => sub {
 
 subtest 'Max Upload Size Enforcement' => sub {
 	local %ENV = (
-	GATEWAY_INTERFACE => 'CGI/1.1',
+		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'POST',
 		CONTENT_TYPE => 'application/x-www-form-urlencoded',
 		CONTENT_LENGTH => 1024 * 1024 * 600,	# 600MB
