@@ -622,6 +622,7 @@ sub params {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't a full pathname"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -629,6 +630,7 @@ sub params {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't a directory"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -637,6 +639,7 @@ sub params {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't writeable"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -645,6 +648,7 @@ sub params {
 				$self->_warn({
 					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't somewhere in the temporary area $tmpdir"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -774,6 +778,7 @@ sub params {
 		if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
 			next;
 		}
+		my $orig_value = $value;
 		$value = _sanitise_input($value);
 
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
@@ -809,7 +814,9 @@ sub params {
 				}
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
+			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i) ||
+			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
+			   ($orig_value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
 				$self->status(403);
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;

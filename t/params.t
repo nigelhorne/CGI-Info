@@ -89,8 +89,9 @@ PARAMS: {
 	# Catch XSS attempts
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=<script>alert(123)</script>';
 	$i = new_ok('CGI::Info');
-	%p = %{$i->params()};
-	ok($p{fred} eq '&lt;script&gt;alert(123)&lt;/script&gt;');
+	# %p = %{$i->params()};
+	# ok($p{fred} eq '&lt;script&gt;alert(123)&lt;/script&gt;');
+	ok(!defined($i->params()));
 
 	# SQL Injection is prevented
 	$ENV{'QUERY_STRING'} = "foo=bar&userName=' OR '1'='1&fred=wilma";

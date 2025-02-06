@@ -98,8 +98,10 @@ PARAM: {
 	# Don't pass XSS through
 	$ENV{'QUERY_STRING'} = 'foo=<script>alert(hello)</script>';
 	$i = new_ok('CGI::Info');
-	ok(defined($i->param('foo')));
-	ok($i->as_string() eq 'foo=&lt\;script&gt\;alert(hello)&lt\;/script&gt\;');
+	# ok(defined($i->param('foo')));
+	# ok($i->as_string() eq 'foo=&lt\;script&gt\;alert(hello)&lt\;/script&gt\;');
+	ok(!defined($i->param('foo')));
+	ok($i->as_string() eq '');
 
 	$ENV{'QUERY_STRING'} = 'foo=&fred=wilma&foo=bar';
 	$i = new_ok('CGI::Info');
