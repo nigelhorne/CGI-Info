@@ -14,13 +14,9 @@ CGI-Info
 
 CGI::Info - Information about the CGI environment
 
-# DESCRIPTION
-
-CGI::Info gets information about the system that a CGI script is running on.
-
 # VERSION
 
-Version 0.90
+Version 0.91
 
 # SYNOPSIS
 
@@ -286,8 +282,11 @@ Returns a boolean if the website is being viewed on a tablet such as an iPad.
 
 ## as\_string
 
-Returns the parameters as a string, which is useful for debugging or
-generating keys for a cache.
+Converts CGI parameters into a formatted string representation with optional raw mode (no escaping of special characters).
+Useful for debugging or generating keys for a cache.
+
+    my $string_representation = $info->as_string();
+    my $raw_string = $info->as_string({ raw => 1 });
 
 ## protocol
 
@@ -437,6 +436,10 @@ Returns the warnings that the object has generated as a ref to an array of hashe
         @warnings = ();
     }
     print STDERR join(';', @warnings), "\n";
+
+## warnings\_as\_string
+
+Returns the warnings that the object has generated as a string.
 
 ## set\_logger
 
