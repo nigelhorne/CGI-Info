@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 197;
+use Test::Most tests => 199;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
@@ -18,6 +18,7 @@ PARAMS: {
 
 	my $i = new_ok('CGI::Info');
 	ok(!defined($i->warnings()));
+	ok(!defined($i->warnings_as_string()));
 	my %p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));
@@ -460,9 +461,10 @@ EOF
 	diag(Data::Dumper->new([$i->warnings()])->Dump()) if($ENV{'TEST_VERBOSE'});
 	like(
 		$i->warnings()->[0]->{'warning'},
-		qr/Blocked directory traversal attack for 'file'/,
+		qr/^Blocked directory traversal attack for 'file'/,
 		'Warning generated for disallowed parameter'
 	);
+	like($i->warnings_as_string(), qr/^Blocked directory traversal attack/, 'warnings_as_string works');
 
 	@ARGV= ('file=/etc/passwd%00');
 	$i = new_ok('CGI::Info');

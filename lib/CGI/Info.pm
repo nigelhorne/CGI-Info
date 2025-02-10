@@ -25,10 +25,6 @@ sub _sanitise_input($);
 
 CGI::Info - Information about the CGI environment
 
-=head1 DESCRIPTION
-
-CGI::Info gets information about the system that a CGI script is running on.
-
 =head1 VERSION
 
 Version 0.90
@@ -1785,6 +1781,22 @@ sub warnings
 	my $self = shift;
 
 	return $self->{'warnings'};
+}
+
+=head2	warnings_as_string
+
+Returns the warnings that the object has generated as a string.
+
+=cut
+
+sub warnings_as_string
+{
+	my $self = shift;
+
+	if(scalar($self->{'warnings'})) {
+		my @warnings = map { $_->{'warning'} } @{$self->{'warnings'}};
+		return join('; ', @warnings);
+	}
 }
 
 =head2 set_logger
