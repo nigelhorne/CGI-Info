@@ -1156,8 +1156,11 @@ sub is_tablet {
 
 =head2 as_string
 
-Returns the parameters as a string, which is useful for debugging or
-generating keys for a cache.
+Converts CGI parameters into a formatted string representation with optional raw mode (no escaping of special characters).
+Useful for debugging or generating keys for a cache.
+
+    my $string_representation = $info->as_string();
+    my $raw_string = $info->as_string({ raw => 1 });
 
 =cut
 
@@ -1165,14 +1168,26 @@ sub as_string
 {
 	my $self = shift;
 
+	# Retrieve object parameters
 	my $params = $self->params() || return '';
+	my $args = $self->_get_params(undef, @_);
+	my $rc;
 
-	my $rc = join ';', map {
-		my $value = $params->{$_};
-			$value =~ s/\\/\\\\/g;
-			$value =~ s/(;|=)/\\$1/g;
+	if($args->{'raw'}) {
+		# Raw mode: return key=value pairs without escaping
+		$rc = join '; ', map {
+			"$_=" . $params->{$_}
+		} sort keys %{$params};
+	} else {
+		# Escaped mode: escape special characters
+		$rc = join '; ', map {
+			my $value = $params->{$_};
+
+			$value =~ s/\\/\\\\/g;	# Escape backslashes
+			$value =~ s/(;|=)/\\$1/g;	# Escape semicolons and equals signs
 			"$_=$value"
-		} sort keys %$params;
+		} sort keys %{$params};
+	}
 
 	$self->_trace("as_string: returning '$rc'") if($rc);
 

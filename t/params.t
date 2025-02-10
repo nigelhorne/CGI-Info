@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 199;
+use Test::Most tests => 200;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
@@ -36,7 +36,7 @@ PARAMS: {
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'name=nigel+horne';
 	%p = %{new_ok('CGI::Info')->params()};
@@ -52,7 +52,8 @@ PARAMS: {
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar,=baz');
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar,\\=baz;fred=wilma');
+	ok($i->as_string() eq 'foo=bar,\\=baz; fred=wilma');
+	ok($i->as_string(raw => 1) eq 'foo=bar,=baz; fred=wilma');
 
 	%p = %{$i->params()};
 	is($p{foo}, 'bar,=baz', 'Reading twice should yield the same result');
@@ -62,7 +63,7 @@ PARAMS: {
 	%p = %{$i->params()};
 	is($p{foo}, 'bar', "Don't add if it's already there");
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'foo=&fred=wilma';
 	$i = new_ok('CGI::Info');
@@ -77,7 +78,7 @@ PARAMS: {
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
 	cmp_ok($i->foo(), 'eq', 'bar', 'Test AUTOLOAD');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'page=submit&country=Singapore&county=';
 	$i = new_ok('CGI::Info');
@@ -451,7 +452,7 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params(logger => MyLogger->new())};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 
 	@ARGV= ('file=/../../../../etc/passwd%00');
@@ -475,14 +476,14 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok($i->is_mobile());
 
 	@ARGV = ('--tablet', 'foo=bar', 'fred=wilma' );
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 	ok($i->is_tablet());
 
@@ -490,7 +491,7 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 	ok($i->is_search_engine());
 
@@ -498,7 +499,7 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 	ok(!$i->is_search_engine());
 	ok($i->is_robot());
