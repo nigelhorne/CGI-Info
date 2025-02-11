@@ -909,7 +909,7 @@ sub _get_params
 	my $default = shift;
 
 	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref $_[0] eq 'HASH');
+	return $_[0] if(ref($_[0]) eq 'HASH');
 
 	my %rc;
 	my $num_args = scalar @_;
@@ -1812,6 +1812,7 @@ sub warnings_as_string
 		my @warnings = map { $_->{'warning'} } @{$self->{'warnings'}};
 		return join('; ', @warnings);
 	}
+	return '';
 }
 
 =head2 set_logger
