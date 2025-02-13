@@ -27,11 +27,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =cut
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 =head1 SYNOPSIS
 
@@ -1979,7 +1979,6 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to the author.
 This module is provided as-is without any warranty.
 
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
