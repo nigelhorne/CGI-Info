@@ -35,7 +35,7 @@ our $VERSION = '0.92';
 
 =head1 SYNOPSIS
 
-The CGI::Info module,
+The C<CGI::Info> module,
 is a Perl library designed to provide information about the environment in which a CGI script operates.
 It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
@@ -94,7 +94,7 @@ sub new
 	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
 		# If the first argument is a hash reference, dereference it
 		%args = %{$_[0]};
-	} elsif((@_ % 2) == 0) {
+	} elsif((scalar(@_) % 2) == 0) {
 		# If there is an even number of arguments, treat them as key-value pairs
 		%args = @_;
 	} else {
@@ -912,7 +912,7 @@ sub _get_params
 	return $_[0] if(ref($_[0]) eq 'HASH');
 
 	my %rc;
-	my $num_args = scalar @_;
+	my $num_args = scalar(@_);
 
 	# Populate %rc based on the number and type of arguments
 	if(($num_args == 1) && (defined $default)) {
@@ -1979,16 +1979,8 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-This module is provided as-is without any warranty.
-
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
 don't differ between tablets and smart-phones.
-
-Please report any bugs or feature requests to C<bug-cgi-info at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 params() returns a ref which means that calling routines can change the hash
 for other routines.
@@ -1997,10 +1989,19 @@ things to happen.
 
 =head1 SEE ALSO
 
-L<HTTP::BrowserDetect>,
-L<https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker>
+=item * L<HTTP::BrowserDetect>
+
+=item * L<https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker>
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to C<bug-cgi-info at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
