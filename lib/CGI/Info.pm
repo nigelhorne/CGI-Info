@@ -915,12 +915,12 @@ sub _get_params
 	my $num_args = scalar(@_);
 
 	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
+	if(($num_args == 1) && defined($default)) {
 		# %rc = ($default => shift);
 		return { $default => shift };
 	} elsif($num_args == 1) {
 		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
+	} elsif(($num_args == 0) && defined($default)) {
 		Carp::croak('Usage: ', ref($self), '->', (caller(1))[3], "($default => \$val)");
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
