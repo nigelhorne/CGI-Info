@@ -1906,7 +1906,7 @@ sub _warn {
 			Sys::Syslog::setlogsock($self->{syslog});
 		}
 		openlog($self->script_name(), 'cons,pid', 'user');
-		syslog('warning', $warning);
+		syslog('warning|local0', $warning);
 		closelog();
 	}
 
