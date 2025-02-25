@@ -1044,10 +1044,20 @@ sub _multipart_data {
 	return @pairs;
 }
 
+# Robust filename generation (preventing overwriting)
 sub _create_file_name {
 	my ($self, $args) = @_;
+	my $filename = $$args{filename} . '_' . time;
 
-	return $$args{filename} . '_' . time;
+	my $counter = 0;
+	my $rc;
+
+	do {
+		$rc = $filename . ($counter ? "_$counter" : '');
+		$counter++;
+	} until(! -e $rc);	# Check if file exists
+
+	return $rc;
 }
 
 # Untaint a filename. Regex from CGI::Untaint::Filenames
