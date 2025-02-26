@@ -951,96 +951,97 @@ sub param {
 #	print "Example 1: Validation failed: $@\n";
 # }
 
-sub _validate_strict {
-    my ($schema, $params) = @_;
+sub _validate_strict
+{
+	my ($schema, $params) = @_;
 
-    # Check if schema and params are references to hashes
-    unless (ref $schema eq 'HASH' && ref $params eq 'HASH') {
-        croak "validate_strict: schema and params must be hash references";
-    }
+	# Check if schema and params are references to hashes
+	unless((ref($schema) eq 'HASH') && (ref($params) eq 'HASH')) {
+		croak 'validate_strict: schema and params must be hash references';
+	}
 
-    my %validated_params;
+	my %validated_params;
 
-    foreach my $key (keys %$schema) {
-        my $rules = $schema->{$key};
-        my $value = $params->{$key};
+	foreach my $key (keys %$schema) {
+		my $rules = $schema->{$key};
+		my $value = $params->{$key};
 
-        # Check if the parameter is required
-        if (ref $rules eq 'HASH' && !exists $rules->{optional} && !exists $params->{$key}) {
-            croak "validate_strict: Required parameter '$key' is missing";
-        }
+		# Check if the parameter is required
+		if (ref $rules eq 'HASH' && !exists $rules->{optional} && !exists $params->{$key}) {
+			croak "validate_strict: Required parameter '$key' is missing";
+		}
 
-       # Handle optional parameters
-        next if (ref $rules eq 'HASH' && exists $rules->{optional} && !defined $value);
+		# Handle optional parameters
+		next if (ref $rules eq 'HASH' && exists $rules->{optional} && !defined $value);
 
-        # If rules are a simple type string
-        if(ref($rules) eq ''){
-            $rules = { type => $rules };
-        }
+		# If rules are a simple type string
+		if(ref($rules) eq '') {
+			$rules = { type => $rules };
+		}
 
-        # Validate based on rules
-        if (ref $rules eq 'HASH') {
-            foreach my $rule_name (keys %$rules) {
-                my $rule_value = $rules->{$rule_name};
+		# Validate based on rules
+		if (ref $rules eq 'HASH') {
+			foreach my $rule_name (keys %$rules) {
+				my $rule_value = $rules->{$rule_name};
 
-                if ($rule_name eq 'type') {
-                    my $type = lc $rule_value;
-                    if ($type eq 'string') {
-                        unless (ref $value eq '' || (defined $value && $value =~ /^.*$/)) { # Allow undef for optional strings
-                            croak "validate_strict: Parameter '$key' must be a string";
-                        }
-                    } elsif ($type eq 'integer') {
-                        unless ($value =~ /^-?\d+$/) {
-                            croak "validate_strict: Parameter '$key' must be an integer";
-                        }
-                        $value = int($value); # Coerce to integer
-                    } elsif ($type eq 'number') {
-                        unless ($value =~ /^-?\d+(?:\.\d+)?$/) {
-                            croak "validate_strict: Parameter '$key' must be a number";
-                        }
-                        $value = eval $value; # Coerce to number (be careful with eval)
+				if ($rule_name eq 'type') {
+					my $type = lc $rule_value;
+					if ($type eq 'string') {
+						unless (ref $value eq '' || (defined $value && $value =~ /^.*$/)) { # Allow undef for optional strings
+							croak "validate_strict: Parameter '$key' must be a string";
+						}
+					} elsif ($type eq 'integer') {
+						unless ($value =~ /^-?\d+$/) {
+							croak "validate_strict: Parameter '$key' must be an integer";
+						}
+						$value = int($value); # Coerce to integer
+					} elsif ($type eq 'number') {
+						unless ($value =~ /^-?\d+(?:\.\d+)?$/) {
+							croak "validate_strict: Parameter '$key' must be a number";
+						}
+						$value = eval $value; # Coerce to number (be careful with eval)
 
-                    } else {
-                        croak "validate_strict: Unknown type '$type'";
-                    }
-                } elsif ($rule_name eq 'min') {
-                    if (ref $value eq '' && $rules->{type} eq 'string') {
-                      next; # Skip if string is undefined
-                    }
-                    unless ($value >= $rule_value) {
-                        croak "validate_strict: Parameter '$key' must be at least $rule_value";
-                    }
-                } elsif ($rule_name eq 'max') {
-                    if (ref $value eq '' && $rules->{type} eq 'string') {
-                      next; # Skip if string is undefined
-                    }
-                    unless ($value <= $rule_value) {
-                        croak "validate_strict: Parameter '$key' must be at most $rule_value";
-                    }
-                } elsif ($rule_name eq 'matches') {
-                    unless ($value =~ $rule_value) {
-                        croak "validate_strict: Parameter '$key' must match '$rule_value'";
-                    }
-                } elsif ($rule_name eq 'callback') {
-                    unless (defined &$rule_value) {
-                      croak "validate_strict: callback for '$key' must be a code reference";
-                    }
-                    my $res = $rule_value->($value);
-                    unless ($res) {
-                        croak "validate_strict: Parameter '$key' failed callback validation";
-                    }
-                } elsif ($rule_name eq 'optional') {
-                   # Already handled at the beginning of the loop
-                } else {
-                    croak "validate_strict: Unknown rule '$rule_name'";
-                }
-            }
-        }
+					} else {
+						croak "validate_strict: Unknown type '$type'";
+					}
+				} elsif ($rule_name eq 'min') {
+					if (ref $value eq '' && $rules->{type} eq 'string') {
+					  next; # Skip if string is undefined
+					}
+					unless ($value >= $rule_value) {
+						croak "validate_strict: Parameter '$key' must be at least $rule_value";
+					}
+				} elsif ($rule_name eq 'max') {
+					if (ref $value eq '' && $rules->{type} eq 'string') {
+					  next; # Skip if string is undefined
+					}
+					unless ($value <= $rule_value) {
+						croak "validate_strict: Parameter '$key' must be at most $rule_value";
+					}
+				} elsif ($rule_name eq 'matches') {
+					unless ($value =~ $rule_value) {
+						croak "validate_strict: Parameter '$key' must match '$rule_value'";
+					}
+				} elsif ($rule_name eq 'callback') {
+					unless (defined &$rule_value) {
+					  croak "validate_strict: callback for '$key' must be a code reference";
+					}
+					my $res = $rule_value->($value);
+					unless ($res) {
+						croak "validate_strict: Parameter '$key' failed callback validation";
+					}
+				} elsif ($rule_name eq 'optional') {
+				   # Already handled at the beginning of the loop
+				} else {
+					croak "validate_strict: Unknown rule '$rule_name'";
+				}
+			}
+		}
 
-        $validated_params{$key} = $value;
-    }
+		$validated_params{$key} = $value;
+	}
 
-    return \%validated_params;
+	return \%validated_params;
 }
 # Helper routine to parse the arguments given to a function.
 # Processes arguments passed to methods and ensures they are in a usable format,
