@@ -1006,9 +1006,9 @@ sub _validate_strict
 							croak "validate_strict: Parameter '$key' must be an integer";
 						}
 						$value = int($value); # Coerce to integer
-					} elsif ($type eq 'number') {
-						unless ($value =~ /^-?\d+(?:\.\d+)?$/) {
-							croak "validate_strict: Parameter '$key' must be a number";
+					} elsif($type eq 'number') {
+						if($value !~ /^-?\d+(?:\.\d+)?$/) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a number");
 						}
 						$value = eval $value; # Coerce to number (be careful with eval)
 
