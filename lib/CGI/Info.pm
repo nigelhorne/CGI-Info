@@ -978,7 +978,7 @@ sub _validate_strict
 
 		# Check if the parameter is required
 		if((ref($rules) eq 'HASH') && (!exists($rules->{optional})) && (!exists($params->{$key}))) {
-			croak "validate_strict: Required parameter '$key' is missing";
+			croak(__PACKAGE__, "::validate_strict: Required parameter '$key' is missing");
 		}
 
 		# Handle optional parameters
