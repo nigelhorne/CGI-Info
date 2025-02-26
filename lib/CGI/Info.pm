@@ -984,6 +984,10 @@ sub _validate_strict
 		my $rules = $schema->{$key};
 		my $value = $params->{$key};
 
+		if(!defined($rules)) {	# Allow anything
+			next;
+		}
+
 		# Check if the parameter is required
 		if((ref($rules) eq 'HASH') && (!exists($rules->{optional})) && (!exists($params->{$key}))) {
 			croak(__PACKAGE__, "::validate_strict: Required parameter '$key' is missing");
