@@ -999,10 +999,10 @@ sub _validate_strict
 
 					if($type eq 'string') {
 						unless((ref($value) eq '') || (defined($value) && ($value =~ /^.*$/))) { # Allow undef for optional strings
-							croak("validate_strict: Parameter '$key' must be a string");
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a string");
 						}
-					} elsif ($type eq 'integer') {
-						unless ($value =~ /^-?\d+$/) {
+					} elsif($type eq 'integer') {
+						if($value !~ /^-?\d+$/) {
 							croak "validate_strict: Parameter '$key' must be an integer";
 						}
 						$value = int($value); # Coerce to integer
@@ -1057,7 +1057,7 @@ sub _validate_strict
 					unless ($res) {
 						croak "validate_strict: Parameter '$key' failed callback validation";
 					}
-				} elsif ($rule_name eq 'optional') {
+				} elsif($rule_name eq 'optional') {
 					# Already handled at the beginning of the loop
 				} else {
 					croak "validate_strict: Unknown rule '$rule_name'";

@@ -73,6 +73,20 @@ subtest 'Allow Parameters Rules' => sub {
 		},
 		'min rule works on integers and strings'
 	);
+
+	local $ENV{'QUERY_STRING'} = 'username=' . 'x' x 51 . '&email=test@example.com&age=30&bio=a+test+bio&ip_address=192.168.1.1';
+	$info = CGI::Info->new();
+	$params = $info->params(allow => $allowed);
+	is_deeply(
+		$params,
+		{
+			'email' => 'test@example.com',
+			'age' => 30,
+			'bio' => 'a test bio',
+			'ip_address' => '192.168.1.1',
+		},
+		'max rule works on strings'
+	);
 };
 
 subtest 'SQL Injection Detection' => sub {
