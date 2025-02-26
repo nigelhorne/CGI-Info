@@ -970,9 +970,17 @@ sub _validate_strict
 		croak 'validate_strict: schema and params must be hash references';
 	}
 
+	foreach my $key (keys %{$params}) {
+		if(!defined($schema->{$key})) {
+			# croak(__PACKAGE__, "::validate_strict: Unknown parameter '$key'");
+			# $self->_notice("Discard unallowed argument '$key'");
+			delete $params->{$key};
+		}
+	}
+
 	my %validated_params;
 
-	foreach my $key (keys %$schema) {
+	foreach my $key (keys %{$schema}) {
 		my $rules = $schema->{$key};
 		my $value = $params->{$key};
 
@@ -982,10 +990,10 @@ sub _validate_strict
 		}
 
 		# Handle optional parameters
-		next if((ref($rules) eq 'HASH') && exists($rules->{optional}) && (!defined($value)));
+		next if((ref($rules) eq 'HASH') && exists($rules->{optional}) && !defined($value));
 
 		# If rules are a simple type string
-		if(ref($rules) eq '') {
+		if((ref($rules) eq '') || !defined(ref($rules))) {
 			$rules = { type => $rules };
 		}
 
@@ -998,6 +1006,9 @@ sub _validate_strict
 					my $type = lc($rule_value);
 
 					if($type eq 'string') {
+						if(ref($value)) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a string");
+						}
 						unless((ref($value) eq '') || (defined($value) && ($value =~ /^.*$/))) { # Allow undef for optional strings
 							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a string");
 						}
