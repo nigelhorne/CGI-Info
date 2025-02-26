@@ -406,9 +406,10 @@ The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
 Allow is a reference to a hash list of CGI parameters that you will allow.
-The value for each entry is a regular expression of permitted values for
-the key.
-[ TODO: allow a hash of rules like Params::Validate ]
+The value for each entry is either a regular expression of permitted values for
+the key,
+or a hash of rules rather like C<Params::Validate> but much stricter.
+
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
@@ -456,6 +457,13 @@ constructor.
 		xyzzy => qr/^[\w\s-]+$/,	# must be alphanumeric
 						# to prevent XSS, and non-empty
 						# as a sanity check
+	};
+	# or
+	$allowed = {
+		email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/ }, # String, basic email format check
+		age => { type => 'integer', min => 0, max => 150 }, # Integer between 0 and 150
+		bio => { type => 'string', optional => 1 }, # String, optional
+		ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ }, #Basic IPv4 validation
 	};
 	my $paramsref = $info->params(allow => $allowed);
 	# or
@@ -766,6 +774,16 @@ sub params {
 			if(defined(my $schema = $self->{allow}->{$key})) {	# Get the schema for this key
 				if(ref($schema) && (ref($schema) ne 'Regexp')) {
 					# TODO: Params::Validate format, perhaps?
+					my @value = ($value);
+					eval {
+						$value = validate_strict({ $key => $schema }, { $key => $value });
+					};
+					if($@) {
+						$self->_info("Block $key = $value: $@");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
+					$value = $value->{$key};
 				} elsif($value !~ $self->{allow}->{$key}) {
 					# Simple regex
 					$self->_info("Block $key = $value");
@@ -902,6 +920,97 @@ sub param {
 	return;
 }
 
+sub validate_strict {
+    my ($schema, $params) = @_;
+
+    # Check if schema and params are references to hashes
+    unless (ref $schema eq 'HASH' && ref $params eq 'HASH') {
+        croak "validate_strict: schema and params must be hash references";
+    }
+
+    my %validated_params;
+
+    foreach my $key (keys %$schema) {
+        my $rules = $schema->{$key};
+        my $value = $params->{$key};
+
+        # Check if the parameter is required
+        if (ref $rules eq 'HASH' && !exists $rules->{optional} && !exists $params->{$key}) {
+            croak "validate_strict: Required parameter '$key' is missing";
+        }
+
+       # Handle optional parameters
+        next if (ref $rules eq 'HASH' && exists $rules->{optional} && !defined $value);
+
+        # If rules are a simple type string
+        if(ref($rules) eq ''){
+            $rules = { type => $rules };
+        }
+
+        # Validate based on rules
+        if (ref $rules eq 'HASH') {
+            foreach my $rule_name (keys %$rules) {
+                my $rule_value = $rules->{$rule_name};
+
+                if ($rule_name eq 'type') {
+                    my $type = lc $rule_value;
+                    if ($type eq 'string') {
+                        unless (ref $value eq '' || (defined $value && $value =~ /^.*$/)) { # Allow undef for optional strings
+                            croak "validate_strict: Parameter '$key' must be a string";
+                        }
+                    } elsif ($type eq 'integer') {
+                        unless ($value =~ /^-?\d+$/) {
+                            croak "validate_strict: Parameter '$key' must be an integer";
+                        }
+                        $value = int($value); # Coerce to integer
+                    } elsif ($type eq 'number') {
+                        unless ($value =~ /^-?\d+(?:\.\d+)?$/) {
+                            croak "validate_strict: Parameter '$key' must be a number";
+                        }
+                        $value = eval $value; # Coerce to number (be careful with eval)
+
+                    } else {
+                        croak "validate_strict: Unknown type '$type'";
+                    }
+                } elsif ($rule_name eq 'min') {
+                    if (ref $value eq '' && $rules->{type} eq 'string') {
+                      next; # Skip if string is undefined
+                    }
+                    unless ($value >= $rule_value) {
+                        croak "validate_strict: Parameter '$key' must be at least $rule_value";
+                    }
+                } elsif ($rule_name eq 'max') {
+                    if (ref $value eq '' && $rules->{type} eq 'string') {
+                      next; # Skip if string is undefined
+                    }
+                    unless ($value <= $rule_value) {
+                        croak "validate_strict: Parameter '$key' must be at most $rule_value";
+                    }
+                } elsif ($rule_name eq 'matches') {
+                    unless ($value =~ $rule_value) {
+                        croak "validate_strict: Parameter '$key' must match '$rule_value'";
+                    }
+                } elsif ($rule_name eq 'callback') {
+                    unless (defined &$rule_value) {
+                      croak "validate_strict: callback for '$key' must be a code reference";
+                    }
+                    my $res = $rule_value->($value);
+                    unless ($res) {
+                        croak "validate_strict: Parameter '$key' failed callback validation";
+                    }
+                } elsif ($rule_name eq 'optional') {
+                   # Already handled at the beginning of the loop
+                } else {
+                    croak "validate_strict: Unknown rule '$rule_name'";
+                }
+            }
+        }
+
+        $validated_params{$key} = $value;
+    }
+
+    return \%validated_params;
+}
 # Helper routine to parse the arguments given to a function.
 # Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
