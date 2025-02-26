@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.94
+	number types can also have min and max values
+
 0.93	Wed Feb 26 09:47:02 EST 2025
 	Use facility local0
 	Improved upload filename generation to prevent overwriting

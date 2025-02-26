@@ -1023,7 +1023,7 @@ sub _validate_strict
 						if(length($value) < $rule_value) {
 							croak("validate_strict: Parameter '$key' must be at least length $rule_value");
 						}
-					} elsif($rules->{'type'} eq 'integer') {
+					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 						if($value < $rule_value) {
 							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be at least $rule_value");
 						}
@@ -1038,7 +1038,7 @@ sub _validate_strict
 						if(length($value) > $rule_value) {
 							croak("validate_strict: Parameter '$key' must be no longer than $rule_value");
 						}
-					} elsif($rules->{'type'} eq 'integer') {
+					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 						if($value > $rule_value) {
 							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be no more than $rule_value");
 						}
