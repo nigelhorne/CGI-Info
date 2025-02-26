@@ -406,9 +406,10 @@ The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
 Allow is a reference to a hash list of CGI parameters that you will allow.
-The value for each entry is either a regular expression of permitted values for
+The value for each entry is either a permitted value,
+a regular expression of permitted values for
 the key,
-or a hash of rules rather like C<Params::Validate> but much stricter.
+or a hash of rules rather like C<Params::Validate> but much more comprehensive.
 
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
@@ -753,30 +754,39 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				$self->_info("Discard unallowed argument '$key'");
+				$self->_notice("Discard unallowed argument '$key'");
 				$self->status(422);
 				next;	# Skip to the next parameter
 			}
 
 			# Do we allow any value, or must it be validated?
 			if(defined(my $schema = $self->{allow}->{$key})) {	# Get the schema for this key
-				if(ref($schema) && (ref($schema) ne 'Regexp')) {
-					# TODO: Params::Validate format, perhaps?
+				if(!ref($schema)) {
+					# Can only contain one value
+					if($value ne $schema) {
+						$self->_notice("Block $key = $value");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
+				} elsif(ref($schema) eq 'Regexp') {
+					if($value !~ $schema) {
+						# Simple regex
+						$self->_notice("Block $key = $value");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
+				} else {
+					# Set of rules
 					my @value = ($value);
 					eval {
 						$value = _validate_strict({ $key => $schema }, { $key => $value });
 					};
 					if($@) {
-						$self->_info("Block $key = $value: $@");
+						$self->_notice("Block $key = $value: $@");
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
 					$value = $value->{$key};
-				} elsif($value !~ $self->{allow}->{$key}) {
-					# Simple regex
-					$self->_info("Block $key = $value");
-					$self->status(422);
-					next;	# Skip to the next parameter
 				}
 			}
 		}
@@ -967,12 +977,12 @@ sub _validate_strict
 		my $value = $params->{$key};
 
 		# Check if the parameter is required
-		if (ref $rules eq 'HASH' && !exists $rules->{optional} && !exists $params->{$key}) {
+		if((ref($rules) eq 'HASH') && (!exists($rules->{optional})) && (!exists($params->{$key}))) {
 			croak "validate_strict: Required parameter '$key' is missing";
 		}
 
 		# Handle optional parameters
-		next if (ref $rules eq 'HASH' && exists $rules->{optional} && !defined $value);
+		next if((ref($rules) eq 'HASH') && exists($rules->{optional}) && (!defined($value)));
 
 		# If rules are a simple type string
 		if(ref($rules) eq '') {
@@ -980,15 +990,16 @@ sub _validate_strict
 		}
 
 		# Validate based on rules
-		if (ref $rules eq 'HASH') {
+		if(ref($rules) eq 'HASH') {
 			foreach my $rule_name (keys %$rules) {
 				my $rule_value = $rules->{$rule_name};
 
-				if ($rule_name eq 'type') {
-					my $type = lc $rule_value;
-					if ($type eq 'string') {
-						unless (ref $value eq '' || (defined $value && $value =~ /^.*$/)) { # Allow undef for optional strings
-							croak "validate_strict: Parameter '$key' must be a string";
+				if($rule_name eq 'type') {
+					my $type = lc($rule_value);
+
+					if($type eq 'string') {
+						unless((ref($value) eq '') || (defined($value) && ($value =~ /^.*$/))) { # Allow undef for optional strings
+							croak("validate_strict: Parameter '$key' must be a string");
 						}
 					} elsif ($type eq 'integer') {
 						unless ($value =~ /^-?\d+$/) {
@@ -1006,17 +1017,17 @@ sub _validate_strict
 					}
 				} elsif ($rule_name eq 'min') {
 					if (ref $value eq '' && $rules->{type} eq 'string') {
-					  next; # Skip if string is undefined
+						next; # Skip if string is undefined
 					}
 					unless ($value >= $rule_value) {
 						croak "validate_strict: Parameter '$key' must be at least $rule_value";
 					}
 				} elsif ($rule_name eq 'max') {
-					if (ref $value eq '' && $rules->{type} eq 'string') {
-					  next; # Skip if string is undefined
+					if((ref($value) eq '') && ($rules->{type} eq 'string')) {
+						next; # Skip if string is undefined
 					}
-					unless ($value <= $rule_value) {
-						croak "validate_strict: Parameter '$key' must be at most $rule_value";
+					unless($value <= $rule_value) {
+						croak("validate_strict: Parameter '$key' must be at most $rule_value");
 					}
 				} elsif ($rule_name eq 'matches') {
 					unless ($value =~ $rule_value) {
@@ -2024,6 +2035,11 @@ sub _debug {
 sub _info {
 	my $self = shift;
 	$self->_log('info', @_);
+}
+
+sub _notice {
+	my $self = shift;
+	$self->_log('notice', @_);
 }
 
 sub _trace {
