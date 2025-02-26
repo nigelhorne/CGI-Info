@@ -54,8 +54,17 @@ Whilst you shouldn't rely on it alone to provide security to your website,
 it is another layer and every little helps.
 
     use CGI::Info;
-    my $info = CGI::Info->new();
-    # ...
+
+    my $info = CGI::Info->new(allow => { id => qr/^\d+$/ });
+    my $params = $info->params();
+
+    if($info->is_mobile()) {
+        print "Mobile view\n";
+    } else {
+        print "Desktop view\n";
+    }
+
+    my $id = $info->param('id');	# Validated against allow schema
 
 =head1 SUBROUTINES/METHODS
 
@@ -71,7 +80,7 @@ L<Sys::Syslog>.
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
-Takes optional parameter logger, an object which is used for warnings
+Takes optional parameter logger, an object which is used for warnings.
 
 Takes optional parameter cache, an object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
@@ -1752,8 +1761,6 @@ sub is_robot {
 =head2 is_search_engine
 
 Is the visitor a search engine?
-
-    use CGI::Info;
 
     if(CGI::Info->new()->is_search_engine()) {
 	# display generic information about yourself
