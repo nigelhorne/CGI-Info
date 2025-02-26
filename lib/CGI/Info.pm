@@ -1015,34 +1015,50 @@ sub _validate_strict
 					} else {
 						croak "validate_strict: Unknown type '$type'";
 					}
-				} elsif ($rule_name eq 'min') {
-					if (ref $value eq '' && $rules->{type} eq 'string') {
-						next; # Skip if string is undefined
+				} elsif($rule_name eq 'min') {
+					if($rules->{'type'} eq 'string') {
+						if(!defined($value)) {
+							next;	# Skip if string is undefined
+						}
+						if(length($value) < $rule_value) {
+							croak("validate_strict: Parameter '$key' must be at least length $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'integer') {
+						if($value < $rule_value) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be at least $rule_value");
+						}
+					} else {
+						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless min value $rule_value");
 					}
-					unless ($value >= $rule_value) {
-						croak "validate_strict: Parameter '$key' must be at least $rule_value";
+				} elsif($rule_name eq 'max') {
+					if($rules->{'type'} eq 'string') {
+						if(!defined($value)) {
+							next;	# Skip if string is undefined
+						}
+						if(length($value) > $rule_value) {
+							croak("validate_strict: Parameter '$key' must be no longer than $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'integer') {
+						if($value > $rule_value) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be no more than $rule_value");
+						}
+					} else {
+						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless max value $rule_value");
 					}
-				} elsif ($rule_name eq 'max') {
-					if((ref($value) eq '') && ($rules->{type} eq 'string')) {
-						next; # Skip if string is undefined
-					}
-					unless($value <= $rule_value) {
-						croak("validate_strict: Parameter '$key' must be at most $rule_value");
-					}
-				} elsif ($rule_name eq 'matches') {
+				} elsif($rule_name eq 'matches') {
 					unless ($value =~ $rule_value) {
 						croak "validate_strict: Parameter '$key' must match '$rule_value'";
 					}
 				} elsif ($rule_name eq 'callback') {
 					unless (defined &$rule_value) {
-					  croak "validate_strict: callback for '$key' must be a code reference";
+						croak(__PACKAGE__, "::validate_strict: callback for '$key' must be a code reference");
 					}
 					my $res = $rule_value->($value);
 					unless ($res) {
 						croak "validate_strict: Parameter '$key' failed callback validation";
 					}
 				} elsif ($rule_name eq 'optional') {
-				   # Already handled at the beginning of the loop
+					# Already handled at the beginning of the loop
 				} else {
 					croak "validate_strict: Unknown rule '$rule_name'";
 				}
@@ -1054,6 +1070,7 @@ sub _validate_strict
 
 	return \%validated_params;
 }
+
 # Helper routine to parse the arguments given to a function.
 # Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want

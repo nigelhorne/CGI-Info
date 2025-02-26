@@ -61,18 +61,17 @@ subtest 'Allow Parameters Rules' => sub {
 		'Command line parameters parsed correctly'
 	);
 
-	local $ENV{'QUERY_STRING'} = 'username=test_user&email=test@example.com&age=300&bio=a+test+bio&ip_address=192.168.1.1';
+	local $ENV{'QUERY_STRING'} = 'username=te&email=test@example.com&age=300&bio=a+test+bio&ip_address=192.168.1.1';
 	$info = CGI::Info->new();
 	$params = $info->params(allow => $allowed);
 	is_deeply(
 		$params,
 		{
-			'username' => 'test_user',
 			'email' => 'test@example.com',
 			'bio' => 'a test bio',
 			'ip_address' => '192.168.1.1',
 		},
-		'Ignore out of range numeric values'
+		'min rule works on integers and strings'
 	);
 };
 
