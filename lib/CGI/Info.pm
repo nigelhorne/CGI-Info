@@ -27,11 +27,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =cut
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 =head1 SYNOPSIS
 
@@ -2177,9 +2177,13 @@ things to happen.
 
 =head1 SEE ALSO
 
+=over 4
+
 =item * L<HTTP::BrowserDetect>
 
 =item * L<https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker>
+
+=back
 
 =head1 SUPPORT
 

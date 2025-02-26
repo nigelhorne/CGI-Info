@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.92
+Version 0.93
 
 # SYNOPSIS
 
@@ -164,9 +164,10 @@ The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
 Allow is a reference to a hash list of CGI parameters that you will allow.
-The value for each entry is either a regular expression of permitted values for
+The value for each entry is either a permitted value,
+a regular expression of permitted values for
 the key,
-or a hash of rules rather like `Params::Validate` but much stricter.
+or a hash of rules rather like `Params::Validate` but much more comprehensive.
 
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
@@ -507,15 +508,3 @@ You can also look for information at:
 Copyright 2010-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 2146:
-
-    '=item' outside of any '=over'
-
-- Around line 2150:
-
-    You forgot a '=back' before '=head1'
