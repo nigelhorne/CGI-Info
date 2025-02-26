@@ -12,14 +12,14 @@ BEGIN { use_ok('CGI::Info') }
 my $info;
 my $upload_dir = tempdir(CLEANUP => 1);
 
-subtest 'Allowed Parameters' => sub {
+subtest 'Allowed Parameters Regex' => sub {
 	local %ENV = (
 		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD => 'GET',
 		QUERY_STRING => 'allowed_param=123&disallowed_param=evil',
 	);
 
-	$info = CGI::Info->new(allow => { allowed_param => qr/^\d+$/ });
+	$info = CGI::Info->new(allow => { allowed_param => qr/^\d{3}$/ });
 	my $params = $info->params();
 
 	is_deeply(
@@ -29,6 +29,26 @@ subtest 'Allowed Parameters' => sub {
 	);
 	cmp_ok($info->status(), '==', 422, 'Status is not OK when disallowed params are used');
 };
+
+# subtest 'Allow Parameters Rules' => sub {
+	# local %ENV = (
+		# GATEWAY_INTERFACE => 'CGI/1.1',
+		# REQUEST_METHOD => 'GET',
+		# QUERY_STRING => 'username=test_user&email=test@example&age=30&bio=a+test+bio&ip_address=192.168.1.1'
+	# );
+
+	# my $allowed = {
+		# username => { type => 'string', min => 3, max => 50, matches => qr/^[a-zA-Z0-9_]+$/ },
+		# email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/ },
+		# age => { type => 'integer', min => 0, max => 150 },
+		# bio => { type => 'string', optional => 1 },
+		# ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ }, #Basic IPv4 validation
+	# };
+
+	# $info = CGI::Info->new(allow => $allowed);
+	# my $params = $info->params();
+	# diag(Data::Dumper->new([$params])->Dump());
+# };
 
 subtest 'SQL Injection Detection' => sub {
 	local %ENV = (
