@@ -406,8 +406,8 @@ The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
 Allow is a reference to a hash list of CGI parameters that you will allow.
-The value for each entry is a regular expression of permitted values for
-the key.
+The value for each entry is either a regular expression of permitted values for
+the key or a hash using the format recognized by C<Params::Validate::validate_strict>.
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
@@ -758,15 +758,26 @@ sub params {
 			if(!exists($self->{allow}->{$key})) {
 				$self->_info("Discard unallowed argument '$key'");
 				$self->status(422);
-				next;
+				next;	# Skip to the next parameter
 			}
 
 			# Do we allow any value, or must it be validated?
-			if(defined($self->{allow}->{$key})) {
-				if($value !~ $self->{allow}->{$key}) {
+			if(defined(my $schema = $self->{allow}->{$key})) {	# Get the schema for this key
+				if(ref($schema) && (ref($schema) ne 'Regexp')) {
+					eval {
+						# Params::Validate format
+						$value = validate_strict({ $key => $schema }, { $key => $value });
+					};
+					if ($@) {
+						$self->_info("Parameter validation failed for '$key': $@");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
+				} elsif($value !~ $self->{allow}->{$key}) {
+					# Simple regex
 					$self->_info("Block $key = $value");
 					$self->status(422);
-					next;
+					next;	# Skip to the next parameter
 				}
 			}
 		}
