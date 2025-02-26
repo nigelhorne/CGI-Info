@@ -108,7 +108,8 @@ sub new
 			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
 			return;
 		}
-		warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
 	}
 
 	if(!defined($class)) {
@@ -129,7 +130,6 @@ sub new
 	return bless {
 		max_upload_size => 512 * 1024,
 		allow => undef,
-		expect => undef,
 		upload_dir => undef,
 		%args	# Overwrite defaults with given arguments
 	}, $class;
@@ -401,7 +401,7 @@ separated string.
 
 The returned hash value can be passed into L<CGI::Untaint>.
 
-Takes four optional parameters: allow, expect, logger and upload_dir.
+Takes four optional parameters: allow, logger and upload_dir.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
@@ -414,12 +414,6 @@ A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
 
-Expect is a reference to a list of arguments that you expect to see and pass on.
-Arguments not in the list are silently ignored.
-This is useful to help to block attacks on your site.
-Its use is deprecated, use allow instead.
-Expect will be removed in a later version.
-
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
 It must be a writeable directory in the temporary area.
@@ -430,7 +424,7 @@ such as a L<Log::Log4perl> or L<Log::Any> object,
 a reference to code,
 or a filename.
 
-The allow, expect, logger and upload_dir arguments can also be passed to the
+The allow, logger and upload_dir arguments can also be passed to the
 constructor.
 
 	use CGI::Info;
@@ -466,12 +460,6 @@ constructor.
 		ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ }, #Basic IPv4 validation
 	};
 	my $paramsref = $info->params(allow => $allowed);
-	# or
-	my @expected = ('foo', 'bar');
-	my $paramsref = $info->params({
-		expect => \@expected,
-		upload_dir = $info->tmpdir()
-	});
 	if(defined($paramsref)) {
 		my $ids = CGI::IDS->new();
 		$ids->set_scan_keys(scan_keys => 1);
@@ -512,14 +500,14 @@ sub params {
 	if(defined($params->{allow})) {
 		$self->{allow} = $params->{allow};
 	}
-	if(defined($params->{expect})) {
-		if(ref($params->{expect}) eq 'ARRAY') {
-			$self->{expect} = $params->{expect};
-			$self->_warn('expect is deprecated, use allow instead');
-		} else {
-			$self->_warn('expect must be a reference to an array');
-		}
-	}
+	# if(defined($params->{expect})) {
+		# if(ref($params->{expect}) eq 'ARRAY') {
+			# $self->{expect} = $params->{expect};
+			# $self->_warn('expect is deprecated, use allow instead');
+		# } else {
+			# $self->_warn('expect must be a reference to an array');
+		# }
+	# }
 	if(defined($params->{upload_dir})) {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
@@ -776,7 +764,7 @@ sub params {
 					# TODO: Params::Validate format, perhaps?
 					my @value = ($value);
 					eval {
-						$value = validate_strict({ $key => $schema }, { $key => $value });
+						$value = _validate_strict({ $key => $schema }, { $key => $value });
 					};
 					if($@) {
 						$self->_info("Block $key = $value: $@");
@@ -793,9 +781,9 @@ sub params {
 			}
 		}
 
-		if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
-			next;
-		}
+		# if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
+			# next;
+		# }
 		my $orig_value = $value;
 		$value = _sanitise_input($value);
 
@@ -920,7 +908,50 @@ sub param {
 	return;
 }
 
-sub validate_strict {
+# Helper routine that validates a set of parameters against a schema.
+#
+# This function takes two arguments:
+#
+# $schema A reference to a hash that defines the validation rules for each parameter.  The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
+# $params A reference to a hash containing the parameters to be validated.  The keys of the hash are the parameter names, and the values are the parameter values.
+#
+# The schema can define the following rules for each parameter:
+#
+# type The data type of the parameter.  Valid types are string, integer, and number.
+# min The minimum length (for strings) or value (for numbers).
+# max The maximum length (for strings) or value (for numbers).
+# matches A regular expression that the parameter value must match.
+# callback A code reference to a subroutine that performs custom validation logic. The subroutine should accept the parameter value as an argument and return true if the value is valid, false otherwise.
+# optional A boolean value indicating whether the parameter is optional. If true, the parameter is not required.  If false or omitted, the parameter is required.
+#
+# If a parameter is optional and its value is `undef`, validation will be skipped for that parameter.
+#
+# If the validation fails, the function will croak with an error message describing the validation failure.
+#
+# If the validation is successful, the function will return a reference to a new hash containing the validated and (where applicable) coerced parameters.  Integer and number parameters will be coerced to their respective types.
+
+# For example:
+#	my $schema = {
+#		username => { type => 'string', min => 3, max => 50 },
+#		age => { type => 'integer', min => 0, max => 150 },
+#	};
+#
+# my $params = {
+#	username => 'john_doe',
+#	age => '30', # Will be coerced to integer
+# };
+#
+# my $validated_params = validate_strict($schema, $params);
+#
+# if (defined $validated_params) {
+#	print "Example 1: Validation successful!\n";
+#	print 'Username: ' . $validated_params->{username} . "\n";
+#	print 'Age: ' . $validated_params->{age} . "\n"; # It's an integer now!
+# } else {
+#	print "Example 1: Validation failed: $@\n";
+# }
+
+sub _validate_strict {
     my ($schema, $params) = @_;
 
     # Check if schema and params are references to hashes
