@@ -1982,40 +1982,40 @@ sub status
 	return $self->{status} || 200;
 }
 
-=head2 warnings
+=head2 messages
 
-Returns the warnings that the object has generated as a ref to an array of hashes.
+Returns the messages that the object has generated as a ref to an array of hashes.
 
-    my @warnings;
-    if(my $w = $info->warnings()) {
-        @warnings = map { $_->{'warning'} } @{$w};
+    my @messages;
+    if(my $w = $info->messages()) {
+        @messages = map { $_->{'message'} } @{$w};
     } else {
-        @warnings = ();
+        @messages = ();
     }
-    print STDERR join(';', @warnings), "\n";
+    print STDERR join(';', @messages), "\n";
 
 =cut
 
-sub warnings
+sub messages
 {
 	my $self = shift;
 
-	return $self->{'warnings'};
+	return $self->{'messages'};
 }
 
-=head2	warnings_as_string
+=head2	messages_as_string
 
-Returns the warnings that the object has generated as a string.
+Returns the messages of that the object has generated as a string.
 
 =cut
 
-sub warnings_as_string
+sub messages_as_string
 {
 	my $self = shift;
 
-	if(scalar($self->{'warnings'})) {
-		my @warnings = map { $_->{'warning'} } @{$self->{'warnings'}};
-		return join('; ', @warnings);
+	if(scalar($self->{'messages'})) {
+		my @messages = map { $_->{'message'} } @{$self->{'messages'}};
+		return join('; ', @messages);
 	}
 	return '';
 }
@@ -2042,6 +2042,11 @@ sub set_logger {
 sub _log
 {
 	my ($self, $level, @messages) = @_;
+
+	# FIXME: add caller's function
+	# if(($level eq 'warn') || ($level eq 'notice')) {
+		push @{$self->{'messages'}}, { level => $level, message => join(' ', @messages) };
+	# }
 
 	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
@@ -2104,9 +2109,6 @@ sub _warn {
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
 
-	# FIXME: add caller's function
-	push @{$self->{'warnings'}}, { warning => $warning };
-
 	# Handle syslog-based logging
 	if($self->{syslog}) {
 		require Sys::Syslog;
@@ -2121,10 +2123,9 @@ sub _warn {
 	}
 
 	# Handle logger-based logging
-	if(my $logger = $self->{logger}) {
-		$self->_log('warn', $warning);
-	} elsif(!defined($self->{syslog})) {
-		# Fallback to Carp warnings
+	$self->_log('warn', $warning);
+	if((!defined($self->{logger})) && (!defined($self->{syslog}))) {
+		# Fallback to Carp
 		Carp::carp($warning);
 	}
 }

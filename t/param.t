@@ -42,8 +42,11 @@ PARAM: {
 		is($obj->param('baz'), 'qux', 'Fetching allowed parameter "baz"');
 
 		is($obj->param('invalid'), undef, 'Fetching disallowed parameter "invalid" returns undef');
+		diag(Data::Dumper->new([$obj->messages()])->Dump()) if($ENV{'TEST_VERBOSE'});
+		# Get the warnings that the object has generated
+		my @warnings = grep defined, map { ($_->{'level'} eq 'warn') ? $_->{'message'} : undef } @{$obj->messages()};
 		like(
-			$obj->warnings()->[0]->{'warning'},
+			$warnings[0],
 			qr/param: invalid isn't in the allow list/,
 			'Warning generated for disallowed parameter'
 		);
