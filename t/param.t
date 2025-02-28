@@ -55,7 +55,7 @@ PARAM: {
 		$obj = CGI::Info->new();
 		is($obj->param('foo'), undef, 'No params set, fetching "foo" returns undef');
 	};
-	
+
 	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
 	$ENV{'REQUEST_METHOD'} = 'GET';
 	$ENV{'QUERY_STRING'} = 'foo=bar';
