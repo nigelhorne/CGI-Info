@@ -434,6 +434,7 @@ Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
 such as a L<Log::Log4perl> or L<Log::Any> object,
 a reference to code,
+a reference to an array,
 or a filename.
 
 The allow, logger and upload_dir arguments can also be passed to the
@@ -1822,7 +1823,7 @@ sub messages_as_string
 
 =head2 set_logger
 
-Sets the class, code reference, or file that will be used for logging.
+Sets the class, array, code reference, or file that will be used for logging.
 
 Sometimes you don't know what the logger is until you've instantiated the class.
 This function fixes the catch22 situation.
@@ -1845,7 +1846,7 @@ sub _log
 
 	# FIXME: add caller's function
 	# if(($level eq 'warn') || ($level eq 'notice')) {
-		push @{$self->{'messages'}}, { level => $level, message => join(' ', @messages) };
+		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
 	# }
 
 	if(my $logger = $self->{'logger'}) {
@@ -1858,6 +1859,8 @@ sub _log
 				level => $level,
 				message => \@messages
 			});
+		} elsif(ref($logger) eq 'ARRAY') {
+			push @{$logger}, { level => $level, message => join(' ', grep defined, @messages) };
 		} elsif(!ref($logger)) {
 			# File
 			if(open(my $fout, '>>', $logger)) {
