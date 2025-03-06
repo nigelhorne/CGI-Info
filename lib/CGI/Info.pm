@@ -5,6 +5,8 @@ package CGI::Info;
 
 use warnings;
 use strict;
+
+use boolean;
 use Carp;
 use File::Spec;
 use Params::Get;
@@ -77,19 +79,33 @@ Creates a CGI::Info object.
 It takes four optional arguments allow, logger, expect and upload_dir,
 which are documented in the params() method.
 
+It takes other optional parameters:
+
+=over 4
+
+=item * C<auto_load>
+
+Enable/disable the AUTOLOAD feature.
+The default is to have it enabled.
+
+=item * C<syslog>
+
 Takes an optional parameter syslog, to log messages to
 L<Sys::Syslog>.
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
-Takes optional parameter logger, an object which is used for warnings.
+=item * C<cache>
 
-Takes optional parameter cache, an object which is used to cache IP lookups.
+An object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
-Takes optional parameter max_upload, which is the maximum file size you can upload
-(-1 for no limit), the default is 512MB.
+=item * C<max_upload>
+
+The maximum file size you can upload (-1 for no limit), the default is 512MB.
+
+=back
 
 =cut
 
@@ -1972,7 +1988,13 @@ sub reset {
 sub AUTOLOAD
 {
 	our $AUTOLOAD;
+
 	my $self = shift or return;
+
+	Carp::croak(__PACKAGE__, ": Unknown method $self") if(!ref($self));
+
+	# Allow the AUTOLOAD feature to be disabled
+	Carp::croak(__PACKAGE__, ": Unknown method $self") if(exists($self->{'auto_load'}) && $self->{'auto_load'}->isFalse());
 
 	# Extract the method name from the AUTOLOAD variable
 	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
