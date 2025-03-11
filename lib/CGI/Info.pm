@@ -9,6 +9,7 @@ use strict;
 use boolean;
 use Carp;
 use File::Spec;
+use Log::Abstraction;
 use Params::Get;
 use Params::Validate::Strict;
 use Scalar::Util;
@@ -189,6 +190,8 @@ sub script_name
 
 sub _find_paths {
 	my $self = shift;
+
+	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
 	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
 
@@ -541,7 +544,7 @@ sub params {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
 	if(defined($params->{logger})) {
-		$self->{logger} = $params->{logger};
+		$self->{logger} = Log::Abstraction->new($params->{logger});
 	}
 	$self->_trace('Entering params');
 
@@ -1850,12 +1853,12 @@ sub set_logger {
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	$self->{logger} = $params->{'logger'};
+	$self->{logger} = Log::Abstraction->new($params->{'logger'});
 
 	return $self;
 }
 
-# Helper routines for logger()
+# Log and remember a message
 sub _log
 {
 	my ($self, $level, @messages) = @_;
@@ -1866,27 +1869,7 @@ sub _log
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		if(ref($logger) eq 'CODE') {
-			# Code reference
-			$logger->({
-				class => ref($self) // __PACKAGE__,
-				function => (caller(2))[3],
-				line => (caller(1))[2],
-				level => $level,
-				message => \@messages
-			});
-		} elsif(ref($logger) eq 'ARRAY') {
-			push @{$logger}, { level => $level, message => join(' ', grep defined, @messages) };
-		} elsif(!ref($logger)) {
-			# File
-			if(open(my $fout, '>>', $logger)) {
-				print $fout uc($level), ': ', ref($self) // __PACKAGE__, ' ', (caller(2))[3], (caller(1))[2], join(' ', @messages), "\n";
-				close $fout;
-			}
-		} else {
-			# Object
-			$logger->$level(@messages);
-		}
+		$self->{'logger'}->$level(@messages);
 	}
 }
 
