@@ -154,6 +154,8 @@ sub new
 		return bless { %{$class}, %args }, ref($class);
 	}
 
+	$args{'logger'} = Log::Abstraction->new($args{'logger'});
+
 	# Return the blessed object
 	return bless {
 		max_upload_size => 512 * 1024,
@@ -543,8 +545,8 @@ sub params {
 	if(defined($params->{upload_dir})) {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
-	if(defined($params->{logger})) {
-		$self->{logger} = Log::Abstraction->new($params->{logger});
+	if(defined($params->{'logger'})) {
+		$self->{'logger'} = Log::Abstraction->new($params->{'logger'});
 	}
 	$self->_trace('Entering params');
 
@@ -896,7 +898,7 @@ sub params {
 		return;
 	}
 
-	if($self->{logger}) {
+	if($self->{'logger'}) {
 		while(my ($key,$value) = each %FORM) {
 			$self->_debug("$key=$value");
 		}
@@ -1059,6 +1061,8 @@ sub _multipart_data {
 	if($writing_file) {
 		close $fout;
 	}
+
+	$self->_trace('Leaving _multipart_data');
 
 	return @pairs;
 }
@@ -1853,7 +1857,7 @@ sub set_logger {
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	$self->{logger} = Log::Abstraction->new($params->{'logger'});
+	$self->{'logger'} = Log::Abstraction->new($params->{'logger'});
 
 	return $self;
 }
@@ -1869,7 +1873,7 @@ sub _log
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		$self->{'logger'}->$level(@messages);
+		$self->{'logger'}->$level(\@messages);
 	}
 }
 
@@ -1896,40 +1900,9 @@ sub _trace {
 # Emit a warning message somewhere
 sub _warn {
 	my $self = shift;
-
 	my $params = Params::Get::get_params('warning', @_);
 
-	# Validate input parameters
-	return unless($params && (ref($params) eq 'HASH'));
-	my $warning = $params->{'warning'};
-	return unless($warning);
-
-	if($self eq __PACKAGE__) {
-		# Called from class method
-		Carp::carp($warning);
-		return;
-	}
-	# return if($self eq __PACKAGE__);  # Called from class method
-
-	# Handle syslog-based logging
-	if($self->{syslog}) {
-		require Sys::Syslog;
-
-		Sys::Syslog->import();
-		if(ref($self->{syslog} eq 'HASH')) {
-			Sys::Syslog::setlogsock($self->{syslog});
-		}
-		openlog($self->script_name(), 'cons,pid', 'user');
-		syslog('warning|local0', $warning);
-		closelog();
-	}
-
-	# Handle logger-based logging
-	$self->_log('warn', $warning);
-	if((!defined($self->{logger})) && (!defined($self->{syslog}))) {
-		# Fallback to Carp
-		Carp::carp($warning);
-	}
+	$self->_log('warn', $params->{'warning'});
 }
 
 # Ensure all environment variables are sanitized and validated before use.
