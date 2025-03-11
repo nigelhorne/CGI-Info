@@ -40,8 +40,7 @@ our $VERSION = '0.95';
 
 =head1 SYNOPSIS
 
-The C<CGI::Info> module,
-is a Perl library designed to provide information about the environment in which a CGI script operates.
+The C<CGI::Info> module is a Perl library designed to provide information about the environment in which a CGI script operates.
 It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
 Additionally, it offers a simple web application firewall to add a layer of security.
@@ -49,7 +48,7 @@ Additionally, it offers a simple web application firewall to add a layer of secu
 All too often Perl programs have information such as the script's name
 hard-coded into their source.
 Generally speaking,
-hard-coding is bad style since it can make programs difficult to read and it reduces readability and portability.
+hard-coding is a bad style since it can make programs difficult to read and it reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
@@ -1096,7 +1095,7 @@ sub _untaint_filename {
 =head2 is_mobile
 
 Returns a boolean if the website is being viewed on a mobile
-device such as a smart-phone.
+device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
 =cut
@@ -1849,7 +1848,7 @@ sub messages_as_string
 Sets the class, array, code reference, or file that will be used for logging.
 
 Sometimes you don't know what the logger is until you've instantiated the class.
-This function fixes the catch22 situation.
+This function fixes the catch-22 situation.
 
 =cut
 
@@ -1972,7 +1971,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 =head1 BUGS
 
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
-don't differ between tablets and smart-phones.
+don't differ between tablets and smartphones.
 
 params() returns a ref which means that calling routines can change the hash
 for other routines.
