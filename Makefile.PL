@@ -72,7 +72,7 @@ WriteMakefile(
 		'Log::Any' => 0,
 		'JSON::MaybeXS' => 0,
 		# 'String::EscapeCage' => 0.02,
-		'Class::Autouse' => 0,
+		# 'Class::Autouse' => 0,
 		'namespace::clean' => 0,
 		'Sys::Path' => 0
 	}, dist => $dist,
