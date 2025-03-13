@@ -155,7 +155,7 @@ sub new
 
 	if(my $logger = $args{'logger'}) {
 		if(!Scalar::Util::blessed($logger)) {
-			$args{'logger'} = Log::Abstraction->new($args{'logger'});
+			$args{'logger'} = Log::Abstraction->new($logger);
 		}
 	} else {
 		$args{'logger'} = Log::Abstraction->new();
@@ -551,7 +551,7 @@ sub params {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
 	if(defined($params->{'logger'})) {
-		$self->{'logger'} = Log::Abstraction->new($params->{'logger'});
+		$self->set_logger($params->{'logger'});
 	}
 	$self->_trace('Entering params');
 
