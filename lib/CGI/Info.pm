@@ -153,7 +153,13 @@ sub new
 		return bless { %{$class}, %args }, ref($class);
 	}
 
-	$args{'logger'} = Log::Abstraction->new($args{'logger'});
+	if(my $logger = $args{'logger'}) {
+		if(!Scalar::Util::blessed($logger)) {
+			$args{'logger'} = Log::Abstraction->new($args{'logger'});
+		}
+	} else {
+		$args{'logger'} = Log::Abstraction->new();
+	}
 
 	# Return the blessed object
 	return bless {
@@ -1856,9 +1862,19 @@ sub set_logger {
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	$self->{'logger'} = Log::Abstraction->new($params->{'logger'});
-
-	return $self;
+	if(defined($params->{'logger'})) {
+		if(my $logger = $params->{'logger'}) {
+			if(Scalar::Util::blessed($logger)) {
+				$self->{'logger'} = $logger;
+			} else {
+				$self->{'logger'} = Log::Abstraction->new($logger);
+			}
+		} else {
+			$self->{'logger'} = Log::Abstraction->new();
+		}
+		return $self;
+	}
+	Carp::croak('Usage: set_logger(logger => $logger)')
 }
 
 # Log and remember a message
