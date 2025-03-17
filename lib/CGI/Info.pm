@@ -32,11 +32,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.95
+Version 0.96
 
 =cut
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 
@@ -1858,7 +1858,8 @@ This function fixes the catch-22 situation.
 
 =cut
 
-sub set_logger {
+sub set_logger
+{
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
