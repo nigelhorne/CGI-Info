@@ -2045,10 +2045,20 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 Copyright 2010-2025 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+=over 4
+
+=item * Personal single user, single computer use: GPL2
+
+=item * All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.
+
+=back
 
 =cut
 
 1;
-
-__END__
