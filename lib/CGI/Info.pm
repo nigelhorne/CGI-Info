@@ -1889,7 +1889,7 @@ sub _log
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		$self->{'logger'}->$level(\@messages);
+		$self->{'logger'}->$level(join(@messages));
 	}
 }
 
@@ -1983,7 +1983,7 @@ sub AUTOLOAD
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 

@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.97
+	Not all loggers (e.g. Log::Any) can cope with a reference to an ARRAY
+
 0.96	Mon Mar 17 08:11:48 EDT 2025
 	Use Log::Abstraction
 	Added the auto_load parameter to disable AUTOLOAD
