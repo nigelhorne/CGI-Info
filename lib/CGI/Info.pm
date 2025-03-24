@@ -1889,7 +1889,7 @@ sub _log
 	# }
 
 	if(my $logger = $self->{'logger'}) {
-		$self->{'logger'}->$level(join(@messages));
+		$self->{'logger'}->$level(join('', grep defined, @messages));
 	}
 }
 
