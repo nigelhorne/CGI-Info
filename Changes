@@ -3,6 +3,8 @@ Revision history for CGI-Info
 0.97
 	Not all loggers (e.g. Log::Any) can cope with a reference to an ARRAY
 	Added config_file argument to new()
+	Added logdir() sanity checks
+	Improved blocking for directory traversal attacks
 
 0.96	Mon Mar 17 08:11:48 EDT 2025
 	Use Log::Abstraction

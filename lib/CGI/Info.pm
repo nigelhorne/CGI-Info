@@ -45,10 +45,11 @@ It aims to eliminate hard-coded script details,
 enhancing code readability and portability.
 Additionally, it offers a simple web application firewall to add a layer of security.
 
-All too often Perl programs have information such as the script's name
+All too often,
+Perl programs have information such as the script's name
 hard-coded into their source.
 Generally speaking,
-hard-coding is a bad style since it can make programs difficult to read and it reduces readability and portability.
+hard-coding is a bad style since it can make programs difficult to read and reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
@@ -76,7 +77,7 @@ it is another layer and every little helps.
 
 Creates a CGI::Info object.
 
-It takes four optional arguments allow, logger, expect and upload_dir,
+It takes four optional arguments: allow, logger, expect and upload_dir,
 which are documented in the params() method.
 
 It takes other optional parameters:
@@ -91,7 +92,8 @@ The default is to have it enabled.
 =item * C<config_file>
 
 Points to a configuration file which contains the parameters to C<new()>.
-The file can be in any common format including C<YAML>, C<XML>, and C<INI>.
+The file can be in any common format,
+including C<YAML>, C<XML>, and C<INI>.
 This allows the parameters to be set at run time.
 
 =item * C<syslog>
@@ -103,11 +105,11 @@ to a hash to be given to Sys::Syslog::setlogsock.
 
 =item * C<cache>
 
-An object which is used to cache IP lookups.
+An object that is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
-=item * C<max_upload>
+=item * C<max_upload_size>
 
 The maximum file size you can upload (-1 for no limit), the default is 512MB.
 
@@ -132,14 +134,14 @@ sub new
 		%args = @_;
 	} else {
 		# If there is an odd number of arguments, treat it as an error
-		carp(__PACKAGE__, ': Invalid arguments passed to new()');
+		croak(__PACKAGE__, ': Invalid arguments passed to new()');
 		return;
 	}
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
 			# Using CGI::Info:new(), not CGI::Info->new()
-			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
 
@@ -161,7 +163,7 @@ sub new
 
 	if(defined($args{'expect'})) {
 		if(ref($args{expect}) ne 'ARRAY') {
-			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
+			Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
 			return;
 		}
 		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
@@ -893,14 +895,14 @@ sub params {
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
 			}
-			if($value =~ /\.\.\//) {
-				$self->status(403);
-				$self->_warn("Blocked directory traversal attack for '$key'");
-				return;
-			}
 			if($value =~ /mustleak\.com\//) {
 				$self->status(403);
 				$self->_warn("Blocked mustleak attack for '$key'");
+				return;
+			}
+			if($value =~ /\.\.\//) {
+				$self->status(403);
+				$self->_warn("Blocked directory traversal attack for '$key'");
 				return;
 			}
 		}
@@ -1436,9 +1438,13 @@ sub logdir {
 		$self = __PACKAGE__->new();
 	}
 
-	if(defined($dir)) {
-		# No sanity testing is done
-		return $self->{logdir} = $dir;
+	if($dir) {
+		if(length($dir) && (-d $dir) && (-w $dir)) {
+			return $self->{'logdir'} = $dir;
+		}
+		$self->_warn("Invalid logdir: $dir");
+		Carp::croak("Invalid logdir: $dir");
+		return;
 	}
 
 	foreach my $rc($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
@@ -1447,7 +1453,7 @@ sub logdir {
 			last;
 		}
 	}
-	carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
+	$self->_warn("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
 	$self->{logdir} ||= $dir;
 
 	return $dir;
@@ -1614,7 +1620,8 @@ Is the visitor a search engine?
 
 =cut
 
-sub is_search_engine {
+sub is_search_engine
+{
 	my $self = shift;
 
 	if(defined($self->{is_search_engine})) {
