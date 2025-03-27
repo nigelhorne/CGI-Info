@@ -88,6 +88,12 @@ It takes other optional parameters:
 Enable/disable the AUTOLOAD feature.
 The default is to have it enabled.
 
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
+
 =item * C<syslog>
 
 Takes an optional parameter syslog, to log messages to
@@ -130,15 +136,6 @@ sub new
 		return;
 	}
 
-	if(defined($args{expect})) {
-		if(ref($args{expect}) ne 'ARRAY') {
-			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
-			return;
-		}
-		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
-	}
-
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
 			# Using CGI::Info:new(), not CGI::Info->new()
@@ -151,6 +148,24 @@ sub new
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
+	}
+
+	# Load the configuration from a config file, if provided
+	if(exists($args{'config_file'}) && (my $config = Config::Auto::parse($args{'config_file'}))) {
+		# my $config = YAML::XS::LoadFile($args{'config_file'});
+		if($config->{$class}) {
+			$config = $config->{$class};
+		}
+		%args = (%{$config}, %args);
+	}
+
+	if(defined($args{'expect'})) {
+		if(ref($args{expect}) ne 'ARRAY') {
+			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
+			return;
+		}
+		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
 	}
 
 	if(my $logger = $args{'logger'}) {
