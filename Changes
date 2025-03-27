@@ -5,6 +5,7 @@ Revision history for CGI-Info
 	Added config_file argument to new()
 	Added logdir() sanity checks
 	Improved blocking for directory traversal attacks
+	Fix auto_load calling unknown routine isFalse
 
 0.96	Mon Mar 17 08:11:48 EDT 2025
 	Use Log::Abstraction

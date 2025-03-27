@@ -83,7 +83,7 @@ subtest 'CGI::Info' => sub {
 			mock_env({
 		GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'GET',
-				QUERY_STRING  => 'name=John&age=30'
+				QUERY_STRING => 'name=John&age=30'
 			}, sub {
 				my $info = CGI::Info->new();
 				my $params = $info->params;
@@ -96,7 +96,7 @@ subtest 'CGI::Info' => sub {
 			mock_env({
 		GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'GET',
-				QUERY_STRING  => 'id=1%27%20OR%201=1--'
+				QUERY_STRING => 'id=1%27%20OR%201=1--'
 			}, sub {
 				my $info = CGI::Info->new(allow => { id => qr/^\d+$/ });
 				my $params = $info->params;
@@ -108,9 +108,9 @@ subtest 'CGI::Info' => sub {
 		subtest 'should handle multipart form uploads' => sub {
 			mock_env({
 		GATEWAY_INTERFACE => 'CGI/1.1',
-				REQUEST_METHOD  => 'POST',
+				REQUEST_METHOD => 'POST',
 				CONTENT_TYPE	=> 'multipart/form-data; boundary=----boundary',
-				CONTENT_LENGTH  => 1000
+				CONTENT_LENGTH => 1000
 			}, sub {
 				local *STDIN;
 				open STDIN, '<', \"------boundary\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\n\ncontent\n------boundary--";
@@ -152,7 +152,7 @@ subtest 'CGI::Info' => sub {
 			mock_env({
 		GATEWAY_INTERFACE => 'CGI/1.1',
 				REQUEST_METHOD => 'GET',
-				QUERY_STRING   => 'file=../../etc/passwd'
+				QUERY_STRING  => 'file=../../etc/passwd'
 			}, sub {
 				my $info = new_ok('CGI::Info');
 				my $params = $info->params();
@@ -171,9 +171,9 @@ subtest 'CGI::Info' => sub {
 
 		subtest 'should detect search engines' => sub {
 			mock_env({
-			REMOTE_ADDR => '66.249.65.32',
-			HTTP_USER_AGENT => 'Googlebot/2.1 (+http://www.google.com/bot.html)'
-		}, sub {
+				REMOTE_ADDR => '66.249.65.32',
+				HTTP_USER_AGENT => 'Googlebot/2.1 (+http://www.google.com/bot.html)'
+			}, sub {
 				my $info = new_ok('CGI::Info');
 				ok $info->is_search_engine, 'Googlebot detected as search engine';
 			});
@@ -182,12 +182,12 @@ subtest 'CGI::Info' => sub {
 
 	subtest 'Directory Methods' => sub {
 		subtest 'should find valid tmpdir' => sub {
-			my $info = CGI::Info->new();
+			my $info = new_ok('CGI::Info');
 			ok -d $info->tmpdir, 'tmpdir exists and is directory';
 		};
 
 		subtest 'should handle non-writable logdir' => sub {
-			my $info = CGI::Info->new();
+			my $info = new_ok('CGI::Info');
 			throws_ok { $info->logdir('/non/existent/path') } qr/Invalid logdir/, 'Handles invalid logdir';
 		};
 	};
@@ -201,6 +201,8 @@ subtest 'CGI::Info' => sub {
 			}, sub {
 				my $info = new_ok('CGI::Info');
 				is($info->test(), 'value', 'AUTOLOAD delegates to param');
+				$info = CGI::Info->new('auto_load' => 0);
+				throws_ok { $info->test() } qr/Unknown method/, 'auto_load can be disabled';
 			});
 		};
 	};

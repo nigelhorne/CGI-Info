@@ -1985,16 +1985,16 @@ sub AUTOLOAD
 
 	my $self = shift or return;
 
-	Carp::croak(__PACKAGE__, ": Unknown method $self") if(!ref($self));
-
-	# Allow the AUTOLOAD feature to be disabled
-	Carp::croak(__PACKAGE__, ": Unknown method $self") if(exists($self->{'auto_load'}) && $self->{'auto_load'}->isFalse());
-
 	# Extract the method name from the AUTOLOAD variable
 	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
 
 	# Skip if called on destruction
-	return if $method eq 'DESTROY';
+	return if($method eq 'DESTROY');
+
+	Carp::croak(__PACKAGE__, ": Unknown method $method") if(!ref($self));
+
+	# Allow the AUTOLOAD feature to be disabled
+	Carp::croak(__PACKAGE__, ": Unknown method $method") if(exists($self->{'auto_load'}) && boolean($self->{'auto_load'})->isFalse());
 
 	# Ensure the method is called on the correct package object
 	return unless ref($self) eq __PACKAGE__;
