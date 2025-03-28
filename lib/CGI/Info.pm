@@ -162,12 +162,12 @@ sub new
 	}
 
 	if(defined($args{'expect'})) {
-		if(ref($args{expect}) ne 'ARRAY') {
-			Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
-			return;
-		}
-		# warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak(__PACKAGE__, ': expect is deprecated, use allow instead');
+		# if(ref($args{expect}) ne 'ARRAY') {
+			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
+			# return;
+		# }
+		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		Carp::croak(__PACKAGE__, ': expect has been deprecated, use allow instead');
 	}
 
 	if(my $logger = $args{'logger'}) {

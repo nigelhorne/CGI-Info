@@ -54,8 +54,12 @@ subtest 'CGI::Info' => sub {
 			unlink $config_file;
 		};
 
-		subtest 'should reject non-ARRAY expect parameter' => sub {
-			throws_ok { CGI::Info->new(expect => {}) } qr/expect must be a reference/, 'Rejects non-array expect';
+		# Expect is deprecated
+		# subtest 'should reject non-ARRAY expect parameter' => sub {
+			# throws_ok { CGI::Info->new(expect => {}) } qr/expect must be a reference/, 'Rejects non-array expect';
+		# };
+		subtest 'expect has been deprecated' => sub {
+			throws_ok { CGI::Info->new(expect => {}) } qr/expect has been deprecated/, 'Rejects non-array expect';
 		};
 	};
 
