@@ -135,14 +135,12 @@ sub new
 	} else {
 		# If there is an odd number of arguments, treat it as an error
 		croak(__PACKAGE__, ': Invalid arguments passed to new()');
-		return;
 	}
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
 			# Using CGI::Info:new(), not CGI::Info->new()
 			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-			return;
 		}
 
 		# FIXME: this only works when no arguments are given
@@ -164,7 +162,6 @@ sub new
 	if(defined($args{'expect'})) {
 		# if(ref($args{expect}) ne 'ARRAY') {
 			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
-			# return;
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
 		Carp::croak(__PACKAGE__, ': expect has been deprecated, use allow instead');
@@ -1444,7 +1441,6 @@ sub logdir {
 		}
 		$self->_warn("Invalid logdir: $dir");
 		Carp::croak("Invalid logdir: $dir");
-		return;
 	}
 
 	foreach my $rc($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
@@ -1996,8 +1992,8 @@ sub AUTOLOAD
 	# Allow the AUTOLOAD feature to be disabled
 	Carp::croak(__PACKAGE__, ": Unknown method $method") if(exists($self->{'auto_load'}) && boolean($self->{'auto_load'})->isFalse());
 
-	# Ensure the method is called on the correct package object
-	return unless ref($self) eq __PACKAGE__;
+	# Ensure the method is called on the correct package object or a subclass
+	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
 
 	# Delegate to the param method
 	return $self->param($method);
