@@ -8,6 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
+use Config::Auto;
 use File::Spec;
 use Log::Abstraction;
 use Params::Get;
