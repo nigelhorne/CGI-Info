@@ -1907,7 +1907,7 @@ sub _log
 		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
 	# }
 
-	if(my $logger = $self->{'logger'}) {
+	if(scalar(@messages) && (my $logger = $self->{'logger'})) {
 		$self->{'logger'}->$level(join('', grep defined, @messages));
 	}
 }
