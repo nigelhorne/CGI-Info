@@ -45,7 +45,7 @@ subtest 'CGI::Info' => sub {
 		};
 
 		subtest 'should load config file if provided' => sub {
-			my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml');
+			my ($fh, $config_file) = tempfile(TEMPLATE => 'test_configXXXX', SUFFIX => '.yml', TMPDIR => 1);
 			print $fh "---\nmax_upload_size: 100\n";
 			close $fh;
 
