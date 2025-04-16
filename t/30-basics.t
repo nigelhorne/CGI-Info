@@ -124,8 +124,9 @@ subtest 'CGI::Info' => sub {
 				local *STDIN;
 				open STDIN, '<', \"------boundary\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\n\ncontent\n------boundary--";
 				my $info = CGI::Info->new(upload_dir => File::Spec->tmpdir());
-				my $params = $info->params;
-				like $params->{file}, qr/test\.txt/, 'File upload handled';
+				my $params = $info->params();
+				like($params->{file}, qr/test\.txt/, 'File upload handled');
+				unlink $params->{'file'}
 			});
 		};
 

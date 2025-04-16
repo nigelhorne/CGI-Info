@@ -80,6 +80,7 @@ subtest 'Upload Directory Validation' => sub {
 	my $params = $info->params();
 
 	ok($params->{file} =~ /test\.txt/, 'File uploaded to valid directory');
+	unlink $params->{'file'};
 };
 
 subtest 'Parameter Sanitization' => sub {
