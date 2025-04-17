@@ -574,6 +574,8 @@ sub params {
 	my $content_type = $ENV{'CONTENT_TYPE'};
 	my %FORM;
 
+	use IO::Interactive;
+
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
 		if(@ARGV) {
 			@pairs = @ARGV;
@@ -594,7 +596,7 @@ sub params {
 			}
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
-		} elsif(!$self->{args_read}) {
+		} elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
 			my $oldfh = select(STDOUT);
 			print "Entering debug mode\n",
 				"Enter key=value pairs - end with quit\n";
