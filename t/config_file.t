@@ -29,7 +29,7 @@ isa_ok($obj, 'CGI::Info');
 cmp_ok($obj->{'max_upload_size'}, '==', 2, 'read max_upload_size from config');
 
 subtest 'Environment test' => sub {
-	local $ENV{'CGI::Info_MAX_UPLOAD_SIZE'} = 3;
+	local $ENV{'CGI::Info::max_upload_size'} = 3;
 
 	$obj = CGI::Info->new(config_file => $config_file);
 
