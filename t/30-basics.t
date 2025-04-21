@@ -41,7 +41,7 @@ sub mock_env {
 subtest 'CGI::Info' => sub {
 	subtest 'Constructor (new)' => sub {
 		subtest 'should handle invalid parameters gracefully' => sub {
-		throws_ok { CGI::Info->new('invalid_param', 'value', 'another parm') } qr/Invalid arguments/, 'Dies on invalid args';
+			throws_ok { CGI::Info->new('invalid_param', 'value', 'another parm') } qr/^Usage/, 'Dies on invalid args';
 		};
 
 		subtest 'should load config file if provided' => sub {
