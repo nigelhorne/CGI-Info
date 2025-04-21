@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use File::Spec;
 use File::Temp qw/tempfile tempdir/;
 use YAML::XS qw/DumpFile/;
 
@@ -11,7 +12,7 @@ use_ok('CGI::Info');
 
 # Create a temp config file
 my $tempdir = tempdir(CLEANUP => 1);
-my $config_file = "$tempdir/config.yml";
+my $config_file = File::Spec->catdir($tempdir, 'config.yml');
 
 # Write a fake config
 my $class_name = 'CGI::Info';
