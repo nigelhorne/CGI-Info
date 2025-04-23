@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.99
+0.99	Wed Apr 23 07:55:03 EDT 2025
 	Don't try to read from the terminal when not interactive
 	Added t/config.t
 	Use Params::Get in new()
