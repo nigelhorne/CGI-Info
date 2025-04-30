@@ -150,7 +150,7 @@ sub new
 		if(!-r $params->{'config_file'}) {
 			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
-		if(my $config = Config::Abstraction->new(config_dirs => [''], config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+		if(my $config = Config::Abstraction->new(config_dirs => [''], config_file => $params->{'config_file'}, env_prefix => uc("${class}::"))) {
 			$config = $config->all();
 			if($config->{$class}) {
 				$config = $config->{$class};
