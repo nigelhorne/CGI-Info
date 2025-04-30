@@ -35,7 +35,13 @@ subtest 'Environment test' => sub {
 
 	ok($obj, 'Object was created successfully');
 	isa_ok($obj, 'CGI::Info');
-	cmp_ok($obj->{'max_upload_size'}, '==', 3, 'read max_upload_size from config');
+	if($^O eq 'MSWin32') {
+		# Debug
+		use Data::Dumper;
+		::diag(Data::Dumper->new([$obj])->Dump());
+		::diag(Data::Dumper->new([$ENV])->Dump());
+	}
+	cmp_ok($obj->{'max_upload_size'}, '==', 3, 'read max_upload_size from environment');
 };
 
 # Nonexistent config file is ignored
