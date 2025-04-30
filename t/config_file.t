@@ -39,7 +39,7 @@ subtest 'Environment test' => sub {
 		# Debug
 		use Data::Dumper;
 		::diag(Data::Dumper->new([$obj])->Dump());
-		::diag(Data::Dumper->new([$ENV])->Dump());
+		::diag(Data::Dumper->new([\%ENV])->Dump());
 	}
 	cmp_ok($obj->{'max_upload_size'}, '==', 3, 'read max_upload_size from environment');
 };
