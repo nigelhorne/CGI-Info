@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.100
+	Pave the way for the latest Config::Abstraction
+
 0.99	Wed Apr 23 07:55:03 EDT 2025
 	Don't try to read from the terminal when not interactive
 	Added t/config.t

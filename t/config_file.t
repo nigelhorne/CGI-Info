@@ -39,9 +39,9 @@ subtest 'Environment test' => sub {
 };
 
 # Nonexistent config file is ignored
-lives_ok {
+throws_ok {
 	CGI::Info->new(config_file => '/nonexistent/path/to/config.yml');
-} 'Does not throw error for nonexistent config file';
+} qr/File not readable/, 'Throws error for nonexistent config file';
 
 # Malformed config file (not a hashref)
 my ($badfh, $badfile) = tempfile();
@@ -50,7 +50,7 @@ close $badfh;
 
 throws_ok {
 	CGI::Info->new(config_file => $badfile);
-} qr/Can't locate object method|HASH/, 'Throws error if config is not a hashref';
+} qr/Can't load configuration from/, 'Throws error if config is not a hashref';
 
 # Config file exists but has no key for the class
 my $nofield_file = File::Spec->catdir($tempdir, 'nokey.yml');

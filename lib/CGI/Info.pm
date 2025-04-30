@@ -145,12 +145,20 @@ sub new
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($params->{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $params->{'config_file'}, env_prefix => "${class}::")->all())) {
+	if(exists($params->{'config_file'})) {
 		# my $config = YAML::XS::LoadFile($params->{'config_file'});
-		if($config->{$class}) {
-			$config = $config->{$class};
+		if(!-r $params->{'config_file'}) {
+			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
-		$params = { %{$config}, %{$params} };
+		if(my $config = Config::Abstraction->new(config_dirs => [''], config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+			$config = $config->all();
+			if($config->{$class}) {
+				$config = $config->{$class};
+			}
+			$params = { %{$config}, %{$params} };
+		} else {
+			croak("$class: Can't load configuration from ", $params->{'config_file'});
+		}
 	}
 
 	if(defined($params->{'expect'})) {
@@ -158,7 +166,7 @@ sub new
 			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak(__PACKAGE__, ': expect has been deprecated, use allow instead');
+		Carp::croak("$class: expect has been deprecated, use allow instead");
 	}
 
 	if(my $logger = $params->{'logger'}) {
