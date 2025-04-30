@@ -214,6 +214,10 @@ sub script_name
 sub _find_paths {
 	my $self = shift;
 
+	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
+		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
+	}
+
 	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
 	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
