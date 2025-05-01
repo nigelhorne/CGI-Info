@@ -134,7 +134,7 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my $params = Params::Get::get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, @_) || {};
 
 	if(!defined($class)) {
 		if((scalar keys %{$params}) > 0) {
@@ -146,10 +146,7 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		if($params) {
-			return bless { %{$class}, %{$params} }, ref($class);
-		}
-		return bless $class, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	# Load the configuration from a config file, if provided
