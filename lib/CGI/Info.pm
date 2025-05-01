@@ -97,6 +97,14 @@ The file can be in any common format,
 including C<YAML>, C<XML>, and C<INI>.
 This allows the parameters to be set at run time.
 
+On non-Windows system,
+the class can be configured using environment variables starting with "CGI::Info::".
+For example:
+
+  export CGI::Info::max_upload_size=65536
+
+It doesn't work on windows because of the case-insensitive nature of that system.
+
 =item * C<syslog>
 
 Takes an optional parameter syslog, to log messages to
