@@ -80,7 +80,7 @@ It takes other optional parameters:
 
         export CGI::Info::max_upload_size=65536
 
-    It doesn't work on windows because of the case-insensitive nature of that system.
+    It doesn't work on Windows because of the case-insensitive nature of that system.
 
 - `syslog`
 
