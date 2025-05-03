@@ -105,6 +105,12 @@ For example:
 
 It doesn't work on Windows because of the case-insensitive nature of that system.
 
+If the configuration file has a section called C<CGI::Info>,
+only that section,
+and the C<global> section,
+if any exists,
+is used.
+
 =item * C<syslog>
 
 Takes an optional parameter syslog, to log messages to
@@ -157,6 +163,10 @@ sub new
 		}
 		if(my $config = Config::Abstraction->new(config_dirs => [''], config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
 			$config = $config->all();
+			if($config->{'global'}) {
+				$params = { %{$config->{'global'}}, %{$params} };
+				delete $config->{'global'};
+			}
 			if($config->{$class}) {
 				$config = $config->{$class};
 			}

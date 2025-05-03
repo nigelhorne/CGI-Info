@@ -64,4 +64,13 @@ $obj = CGI::Info->new(config_file => $nofield_file);
 ok($obj, 'Object created with config that lacks class key');
 cmp_ok($obj->{'max_upload_size'}, '==', 512 * 1024, 'Falls back to default if class key missing');
 
+# The global section is read
+my $global_file = File::Spec->catdir($tempdir, 'global.yml');
+DumpFile($global_file, {
+	global => { max_upload_size => 4 }
+});
+$obj = CGI::Info->new(config_file => $global_file);
+ok($obj, 'Object created with config that includes a global section');
+cmp_ok($obj->{'max_upload_size'}, '==', 4, 'The global section is used');
+
 done_testing();

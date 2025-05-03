@@ -82,6 +82,12 @@ It takes other optional parameters:
 
     It doesn't work on Windows because of the case-insensitive nature of that system.
 
+    If the configuration file has a section called `CGI::Info`,
+    only that section,
+    and the `global` section,
+    if any exists,
+    is used.
+
 - `syslog`
 
     Takes an optional parameter syslog, to log messages to
