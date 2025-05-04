@@ -33,11 +33,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.99
+Version 0.100
 
 =cut
 
-our $VERSION = '0.99';
+our $VERSION = '0.100';
 
 =head1 SYNOPSIS
 
