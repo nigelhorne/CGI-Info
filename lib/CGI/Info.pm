@@ -90,6 +90,10 @@ It takes other optional parameters:
 Enable/disable the AUTOLOAD feature.
 The default is to have it enabled.
 
+=item * C<config_dirs>
+
+Where to look for C<config_file>
+
 =item * C<config_file>
 
 Points to a configuration file which contains the parameters to C<new()>.
@@ -158,10 +162,10 @@ sub new
 	# Load the configuration from a config file, if provided
 	if(exists($params->{'config_file'})) {
 		# my $config = YAML::XS::LoadFile($params->{'config_file'});
-		if(!-r $params->{'config_file'}) {
+		if((!exists $params->{'config_dirs'}) && (!-r $params->{'config_file'})) {
 			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
-		if(my $config = Config::Abstraction->new(config_dirs => [''], config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+		if(my $config = Config::Abstraction->new(config_dirs => $params->{'config_dirs'} || [''], config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
 			$config = $config->all();
 			if($config->{'global'}) {
 				$params = { %{$config->{'global'}}, %{$params} };

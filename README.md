@@ -67,6 +67,10 @@ It takes other optional parameters:
     Enable/disable the AUTOLOAD feature.
     The default is to have it enabled.
 
+- `config_dirs`
+
+    Where to look for `config_file`
+
 - `config_file`
 
     Points to a configuration file which contains the parameters to `new()`.

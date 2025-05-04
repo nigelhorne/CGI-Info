@@ -73,4 +73,12 @@ $obj = CGI::Info->new(config_file => $global_file);
 ok($obj, 'Object created with config that includes a global section');
 cmp_ok($obj->{'max_upload_size'}, '==', 4, 'The global section is used');
 
+# config_dirs is honoured
+DumpFile($global_file, {
+	global => { max_upload_size => 5 }
+});
+$obj = CGI::Info->new(config_dirs => [$tempdir], config_file => 'global.yml');
+ok($obj, 'Object created with config that includes a global section');
+cmp_ok($obj->{'max_upload_size'}, '==', 5, 'The global section is used');
+
 done_testing();
