@@ -49,7 +49,6 @@ ALLOWED: {
 	ok($i->as_string() eq '');
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval { $i->param('fred') };
-	diag($@);
 	ok($@ =~ /fred isn't in the allow list at/);
 
 	$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma';
