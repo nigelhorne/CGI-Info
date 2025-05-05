@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.101
+	Try hard to find the config files - should be in Config::Abstraction
+
 0.100	Sat May  3 21:16:56 EDT 2025
 	Pave the way for the latest Config::Abstraction
 

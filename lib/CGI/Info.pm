@@ -165,7 +165,24 @@ sub new
 		if((!exists $params->{'config_dirs'}) && (!-r $params->{'config_file'})) {
 			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
-		if(my $config = Config::Abstraction->new(config_dirs => $params->{'config_dirs'} || [''], config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+		# Try hard to find the config files
+		# TODO: put this code into Config::Abstraction
+		my $config_dirs = $params->{'config_dirs'};
+		if(!$config_dirs) {
+			if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
+				$config_dirs = [''];
+			} else {
+				my $dir = File::Spec->catdir($ENV{'HOME'}, '.conf');
+				if(-d $dir) {
+					$config_dirs = [$dir];
+				} else {
+					# TODO: Apache dirs, /etc, /usr/local/etc, etc
+					$config_dirs = [''];
+				}
+			}
+		}
+
+		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
 			$config = $config->all();
 			if($config->{'global'}) {
 				$params = { %{$config->{'global'}}, %{$params} };
