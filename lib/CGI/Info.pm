@@ -195,6 +195,17 @@ sub new
 		} else {
 			croak("$class: Can't load configuration from ", $params->{'config_file'});
 		}
+	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
+		# Try default locations
+		$config = $config->all();
+		if($config->{'global'}) {
+			$params = { %{$config->{'global'}}, %{$params} };
+			delete $config->{'global'};
+		}
+		if($config->{$class}) {
+			$config = $config->{$class};
+		}
+		$params = { %{$config}, %{$params} };
 	}
 
 	if(defined($params->{'expect'})) {
