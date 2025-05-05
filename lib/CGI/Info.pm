@@ -166,7 +166,7 @@ sub new
 			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
 		# Try hard to find the config files
-		# TODO: put this code into Config::Abstraction
+		# TODO: Config::Abstraction 0.17 has this built in
 		my $config_dirs = $params->{'config_dirs'};
 		if(!$config_dirs) {
 			if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
