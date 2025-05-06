@@ -55,7 +55,7 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'boolean' => 0,
 		'Carp' => 0,
-		'Config::Abstraction' => 0,
+		'Config::Abstraction' => 0.17,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'File::Spec' => 3.4,
 		'Log::Abstraction' => 0.05,

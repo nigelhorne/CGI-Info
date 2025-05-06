@@ -8,7 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
-use Config::Abstraction;
+use Config::Abstraction 0.17;
 use File::Spec;
 use Log::Abstraction;
 use Params::Get;
@@ -26,6 +26,7 @@ use Sys::Path;
 use namespace::clean;
 
 sub _sanitise_input($);
+sub _merge_config($$$);
 
 =head1 NAME
 
@@ -162,50 +163,18 @@ sub new
 	# Load the configuration from a config file, if provided
 	if(exists($params->{'config_file'})) {
 		# my $config = YAML::XS::LoadFile($params->{'config_file'});
-		if((!exists $params->{'config_dirs'}) && (!-r $params->{'config_file'})) {
-			croak("$class: ", $params->{'config_file'}, ': File not readable');
-		}
-		# Try hard to find the config files
-		# TODO: Config::Abstraction 0.17 has this built in
 		my $config_dirs = $params->{'config_dirs'};
-		if(!$config_dirs) {
-			if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
-				$config_dirs = [''];
-			} else {
-				my $dir = File::Spec->catdir($ENV{'HOME'}, '.conf');
-				if(-d $dir) {
-					$config_dirs = [$dir];
-				} else {
-					# TODO: Apache dirs, /etc, /usr/local/etc, etc
-					$config_dirs = [''];
-				}
-			}
+		if((!$config_dirs) && (!-r $params->{'config_file'})) {
+			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
 
 		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
-			$config = $config->all();
-			if($config->{'global'}) {
-				$params = { %{$config->{'global'}}, %{$params} };
-				delete $config->{'global'};
-			}
-			if($config->{$class}) {
-				$config = $config->{$class};
-			}
-			$params = { %{$config}, %{$params} };
+			$params = _merge_config($config, $params, $class);
 		} else {
 			croak("$class: Can't load configuration from ", $params->{'config_file'});
 		}
 	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
-		# Try default locations
-		$config = $config->all();
-		if($config->{'global'}) {
-			$params = { %{$config->{'global'}}, %{$params} };
-			delete $config->{'global'};
-		}
-		if($config->{$class}) {
-			$config = $config->{$class};
-		}
-		$params = { %{$config}, %{$params} };
+		$params = _merge_config($config, $params, $class);
 	}
 
 	if(defined($params->{'expect'})) {
@@ -1993,6 +1962,22 @@ sub _warn {
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('warn', $params->{'warning'});
+}
+
+# Merge configuration hash into the given hash
+sub _merge_config($$$)
+{
+	my($config, $params, $section) = @_;
+
+	$config = $config->all();
+	if($config->{'global'}) {
+		$params = { %{$config->{'global'}}, %{$params} };
+		delete $config->{'global'};
+	}
+	if($config->{$section}) {
+		$config = $config->{$section};
+	}
+	return { %{$config}, %{$params} };
 }
 
 # Ensure all environment variables are sanitized and validated before use.
