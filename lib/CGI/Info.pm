@@ -8,7 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
-use Config::Abstraction 0.17;
+use Config::Abstraction 0.19;
 use File::Spec;
 use Log::Abstraction;
 use Params::Get;
@@ -168,12 +168,12 @@ sub new
 			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
 
-		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+		if(my $config = Config::Abstraction->new(data => $params, config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
 			$params = _merge_config($config, $params, $class);
 		} else {
 			croak("$class: Can't load configuration from ", $params->{'config_file'});
 		}
-	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
+	} elsif(my $config = Config::Abstraction->new(data => $params, env_prefix => "${class}::")) {
 		$params = _merge_config($config, $params, $class);
 	}
 
