@@ -1971,13 +1971,13 @@ sub _merge_config($$$)
 
 	$config = $config->all();
 	if($config->{'global'}) {
-		$params = { %{$config->{'global'}}, %{$params} };
+		$params = { %{$params}, %{$config->{'global'}} };
 		delete $config->{'global'};
 	}
 	if($config->{$section}) {
 		$config = $config->{$section};
 	}
-	return { %{$config}, %{$params} };
+	return { %{$params}, %{$config} };
 }
 
 # Ensure all environment variables are sanitized and validated before use.
