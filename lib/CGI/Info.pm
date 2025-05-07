@@ -8,7 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
-use Config::Abstraction 0.19;
+use Config::Abstraction 0.20;
 use File::Spec;
 use Log::Abstraction;
 use Params::Get;
@@ -26,7 +26,6 @@ use Sys::Path;
 use namespace::clean;
 
 sub _sanitise_input($);
-sub _merge_config($$$);
 
 =head1 NAME
 
@@ -168,13 +167,13 @@ sub new
 			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
 
-		if(my $config = Config::Abstraction->new(data => $params, config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
-			$params = _merge_config($config, $params, $class);
+		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+			$params = $config->merge_defaults(defaults => $params, section => $class);
 		} else {
 			croak("$class: Can't load configuration from ", $params->{'config_file'});
 		}
-	} elsif(my $config = Config::Abstraction->new(data => $params, env_prefix => "${class}::")) {
-		$params = _merge_config($config, $params, $class);
+	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
+		$params = $config->merge_defaults(defaults => $params, section => $class);
 	}
 
 	if(defined($params->{'expect'})) {
@@ -186,8 +185,10 @@ sub new
 	}
 
 	if(my $logger = $params->{'logger'}) {
-		if(!Scalar::Util::blessed($logger)) {
-			$params->{'logger'} = Log::Abstraction->new($logger);
+		if((ref($logger) eq 'HASH') && $logger->{'syslog'}) {
+			$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1, syslog => $logger->{'syslog'});
+		} else {
+			$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1, logger => $logger);
 		}
 	} else {
 		$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1);
@@ -1962,22 +1963,6 @@ sub _warn {
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('warn', $params->{'warning'});
-}
-
-# Merge configuration hash into the given hash
-sub _merge_config($$$)
-{
-	my($config, $params, $section) = @_;
-
-	$config = $config->all();
-	if($config->{'global'}) {
-		$params = { %{$params}, %{$config->{'global'}} };
-		delete $config->{'global'};
-	}
-	if($config->{$section}) {
-		$config = $config->{$section};
-	}
-	return { %{$params}, %{$config} };
 }
 
 # Ensure all environment variables are sanitized and validated before use.
