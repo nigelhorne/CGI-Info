@@ -10,7 +10,7 @@ use boolean;
 use Carp;
 use Config::Abstraction 0.20;
 use File::Spec;
-use Log::Abstraction;
+use Log::Abstraction 0.10;
 use Params::Get;
 use Params::Validate::Strict;
 use Scalar::Util;
@@ -176,14 +176,7 @@ sub new
 		$params = $config->merge_defaults(defaults => $params, section => $class);
 	}
 
-	if(defined($params->{'expect'})) {
-		# if(ref($params->{expect}) ne 'ARRAY') {
-			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
-		# }
-		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak("$class: expect has been deprecated, use allow instead");
-	}
-
+	# Load the default logger, which may have been defined in the config file or passed in
 	if(my $logger = $params->{'logger'}) {
 		if((ref($logger) eq 'HASH') && $logger->{'syslog'}) {
 			$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1, syslog => $logger->{'syslog'});
@@ -192,6 +185,14 @@ sub new
 		}
 	} else {
 		$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1);
+	}
+
+	if(defined($params->{'expect'})) {
+		# if(ref($params->{expect}) ne 'ARRAY') {
+			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
+		# }
+		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		Carp::croak("$class: expect has been deprecated, use allow instead");
 	}
 
 	# Return the blessed object
