@@ -190,7 +190,7 @@ sub new
 			$params->{'logger'} = Log::Abstraction->new($logger);
 		}
 	} else {
-		$params->{'logger'} = Log::Abstraction->new();
+		$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1);
 	}
 
 	# Return the blessed object
