@@ -8,6 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
+use Class::Debug 0.02;
 use Config::Abstraction 0.20;
 use File::Spec;
 use Log::Abstraction 0.10;
@@ -160,32 +161,7 @@ sub new
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($params->{'config_file'})) {
-		# my $config = YAML::XS::LoadFile($params->{'config_file'});
-		my $config_dirs = $params->{'config_dirs'};
-		if((!$config_dirs) && (!-r $params->{'config_file'})) {
-			croak("$class: ", $params->{'config_file'}, ': File not readable');
-		}
-
-		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
-			$params = $config->merge_defaults(defaults => $params, section => $class);
-		} else {
-			croak("$class: Can't load configuration from ", $params->{'config_file'});
-		}
-	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
-		$params = $config->merge_defaults(defaults => $params, section => $class);
-	}
-
-	# Load the default logger, which may have been defined in the config file or passed in
-	if(my $logger = $params->{'logger'}) {
-		if((ref($logger) eq 'HASH') && $logger->{'syslog'}) {
-			$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1, syslog => $logger->{'syslog'});
-		} else {
-			$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1, logger => $logger);
-		}
-	} else {
-		$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1);
-	}
+	$params = Class::Debug::setup($class, $params);
 
 	if(defined($params->{'expect'})) {
 		# if(ref($params->{expect}) ne 'ARRAY') {
