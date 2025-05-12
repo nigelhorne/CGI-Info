@@ -33,7 +33,7 @@ jobs:
           git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git
           cd $GITHUB_WORKSPACE
           cpanm -iqn File::Spec ExtUtils::MakeMaker
-          cpanm -iqn Test::DescribeMe XML::PP Config::Abstraction boolean
+          cpanm -iqn Test::DescribeMe XML::PP Config::Abstraction boolean Class::Debug
           cpanm -iqn --installdeps .
       - name: Make module
         env:
