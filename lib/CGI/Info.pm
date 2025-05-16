@@ -1,7 +1,7 @@
 package CGI::Info;
 
 # TODO: remove the expect argument
-# TODO:	look into params::check or params::validate and/or giving a subroutine for the allow parameter to params()
+# TODO:	look into params::check or params::validate
 
 use warnings;
 use strict;
@@ -34,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 =head1 SYNOPSIS
 
@@ -572,7 +572,7 @@ Basic usage:
         allow => {
             # Simple value check
             even_number => sub { ($_[1] % 2) == 0 },
- 
+
             # Context-aware validation
             child_age => sub {
                 my ($key, $value, $info) = @_;
