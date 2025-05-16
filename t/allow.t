@@ -4,97 +4,93 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Test::Most tests => 38;
+use Test::Most tests => 42;
 use Test::NoWarnings;
 
-BEGIN {
-	use_ok('CGI::Info');
-}
+BEGIN { use_ok('CGI::Info') }
 
-ALLOWED: {
-	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
-	$ENV{'REQUEST_METHOD'} = 'GET';
+$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+$ENV{'REQUEST_METHOD'} = 'GET';
 
-	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
-	my %allowed = ('fred' => undef);
-	my $i = new_ok('CGI::Info');
-	my %p = %{$i->params({allow => \%allowed})};
-	ok(!exists($p{foo}));
-	cmp_ok($p{fred}, 'eq', 'wilma', 'check valid param');
-	ok($i->as_string() eq 'fred=wilma');
+$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
+my %allowed = ('fred' => undef);
+my $i = new_ok('CGI::Info');
+my %p = %{$i->params({allow => \%allowed})};
+ok(!exists($p{foo}));
+cmp_ok($p{fred}, 'eq', 'wilma', 'check valid param');
+ok($i->as_string() eq 'fred=wilma');
 
-	$ENV{'QUERY_STRING'} = 'barney=betty&fred=wilma';
-	%allowed = ('fred' => 'barney', 'wilma' => 'betty');
-	$i = new_ok('CGI::Info');
-	is($i->params({allow => \%allowed}), undef, 'Check when different parameter is given');
-	cmp_ok($i->as_string(), 'eq', '', 'no valid args gives empty as_string()');
+$ENV{'QUERY_STRING'} = 'barney=betty&fred=wilma';
+%allowed = ('fred' => 'barney', 'wilma' => 'betty');
+$i = new_ok('CGI::Info');
+is($i->params({allow => \%allowed}), undef, 'Check when different parameter is given');
+cmp_ok($i->as_string(), 'eq', '', 'no valid args gives empty as_string()');
 
-	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=baz';
-	%allowed = ('foo' => undef);
-	$i = new_ok('CGI::Info' => [
-		allow => \%allowed
-	]);
-	%p = %{$i->params()};
-	ok($p{foo} eq 'bar,baz');
-	ok(!exists($p{fred}));
-	ok($i->as_string() eq 'foo=bar,baz');
+$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=baz';
+%allowed = ('foo' => undef);
+$i = new_ok('CGI::Info' => [
+	allow => \%allowed
+]);
+%p = %{$i->params()};
+ok($p{foo} eq 'bar,baz');
+ok(!exists($p{fred}));
+ok($i->as_string() eq 'foo=bar,baz');
 
-	# Reading twice should yield the same result
-	%p = %{$i->params()};
-	ok($p{foo} eq 'bar,baz');
+# Reading twice should yield the same result
+%p = %{$i->params()};
+ok($p{foo} eq 'bar,baz');
 
-	%allowed = ('foo' => qr(\d+));
-	$i = new_ok('CGI::Info' => [
-		allow => \%allowed,
-		# logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
-	]);
-	ok(!defined($i->params()));
-	ok($i->as_string() eq '');
-	local $SIG{__WARN__} = sub { die $_[0] };
-	eval { $i->param('fred') };
-	diag($@);
-	ok($@ =~ /fred isn't in the allow list at/);
+%allowed = ('foo' => qr(\d+));
+$i = new_ok('CGI::Info' => [
+	allow => \%allowed,
+	# logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
+]);
+ok(!defined($i->params()));
+ok($i->as_string() eq '');
+local $SIG{__WARN__} = sub { die $_[0] };
+eval { $i->param('fred') };
+diag($@);
+ok($@ =~ /fred isn't in the allow list at/);
 
-	$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma';
+$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma';
 
-	$i = new_ok('CGI::Info' => [
-		allow => \%allowed,
-		logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
-	]);
-	%p = %{$i->params()};
-	ok($p{foo} eq '123');
-	ok(!exists($p{fred}));
-	ok($i->param('foo') eq '123');
-	eval { $i->param('fred') };
-	ok($@ =~ /fred isn't in the allow list at/);
-	ok($i->as_string() eq 'foo=123');
+$i = new_ok('CGI::Info' => [
+	allow => \%allowed,
+	logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
+]);
+%p = %{$i->params()};
+ok($p{foo} eq '123');
+ok(!exists($p{fred}));
+ok($i->param('foo') eq '123');
+eval { $i->param('fred') };
+ok($@ =~ /fred isn't in the allow list at/);
+ok($i->as_string() eq 'foo=123');
 
-	#---------------------
-	# What if the allowed parameters become more restrictive, that can
-	#	happen when a client did a peek then sets the allowed
+#---------------------
+# What if the allowed parameters become more restrictive, that can
+#	happen when a client did a peek then sets the allowed
 
-	$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma&admin=1';
-	$i = new_ok('CGI::Info');
-	$i->set_logger(sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} });
-	ok($i->param('fred') eq 'wilma');
-	ok($i->param('admin') == 1);
-	%p = %{$i->params(allow => \%allowed)};
-	ok($p{foo} eq '123');
-	ok(!exists($p{fred}));
-	ok(!exists($p{'admin'}));
-	eval { $i->param('admin') };
-	ok($@ =~ /admin isn't in the allow list at/);
-	ok($i->param('foo') eq '123');
-	eval { $i->param('fred') };
-	ok($@ =~ /fred isn't in the allow list at/);
-	ok($i->as_string() eq 'foo=123');
+$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma&admin=1';
+$i = new_ok('CGI::Info');
+$i->set_logger(sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} });
+ok($i->param('fred') eq 'wilma');
+ok($i->param('admin') == 1);
+%p = %{$i->params(allow => \%allowed)};
+ok($p{foo} eq '123');
+ok(!exists($p{fred}));
+ok(!exists($p{'admin'}));
+eval { $i->param('admin') };
+ok($@ =~ /admin isn't in the allow list at/);
+ok($i->param('foo') eq '123');
+eval { $i->param('fred') };
+ok($@ =~ /fred isn't in the allow list at/);
+ok($i->as_string() eq 'foo=123');
 
-	%allowed = ('foo' => qr([a-z]+));
-	$i = new_ok('CGI::Info' => [
-		allow => \%allowed
-	]);
-	ok(!defined($i->params()));
-}
+%allowed = ('foo' => qr([a-z]+));
+$i = new_ok('CGI::Info' => [
+	allow => \%allowed
+]);
+ok(!defined($i->params()));
 
 subtest 'Allowed Parameters Regex' => sub {
 	local %ENV = (
@@ -218,3 +214,85 @@ subtest 'Allow Parameters Rules' => sub {
 	);
 	ok(scalar(@messages) > 0);
 };
+
+{
+	# Setup CGI environment
+	local %ENV = (
+		'GATEWAY_INTERFACE' => 'CGI/1.1',
+		'REQUEST_METHOD' => 'GET',
+		'QUERY_STRING' => 'name=John&age=25&id=123&score=85'
+	);
+
+	sub custom_age_check {
+		my ($key, $value) = @_;
+		return $value =~ /^\d+$/ && $value >= 18 && $value <= 120;
+	}
+
+	sub complex_id_validation {
+		my ($value, $cgi_info) = @_;	# Demonstrate access to CGI::Info instance
+		return $value =~ /^\d+$/ && $cgi_info->param('age') > 20;
+	}
+
+	# Test cases
+	subtest 'Basic subroutine validation' => sub {
+		my $info = CGI::Info->new(
+			allow => {
+				name => sub { length($_[1]) > 2 },	# Anonymous subroutine
+				age => \&custom_age_check,	# Reference to named sub
+				id => qr/^\d+$/,	# Mixed with regex validation
+			}
+		);
+
+		my $params = $info->params();
+
+		is($params->{name}, 'John', 'Name passed validation');
+		is($params->{age}, 25, 'Valid age accepted');
+		is($params->{id}, 123, 'ID passed regex validation');
+		ok(!exists $params->{score}, 'Unallowed parameter filtered out');
+	};
+
+	subtest 'Subroutine with CGI::Info instance access' => sub {
+		my $info = CGI::Info->new(
+			allow => {
+				id => sub { complex_id_validation($_[1], $_[2]) },
+				age => \&custom_age_check,
+			}
+		);
+
+		my $params = $info->params();
+
+		is($params->{id}, 123, 'ID validated with instance access');
+		is($params->{age}, 25, 'Age validated normally');
+	};
+
+	subtest 'Failed validations' => sub {
+		local $ENV{QUERY_STRING} = 'name=Jo&age=170&id=abc';
+
+		my $info = CGI::Info->new(
+			allow => {
+				name => sub { length($_[1]) > 2 },
+				age => \&custom_age_check,
+				id => qr/^\d+$/,
+			}
+		);
+
+		my $params = $info->params();
+
+		ok(!exists $params->{name}, 'Short name rejected');
+		ok(!exists $params->{age}, 'Age over 120 rejected');
+		ok(!exists $params->{id}, 'Non-numeric ID rejected');
+	};
+
+	subtest 'Error handling' => sub {
+		local $ENV{QUERY_STRING} = 'test=bad';
+
+		my $info = CGI::Info->new(
+			allow => {
+				test => sub { die 'Validation error' }	# Force die
+			}
+		);
+
+		eval { $info->params() };
+		like($@, qr/Validation error/, 'Subroutine exceptions propagate correctly');
+	};
+}

@@ -5,6 +5,7 @@ Revision history for CGI-Info
 	Don't use notice() since Log::Log4perl doesn't understand it
 	Added the cache() method
 	Work around "(in cleanup) Failed to get MD5_CTX pointer" issue
+	Enhanced allow parameter with subroutine support
 
 0.102	Thu May  8 21:39:31 EDT 2025
 	Use Class::Debug

@@ -468,11 +468,14 @@ Allow is a reference to a hash list of CGI parameters that you will allow.
 The value for each entry is either a permitted value,
 a regular expression of permitted values for
 the key,
+a code reference,
 or a hash of L<Params::Validate::Strict> rules.
-
+Subroutine exceptions propagate normally, allowing custom error handling.
+This works alongside existing regex and Params::Validate::Strict patterns.
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
+
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
@@ -547,6 +550,50 @@ mustleak and directory traversals,
 thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layers.
 
+=head3 Validation Subroutine Support
+
+The C<allow> parameter accepts subroutine references for dynamic validation,
+enabling complex parameter checks beyond static regex patterns.
+These callbacks:
+
+=over 4
+
+=item * Receive three arguments: the parameter key, value and the C<CGI::Info> instance
+
+=item * Must return a true value to allow the parameter, false to reject
+
+=item * Can access other parameters through the instance for contextual validation
+
+=back
+
+Basic usage:
+
+    CGI::Info->new(
+        allow => {
+            # Simple value check
+            even_number => sub { ($_[1] % 2) == 0 },
+ 
+            # Context-aware validation
+            child_age => sub {
+                my ($key, $value, $info) = @_;
+                $info->param('is_parent') ? $value <= 18 : 0
+            }
+        }
+    );
+
+Advanced features:
+
+    # Combine with regex validation
+    mixed_validation => {
+        email => qr/@/,  # Regex check
+        promo_code => \&validate_promo_code  # Subroutine check
+    }
+
+    # Throw custom exceptions
+    dangerous_param => sub {
+        die 'Hacking attempt!' if $_[1] =~ /DROP TABLE/;
+        return 1;
+    }
 =cut
 
 sub params {
@@ -837,6 +884,11 @@ sub params {
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
+				} elsif(ref($schema) eq 'CODE') {
+					unless($schema->($key, $value, $self)) {
+						$self->_info("Block $key = $value");
+						next;
+					}
 				} else {
 					# Set of rules
 					eval {
@@ -978,10 +1030,21 @@ sub param {
 		return;
 	}
 
-	if(defined($self->params())) {
-		return $self->params()->{$field};
+	# Prevent deep recursion which can happen when a validation routine calls param()
+	my $allow;
+	if($self->{in_param} && $self->{allow}) {
+		$allow = delete $self->{allow};
 	}
-	return;
+	$self->{in_param} = 1;
+
+	my $params = $self->params();
+
+	$self->{in_param} = 0;
+	$self->{allow} = $allow if($allow);
+
+	if($params) {
+		return $params->{$field};
+	}
 }
 
 sub _sanitise_input($) {
