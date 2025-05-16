@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+
+use Data::Dumper;
 use Test::Most tests => 38;
 use Test::NoWarnings;
 
@@ -101,7 +103,8 @@ subtest 'Allowed Parameters Regex' => sub {
 		QUERY_STRING => 'allowed_param=123&disallowed_param=evil',
 	);
 
-	my $info = CGI::Info->new(allow => { allowed_param => qr/^\d{3}$/ });
+	my @messages;
+	my $info = CGI::Info->new(allow => { allowed_param => qr/^\d{3}$/ }, logger => \@messages);
 	my $params = $info->params();
 
 	is_deeply(
@@ -110,6 +113,7 @@ subtest 'Allowed Parameters Regex' => sub {
 		'Only allowed parameters are present'
 	);
 	cmp_ok($info->status(), '==', 422, 'Status is not OK when disallowed params are used');
+	ok(scalar(@messages) > 0);
 };
 
 subtest 'Allow Parameters Rules' => sub {
@@ -127,7 +131,8 @@ subtest 'Allow Parameters Rules' => sub {
 		ip_address => { type => 'string', matches => qr/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/ },	# Basic IPv4 validation
 	};
 
-	my $info = CGI::Info->new(allow => $allowed);
+	my @messages;
+	my $info = CGI::Info->new(allow => $allowed, logger => \@messages);
 	my $params = $info->params();
 	diag(Data::Dumper->new([$params])->Dump()) if($ENV{'TEST_VERBOSE'});
 
@@ -144,7 +149,7 @@ subtest 'Allow Parameters Rules' => sub {
 	);
 
 	local $ENV{'QUERY_STRING'} = 'username=te&email=test@example.com&age=300&bio=a+test+bio&ip_address=192.168.1.1';
-	$info = new_ok('CGI::Info');
+	$info = CGI::Info->new(logger => \@messages);
 	$params = $info->params(allow => $allowed);
 	is_deeply(
 		$params,
@@ -157,7 +162,7 @@ subtest 'Allow Parameters Rules' => sub {
 	);
 
 	local $ENV{'QUERY_STRING'} = 'username=' . 'x' x 51 . '&email=test@example.com&age=30&bio=a+test+bio&ip_address=192.168.1.1';
-	$info = CGI::Info->new();
+	$info = CGI::Info->new(logger => \@messages);
 	$params = $info->params(allow => $allowed);
 	is_deeply(
 		$params,
@@ -171,7 +176,7 @@ subtest 'Allow Parameters Rules' => sub {
 	);
 
 	local $ENV{'QUERY_STRING'} = 'username=test_user&email=test@example&age=30&bio=a+test+bio&ip_address=192.168.1.1';
-	$info = CGI::Info->new();
+	$info = CGI::Info->new(logger => \@messages);
 	$params = $info->params({ allow => $allowed });
 	is_deeply(
 		$params,
@@ -185,7 +190,7 @@ subtest 'Allow Parameters Rules' => sub {
 	);
 
 	local $ENV{'QUERY_STRING'} = 'username=test_user&email=test@example.com&age=-1&bio=a+test+bio&ip_address=192.168.1.1';
-	$info = CGI::Info->new();
+	$info = CGI::Info->new(logger => \@messages);
 	$params = $info->params({ allow => $allowed });
 	is_deeply(
 		$params,
@@ -199,7 +204,7 @@ subtest 'Allow Parameters Rules' => sub {
 	);
 
 	local $ENV{'QUERY_STRING'} = 'username=test_user&email=test@example.com&age=150&bio=a+test+bio&ip_address=192.168.1.';
-	$info = CGI::Info->new();
+	$info = CGI::Info->new(logger => \@messages);
 	$params = $info->params({ allow => $allowed });
 	is_deeply(
 		$params,
@@ -211,4 +216,5 @@ subtest 'Allow Parameters Rules' => sub {
 		},
 		'string regex rule works',
 	);
+	ok(scalar(@messages) > 0);
 };

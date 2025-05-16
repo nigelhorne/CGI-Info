@@ -482,6 +482,10 @@ Returns the messages that the object has generated as a ref to an array of hashe
 
 Returns the messages of that the object has generated as a string.
 
+## cache
+
+Get/set the internal cache system
+
 ## set\_logger
 
 Sets the class, array, code reference, or file that will be used for logging.

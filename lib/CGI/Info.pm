@@ -808,7 +808,7 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				$self->_notice("Discard unallowed argument '$key'");
+				$self->_info("Discard unallowed argument '$key'");
 				$self->status(422);
 				next;	# Skip to the next parameter
 			}
@@ -818,14 +818,14 @@ sub params {
 				if(!ref($schema)) {
 					# Can only contain one value
 					if($value ne $schema) {
-						$self->_notice("Block $key = $value");
+						$self->_info("Block $key = $value");
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
 				} elsif(ref($schema) eq 'Regexp') {
 					if($value !~ $schema) {
 						# Simple regex
-						$self->_notice("Block $key = $value");
+						$self->_info("Block $key = $value");
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
@@ -839,7 +839,7 @@ sub params {
 						});
 					};
 					if($@) {
-						$self->_notice("Block $key = $value: $@");
+						$self->_info("Block $key = $value: $@");
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
@@ -1870,6 +1870,23 @@ sub messages_as_string
 	return '';
 }
 
+=head2 cache
+
+Get/set the internal cache system
+
+=cut
+
+sub cache
+{
+	my $self = shift;
+	my $cache = shift;
+
+	if($cache) {
+		$self->{'cache'} = $cache;
+	}
+	return $self->{'cache'};
+}
+
 =head2 set_logger
 
 Sets the class, array, code reference, or file that will be used for logging.
@@ -1905,7 +1922,7 @@ sub _log
 	my ($self, $level, @messages) = @_;
 
 	# FIXME: add caller's function
-	# if(($level eq 'warn') || ($level eq 'notice')) {
+	# if(($level eq 'warn') || ($level eq 'info')) {
 		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
 	# }
 
