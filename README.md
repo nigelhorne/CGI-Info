@@ -484,7 +484,12 @@ Returns the messages of that the object has generated as a string.
 
 ## cache
 
-Get/set the internal cache system
+Get/set the internal cache system.
+
+Use this rather than pass the cache argument to `new()` if you see these error messages,
+"(in cleanup) Failed to get MD5\_CTX pointer".
+It's some obscure problem that I can't work out,
+but calling this after `new()` works.
 
 ## set\_logger
 

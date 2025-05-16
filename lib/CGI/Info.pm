@@ -1872,7 +1872,12 @@ sub messages_as_string
 
 =head2 cache
 
-Get/set the internal cache system
+Get/set the internal cache system.
+
+Use this rather than pass the cache argument to C<new()> if you see these error messages,
+"(in cleanup) Failed to get MD5_CTX pointer".
+It's some obscure problem that I can't work out,
+but calling this after C<new()> works.
 
 =cut
 
