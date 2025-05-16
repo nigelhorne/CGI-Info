@@ -69,9 +69,9 @@ ROBOT: {
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.7; en-US; rv:1.9.2.20) Gecko/20110803 Firefox/3.6.20';
 
 	$i = new_ok('CGI::Info' => [{
+		cache => $cache,
 		logger => \@messages
 	}]);
-	$i->cache($cache);
 	ok($i->is_robot() == 0);
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);

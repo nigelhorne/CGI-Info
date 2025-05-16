@@ -160,6 +160,10 @@ sub new
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
+	# Stash copy of cache to avoid "(in cleanup) Failed to get MD5_CTX pointer".
+	# I suspect Hash::Merge is confusing something
+	my $cache = delete $params->{'cache'};
+
 	# Load the configuration from a config file, if provided
 	$params = Class::Debug::setup($class, $params);
 
@@ -169,6 +173,10 @@ sub new
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
 		Carp::croak("$class: expect has been deprecated, use allow instead");
+	}
+
+	if($cache) {
+		$params->{'cache'} = $cache;
 	}
 
 	# Return the blessed object
