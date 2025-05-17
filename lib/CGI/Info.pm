@@ -1977,19 +1977,16 @@ sub set_logger
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	if(defined($params->{'logger'})) {
-		if(my $logger = $params->{'logger'}) {
-			if(Scalar::Util::blessed($logger)) {
-				$self->{'logger'} = $logger;
-			} else {
-				$self->{'logger'} = Log::Abstraction->new($logger);
-			}
+	if(my $logger = $params->{'logger'}) {
+		if(Scalar::Util::blessed($logger)) {
+			$self->{'logger'} = $logger;
 		} else {
-			$self->{'logger'} = Log::Abstraction->new();
+			$self->{'logger'} = Log::Abstraction->new($logger);
 		}
-		return $self;
+	} else {
+		$self->{'logger'} = Log::Abstraction->new();
 	}
-	Carp::croak('Usage: set_logger(logger => $logger)')
+	return $self;
 }
 
 # Log and remember a message
