@@ -162,6 +162,7 @@ sub new
 
 	# Stash copy of cache to avoid "(in cleanup) Failed to get MD5_CTX pointer".
 	# I suspect Hash::Merge is confusing something
+	# TODO: This may not be needed with Config::Abstraction release 0.26 since that has clone turned off
 	my $cache = delete $params->{'cache'};
 
 	# Load the configuration from a config file, if provided
