@@ -10,12 +10,13 @@ BEGIN { use_ok('CGI::Info') }
 
 # my $info = new_ok('CGI::Info');
 my @messages;
-# $info->set_logger(logger => \@messages);
-my $info = CGI::Info->new({ logger => { array => \@messages } });
+my $info = CGI::Info->new({ logger => \@messages });
+$info->{logger}->level('debug');
 
 my $name = $info->script_name();
 
 diag(Data::Dumper->new([\@messages])->Dump()) if($ENV{'TEST_VERBOSE'});
+diag(Data::Dumper->new([$info->{logger}])->Dump()) if($ENV{'TEST_VERBOSE'});
 
 is_deeply(\@messages, [
 	{
@@ -24,11 +25,12 @@ is_deeply(\@messages, [
 	}
 ]);
 
-cmp_deeply(\@messages, $info->messages(), 'messages() works with logger passed to new()');
+cmp_deeply($info->{'logger'}->messages(), $info->messages(), 'messages() works with logger passed to new()');
 
 my @messages2;
 $info = new_ok('CGI::Info');
 $info->set_logger(logger => \@messages2);
+$info->{logger}->level('trace');
 
 $name = $info->script_name();
 
