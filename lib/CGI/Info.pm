@@ -2108,6 +2108,10 @@ things to happen.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/nigelhorne/CGI-Info>
+
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
