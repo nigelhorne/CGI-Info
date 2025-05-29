@@ -44,7 +44,7 @@ if($^O ne 'MSWin32') {
 # Nonexistent config file is ignored
 throws_ok {
 	CGI::Info->new(config_file => '/nonexistent/path/to/config.yml');
-} qr/File not readable/, 'Throws error for nonexistent config file';
+} qr/No such file or directory/, 'Throws error for nonexistent config file';
 
 # Malformed config file (not a hashref)
 my ($badfh, $badfile) = tempfile();
