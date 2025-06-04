@@ -14,6 +14,7 @@ use File::Spec;
 use Log::Abstraction 0.10;
 use Params::Get;
 use Params::Validate::Strict;
+use Net::CIDR;
 use Scalar::Util;
 use Socket;	# For AF_INET
 use 5.008;
@@ -1743,6 +1744,16 @@ sub is_search_engine
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
 	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) {
+		if($self->{cache}) {
+			$self->{cache}->set($key, 'search', '1 day');
+		}
+		$self->{is_search_engine} = 1;
+		return 1;
+	}
+
+	my @cidr_blocks = ('47.235.0.0/12');	# Alibaba
+
+	if(Net::CIDR::cidrlookup($remote, @cidr_blocks)) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}

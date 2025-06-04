@@ -60,6 +60,7 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'File::Spec' => 3.4,
 		'Log::Abstraction' => 0.10,
+		'Net::CIDR' => 0,
 		'Params::Get' => 0,
 		'Params::Validate::Strict' => 0.02,
 		'Scalar::Util' => 0,
