@@ -986,7 +986,7 @@ sub params {
 
 =head2 param
 
-Get a single parameter.
+Get a single parameter from the query string.
 Takes an optional single string parameter which is the argument to return. If
 that parameter is not given param() is a wrapper to params() with no arguments.
 
