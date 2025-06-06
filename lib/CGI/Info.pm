@@ -8,7 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
-use Class::Debug 0.02;
+use Object::Configure;
 use Config::Abstraction 0.26;
 use File::Spec;
 use Log::Abstraction 0.10;
@@ -162,7 +162,7 @@ sub new
 	}
 
 	# Load the configuration from a config file, if provided
-	$params = Class::Debug::setup($class, $params);
+	$params = Object::Configure::configure($class, $params);
 
 	if(defined($params->{'expect'})) {
 		# if(ref($params->{expect}) ne 'ARRAY') {
