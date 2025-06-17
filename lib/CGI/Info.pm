@@ -1185,6 +1185,8 @@ Returns a boolean if the website is being viewed on a mobile
 device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
+Can be overriden by the IS_MOBILE environment setting
+
 =cut
 
 sub is_mobile {
@@ -1192,6 +1194,10 @@ sub is_mobile {
 
 	if(defined($self->{is_mobile})) {
 		return $self->{is_mobile};
+	}
+
+	if($ENV{'IS_MOBILE'}) {
+		return $ENV{'IS_MOBILE'}
 	}
 
 	# Support Sec-CH-UA-Mobile
@@ -1681,6 +1687,8 @@ Is the visitor a search engine?
 	# allow the user to pick and choose something to display
     }
 
+Can be overriden by the IS_SEARCH_ENGINE environment setting
+
 =cut
 
 sub is_search_engine
@@ -1689,6 +1697,10 @@ sub is_search_engine
 
 	if(defined($self->{is_search_engine})) {
 		return $self->{is_search_engine};
+	}
+
+	if($ENV{'IS_SEARCH_ENGINE'}) {
+		return $ENV{'IS_SEARCH_ENGINE'}
 	}
 
 	my $remote = $ENV{'REMOTE_ADDR'};
@@ -2159,7 +2171,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENCE AND COPYRIGHT
 
 Copyright 2010-2025 Nigel Horne.
 

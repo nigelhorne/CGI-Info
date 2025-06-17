@@ -93,7 +93,8 @@ WriteMakefile(
 				repository => 'https://github.com/nigelhorne/CGI-Info',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/CGI-Info.git',
-				web => 'https://github.com/nigelhorne/CGI-Info'
+				web => 'https://github.com/nigelhorne/CGI-Info',
+				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-CGI-Info@rt.cpan.org',
 				url => 'https://github.com/nigelhorne/CGI-Info/issues',

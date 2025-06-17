@@ -4,6 +4,7 @@ Revision history for CGI-Info
 	Bumped minimum version of Config::Abstraction - and hence removed MD5_CTX workaround code
 	Flag Alibaba as a search engine
 	Use Object::Configure instead of Class::Debug
+	Allow IS_SEARCH_ENGINE and IS_MOBILE to be set in the environment
 
 0.103	Fri May 16 17:48:32 EDT 2025
 	Mark Clickagy as a bot
