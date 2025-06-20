@@ -34,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -671,11 +671,11 @@ sub params {
 			return;
 		}
 	} elsif($ENV{'REQUEST_METHOD'} eq 'POST') {
-		if(!defined($ENV{'CONTENT_LENGTH'})) {
+		my $content_length = $self->_get_env('CONTENT_LENGTH');
+		if((!defined($content_length)) || ($content_length =~ /\D/)) {
 			$self->{status} = 411;
 			return;
 		}
-		my $content_length = $ENV{'CONTENT_LENGTH'};
 		if(($self->{max_upload_size} >= 0) && ($content_length > $self->{max_upload_size})) {	# Set maximum posts
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413

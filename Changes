@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-0.104
+0.104	Fri Jun 20 07:41:53 EDT 2025
 	Bumped minimum version of Config::Abstraction - and hence removed MD5_CTX workaround code
 	Flag Alibaba as a search engine
 	Use Object::Configure instead of Class::Debug
