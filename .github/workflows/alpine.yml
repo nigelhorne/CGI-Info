@@ -2,6 +2,8 @@
 # see https://github.com/FGasper/perl-github-action-tips
 
 name: Test Code on Alpine Linux
+permissions:
+  contents: read
 on:
   push:
     branches:
