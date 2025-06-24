@@ -2044,6 +2044,9 @@ sub _warn {
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('warn', $params->{'warning'});
+	if(!defined($self->{'logger'})) {
+		Carp::carp($params->{'warning'});
+	}
 }
 
 # Ensure all environment variables are sanitized and validated before use.
