@@ -1741,6 +1741,7 @@ sub is_search_engine
 		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo() || $browser->bingbot());
 		if(!$is_search) {
 			if(($agent =~ /SeznamBot\//) ||
+			   ($agent =~ /Google-InspectionTool\//) ||
 			   ($agent =~ /Googlebot\//)) {
 				$is_search = 1;
 			}
