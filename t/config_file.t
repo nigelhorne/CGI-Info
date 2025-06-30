@@ -31,7 +31,7 @@ cmp_ok($obj->{'max_upload_size'}, '==', 2, 'read max_upload_size from config');
 # Windows gets confused with the case, it seems that it only likes uppercase environment variables
 if($^O ne 'MSWin32') {
 	subtest 'Environment test' => sub {
-		local $ENV{'CGI__Info__max_upload_size'} = 3;
+		local $ENV{$class_name . '__max_upload_size'} = 3;
 
 		$obj = CGI::Info->new(config_file => $config_file);
 
