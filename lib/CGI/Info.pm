@@ -1759,17 +1759,10 @@ sub is_search_engine
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
-	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) {
-		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
-		}
-		$self->{is_search_engine} = 1;
-		return 1;
-	}
-
 	my @cidr_blocks = ('47.235.0.0/12');	# Alibaba
 
-	if(Net::CIDR::cidrlookup($remote, @cidr_blocks)) {
+	if((defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) ||
+	   (Net::CIDR::cidrlookup($remote, @cidr_blocks))) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}
