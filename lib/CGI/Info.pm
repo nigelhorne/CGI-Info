@@ -1575,6 +1575,10 @@ sub is_robot {
 		return 1;
 	}
 
+	# TODO:
+	# Download and use list from
+	#	https://raw.githubusercontent.com/mitchellkrogza/apache-ultimate-bad-bot-blocker/refs/heads/master/_generator_lists/bad-user-agents.list
+
 	my $key = "$remote/$agent";
 
 	if(my $referrer = $ENV{'HTTP_REFERER'}) {
