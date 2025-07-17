@@ -401,11 +401,16 @@ sub _find_site_details
 Domain_name is the name of the controlling domain for this website.
 Usually it will be similar to host_name, but will lack the http:// or www prefixes.
 
+Can be called as a class method.
+
 =cut
 
 sub domain_name {
 	my $self = shift;
 
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
 	return $self->{domain} if $self->{domain};
 
 	$self->_find_site_details();
