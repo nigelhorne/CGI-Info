@@ -4,6 +4,7 @@ Revision history for CGI-Info
 	carp for warning when logger not set
 	Flag Google-InspectionTool as a search_engine
 	Added "Fuzz Faster U Fool" as a bot
+	Also look in SSL_TLS_SNI for hostname
 
 0.104	Fri Jun 20 07:41:53 EDT 2025
 	Bumped minimum version of Config::Abstraction - and hence removed MD5_CTX workaround code

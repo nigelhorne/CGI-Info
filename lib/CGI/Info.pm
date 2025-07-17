@@ -362,12 +362,11 @@ sub _find_site_details
 
 	return if $self->{site} && $self->{cgi_site};
 
-	# Import necessary modules
-	require URI::Heuristic unless URI::Heuristic->can('uf_uristr');
-	require Sys::Hostname unless Sys::Hostname->can('hostname');
-
 	# Determine cgi_site using environment variables or hostname
-	if (my $host = $ENV{'HTTP_HOST'} || $ENV{'SERVER_NAME'}) {
+	if (my $host = ($ENV{'HTTP_HOST'} || $ENV{'SERVER_NAME'} || $ENV{'SSL_TLS_SNI'})) {
+		# Import necessary module
+			require URI::Heuristic unless URI::Heuristic->can('uf_uristr');
+
 		$self->{cgi_site} = URI::Heuristic::uf_uristr($host);
 		# Remove trailing dots from the name.  They are legal in URLs
 		# and some sites link using them to avoid spoofing (nice)
@@ -377,6 +376,9 @@ sub _find_site_details
 			$self->{cgi_site} =~ s/^http/$protocol/;
 		}
 	} else {
+		# Import necessary module
+		require Sys::Hostname unless Sys::Hostname->can('hostname');
+
 		$self->_debug('Falling back to using hostname');
 		$self->{cgi_site} = Sys::Hostname::hostname();
 	}
