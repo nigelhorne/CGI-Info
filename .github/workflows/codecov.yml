@@ -1,6 +1,8 @@
 ---
 # https://github.com/codecov/example-perl/blob/master/github.yml
 name: Code coverage - codecov.io
+permissions:
+  contents: read
 
 on:
   pull_request:
