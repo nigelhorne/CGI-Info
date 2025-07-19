@@ -4,6 +4,8 @@
 # codecov is 5.12 and above, so can't test on 5.10
 
 name: Test Code on Ubuntu
+permissions:
+  contents: write
 on:
   push:
     branches:
