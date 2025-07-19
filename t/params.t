@@ -529,6 +529,7 @@ EOF
 
 			sub new { bless { }, shift }
 			sub trace { }
+			sub debug { }
 			sub warn { shift; $mess = (ref($_[0]) eq 'ARRAY') ? join(' ', @{$_[0]}) : join(' ' , @_) }
 		}
 

@@ -919,7 +919,7 @@ sub params {
 			# if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
 			if(($value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
 			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
-			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
+			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /\sAND\s1=1/ix) ||
@@ -929,9 +929,9 @@ sub params {
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
-					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$value'");
+					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$value'");
 				} else {
-					$self->_warn("SQL injection attempt blocked for '$value'");
+					$self->_warn("SQL injection attempt blocked for '$key=$value'");
 				}
 				return;
 			}
