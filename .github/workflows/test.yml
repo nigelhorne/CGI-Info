@@ -61,3 +61,8 @@ jobs:
         #   curl -Os https://uploader.codecov.io/latest/macos/codecov
         #   chmod +x codecov
         #   ./codecov -t ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Show cpanm build log on failure (Windows)
+        if: runner.os == 'Windows' && failure()
+        shell: pwsh
+        run: Get-Content "$env:USERPROFILE\.cpanm\work\*\build.log" -Tail 100
