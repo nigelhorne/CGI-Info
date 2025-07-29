@@ -2,14 +2,23 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 202;
+use Test::Most tests => 204;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
-BEGIN { use_ok('CGI::Info') }
+my $has_test_returns;
+
+BEGIN {
+	use_ok('CGI::Info');
+	$has_test_returns = eval {
+		require Test::Returns;
+		Test::Returns->import(qw(returns_is returns_isnt));
+		1;
+	};
+}
 
 PARAMS: {
 	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
@@ -20,6 +29,9 @@ PARAMS: {
 	ok(!defined($i->messages()));
 	ok($i->messages_as_string() eq '');
 	my %p = %{$i->params()};
+	if($has_test_returns) {
+		returns_is(\%p, { type => 'hashref', max => 1, min => 1 }, 'params returns a hash ref');
+	}
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));
 	ok($i->as_string() eq 'foo=bar');
@@ -34,6 +46,9 @@ PARAMS: {
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
+	if($has_test_returns) {
+		returns_is(\%p, { type => 'hashref', max => 2, min => 2 }, 'params returns a hash ref');
+	}
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar; fred=wilma');
