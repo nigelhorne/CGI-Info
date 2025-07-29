@@ -943,7 +943,7 @@ sub params {
 					} else {
 						$self->_warn("SQL injection attempt blocked for '$agent'");
 					}
-					return 1;
+					return;
 				}
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
