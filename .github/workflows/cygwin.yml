@@ -3,6 +3,8 @@
 # See also https://github.com/egor-tensin/setup-cygwin/issues/9
 
 name: Test Code on Cygwin
+permissions:
+  contents: read
 on:
   push:
     branches:
