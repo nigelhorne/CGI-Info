@@ -14,6 +14,7 @@ use Log::Abstraction 0.10;
 use Params::Get;
 use Params::Validate::Strict;
 use Net::CIDR;
+use Return::Set;
 use Scalar::Util;
 use Socket;	# For AF_INET
 use 5.008;
@@ -987,7 +988,7 @@ sub params {
 
 	$self->{paramref} = \%FORM;
 
-	return \%FORM;
+	return Return::Set::set_return(\%FORM, { type => 'hashref', min => 1 });
 }
 
 =head2 param
@@ -1042,7 +1043,7 @@ sub param {
 	$self->{allow} = $allow if($allow);
 
 	if($params) {
-		return $params->{$field};
+		return Return::Set::set_return($params->{$field}, { type => 'string' });
 	}
 }
 
