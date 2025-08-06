@@ -177,6 +177,13 @@ sub new
 		Carp::croak("$class: expect has been deprecated, use allow instead");
 	}
 
+	# Validate logger object has required methods
+	if(defined $params->{'logger'}) {
+		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
+			Carp::croak("Logger must be an object with info() and error() methods");
+		}
+	}
+
 	# Return the blessed object
 	return bless {
 		max_upload_size => 512 * 1024,
