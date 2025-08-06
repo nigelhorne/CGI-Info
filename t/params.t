@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 204;
+use Test::Most tests => 202;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
@@ -168,7 +168,8 @@ PARAMS: {
 	ok($p{foo} eq 'b ar');
 
 	$ENV{'REQUEST_METHOD'} = 'FOO';
-	$i = new_ok('CGI::Info');
+	local $ENV{'CGI__INFO__carp_on_warn'} = 1;
+	$i = CGI::Info->new();
 
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval { $i->params() };
@@ -248,7 +249,6 @@ EOF
 
 	$ENV{'REQUEST_METHOD'} = 'GET';
 	CGI::Info->reset();	# Force stdin re-read
-	$i = new_ok('CGI::Info');
 	$i = new_ok('CGI::Info' => [
 		upload_dir => $tmpdir
 	]);
@@ -451,7 +451,6 @@ EOF
 		upload_dir => $tmpdir
 	]);
 	eval { %p = $i->params() };
-	diag($@);
 	ok($@ =~ /Disallowing invalid filename/);
 	ok(defined($p{country}));
 	ok($p{country} eq '44');
