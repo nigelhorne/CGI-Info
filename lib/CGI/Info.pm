@@ -2111,6 +2111,9 @@ sub AUTOLOAD
 	# Ensure the method is called on the correct package object or a subclass
 	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
 
+	# Validate method name - only allow safe config methods
+	Carp::croak(__PACKAGE__, ": Invalid method name: $method") unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
 	# Delegate to the param method
 	return $self->param($method);
 }
