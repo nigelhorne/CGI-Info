@@ -8,7 +8,7 @@ use strict;
 
 use boolean;
 use Carp;
-use Object::Configure 0.10;
+use Object::Configure 0.12;
 use File::Spec;
 use Log::Abstraction 0.10;
 use Params::Get 0.13;

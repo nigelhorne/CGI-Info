@@ -59,7 +59,7 @@ WriteMakefile(
 		'File::Spec' => 3.4,
 		'Log::Abstraction' => 0.10,
 		'Net::CIDR' => 0,
-		'Object::Configure' => 0.10,
+		'Object::Configure' => 0.12,
 		'Params::Get' => 0.13,
 		'Params::Validate::Strict' => 0.02,
 		'Return::Set' => 0,
