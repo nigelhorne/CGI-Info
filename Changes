@@ -6,6 +6,7 @@ Revision history for CGI-Info
 	Fix params() to return undef, not a scalar, when blocking an SQL injection
 	AUTOLOAD: added sanity check to the method name
 	Fix json testing when stdin_data is set
+	Only load IO::Interactive when needed
 
 0.105	Thu Jul 17 15:07:43 EDT 2025
 	carp for warning when logger not set

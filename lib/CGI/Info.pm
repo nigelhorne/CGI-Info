@@ -640,9 +640,10 @@ sub params {
 	my $content_type = $ENV{'CONTENT_TYPE'};
 	my %FORM;
 
-	use IO::Interactive;
-
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
+		require IO::Interactive;
+		IO::Interactive->import();
+
 		if(@ARGV) {
 			@pairs = @ARGV;
 			if(defined($pairs[0])) {
