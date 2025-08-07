@@ -792,26 +792,27 @@ sub params {
 
 			return \%FORM;
 		} elsif($content_type =~ /application\/json/i) {
+			require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
+			# require JSON::MaybeXS;
+			# JSON::MaybeXS->import();
+
 			my $buffer;
+
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
-				require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
-				# require JSON::MaybeXS;
-				# JSON::MaybeXS->import();
-
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
 					$self->_warn({
 						warning => 'read failed: something else may have read STDIN'
 					});
 				}
 				$stdin_data = $buffer;
-				# JSON::Parse::assert_valid_json($buffer);
-				# my $paramref = JSON::Parse::parse_json($buffer);
-				my $paramref = decode_json($buffer);
-				foreach my $key(keys(%{$paramref})) {
-					push @pairs, "$key=" . $paramref->{$key};
-				}
+			}
+			# JSON::Parse::assert_valid_json($buffer);
+			# my $paramref = JSON::Parse::parse_json($buffer);
+			my $paramref = decode_json($buffer);
+			foreach my $key(keys(%{$paramref})) {
+				push @pairs, "$key=" . $paramref->{$key};
 			}
 		} else {
 			my $buffer;

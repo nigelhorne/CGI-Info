@@ -5,6 +5,7 @@ Revision history for CGI-Info
 	Allow 'St Peter&#39;s' as an argument
 	Fix params() to return undef, not a scalar, when blocking an SQL injection
 	AUTOLOAD: added sanity check to the method name
+	Fix json testing when stdin_data is set
 
 0.105	Thu Jul 17 15:07:43 EDT 2025
 	carp for warning when logger not set
