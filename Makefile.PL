@@ -50,6 +50,7 @@ WriteMakefile(
 		'warnings' => 0,
 		'IPC::System::Simple' => 0,
 		'Taint::Runtime' => 0,
+		'Test::Returns' => 0,
 		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	}, PREREQ_PM => {
