@@ -1,6 +1,8 @@
 ---
 name: test dependent modules
 # https://raw.githubusercontent.com/libwww-perl/URI/master/.github/workflows/test-dependents.yml
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
