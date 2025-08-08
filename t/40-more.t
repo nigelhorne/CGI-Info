@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::MockModule;
+use Test::Needs 'Test::MockModule';
 use File::Temp qw(tempdir);
 use JSON::MaybeXS qw(encode_json);
 use Test::Returns;
