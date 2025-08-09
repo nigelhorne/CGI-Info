@@ -66,3 +66,7 @@ jobs:
         if: runner.os == 'Windows' && failure()
         shell: pwsh
         run: Get-Content "$env:USERPROFILE\.cpanm\work\*\build.log" -Tail 100
+
+      - name: Show cpanm build log on failure (non-Windows)
+        if: runner.os != 'Windows' && failure()
+        run: tail -100 "$env:HOME/.cpanm/work/*/build.log"
