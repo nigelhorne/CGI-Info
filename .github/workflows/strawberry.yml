@@ -3,6 +3,8 @@
 # and https://github.com/shogo82148/actions-setup-perl/tree/v1.31.3
 
 name: Test Code on Windows using Strawberry Perl
+permissions:
+  contents: read
 on:
   push:
     branches:
