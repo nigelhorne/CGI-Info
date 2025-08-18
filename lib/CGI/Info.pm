@@ -139,7 +139,8 @@ The maximum file size you can upload (-1 for no limit), the default is 512MB.
 The class can be configured at runtime using environments and configuration files,
 for example,
 setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to use L<Carp>.
-For more information about runtime configuration see L<Object::Configure>.
+For more information about runtime configuration,
+see L<Object::Configure>.
 
 =cut
 

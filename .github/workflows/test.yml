@@ -69,4 +69,4 @@ jobs:
 
       - name: Show cpanm build log on failure (non-Windows)
         if: runner.os != 'Windows' && failure()
-        run: tail -100 "$env:HOME/.cpanm/work/*/build.log"
+        run: tail -100 "$HOME/.cpanm/work/*/build.log"
