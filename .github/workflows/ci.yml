@@ -72,7 +72,8 @@ jobs:
       - name: Generate custom coverage index
         run: |
           mkdir -p cover_db
-          cover -dump > cover_db/coverage.json
+          # cover -dump > cover_db/coverage.json
+          cover -report json -outputdir cover_db
           perl scripts/generate_index.pl
 
       - name: Archive coverage snapshot
