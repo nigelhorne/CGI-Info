@@ -113,7 +113,8 @@ It takes other optional parameters:
 The class can be configured at runtime using environments and configuration files,
 for example,
 setting `$ENV{'CGI__INFO__carp_on_warn'}` causes warnings to use [Carp](https://metacpan.org/pod/Carp).
-For more information about runtime configuration see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
+For more information about configuring object constructors at runtime,
+see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
 
 ## script\_name
 
@@ -573,6 +574,7 @@ things to happen.
 
 # SEE ALSO
 
+- Test coverage report: [https://nigelhorne.github.io/CGI-Info/coverage/](https://nigelhorne.github.io/CGI-Info/coverage/)
 - [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)

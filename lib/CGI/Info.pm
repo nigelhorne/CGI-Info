@@ -2153,6 +2153,8 @@ things to happen.
 
 =over 4
 
+=item * Test coverage report: L<https://nigelhorne.github.io/CGI-Info/coverage/>
+
 =item * L<Object::Configure>
 
 =item * L<HTTP::BrowserDetect>
