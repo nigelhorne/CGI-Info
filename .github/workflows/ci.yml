@@ -1,0 +1,90 @@
+---
+# Create https://nigelhorne.github.io/CGI-Info/coverage/
+name: CI
+
+permissions:
+  contents: write  # needed to push to gh-pages
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        perl: ["5.40"]
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v5
+
+      # Install Perl via perlbrew
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          # install cpanminus
+          # cpanm-options: --notest
+
+      # Install module dependencies (from cpanfile or manually)
+      - name: Install dependencies
+        run: |
+          cpanm --notest --installdeps .
+          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover Devel::Cover::Report::Html
+
+      # Optional: run Perl::Critic static checks
+      # - name: Run Perl::Critic
+      #   run: |
+      #     cpanm Perl::Critic
+      #     perlcritic --verbose 5 lib || true
+
+      - name: Run tests manually
+        run: |
+          prove -l -b -v t
+
+      # Run the tests with Devel::Cover for coverage
+      - name: Run tests with coverage
+        run: |
+          COVER_VERBOSE=1 cover -test
+        working-directory: ${{ github.workspace }}
+
+      # Generate HTML coverage report
+      - name: Generate HTML report
+        run: |
+          mkdir -p cover_html
+          cover -report html -outputdir cover_html
+      # working-directory: ${{ github.workspace }}
+
+      - name: Check for HTML report
+        run: |
+          if [ ! -f cover_html/coverage.html ]; then
+            echo "HTML report not found. Skipping deployment."
+            exit 1
+          fi
+
+      - name: Rename coverage.html to index.html
+        run: |
+          mv cover_html/coverage.html cover_html/index.html
+
+      - name: Generate custom coverage index
+        run: |
+          mkdir -p cover_db
+          # cover -dump > cover_db/coverage.json
+          cover -report json -outputdir cover_db
+          perl scripts/generate_index.pl
+
+      # Deploy HTML report to GitHub Pages
+      - name: Publish coverage report
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./cover_html
+          destination_dir: coverage
+          user_name: github-actions
+          user_email: github-actions@github.com
+          # Create a completely new gh-pages branch
+          force_orphan: true
+          keep_files: false
