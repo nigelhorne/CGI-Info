@@ -76,6 +76,21 @@ jobs:
           cover -report json -outputdir cover_db
           perl scripts/generate_index.pl
 
+      - name: Archive coverage snapshot
+        run: |
+          mkdir -p coverage-history
+          TIMESTAMP=$(date +%Y-%m-%d)
+          SHA=$(git rev-parse --short HEAD)
+          cp cover_db/coverage.json "coverage-history/${TIMESTAMP}-${SHA}.json"
+
+      - name: Commit coverage snapshot
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          git add coverage-history/
+          git commit -m "Add coverage snapshot for $TIMESTAMP ($SHA)" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref_name }}
+
       # Deploy HTML report to GitHub Pages
       - name: Publish coverage report
         uses: peaceiris/actions-gh-pages@v4

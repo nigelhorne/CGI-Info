@@ -2,7 +2,9 @@
 
 use strict;
 use warnings;
+
 use JSON::MaybeXS;
+use File::Glob ':glob';
 use File::Slurp;
 use POSIX qw(strftime);
 use File::stat;
@@ -181,6 +183,58 @@ $html .= <<"HTML";
 </body>
 </html>
 HTML
+
+# Parse historical snapshots
+my @history_files = bsd_glob("coverage-history/*.json");
+my @trend_points;
+
+foreach my $file (sort @history_files) {
+    my $json = eval { decode_json(read_file($file)) };
+    next unless $json && $json->{summary}{Total};
+
+    my $pct = $json->{summary}{Total}{total}{percentage} // 0;
+    my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
+    push @trend_points, { date => $date, coverage => sprintf("%.1f", $pct) };
+}
+
+# Inject chart if we have data
+if (@trend_points >= 2) {
+    my $labels = join(",", map { qq{"$_->{date}"} } @trend_points);
+    my $values = join(",", map { $_->{coverage} } @trend_points);
+
+    $html .= <<"HTML";
+
+<h2>Coverage Trend</h2>
+<canvas id="coverageTrend" width="600" height="300"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('coverageTrend').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [$labels],
+        datasets: [{
+            label: 'Total Coverage (%)',
+            data: [$values],
+            borderColor: 'green',
+            backgroundColor: 'rgba(0,128,0,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+});
+</script>
+HTML
+}
 
 # Write to index.html
 write_file($output, $html);
