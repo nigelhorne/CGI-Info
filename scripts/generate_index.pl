@@ -185,7 +185,7 @@ $html .= <<"HTML";
 HTML
 
 # Parse historical snapshots
-my @history_files = bsd_glob("coverage-history/*.json");
+my @history_files = bsd_glob("coverage_history/*.json");
 my @trend_points;
 
 foreach my $file (sort @history_files) {

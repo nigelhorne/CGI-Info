@@ -78,16 +78,16 @@ jobs:
 
       - name: Archive coverage snapshot
         run: |
-          mkdir -p coverage-history
+          mkdir -p coverage_history
           TIMESTAMP=$(date +%Y-%m-%d)
           SHA=$(git rev-parse --short HEAD)
-          cp cover_db/coverage.json "coverage-history/${TIMESTAMP}-${SHA}.json"
+          cp cover_db/cover.json "coverage_history/${TIMESTAMP}-${SHA}.json"
 
       - name: Commit coverage snapshot
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
-          git add coverage-history/
+          git add coverage_history/
           git commit -m "Add coverage snapshot for $TIMESTAMP ($SHA)" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
 
