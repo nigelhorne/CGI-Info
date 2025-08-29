@@ -1,5 +1,7 @@
 ---
 # See https://github.com/actions/virtual-environments
+permissions:
+  contents: read
 
 name: Test Code on Windows
 on:
