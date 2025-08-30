@@ -232,44 +232,6 @@ foreach my $file (sort @history_files) {
 }
 
 # Inject chart if we have data
-# if (@trend_points >= 2) {
-if(0) {
-	my $labels = join(',', map { qq{"$_->{date}"} } @trend_points);
-	my $values = join(',', map { $_->{coverage} } @trend_points);
-
-	$html .= <<"HTML";
-
-<h2>Coverage Trend</h2>
-<canvas id="coverageTrend" width="600" height="300"></canvas>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const ctx = document.getElementById('coverageTrend').getContext('2d');
-const chart = new Chart(ctx, {
-	type: 'line',
-	data: {
-		labels: [$labels],
-		datasets: [{
-			label: 'Total Coverage (%)',
-			data: [$values],
-			borderColor: 'green',
-			backgroundColor: 'rgba(0,128,0,0.1)',
-			fill: true,
-			tension: 0.3,
-			pointRadius: 3
-		}]
-	}, options: {
-		scales: {
-			y: {
-				beginAtZero: true,
-				max: 100
-			}
-		}
-	}
-});
-</script>
-HTML
-}
-
 my %commit_times;
 open(my $log, '-|', 'git log --all --pretty=format:"%H %h %ci"') or die "Can't run git log: $!";
 while (<$log>) {
@@ -279,63 +241,59 @@ while (<$log>) {
 }
 
 my @data_points;
+my $prev_pct;
 foreach my $file (sort @history_files) {
-	my $json = eval { decode_json(read_file($file)) };
-	next unless $json && $json->{summary}{Total};
+    my $json = eval { decode_json(read_file($file)) };
+    next unless $json && $json->{summary}{Total};
 
-	my ($sha) = $file =~ /-(\w{7})\.json$/;
+    my ($sha) = $file =~ /-(\w{7})\.json$/;
+    my $timestamp = $commit_times{$sha} // strftime("%Y-%m-%dT%H:%M:%S", localtime((stat($file))->mtime));
+$timestamp =~ s/ /T/;
+$timestamp =~ s/\s+([+-]\d{2}):?(\d{2})$/$1:$2/;	# Fix space before timezone
+$timestamp =~ s/ //g;  # Remove any remaining spaces
 
-	my $timestamp = $commit_times{$sha};
-	unless ($timestamp) {
-		warn "SHA $sha not found in git log — using file mtime";
-		$timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime((stat($file))->mtime));
-	}
-	# Original format: "2025-08-30 09:26:58 -0400"
-	$timestamp =~ s/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) ([+-]\d{4})$/$1T$2$3/;
-	$timestamp =~ s/([+-]\d{2})(\d{2})$/$1:$2/;
+    my $pct = $json->{summary}{Total}{total}{percentage} // 0;
+    my $delta = defined $prev_pct ? sprintf('%.1f', $pct - $prev_pct) : 0;
+    $prev_pct = $pct;
 
-	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
-	# my $timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime((stat($file))->mtime));
-	# my $timestamp = `git show -s --format=%ci $sha`;
-	# chomp $timestamp;
-	$timestamp =~ s/ /T/;	# Optional: convert to ISO format
+    my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
+    my $url = "https://github.com/nigelhorne/CGI-Info/commit/$sha";
 
-	my $url = "https://github.com/nigelhorne/CGI-Info/commit/$sha";
-
-	push @data_points, qq{{ x: "$timestamp", y: $pct, url: "$url", label: "$timestamp" }};
-
-	print "$sha => $timestamp => $pct\n";
+	push @data_points, qq{{ x: "$timestamp", y: $pct, delta: $delta, url: "$url", label: "$timestamp", pointBackgroundColor: "$color" }};
 }
 
 my $js_data = join(",\n", @data_points);
 
 $html .= <<"HTML";
-	<canvas id="coverageTrend" width="600" height="300"></canvas>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-	<script>
-	const dataPoints = [
-	$js_data
-	];
+<canvas id="coverageTrend" width="600" height="300"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script>
+const dataPoints = [
+$js_data
+];
 HTML
 
 $html .= <<'HTML';
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
   type: 'line',
-  data: {
-    datasets: [{
-      label: 'Total Coverage (%)',
-      data: dataPoints,
-      borderColor: 'green',
-      backgroundColor: 'rgba(0,128,0,0.1)',
-      pointRadius: 5,
-      pointHoverRadius: 7,
-      pointStyle: 'circle',
-      fill: false,
-      tension: 0.3
-    }]
-  },
+data: {
+  datasets: [{
+    label: 'Total Coverage (%)',
+    data: dataPoints,
+    borderColor: 'green',
+    backgroundColor: 'rgba(0,128,0,0.1)',
+    pointRadius: 5,
+    pointHoverRadius: 7,
+    pointStyle: 'circle',
+    fill: false,
+    tension: 0.3,
+pointBackgroundColor: function(context) {
+  return context.raw.pointBackgroundColor || 'gray';
+}
+  }]
+},
   options: {
 scales: {
   x: {
@@ -368,6 +326,7 @@ time: {
 });
 </script>
 HTML
+
 
 $html .= <<"HTML";
 <footer>
