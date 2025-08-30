@@ -51,11 +51,17 @@
 <h1>CGI::Info</h1><h2>Coverage Report</h2>
 <table>
 <tr><th>File</th><th>Stmt</th><th>Branch</th><th>Cond</th><th>Sub</th><th>Total</th><th>&Delta;</th></tr>
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/15a9065037dfd0b14efd926882c769b41ff89419/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/15a9065037dfd0b14efd926882c769b41ff89419/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/881af428a6b5eb756542149b9894145d29246425/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/881af428a6b5eb756542149b9894145d29246425/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
 <tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 <tr class="med"><td><strong>Total</strong></td><td>87.2</td><td>75.6</td><td>58.7</td><td>98.5</td><td colspan="2"><strong>79.1</strong></td></tr>
 </table>
+<p>
+	<label>
+		<input type="checkbox" id="toggleTrend" checked>
+		Show regression trend
+	</label>
+</p>
 <canvas id="coverageTrend" width="600" height="300"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -65,109 +71,110 @@ function linearRegression(data) {
 	const ys = data.map(p => p.y);
 	const n = xs.length;
 
-  const sumX = xs.reduce((a, b) => a + b, 0);
-  const sumY = ys.reduce((a, b) => a + b, 0);
-  const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
-  const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
+	const sumX = xs.reduce((a, b) => a + b, 0);
+	const sumY = ys.reduce((a, b) => a + b, 0);
+	const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
+	const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
 
-  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
+	const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+	const intercept = (sumY - slope * sumX) / n;
 
-  return xs.map(x => ({
-    x: new Date(x).toISOString(),
-    y: slope * x + intercept
-  }));
+	return xs.map(x => ({
+		x: new Date(x).toISOString(),
+		y: slope * x + intercept
+	}));
 }
 
-const dataPoints = [
-{ x: "2025-08-29T19:41:55-04:00", y: 79.0953545232274, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/c77ab02", label: "2025-08-29T19:41:55-04:00", pointBackgroundColor: "gray" },
+const dataPoints = [ { x: "2025-08-29T19:41:55-04:00", y: 79.0953545232274, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/c77ab02", label: "2025-08-29T19:41:55-04:00", pointBackgroundColor: "gray" },
 { x: "2025-08-30T16:16:14-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/14995c3", label: "2025-08-30T16:16:14-04:00", pointBackgroundColor: "gray" },
+{ x: "2025-08-30T17:51:50-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/15a9065", label: "2025-08-30T17:51:50-04:00", pointBackgroundColor: "gray" },
 { x: "2025-08-30T14:51:38-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/2ce4b95", label: "2025-08-30T14:51:38-04:00", pointBackgroundColor: "gray" },
 { x: "2025-08-29T20:02:27-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/4e1e1c4", label: "2025-08-29T20:02:27-04:00", pointBackgroundColor: "gray" },
 { x: "2025-08-29T21:32:26-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/5a7c4c0", label: "2025-08-29T21:32:26-04:00", pointBackgroundColor: "gray" },
 { x: "2025-08-29T20:41:33-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/5ddf84b", label: "2025-08-29T20:41:33-04:00", pointBackgroundColor: "gray" },
 { x: "2025-08-29T21:12:14-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/95d3a1a", label: "2025-08-29T21:12:14-04:00", pointBackgroundColor: "gray" },
 { x: "2025-08-29T20:09:49-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/96a83ad", label: "2025-08-29T20:09:49-04:00", pointBackgroundColor: "gray" },
-{ x: "2025-08-30T16:33:19-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a48702f", label: "2025-08-30T16:33:19-04:00", pointBackgroundColor: "gray" }
-];
-	const regressionPoints = linearRegression(dataPoints);
-	const ctx = document.getElementById('coverageTrend').getContext('2d');
-	const chart = new Chart(ctx, {
+{ x: "2025-08-30T16:33:19-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a48702f", label: "2025-08-30T16:33:19-04:00", pointBackgroundColor: "gray" } ];
+const regressionPoints = linearRegression(dataPoints);
+const ctx = document.getElementById('coverageTrend').getContext('2d');
+const chart = new Chart(ctx, {
 	type: 'line',
-data: {
-	datasets: [{
-    label: 'Total Coverage (%)',
-    data: dataPoints,
-    borderColor: 'green',
-    backgroundColor: 'rgba(0,128,0,0.1)',
-    pointRadius: 5,
-    pointHoverRadius: 7,
-    pointStyle: 'circle',
-    fill: false,
-    tension: 0.3,
-    pointBackgroundColor: function(context) {
-      return context.raw.pointBackgroundColor || 'gray';
-    }
-  }, {
-    label: 'Regression Line',
-    data: regressionPoints,
-    borderColor: 'blue',
-    borderDash: [5, 5],
-    pointRadius: 0,
-    fill: false,
-    tension: 0.0
-  }]
-},
-  options: {
-scales: {
-  x: {
-    type: 'time',
-time: {
-  tooltipFormat: 'MMM d, yyyy HH:mm:ss',
-  unit: 'minute'
-},
-    title: { display: true, text: 'Timestamp' }
-  },
-      y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
-    },
-plugins: {
-  legend: {
-    display: true,
-    position: 'top', // You can also use 'bottom', 'left', or 'right'
-    labels: {
-      boxWidth: 12,
-      padding: 10,
-      font: {
-        size: 12,
-        weight: 'bold'
-      }
-    }
-  },
-tooltip: {
-  callbacks: {
-    label: function(context) {
-      const label = context.raw.label;
-      const coverage = context.raw.y.toFixed(1);
-      const delta = context.raw.delta?.toFixed(1) ?? '0.0';
-      const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
-      return `${label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
-    }
-  }
-}
-},
-    onClick: (e) => {
-      const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-      if (points.length) {
-        const url = chart.data.datasets[0].data[points[0].index].url;
-        window.open(url, '_blank');
-      }
+	data: {
+		datasets: [{
+			label: 'Total Coverage (%)',
+			data: dataPoints,
+			borderColor: 'green',
+			backgroundColor: 'rgba(0,128,0,0.1)',
+			pointRadius: 5,
+			pointHoverRadius: 7,
+			pointStyle: 'circle',
+			fill: false,
+			tension: 0.3,
+			pointBackgroundColor: function(context) {
+				return context.raw.pointBackgroundColor || 'gray';
+			}
+		}, {
+			label: 'Regression Line',
+			data: regressionPoints,
+			borderColor: 'blue',
+			borderDash: [5, 5],
+			pointRadius: 0,
+			fill: false,
+			tension: 0.0
+		}]
+	}, options: {
+		scales: {
+			x: {
+				type: 'time',
+				time: {
+					tooltipFormat: 'MMM d, yyyy HH:mm:ss',
+					unit: 'minute'
+				},
+				title: { display: true, text: 'Timestamp' }
+			},
+			y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
+		}, plugins: {
+			legend: {
+				display: true,
+				position: 'top', // You can also use 'bottom', 'left', or 'right'
+				labels: {
+					boxWidth: 12,
+					padding: 10,
+					font: {
+						size: 12,
+						weight: 'bold'
+					}
+				}
+			}, tooltip: {
+				callbacks: {
+					label: function(context) {
+						const label = context.raw.label;
+						const coverage = context.raw.y.toFixed(1);
+						const delta = context.raw.delta?.toFixed(1) ?? '0.0';
+						const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
+						return `${label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
+					}
+				}
+			}
+		}, onClick: (e) => {
+			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+			if (points.length) {
+				const url = chart.data.datasets[0].data[points[0].index].url;
+				window.open(url, '_blank');
+			}
 		}
 	}
+});
+document.getElementById('toggleTrend').addEventListener('change', function(e) {
+	const show = e.target.checked;
+	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
+	trendDataset.hidden = !show;
+	chart.update();
 });
 </script>
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2025-08-30 21:56:58 - <a href="https://github.com/nigelhorne/CGI-Info/commit/15a9065037dfd0b14efd926882c769b41ff89419">commit <code>15a9065</code></a></em></p>
+	<p><em>Last updated: 2025-08-30 22:52:51 - <a href="https://github.com/nigelhorne/CGI-Info/commit/881af428a6b5eb756542149b9894145d29246425">commit <code>881af42</code></a></em></p>
 </footer>
 </body>
 </html>
