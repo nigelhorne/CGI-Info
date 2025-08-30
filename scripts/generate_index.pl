@@ -66,6 +66,9 @@ my $html = <<"HTML";
 			font-weight: bold;
 			background-color: #f0f0f0;
 		}
+		td.positive { color: green; font-weight: bold; }
+		td.negative { color: red; font-weight: bold; }
+		td.neutral  { color: gray; }
 	</style>
 </head>
 <body>
@@ -75,10 +78,31 @@ my $html = <<"HTML";
 	</a>
 	<img src="$coverage_badge_url" alt="Coverage badge">
 </div>
-<h1>CGI::Info Coverage Report</h1>
+<h1>CGI::Info</h1><h2>Coverage Report</h2>
 <table>
-<tr><th>File</th><th>Stmt</th><th>Branch</th><th>Cond</th><th>Sub</th><th>Total</th></tr>
+<tr><th>File</th><th>Stmt</th><th>Branch</th><th>Cond</th><th>Sub</th><th>Total</th><th>&Delta;</th></tr>
 HTML
+
+# Load previous snapshot for delta comparison
+my @history = sort { $a cmp $b } bsd_glob("coverage_history/*.json");
+my $prev_data;
+
+if (@history >= 1) {
+	my $prev_file = $history[-1];  # Most recent before current
+	eval {
+		$prev_data = decode_json(read_file($prev_file));
+	};
+}
+my %deltas;
+if ($prev_data) {
+	for my $file (keys %{$data->{summary}}) {
+		next if $file eq 'Total';
+		my $curr = $data->{summary}{$file}{total}{percentage} // 0;
+		my $prev = $prev_data->{summary}{$file}{total}{percentage} // 0;
+		my $delta = sprintf('%.1f', $curr - $prev);
+		$deltas{$file} = $delta;
+	}
+}
 
 my $commit_sha = `git rev-parse HEAD`;
 chomp $commit_sha;
@@ -119,6 +143,21 @@ for my $file (sort keys %{$data->{summary}}) {
 		$badge_class, $tooltip, $total
 	);
 
+my $delta_html = '';
+if (exists $deltas{$file}) {
+	my $delta = $deltas{$file};
+	my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
+	my $delta_icon  = $delta > 0 ? '&#9650;' : $delta < 0 ? '&#9660;' : '&#9679;';
+	my $prev_pct = $prev_data->{summary}{$file}{total}{percentage} // 0;
+
+	$delta_html = sprintf(
+		'<td class="%s" title="Previous: %.1f%%">%s %.1f%%</td>',
+		$delta_class, $prev_pct, $delta_icon, abs($delta)
+	);
+} else {
+	$delta_html = '<td class="neutral" title="No previous data">&#9679;</td>';
+}
+
 	my $source_url = $github_base . $file;
 	my $has_coverage = (
 		defined $info->{statement}{percentage} ||
@@ -132,13 +171,14 @@ for my $file (sort keys %{$data->{summary}}) {
 		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
 	$html .= sprintf(
-		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line">%s</a> %s</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td></tr>\n},
+		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line">%s</a> %s</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>\n},
 		$row_class, $html_file, $file, $source_link,
 		$info->{statement}{percentage} // 0,
 		$info->{branch}{percentage} // 0,
 		$info->{condition}{percentage} // 0,
 		$info->{subroutine}{percentage} // 0,
-		$badge_html
+		$badge_html,
+		$delta_html
 	);
 }
 
@@ -183,20 +223,20 @@ my @history_files = bsd_glob("coverage_history/*.json");
 my @trend_points;
 
 foreach my $file (sort @history_files) {
-    my $json = eval { decode_json(read_file($file)) };
-    next unless $json && $json->{summary}{Total};
+	my $json = eval { decode_json(read_file($file)) };
+	next unless $json && $json->{summary}{Total};
 
-    my $pct = $json->{summary}{Total}{total}{percentage} // 0;
-    my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
-    push @trend_points, { date => $date, coverage => sprintf("%.1f", $pct) };
+	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
+	my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
+	push @trend_points, { date => $date, coverage => sprintf("%.1f", $pct) };
 }
 
 # Inject chart if we have data
 if (@trend_points >= 2) {
-    my $labels = join(",", map { qq{"$_->{date}"} } @trend_points);
-    my $values = join(",", map { $_->{coverage} } @trend_points);
+	my $labels = join(',', map { qq{"$_->{date}"} } @trend_points);
+	my $values = join(',', map { $_->{coverage} } @trend_points);
 
-    $html .= <<"HTML";
+	$html .= <<"HTML";
 
 <h2>Coverage Trend</h2>
 <canvas id="coverageTrend" width="600" height="300"></canvas>
@@ -204,7 +244,7 @@ if (@trend_points >= 2) {
 <script>
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
-    type: 'line',
+	type: 'line',
     data: {
         labels: [$labels],
         datasets: [{
