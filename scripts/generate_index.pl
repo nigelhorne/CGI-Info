@@ -232,7 +232,8 @@ foreach my $file (sort @history_files) {
 }
 
 # Inject chart if we have data
-if (@trend_points >= 2) {
+# if (@trend_points >= 2) {
+if(0) {
 	my $labels = join(',', map { qq{"$_->{date}"} } @trend_points);
 	my $values = join(',', map { $_->{coverage} } @trend_points);
 
@@ -268,6 +269,105 @@ const chart = new Chart(ctx, {
 </script>
 HTML
 }
+
+my %commit_times;
+open(my $log, '-|', 'git log --all --pretty=format:"%H %h %ci"') or die "Can't run git log: $!";
+while (<$log>) {
+	chomp;
+	my ($full_sha, $short_sha, $datetime) = split ' ', $_, 3;
+	$commit_times{$short_sha} = $datetime;
+}
+
+my @data_points;
+foreach my $file (sort @history_files) {
+	my $json = eval { decode_json(read_file($file)) };
+	next unless $json && $json->{summary}{Total};
+
+	my ($sha) = $file =~ /-(\w{7})\.json$/;
+
+	my $timestamp = $commit_times{$sha};
+	unless ($timestamp) {
+		warn "SHA $sha not found in git log — using file mtime";
+		$timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime((stat($file))->mtime));
+	}
+	# Original format: "2025-08-30 09:26:58 -0400"
+	$timestamp =~ s/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) ([+-]\d{4})$/$1T$2$3/;
+	$timestamp =~ s/([+-]\d{2})(\d{2})$/$1:$2/;
+
+	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
+	# my $timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime((stat($file))->mtime));
+	# my $timestamp = `git show -s --format=%ci $sha`;
+	# chomp $timestamp;
+	$timestamp =~ s/ /T/;	# Optional: convert to ISO format
+
+	my $url = "https://github.com/nigelhorne/CGI-Info/commit/$sha";
+
+	push @data_points, qq{{ x: "$timestamp", y: $pct, url: "$url", label: "$timestamp" }};
+
+	print "$sha => $timestamp => $pct\n";
+}
+
+my $js_data = join(",\n", @data_points);
+
+$html .= <<"HTML";
+	<canvas id="coverageTrend" width="600" height="300"></canvas>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+	<script>
+	const dataPoints = [
+	$js_data
+	];
+HTML
+
+$html .= <<'HTML';
+const ctx = document.getElementById('coverageTrend').getContext('2d');
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    datasets: [{
+      label: 'Total Coverage (%)',
+      data: dataPoints,
+      borderColor: 'green',
+      backgroundColor: 'rgba(0,128,0,0.1)',
+      pointRadius: 5,
+      pointHoverRadius: 7,
+      pointStyle: 'circle',
+      fill: false,
+      tension: 0.3
+    }]
+  },
+  options: {
+scales: {
+  x: {
+    type: 'time',
+time: {
+  tooltipFormat: 'MMM d, yyyy HH:mm:ss',
+  unit: 'minute'
+},
+    title: { display: true, text: 'Timestamp' }
+  },
+      y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `${context.raw.label}: ${context.raw.y}%`;
+          }
+        }
+      }
+    },
+    onClick: (e) => {
+      const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+      if (points.length) {
+        const url = chart.data.datasets[0].data[points[0].index].url;
+        window.open(url, '_blank');
+      }
+    }
+  }
+});
+</script>
+HTML
 
 $html .= <<"HTML";
 <footer>
