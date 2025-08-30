@@ -186,7 +186,7 @@ if (exists $deltas{$file}) {
 my $avg_coverage = $total_files ? int($total_coverage / $total_files) : 0;
 
 $html .= sprintf(
-	qq{<tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="2">Avg: %d%%, Low: %d</td></tr>\n},
+	qq{<tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>\n},
 	$total_files, $avg_coverage, $low_coverage_count
 );
 
@@ -196,7 +196,7 @@ if (my $total_info = $data->{summary}{Total}) {
 	my $class = $total_pct > 80 ? 'high' : $total_pct > 50 ? 'med' : 'low';
 
 	$html .= sprintf(
-		qq{<tr class="%s"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td><strong>%.1f</strong></td></tr>\n},
+		qq{<tr class="%s"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>\n},
 		$class,
 		$total_info->{statement}{percentage} // 0,
 		$total_info->{branch}{percentage} // 0,
