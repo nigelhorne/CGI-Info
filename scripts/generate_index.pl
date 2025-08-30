@@ -176,12 +176,6 @@ my $short_sha = substr($commit_sha, 0, 7);
 
 $html .= <<"HTML";
 </table>
-<footer>
-	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
-</footer>
-</body>
-</html>
 HTML
 
 # Parse historical snapshots
@@ -235,6 +229,15 @@ const chart = new Chart(ctx, {
 </script>
 HTML
 }
+
+$html .= <<"HTML";
+<footer>
+	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
+	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
+</footer>
+</body>
+</html>
+HTML
 
 # Write to index.html
 write_file($output, $html);
