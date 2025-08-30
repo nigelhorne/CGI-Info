@@ -265,6 +265,12 @@ foreach my $file (sort @history_files) {
 my $js_data = join(",\n", @data_points);
 
 $html .= <<"HTML";
+<p>
+	<label>
+		<input type="checkbox" id="toggleTrend" checked>
+		Show regression trend
+	</label>
+</p>
 <canvas id="coverageTrend" width="600" height="300"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -274,103 +280,102 @@ function linearRegression(data) {
 	const ys = data.map(p => p.y);
 	const n = xs.length;
 
-  const sumX = xs.reduce((a, b) => a + b, 0);
-  const sumY = ys.reduce((a, b) => a + b, 0);
-  const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
-  const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
+	const sumX = xs.reduce((a, b) => a + b, 0);
+	const sumY = ys.reduce((a, b) => a + b, 0);
+	const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
+	const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
 
-  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
+	const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+	const intercept = (sumY - slope * sumX) / n;
 
-  return xs.map(x => ({
-    x: new Date(x).toISOString(),
-    y: slope * x + intercept
-  }));
+	return xs.map(x => ({
+		x: new Date(x).toISOString(),
+		y: slope * x + intercept
+	}));
 }
 
-const dataPoints = [
-$js_data
-];
+const dataPoints = [ $js_data ];
 HTML
 
 $html .= <<'HTML';
-	const regressionPoints = linearRegression(dataPoints);
-	const ctx = document.getElementById('coverageTrend').getContext('2d');
-	const chart = new Chart(ctx, {
+const regressionPoints = linearRegression(dataPoints);
+const ctx = document.getElementById('coverageTrend').getContext('2d');
+const chart = new Chart(ctx, {
 	type: 'line',
-data: {
-	datasets: [{
-    label: 'Total Coverage (%)',
-    data: dataPoints,
-    borderColor: 'green',
-    backgroundColor: 'rgba(0,128,0,0.1)',
-    pointRadius: 5,
-    pointHoverRadius: 7,
-    pointStyle: 'circle',
-    fill: false,
-    tension: 0.3,
-    pointBackgroundColor: function(context) {
-      return context.raw.pointBackgroundColor || 'gray';
-    }
-  }, {
-    label: 'Regression Line',
-    data: regressionPoints,
-    borderColor: 'blue',
-    borderDash: [5, 5],
-    pointRadius: 0,
-    fill: false,
-    tension: 0.0
-  }]
-},
-  options: {
-scales: {
-  x: {
-    type: 'time',
-time: {
-  tooltipFormat: 'MMM d, yyyy HH:mm:ss',
-  unit: 'minute'
-},
-    title: { display: true, text: 'Timestamp' }
-  },
-      y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
-    },
-plugins: {
-  legend: {
-    display: true,
-    position: 'top', // You can also use 'bottom', 'left', or 'right'
-    labels: {
-      boxWidth: 12,
-      padding: 10,
-      font: {
-        size: 12,
-        weight: 'bold'
-      }
-    }
-  },
-tooltip: {
-  callbacks: {
-    label: function(context) {
-      const label = context.raw.label;
-      const coverage = context.raw.y.toFixed(1);
-      const delta = context.raw.delta?.toFixed(1) ?? '0.0';
-      const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
-      return `${label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
-    }
-  }
-}
-},
-    onClick: (e) => {
-      const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-      if (points.length) {
-        const url = chart.data.datasets[0].data[points[0].index].url;
-        window.open(url, '_blank');
-      }
+	data: {
+		datasets: [{
+			label: 'Total Coverage (%)',
+			data: dataPoints,
+			borderColor: 'green',
+			backgroundColor: 'rgba(0,128,0,0.1)',
+			pointRadius: 5,
+			pointHoverRadius: 7,
+			pointStyle: 'circle',
+			fill: false,
+			tension: 0.3,
+			pointBackgroundColor: function(context) {
+				return context.raw.pointBackgroundColor || 'gray';
+			}
+		}, {
+			label: 'Regression Line',
+			data: regressionPoints,
+			borderColor: 'blue',
+			borderDash: [5, 5],
+			pointRadius: 0,
+			fill: false,
+			tension: 0.0
+		}]
+	}, options: {
+		scales: {
+			x: {
+				type: 'time',
+				time: {
+					tooltipFormat: 'MMM d, yyyy HH:mm:ss',
+					unit: 'minute'
+				},
+				title: { display: true, text: 'Timestamp' }
+			},
+			y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
+		}, plugins: {
+			legend: {
+				display: true,
+				position: 'top', // You can also use 'bottom', 'left', or 'right'
+				labels: {
+					boxWidth: 12,
+					padding: 10,
+					font: {
+						size: 12,
+						weight: 'bold'
+					}
+				}
+			}, tooltip: {
+				callbacks: {
+					label: function(context) {
+						const label = context.raw.label;
+						const coverage = context.raw.y.toFixed(1);
+						const delta = context.raw.delta?.toFixed(1) ?? '0.0';
+						const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
+						return `${label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
+					}
+				}
+			}
+		}, onClick: (e) => {
+			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+			if (points.length) {
+				const url = chart.data.datasets[0].data[points[0].index].url;
+				window.open(url, '_blank');
+			}
 		}
 	}
 });
+document.getElementById('toggleTrend').addEventListener('change', function(e) {
+	const show = e.target.checked;
+	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
+	trendDataset.hidden = !show;
+	chart.update();
+});
 </script>
 HTML
-
 
 $html .= <<"HTML";
 <footer>
