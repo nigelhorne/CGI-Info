@@ -243,21 +243,21 @@ while (<$log>) {
 my @data_points;
 my $prev_pct;
 foreach my $file (sort @history_files) {
-    my $json = eval { decode_json(read_file($file)) };
-    next unless $json && $json->{summary}{Total};
+	my $json = eval { decode_json(read_file($file)) };
+	next unless $json && $json->{summary}{Total};
 
-    my ($sha) = $file =~ /-(\w{7})\.json$/;
-    my $timestamp = $commit_times{$sha} // strftime("%Y-%m-%dT%H:%M:%S", localtime((stat($file))->mtime));
-$timestamp =~ s/ /T/;
-$timestamp =~ s/\s+([+-]\d{2}):?(\d{2})$/$1:$2/;	# Fix space before timezone
-$timestamp =~ s/ //g;  # Remove any remaining spaces
+	my ($sha) = $file =~ /-(\w{7})\.json$/;
+	my $timestamp = $commit_times{$sha} // strftime("%Y-%m-%dT%H:%M:%S", localtime((stat($file))->mtime));
+	$timestamp =~ s/ /T/;
+	$timestamp =~ s/\s+([+-]\d{2}):?(\d{2})$/$1:$2/;	# Fix space before timezone
+	$timestamp =~ s/ //g;	# Remove any remaining spaces
 
-    my $pct = $json->{summary}{Total}{total}{percentage} // 0;
-    my $delta = defined $prev_pct ? sprintf('%.1f', $pct - $prev_pct) : 0;
-    $prev_pct = $pct;
+	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
+	my $delta = defined $prev_pct ? sprintf('%.1f', $pct - $prev_pct) : 0;
+	$prev_pct = $pct;
 
-    my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
-    my $url = "https://github.com/nigelhorne/CGI-Info/commit/$sha";
+	my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
+	my $url = "https://github.com/nigelhorne/CGI-Info/commit/$sha";
 
 	push @data_points, qq{{ x: "$timestamp", y: $pct, delta: $delta, url: "$url", label: "$timestamp", pointBackgroundColor: "$color" }};
 }
@@ -277,7 +277,7 @@ HTML
 $html .= <<'HTML';
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
-  type: 'line',
+	type: 'line',
 data: {
   datasets: [{
     label: 'Total Coverage (%)',
@@ -306,15 +306,31 @@ time: {
   },
       y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
     },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            return `${context.raw.label}: ${context.raw.y}%`;
-          }
-        }
+plugins: {
+  legend: {
+    display: true,
+    position: 'top', // You can also use 'bottom', 'left', or 'right'
+    labels: {
+      boxWidth: 12,
+      padding: 10,
+      font: {
+        size: 12,
+        weight: 'bold'
       }
-    },
+    }
+  },
+tooltip: {
+  callbacks: {
+    label: function(context) {
+      const label = context.raw.label;
+      const coverage = context.raw.y.toFixed(1);
+      const delta = context.raw.delta?.toFixed(1) ?? '0.0';
+      const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
+      return `${label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
+    }
+  }
+}
+},
     onClick: (e) => {
       const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
       if (points.length) {
@@ -322,7 +338,7 @@ time: {
         window.open(url, '_blank');
       }
     }
-  }
+	}
 });
 </script>
 HTML
