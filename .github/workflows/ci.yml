@@ -72,7 +72,7 @@ jobs:
       - name: Generate custom coverage index
         run: |
           mkdir -p cover_db
-          # cover -dump > cover_db/coverage.json
+          # cover -dump > cover_db/cover.json
           cover -report json -outputdir cover_db
           perl scripts/generate_index.pl
 
@@ -82,6 +82,8 @@ jobs:
           TIMESTAMP=$(date +%Y-%m-%d)
           SHA=$(git rev-parse --short HEAD)
           cp cover_db/cover.json "coverage_history/${TIMESTAMP}-${SHA}.json"
+          # Remove older history
+          # ls -t coverage_history/*.json | tail -n +31 | xargs rm -f
 
       - name: Commit coverage snapshot
         run: |
@@ -100,6 +102,4 @@ jobs:
           destination_dir: coverage
           user_name: github-actions
           user_email: github-actions@github.com
-          # Create a completely new gh-pages branch
-          force_orphan: true
-          keep_files: false
+          keep_files: true
