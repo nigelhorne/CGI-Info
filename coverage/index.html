@@ -48,14 +48,44 @@
 <h1>CGI::Info Coverage Report</h1>
 <table>
 <tr><th>File</th><th>Stmt</th><th>Branch</th><th>Cond</th><th>Sub</th><th>Total</th></tr>
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/4e1e1c43e3279636be20d6cf85fe1c6100cfef4b/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td></tr>
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/4e1e1c43e3279636be20d6cf85fe1c6100cfef4b/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/96a83ad204b98929bfcc98ba67893ab376d65d6f/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/96a83ad204b98929bfcc98ba67893ab376d65d6f/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td></tr>
 <tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="2">Avg: 73%, Low: 1</td></tr>
 <tr class="med"><td><strong>Total</strong></td><td>87.2</td><td>75.6</td><td>58.7</td><td>98.5</td><td><strong>79.1</strong></td></tr>
 </table>
+
+<h2>Coverage Trend</h2>
+<canvas id="coverageTrend" width="600" height="300"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('coverageTrend').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ["2025-08-29","2025-08-30"],
+        datasets: [{
+            label: 'Total Coverage (%)',
+            data: [79.1,79.1],
+            borderColor: 'green',
+            backgroundColor: 'rgba(0,128,0,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+});
+</script>
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2025-08-30 00:04:29 - <a href="https://github.com/nigelhorne/CGI-Info/commit/4e1e1c43e3279636be20d6cf85fe1c6100cfef4b">commit <code>4e1e1c4</code></a></em></p>
+	<p><em>Last updated: 2025-08-30 00:13:45 - <a href="https://github.com/nigelhorne/CGI-Info/commit/96a83ad204b98929bfcc98ba67893ab376d65d6f">commit <code>96a83ad</code></a></em></p>
 </footer>
 </body>
 </html>
