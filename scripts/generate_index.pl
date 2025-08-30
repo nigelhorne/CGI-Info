@@ -68,7 +68,7 @@ my $html = <<"HTML";
 		}
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
-		td.neutral  { color: gray; }
+		td.neutral { color: gray; }
 	</style>
 </head>
 <body>
@@ -88,7 +88,7 @@ my @history = sort { $a cmp $b } bsd_glob("coverage_history/*.json");
 my $prev_data;
 
 if (@history >= 1) {
-	my $prev_file = $history[-1];  # Most recent before current
+	my $prev_file = $history[-1];	# Most recent before current
 	eval {
 		$prev_data = decode_json(read_file($prev_file));
 	};
@@ -147,7 +147,7 @@ my $delta_html = '';
 if (exists $deltas{$file}) {
 	my $delta = $deltas{$file};
 	my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
-	my $delta_icon  = $delta > 0 ? '&#9650;' : $delta < 0 ? '&#9660;' : '&#9679;';
+	my $delta_icon = $delta > 0 ? '&#9650;' : $delta < 0 ? '&#9660;' : '&#9679;';
 	my $prev_pct = $prev_data->{summary}{$file}{total}{percentage} // 0;
 
 	$delta_html = sprintf(
@@ -228,7 +228,7 @@ foreach my $file (sort @history_files) {
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
 	my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
-	push @trend_points, { date => $date, coverage => sprintf("%.1f", $pct) };
+	push @trend_points, { date => $date, coverage => sprintf('%.1f', $pct) };
 }
 
 # Inject chart if we have data
@@ -245,26 +245,25 @@ if (@trend_points >= 2) {
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
 	type: 'line',
-    data: {
-        labels: [$labels],
-        datasets: [{
-            label: 'Total Coverage (%)',
-            data: [$values],
-            borderColor: 'green',
-            backgroundColor: 'rgba(0,128,0,0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 3
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true,
-                max: 100
-            }
-        }
-    }
+	data: {
+		labels: [$labels],
+		datasets: [{
+			label: 'Total Coverage (%)',
+			data: [$values],
+			borderColor: 'green',
+			backgroundColor: 'rgba(0,128,0,0.1)',
+			fill: true,
+			tension: 0.3,
+			pointRadius: 3
+		}]
+	}, options: {
+		scales: {
+			y: {
+				beginAtZero: true,
+				max: 100
+			}
+		}
+	}
 });
 </script>
 HTML
