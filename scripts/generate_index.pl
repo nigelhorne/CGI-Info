@@ -143,20 +143,20 @@ for my $file (sort keys %{$data->{summary}}) {
 		$badge_class, $tooltip, $total
 	);
 
-my $delta_html = '';
-if (exists $deltas{$file}) {
-	my $delta = $deltas{$file};
-	my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
-	my $delta_icon = $delta > 0 ? '&#9650;' : $delta < 0 ? '&#9660;' : '&#9679;';
-	my $prev_pct = $prev_data->{summary}{$file}{total}{percentage} // 0;
+	my $delta_html = '';
+	if (exists $deltas{$file}) {
+		my $delta = $deltas{$file};
+		my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
+		my $delta_icon = $delta > 0 ? '&#9650;' : $delta < 0 ? '&#9660;' : '&#9679;';
+		my $prev_pct = $prev_data->{summary}{$file}{total}{percentage} // 0;
 
-	$delta_html = sprintf(
-		'<td class="%s" title="Previous: %.1f%%">%s %.1f%%</td>',
-		$delta_class, $prev_pct, $delta_icon, abs($delta)
-	);
-} else {
-	$delta_html = '<td class="neutral" title="No previous data">&#9679;</td>';
-}
+		$delta_html = sprintf(
+			'<td class="%s" title="Previous: %.1f%%">%s %.1f%%</td>',
+			$delta_class, $prev_pct, $delta_icon, abs($delta)
+		);
+	} else {
+		$delta_html = '<td class="neutral" title="No previous data">&#9679;</td>';
+	}
 
 	my $source_url = $github_base . $file;
 	my $has_coverage = (
@@ -239,15 +239,36 @@ while (<$log>) {
 	my ($full_sha, $short_sha, $datetime) = split ' ', $_, 3;
 	$commit_times{$short_sha} = $datetime;
 }
+close $log;
+
+my %commit_messages;
+open($log, '-|', 'git log --pretty=format:"%h %s"') or die "Can't run git log: $!";
+while (<$log>) {
+	chomp;
+	my ($short_sha, $message) = /^(\w+)\s+(.*)$/;
+	$commit_messages{$short_sha} = $message;
+}
+close $log;
+
+# Only display the last 10 commits
+my $elements_to_keep = 10;
+
+# Calculate the number of elements to remove from the beginning
+my $elements_to_remove = scalar(@history_files) - $elements_to_keep;
+
+# Use splice to remove elements from the beginning of the array
+@history_files = sort(@history_files);
+splice(@history_files, 0, $elements_to_remove);
 
 my @data_points;
 my $prev_pct;
-foreach my $file (sort @history_files) {
+
+foreach my $file (@history_files) {
 	my $json = eval { decode_json(read_file($file)) };
 	next unless $json && $json->{summary}{Total};
 
 	my ($sha) = $file =~ /-(\w{7})\.json$/;
-	my $timestamp = $commit_times{$sha} // strftime("%Y-%m-%dT%H:%M:%S", localtime((stat($file))->mtime));
+	my $timestamp = $commit_times{$sha} // strftime('%Y-%m-%dT%H:%M:%S', localtime((stat($file))->mtime));
 	$timestamp =~ s/ /T/;
 	$timestamp =~ s/\s+([+-]\d{2}):?(\d{2})$/$1:$2/;	# Fix space before timezone
 	$timestamp =~ s/ //g;	# Remove any remaining spaces
@@ -259,7 +280,8 @@ foreach my $file (sort @history_files) {
 	my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
 	my $url = "https://github.com/nigelhorne/CGI-Info/commit/$sha";
 
-	push @data_points, qq{{ x: "$timestamp", y: $pct, delta: $delta, url: "$url", label: "$timestamp", pointBackgroundColor: "$color" }};
+	my $comment = $commit_messages{$sha} // '';
+	push @data_points, qq{{ x: "$timestamp", y: $pct, delta: $delta, url: "$url", label: "$timestamp", pointBackgroundColor: "$color", comment: "$comment" }};
 }
 
 my $js_data = join(",\n", @data_points);
@@ -351,11 +373,14 @@ const chart = new Chart(ctx, {
 			}, tooltip: {
 				callbacks: {
 					label: function(context) {
-						const label = context.raw.label;
-						const coverage = context.raw.y.toFixed(1);
-						const delta = context.raw.delta?.toFixed(1) ?? '0.0';
+						const raw = context.raw;
+						const coverage = raw.y.toFixed(1);
+						const delta = raw.delta?.toFixed(1) ?? '0.0';
 						const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
-						return `${label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
+						// const baseLine = `${raw.label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
+						const baseLine = `${coverage}% (${sign}${Math.abs(delta)}%)`;
+						const commentLine = raw.comment ? raw.comment : null;
+						return commentLine ? [baseLine, commentLine] : [baseLine];
 					}
 				}
 			}
