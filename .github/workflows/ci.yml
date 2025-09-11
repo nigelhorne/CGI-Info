@@ -31,6 +31,12 @@ jobs:
           # install cpanminus
           # cpanm-options: --notest
 
+      - name: Update Ubuntu Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get -y upgrade
+        if: runner.os == 'Linux'
+
       # Install module dependencies (from cpanfile or manually)
       - name: Install dependencies
         run: |
