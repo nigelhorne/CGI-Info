@@ -39,7 +39,7 @@
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
 		td.neutral { color: gray; }
-		// Show a cursor points on the headers to show that they are clickable
+		// Show cursor points on the headers to show that they are clickable
 		th { background-color: #f2f2f2; cursor: pointer; }
 		th.sortable {
 			cursor: pointer;
@@ -53,6 +53,10 @@
 		th .arrow.active {
 			color: #000;	/* dark for active */
 			font-weight: bold;
+		}
+		.sparkline {
+			display: inline-block;
+			vertical-align: middle;
 		}
 	</style>
 </head>
@@ -80,9 +84,9 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/86c803b781b83bec3c88014bc3dcb94d31e8bb52/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/ef2bc2d07d40787c9df7180335e3ae30dbadb49e/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
 
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/86c803b781b83bec3c88014bc3dcb94d31e8bb52/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/ef2bc2d07d40787c9df7180335e3ae30dbadb49e/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4"></canvas></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
 
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 
@@ -127,7 +131,8 @@ const dataPoints = [ { x: "2025-08-29T19:41:55-04:00", y: 79.0953545232274, delt
 { x: "2025-08-30T14:51:38-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/2ce4b95", label: "2025-08-30T14:51:38-04:00", pointBackgroundColor: "gray", comment: "Latest trends graph" },
 { x: "2025-08-30T16:33:19-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a48702f", label: "2025-08-30T16:33:19-04:00", pointBackgroundColor: "gray", comment: "Show deltas on tooltips" },
 { x: "2025-08-30T17:51:50-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/15a9065", label: "2025-08-30T17:51:50-04:00", pointBackgroundColor: "gray", comment: "Added regression line" },
-{ x: "2025-09-11T13:13:22-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dff77b5", label: "2025-09-11T13:13:22-04:00", pointBackgroundColor: "gray", comment: "Latest test page generation code from SEO::Inspector" } ];
+{ x: "2025-09-11T13:13:22-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dff77b5", label: "2025-09-11T13:13:22-04:00", pointBackgroundColor: "gray", comment: "Latest test page generation code from SEO::Inspector" },
+{ x: "2025-09-11T15:14:26-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/86c803b", label: "2025-09-11T15:14:26-04:00", pointBackgroundColor: "gray", comment: "Latest testing dashboard from SEO::Inspector" } ];
 
 const regressionPoints = linearRegression(dataPoints);
 const ctx = document.getElementById('coverageTrend').getContext('2d');
@@ -292,11 +297,42 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.querySelectorAll("canvas.sparkline").forEach(canvas => {
+		const raw = canvas.getAttribute("data-points");
+		if (!raw) return;
+		const points = raw.split(",").map(v => parseFloat(v));
+
+		new Chart(canvas.getContext("2d"), {
+			type: 'line',
+			data: {
+				labels: points.map((_, i) => i+1),
+				datasets: [{
+					data: points,
+					borderColor: points.length > 1 && points[points.length-1] >= points[0] ? "green" : "red",
+					borderWidth: 1,
+					fill: false,
+					tension: 0.3,
+					pointRadius: 0
+				}]
+			},
+			options: {
+				responsive: false,
+				maintainAspectRatio: false,
+				elements: { line: { borderJoinStyle: 'round' } },
+				plugins: { legend: { display: false }, tooltip: { enabled: false } },
+				scales: { x: { display: false }, y: { display: false } }
+			}
+		});
+	});
+});
+
 </script>
 
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2025-09-11 19:19:42 - <a href="https://github.com/nigelhorne/CGI-Info/commit/86c803b781b83bec3c88014bc3dcb94d31e8bb52">commit <code>86c803b</code></a></em></p>
+	<p><em>Last updated: 2025-09-11 20:27:43 - <a href="https://github.com/nigelhorne/CGI-Info/commit/ef2bc2d07d40787c9df7180335e3ae30dbadb49e">commit <code>ef2bc2d</code></a></em></p>
 </footer>
 </body>
 </html>
