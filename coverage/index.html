@@ -39,6 +39,21 @@
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
 		td.neutral { color: gray; }
+		// Show a cursor points on the headers to show that they are clickable
+		th { background-color: #f2f2f2; cursor: pointer; }
+		th.sortable {
+			cursor: pointer;
+			user-select: none;
+			white-space: nowrap;
+		}
+		th .arrow {
+			color: #aaa;	/* dimmed for inactive */
+			font-weight: normal;
+		}
+		th .arrow.active {
+			color: #000;	/* dark for active */
+			font-weight: bold;
+		}
 	</style>
 </head>
 <body>
@@ -49,18 +64,31 @@
 	<img src="https://img.shields.io/badge/coverage-79%25-yellow" alt="Coverage badge">
 </div>
 <h1>CGI::Info</h1><h2>Coverage Report</h2>
-<table>
-<tr><th>File</th><th>Stmt</th><th>Branch</th><th>Cond</th><th>Sub</th><th>Total</th><th>&Delta;</th></tr>
+<table data-sort-col="0" data-sort-order="asc">
+<!-- Make the column headers clickable -->
+<thead>
+<tr>
+	<th class="sortable" onclick="sortTable(0)"><span class="label">File</span> <span class="arrow active">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(1)"><span class="label">Stmt</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(2)"><span class="label">Branch</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(3)"><span class="label">Cond</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(4)"><span class="label">Sub</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(5)"><span class="label">Total</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(6)"><span class="label">&Delta;</span> <span class="arrow">&#x25B2;</span></th>
+</tr>
+</thead>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/dff77b5e97d50903253870f76c8f66f343c8420d/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tbody>
 
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/dff77b5e97d50903253870f76c8f66f343c8420d/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/86c803b781b83bec3c88014bc3dcb94d31e8bb52/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
 
-<tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/86c803b781b83bec3c88014bc3dcb94d31e8bb52/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
 
-<tr class="med"><td><strong>Total</strong></td><td>87.2</td><td>75.6</td><td>58.7</td><td>98.5</td><td colspan="2"><strong>79.1</strong></td></tr>
+<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 
-</table>
+<tr class="med nosort"><td><strong>Total</strong></td><td>87.2</td><td>75.6</td><td>58.7</td><td>98.5</td><td colspan="2"><strong>79.1</strong></td></tr>
+
+</tbody></table>
 <p>
 	<h2>Coverage Trend</h2>
 	<label>
@@ -98,7 +126,8 @@ const dataPoints = [ { x: "2025-08-29T19:41:55-04:00", y: 79.0953545232274, delt
 { x: "2025-08-29T21:32:26-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/5a7c4c0", label: "2025-08-29T21:32:26-04:00", pointBackgroundColor: "gray", comment: "Don't add coverage history to the manifest" },
 { x: "2025-08-30T14:51:38-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/2ce4b95", label: "2025-08-30T14:51:38-04:00", pointBackgroundColor: "gray", comment: "Latest trends graph" },
 { x: "2025-08-30T16:33:19-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a48702f", label: "2025-08-30T16:33:19-04:00", pointBackgroundColor: "gray", comment: "Show deltas on tooltips" },
-{ x: "2025-08-30T17:51:50-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/15a9065", label: "2025-08-30T17:51:50-04:00", pointBackgroundColor: "gray", comment: "Added regression line" } ];
+{ x: "2025-08-30T17:51:50-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/15a9065", label: "2025-08-30T17:51:50-04:00", pointBackgroundColor: "gray", comment: "Added regression line" },
+{ x: "2025-09-11T13:13:22-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dff77b5", label: "2025-09-11T13:13:22-04:00", pointBackgroundColor: "gray", comment: "Latest test page generation code from SEO::Inspector" } ];
 
 const regressionPoints = linearRegression(dataPoints);
 const ctx = document.getElementById('coverageTrend').getContext('2d');
@@ -179,11 +208,95 @@ document.getElementById('toggleTrend').addEventListener('change', function(e) {
 	trendDataset.hidden = !show;
 	chart.update();
 });
+
+function sortTable(n) {
+	const table = document.querySelector("table");
+	if (!table || !table.tBodies || !table.tBodies[0]) return;
+
+	// All rows in tbody
+	const allBodyRows = Array.from(table.tBodies[0].rows);
+
+	// Separate normal (sortable) rows and fixed (nosort) rows.
+	const normalRows = allBodyRows.filter(r => !r.classList.contains("nosort"));
+	const fixedRows = allBodyRows.filter(r => r.classList.contains("nosort"));
+
+	// Decide numeric vs text column (column 0 = File => text)
+	const isNumeric = n > 0;
+
+	// Determine ascending/descending toggle logic
+	const prevCol = table.getAttribute("data-sort-col");
+	const prevOrder = table.getAttribute("data-sort-order") || "desc";
+	const asc = (prevCol != n) ? true : (prevOrder === "desc");
+
+	normalRows.sort((a, b) => {
+		let x = (a.cells[n] && a.cells[n].innerText) ? a.cells[n].innerText.trim() : "";
+		let y = (b.cells[n] && b.cells[n].innerText) ? b.cells[n].innerText.trim() : "";
+
+		if (isNumeric) {
+			// Remove non-number characters (arrows, percent signs, bullets, etc.)
+			x = parseFloat(x.replace(/[^0-9.\-+eE]/g, '')) || 0;
+			y = parseFloat(y.replace(/[^0-9.\-+eE]/g, '')) || 0;
+		} else {
+			// Text compare (case-insensitive)
+			x = x.toLowerCase();
+			y = y.toLowerCase();
+		}
+
+		if (x < y) return asc ? -1 : 1;
+		if (x > y) return asc ? 1 : -1;
+		return 0;
+	});
+
+	// Reattach rows: sorted normalRows first, then fixedRows (keeps summary/total last)
+	normalRows.forEach(r => table.tBodies[0].appendChild(r));
+	fixedRows.forEach(r => table.tBodies[0].appendChild(r));
+
+	// Update header arrows
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+		if (i === n) {
+			// active column: bold arrow, direction ▲ or ▼
+			arrow.textContent = asc ? "▲" : "▼";
+			arrow.classList.add("active");
+		} else {
+			// inactive column: always ▲, dimmed
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
+
+	// Remember state (so clicking same column toggles)
+	table.setAttribute("data-sort-col", n);
+	table.setAttribute("data-sort-order", asc ? "asc" : "desc");
+}
+
+// Initial display.
+// The table has been set up sorted in ascending order on the filename, reflect that in the GUI
+document.addEventListener("DOMContentLoaded", () => {
+	const table = document.querySelector("table");
+	if (!table) return;
+
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+
+		if (i === 0) {
+			arrow.textContent = "▲";
+			arrow.classList.add("active");
+		} else {
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
+});
 </script>
 
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2025-09-11 17:18:14 - <a href="https://github.com/nigelhorne/CGI-Info/commit/dff77b5e97d50903253870f76c8f66f343c8420d">commit <code>dff77b5</code></a></em></p>
+	<p><em>Last updated: 2025-09-11 19:19:42 - <a href="https://github.com/nigelhorne/CGI-Info/commit/86c803b781b83bec3c88014bc3dcb94d31e8bb52">commit <code>86c803b</code></a></em></p>
 </footer>
 </body>
 </html>
