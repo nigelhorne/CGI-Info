@@ -71,7 +71,7 @@ push @html, <<"HTML";
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
 		td.neutral { color: gray; }
-		// Show a cursor points on the headers to show that they are clickable
+		// Show cursor points on the headers to show that they are clickable
 		th { background-color: #f2f2f2; cursor: pointer; }
 		th.sortable {
 			cursor: pointer;
@@ -85,6 +85,10 @@ push @html, <<"HTML";
 		th .arrow.active {
 			color: #000;	/* dark for active */
 			font-weight: bold;
+		}
+		.sparkline {
+			display: inline-block;
+			vertical-align: middle;
 		}
 	</style>
 </head>
@@ -200,8 +204,27 @@ for my $file (sort keys %{$data->{summary}}) {
 		? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
 		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
+	# Create the sparkline
+	# There's probably some duplication of code here
+	my @file_history;
+	my @history_files = sort <coverage_history/*.json>;
+
+	my %history;
+	for my $file (@history_files) {
+		my $json = eval { decode_json(read_file($file)) };
+		next unless $json;
+		$history{$file} = $json;
+	}
+	for my $hist_file (sort @history_files) {
+		my $json = eval { decode_json(read_file($hist_file)) };
+		next unless $json && $json->{summary}{$file};
+		my $pct = $json->{summary}{$file}{total}{percentage} // 0;
+		push @file_history, sprintf('%.1f', $pct);
+	}
+	my $points_attr = join(',', @file_history);
+
 	push @html, sprintf(
-		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line">%s</a> %s</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>\n},
+		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line">%s</a> %s<canvas class="sparkline" width="80" height="20" data-points="$points_attr"></canvas></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>\n},
 		$row_class, $html_file, $file, $source_link,
 		$info->{statement}{percentage} // 0,
 		$info->{branch}{percentage} // 0,
@@ -538,6 +561,37 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.querySelectorAll("canvas.sparkline").forEach(canvas => {
+		const raw = canvas.getAttribute("data-points");
+		if (!raw) return;
+		const points = raw.split(",").map(v => parseFloat(v));
+
+		new Chart(canvas.getContext("2d"), {
+			type: 'line',
+			data: {
+				labels: points.map((_, i) => i+1),
+				datasets: [{
+					data: points,
+					borderColor: points.length > 1 && points[points.length-1] >= points[0] ? "green" : "red",
+					borderWidth: 1,
+					fill: false,
+					tension: 0.3,
+					pointRadius: 0
+				}]
+			},
+			options: {
+				responsive: false,
+				maintainAspectRatio: false,
+				elements: { line: { borderJoinStyle: 'round' } },
+				plugins: { legend: { display: false }, tooltip: { enabled: false } },
+				scales: { x: { display: false }, y: { display: false } }
+			}
+		});
+	});
+});
+
 </script>
 HTML
 
