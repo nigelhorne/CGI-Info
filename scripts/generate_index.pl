@@ -71,6 +71,21 @@ push @html, <<"HTML";
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
 		td.neutral { color: gray; }
+		// Show a cursor points on the headers to show that they are clickable
+		th { background-color: #f2f2f2; cursor: pointer; }
+		th.sortable {
+			cursor: pointer;
+			user-select: none;
+			white-space: nowrap;
+		}
+		th .arrow {
+			color: #aaa;	/* dimmed for inactive */
+			font-weight: normal;
+		}
+		th .arrow.active {
+			color: #000;	/* dark for active */
+			font-weight: bold;
+		}
 	</style>
 </head>
 <body>
@@ -81,8 +96,21 @@ push @html, <<"HTML";
 	<img src="$coverage_badge_url" alt="Coverage badge">
 </div>
 <h1>CGI::Info</h1><h2>Coverage Report</h2>
-<table>
-<tr><th>File</th><th>Stmt</th><th>Branch</th><th>Cond</th><th>Sub</th><th>Total</th><th>&Delta;</th></tr>
+<table data-sort-col="0" data-sort-order="asc">
+<!-- Make the column headers clickable -->
+<thead>
+<tr>
+	<th class="sortable" onclick="sortTable(0)"><span class="label">File</span> <span class="arrow active">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(1)"><span class="label">Stmt</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(2)"><span class="label">Branch</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(3)"><span class="label">Cond</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(4)"><span class="label">Sub</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(5)"><span class="label">Total</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(6)"><span class="label">&Delta;</span> <span class="arrow">&#x25B2;</span></th>
+</tr>
+</thead>
+
+<tbody>
 HTML
 
 # Load previous snapshot for delta comparison
@@ -188,7 +216,7 @@ for my $file (sort keys %{$data->{summary}}) {
 my $avg_coverage = $total_files ? int($total_coverage / $total_files) : 0;
 
 push @html, sprintf(
-	qq{<tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>\n},
+	qq{<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>\n},
 	$total_files, $avg_coverage, $low_coverage_count
 );
 
@@ -198,7 +226,7 @@ if (my $total_info = $data->{summary}{Total}) {
 	my $class = $total_pct > 80 ? 'high' : $total_pct > 50 ? 'med' : 'low';
 
 	push @html, sprintf(
-		qq{<tr class="%s"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>\n},
+		qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>\n},
 		$class,
 		$total_info->{statement}{percentage} // 0,
 		$total_info->{branch}{percentage} // 0,
@@ -216,7 +244,7 @@ if (my $stat = stat($cover_db)) {
 my $commit_url = "https://github.com/nigelhorne/CGI-Info/commit/$commit_sha";
 my $short_sha = substr($commit_sha, 0, 7);
 
-push @html, '</table>';
+push @html, '</tbody></table>';
 
 # Parse historical snapshots
 my @history_files = bsd_glob("coverage_history/*.json");
@@ -425,6 +453,90 @@ document.getElementById('toggleTrend').addEventListener('change', function(e) {
 	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
 	trendDataset.hidden = !show;
 	chart.update();
+});
+
+function sortTable(n) {
+	const table = document.querySelector("table");
+	if (!table || !table.tBodies || !table.tBodies[0]) return;
+
+	// All rows in tbody
+	const allBodyRows = Array.from(table.tBodies[0].rows);
+
+	// Separate normal (sortable) rows and fixed (nosort) rows.
+	const normalRows = allBodyRows.filter(r => !r.classList.contains("nosort"));
+	const fixedRows = allBodyRows.filter(r => r.classList.contains("nosort"));
+
+	// Decide numeric vs text column (column 0 = File => text)
+	const isNumeric = n > 0;
+
+	// Determine ascending/descending toggle logic
+	const prevCol = table.getAttribute("data-sort-col");
+	const prevOrder = table.getAttribute("data-sort-order") || "desc";
+	const asc = (prevCol != n) ? true : (prevOrder === "desc");
+
+	normalRows.sort((a, b) => {
+		let x = (a.cells[n] && a.cells[n].innerText) ? a.cells[n].innerText.trim() : "";
+		let y = (b.cells[n] && b.cells[n].innerText) ? b.cells[n].innerText.trim() : "";
+
+		if (isNumeric) {
+			// Remove non-number characters (arrows, percent signs, bullets, etc.)
+			x = parseFloat(x.replace(/[^0-9.\-+eE]/g, '')) || 0;
+			y = parseFloat(y.replace(/[^0-9.\-+eE]/g, '')) || 0;
+		} else {
+			// Text compare (case-insensitive)
+			x = x.toLowerCase();
+			y = y.toLowerCase();
+		}
+
+		if (x < y) return asc ? -1 : 1;
+		if (x > y) return asc ? 1 : -1;
+		return 0;
+	});
+
+	// Reattach rows: sorted normalRows first, then fixedRows (keeps summary/total last)
+	normalRows.forEach(r => table.tBodies[0].appendChild(r));
+	fixedRows.forEach(r => table.tBodies[0].appendChild(r));
+
+	// Update header arrows
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+		if (i === n) {
+			// active column: bold arrow, direction ▲ or ▼
+			arrow.textContent = asc ? "▲" : "▼";
+			arrow.classList.add("active");
+		} else {
+			// inactive column: always ▲, dimmed
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
+
+	// Remember state (so clicking same column toggles)
+	table.setAttribute("data-sort-col", n);
+	table.setAttribute("data-sort-order", asc ? "asc" : "desc");
+}
+
+// Initial display.
+// The table has been set up sorted in ascending order on the filename, reflect that in the GUI
+document.addEventListener("DOMContentLoaded", () => {
+	const table = document.querySelector("table");
+	if (!table) return;
+
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+
+		if (i === 0) {
+			arrow.textContent = "▲";
+			arrow.classList.add("active");
+		} else {
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
 });
 </script>
 HTML
