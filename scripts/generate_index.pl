@@ -7,11 +7,13 @@ use autodie qw(:all);
 use JSON::MaybeXS;
 use File::Glob ':glob';
 use File::Slurp;
-use POSIX qw(strftime);
 use File::stat;
+use POSIX qw(strftime);
+use Readonly;
 
-my $cover_db = 'cover_db/cover.json';
-my $output = 'cover_html/index.html';
+Readonly my $cover_db => 'cover_db/cover.json';
+Readonly my $output => 'cover_html/index.html';
+Readonly my $max_points => 10;	# Only display the last 10 commits in the coverage trend graph
 
 # Read and decode coverage data
 my $json_text = read_file($cover_db);
@@ -25,7 +27,7 @@ if(my $total_info = $data->{summary}{Total}) {
 	$badge_color = $coverage_pct > 80 ? 'brightgreen' : $coverage_pct > 50 ? 'yellow' : 'red';
 }
 
-my $coverage_badge_url = "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
+Readonly my $coverage_badge_url => "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
 
 # Start HTML
 my @html;	# build in array, join later
@@ -308,7 +310,6 @@ close $log;
 # Collect data points from non-merge commits
 my @data_points_with_time;
 my $processed_count = 0;
-my $max_points = 10;	# Only display the last 10 commits
 
 foreach my $file (reverse sort @history_files) {
 	last if $processed_count >= $max_points;
@@ -372,7 +373,14 @@ HTML
 
 push @html, <<"HTML";
 <canvas id="coverageTrend" width="600" height="300"></canvas>
+<!-- Zoom controls for the trend chart -->
+<div id="zoomControls" style="margin-top:8px;">
+	<button id="resetZoomBtn" type="button">Reset Zoom</button>
+	<span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add chartjs-plugin-zoom (required for wheel/pinch/drag zoom & pan) -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom\@2.1.1/dist/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
 function linearRegression(data) {
@@ -399,6 +407,20 @@ HTML
 
 push @html, <<'HTML';
 const regressionPoints = linearRegression(dataPoints);
+// Try to register the zoom plugin (handles different UMD builds)
+(function registerZoomPlugin(){
+	try {
+		const candidates = ['chartjsPluginZoom','ChartZoom','zoomPlugin','chartjs_plugin_zoom','ChartjsPluginZoom','chartjsPluginZoom'];
+		for (const name of candidates) {
+			if (window[name]) {
+				try { Chart.register(window[name]); console.log('Registered zoom plugin:', name); return; } catch(e) { console.warn('zoom register failed for', name, e); }
+			}
+		}
+		// Some CDN builds auto-register the plugin; if nothing found that's OK (feature disabled).
+	} catch(e) {
+		console.warn('registerZoomPlugin error', e);
+	}
+})();
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
 	type: 'line',
@@ -461,6 +483,17 @@ const chart = new Chart(ctx, {
 						return commentLine ? [baseLine, commentLine] : [baseLine];
 					}
 				}
+			} , zoom: {	// Enable zoom & pan on the x-axis for the trend chart
+				pan: {
+					enabled: true,
+					mode: 'x'
+				}, zoom: {
+					wheel: {
+						enabled: true
+					}, pinch: {
+						enabled: true
+					}, mode: 'x'
+				}
 			}
 		}, onClick: (e) => {
 			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
@@ -471,12 +504,29 @@ const chart = new Chart(ctx, {
 		}
 	}
 });
+
 document.getElementById('toggleTrend').addEventListener('change', function(e) {
 	const show = e.target.checked;
 	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
 	trendDataset.hidden = !show;
 	chart.update();
 });
+
+// Reset Zoom button handler (calls plugin API if available)
+const resetBtn = document.getElementById('resetZoomBtn');
+if (resetBtn) {
+	resetBtn.addEventListener('click', function() {
+		try {
+			if (chart && typeof chart.resetZoom === 'function') {
+				chart.resetZoom();
+			} else {
+				console.warn('resetZoom not available; zoom plugin may not be registered.');
+			}
+		} catch (e) {
+			console.warn('resetZoom call failed', e);
+		}
+	});
+}
 
 function sortTable(n) {
 	const table = document.querySelector("table");
@@ -542,7 +592,7 @@ function sortTable(n) {
 }
 
 // Initial display.
-// The table has been set up sorted in ascending order on the filename, reflect that in the GUI
+// The table has been set up sorted in ascending order on the filename; reflect that in the GUI
 document.addEventListener("DOMContentLoaded", () => {
 	const table = document.querySelector("table");
 	if (!table) return;
@@ -580,13 +630,28 @@ document.addEventListener("DOMContentLoaded", () => {
 					tension: 0.3,
 					pointRadius: 0
 				}]
-			},
-			options: {
+			}, options: {
 				responsive: false,
 				maintainAspectRatio: false,
 				elements: { line: { borderJoinStyle: 'round' } },
-				plugins: { legend: { display: false }, tooltip: { enabled: false } },
-				scales: { x: { display: false }, y: { display: false } }
+				plugins: {
+					legend: { display: false },
+					tooltip: { enabled: false },
+					zoom: {	// Enable zoom and pan
+						pan: {
+							enabled: true,
+							mode: 'x',
+						}, zoom: {
+							wheel: {
+								enabled: true,
+							},
+							pinch: {
+								enabled: true
+							},
+							mode: 'x',
+						}
+					}
+				}, scales: { x: { display: false }, y: { display: false } }
 			}
 		});
 	});

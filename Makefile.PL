@@ -40,6 +40,7 @@ WriteMakefile(
 		'LWP::UserAgent' => 0,
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		'POSIX' => 0,
+		'Readonly' => 0,
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
