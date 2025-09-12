@@ -84,9 +84,9 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/ef2bc2d07d40787c9df7180335e3ae30dbadb49e/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/cbd128fd0f2e13401928976c25d38a3fc3945435/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
 
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/ef2bc2d07d40787c9df7180335e3ae30dbadb49e/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4"></canvas></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/cbd128fd0f2e13401928976c25d38a3fc3945435/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4"></canvas></td><td>87.8</td><td>76.5</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.4%</span></td><td class="neutral" title="Previous: 79.4%">&#9679; 0.0%</td></tr>
 
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 
@@ -102,7 +102,14 @@
 </p>
 
 <canvas id="coverageTrend" width="600" height="300"></canvas>
+<!-- Zoom controls for the trend chart -->
+<div id="zoomControls" style="margin-top:8px;">
+	<button id="resetZoomBtn" type="button">Reset Zoom</button>
+	<span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add chartjs-plugin-zoom (required for wheel/pinch/drag zoom & pan) -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.1.1/dist/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
 function linearRegression(data) {
@@ -132,9 +139,24 @@ const dataPoints = [ { x: "2025-08-29T19:41:55-04:00", y: 79.0953545232274, delt
 { x: "2025-08-30T16:33:19-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a48702f", label: "2025-08-30T16:33:19-04:00", pointBackgroundColor: "gray", comment: "Show deltas on tooltips" },
 { x: "2025-08-30T17:51:50-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/15a9065", label: "2025-08-30T17:51:50-04:00", pointBackgroundColor: "gray", comment: "Added regression line" },
 { x: "2025-09-11T13:13:22-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dff77b5", label: "2025-09-11T13:13:22-04:00", pointBackgroundColor: "gray", comment: "Latest test page generation code from SEO::Inspector" },
-{ x: "2025-09-11T15:14:26-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/86c803b", label: "2025-09-11T15:14:26-04:00", pointBackgroundColor: "gray", comment: "Latest testing dashboard from SEO::Inspector" } ];
+{ x: "2025-09-11T15:14:26-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/86c803b", label: "2025-09-11T15:14:26-04:00", pointBackgroundColor: "gray", comment: "Latest testing dashboard from SEO::Inspector" },
+{ x: "2025-09-11T16:22:01-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/ef2bc2d", label: "2025-09-11T16:22:01-04:00", pointBackgroundColor: "gray", comment: "Test dashboard: show a sparkline against each file" } ];
 
 const regressionPoints = linearRegression(dataPoints);
+// Try to register the zoom plugin (handles different UMD builds)
+(function registerZoomPlugin(){
+	try {
+		const candidates = ['chartjsPluginZoom','ChartZoom','zoomPlugin','chartjs_plugin_zoom','ChartjsPluginZoom','chartjsPluginZoom'];
+		for (const name of candidates) {
+			if (window[name]) {
+				try { Chart.register(window[name]); console.log('Registered zoom plugin:', name); return; } catch(e) { console.warn('zoom register failed for', name, e); }
+			}
+		}
+		// Some CDN builds auto-register the plugin; if nothing found that's OK (feature disabled).
+	} catch(e) {
+		console.warn('registerZoomPlugin error', e);
+	}
+})();
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
 	type: 'line',
@@ -197,6 +219,17 @@ const chart = new Chart(ctx, {
 						return commentLine ? [baseLine, commentLine] : [baseLine];
 					}
 				}
+			} , zoom: {	// Enable zoom & pan on the x-axis for the trend chart
+				pan: {
+					enabled: true,
+					mode: 'x'
+				}, zoom: {
+					wheel: {
+						enabled: true
+					}, pinch: {
+						enabled: true
+					}, mode: 'x'
+				}
 			}
 		}, onClick: (e) => {
 			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
@@ -207,12 +240,29 @@ const chart = new Chart(ctx, {
 		}
 	}
 });
+
 document.getElementById('toggleTrend').addEventListener('change', function(e) {
 	const show = e.target.checked;
 	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
 	trendDataset.hidden = !show;
 	chart.update();
 });
+
+// Reset Zoom button handler (calls plugin API if available)
+const resetBtn = document.getElementById('resetZoomBtn');
+if (resetBtn) {
+	resetBtn.addEventListener('click', function() {
+		try {
+			if (chart && typeof chart.resetZoom === 'function') {
+				chart.resetZoom();
+			} else {
+				console.warn('resetZoom not available; zoom plugin may not be registered.');
+			}
+		} catch (e) {
+			console.warn('resetZoom call failed', e);
+		}
+	});
+}
 
 function sortTable(n) {
 	const table = document.querySelector("table");
@@ -278,7 +328,7 @@ function sortTable(n) {
 }
 
 // Initial display.
-// The table has been set up sorted in ascending order on the filename, reflect that in the GUI
+// The table has been set up sorted in ascending order on the filename; reflect that in the GUI
 document.addEventListener("DOMContentLoaded", () => {
 	const table = document.querySelector("table");
 	if (!table) return;
@@ -316,13 +366,28 @@ document.addEventListener("DOMContentLoaded", () => {
 					tension: 0.3,
 					pointRadius: 0
 				}]
-			},
-			options: {
+			}, options: {
 				responsive: false,
 				maintainAspectRatio: false,
 				elements: { line: { borderJoinStyle: 'round' } },
-				plugins: { legend: { display: false }, tooltip: { enabled: false } },
-				scales: { x: { display: false }, y: { display: false } }
+				plugins: {
+					legend: { display: false },
+					tooltip: { enabled: false },
+					zoom: {	// Enable zoom and pan
+						pan: {
+							enabled: true,
+							mode: 'x',
+						}, zoom: {
+							wheel: {
+								enabled: true,
+							},
+							pinch: {
+								enabled: true
+							},
+							mode: 'x',
+						}
+					}
+				}, scales: { x: { display: false }, y: { display: false } }
 			}
 		});
 	});
@@ -332,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2025-09-11 20:27:43 - <a href="https://github.com/nigelhorne/CGI-Info/commit/ef2bc2d07d40787c9df7180335e3ae30dbadb49e">commit <code>ef2bc2d</code></a></em></p>
+	<p><em>Last updated: 2025-09-12 01:35:48 - <a href="https://github.com/nigelhorne/CGI-Info/commit/cbd128fd0f2e13401928976c25d38a3fc3945435">commit <code>cbd128f</code></a></em></p>
 </footer>
 </body>
 </html>
