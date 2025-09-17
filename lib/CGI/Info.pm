@@ -172,7 +172,7 @@ sub new
 
 	# Validate logger object has required methods
 	if(defined $params->{'logger'}) {
-		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
+		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('warn') && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
 			Carp::croak("Logger must be an object with info() and error() methods");
 		}
 	}
