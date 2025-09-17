@@ -29,7 +29,7 @@ https://pjcj.net
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif (&amp;Scalar::Util::blessed($class)) { }</td></tr>
 <tr><td class="h"><a id="L158">158</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (scalar keys %{$params;} &gt; 0)</td></tr>
 <tr><td class="h"><a id="L174">174</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $$params{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L175">175</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (&amp;Scalar::Util::blessed($$params{&quot;logger&quot;}) and $$params{&quot;logger&quot;}-&gt;can(&quot;info&quot;) and $$params{&quot;logger&quot;}-&gt;can(&quot;error&quot;))</td></tr>
+<tr><td class="h"><a id="L175">175</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (&amp;Scalar::Util::blessed($$params{&quot;logger&quot;}) and $$params{&quot;logger&quot;}-&gt;can(&quot;warn&quot;) and $$params{&quot;logger&quot;}-&gt;can(&quot;info&quot;) and $$params{&quot;logger&quot;}-&gt;can(&quot;error&quot;))</td></tr>
 <tr><td class="h"><a id="L180">180</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;expect&quot;})</td></tr>
 <tr><td class="h"><a id="L185">185</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $$params{&quot;logger&quot;})</td></tr>
 <tr><td class="h"><a id="L219">219</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;script_name&quot;})</td></tr>
