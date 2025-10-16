@@ -129,6 +129,20 @@ thus avoiding hard-coded paths into forms.
         # ...
         print "<form method=\"POST\" action=$script_name name=\"my_form\">\n";
 
+### API SPECIFICATION
+
+#### INPUT
+
+None.
+
+#### OUTPUT
+
+    {
+      type => 'string',
+      'min' => 1,
+      'nomatch' => qr/^[\/\\]/    # Does not return absolute path
+    }
+
 ## script\_path
 
 Finds the full path name of the script.

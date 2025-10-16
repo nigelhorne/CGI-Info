@@ -210,6 +210,24 @@ thus avoiding hard-coded paths into forms.
 	# ...
 	print "<form method=\"POST\" action=$script_name name=\"my_form\">\n";
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+=over 4
+
+=back
+
+  {
+    type => 'string',
+    'min' => 1,
+    'nomatch' => qr/^[\/\\]/	# Does not return absolute path
+  }
+
 =cut
 
 sub script_name
