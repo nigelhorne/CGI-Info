@@ -20,7 +20,7 @@ https://pjcj.net
 <h1>Branch Coverage</h1>
 <table>
 <tr><td class="h" align="right">File:</td><td align="left">blib/lib/CGI/Info.pm</td></tr>
-<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">76.1%</td></tr>
+<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">76.0%</td></tr>
 </table>
 <div><br/></div>
 <table>
@@ -32,259 +32,256 @@ https://pjcj.net
 <tr><td class="h"><a id="L175">175</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (&amp;Scalar::Util::blessed($$params{&quot;logger&quot;}) and $$params{&quot;logger&quot;}-&gt;can(&quot;warn&quot;) and $$params{&quot;logger&quot;}-&gt;can(&quot;info&quot;) and $$params{&quot;logger&quot;}-&gt;can(&quot;error&quot;))</td></tr>
 <tr><td class="h"><a id="L180">180</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;expect&quot;})</td></tr>
 <tr><td class="h"><a id="L185">185</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $$params{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L237">237</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;script_name&quot;})</td></tr>
-<tr><td class="h"><a id="L246">246</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__))</td></tr>
-<tr><td class="h"><a id="L252">252</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless &quot;File::Basename&quot;-&gt;can(&quot;basename&quot;)</td></tr>
-<tr><td class="h"><a id="L261">261</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $script_path = $self-&gt;_get_env(&#39;SCRIPT_FILENAME&#39;)) { }</td></tr>
+<tr><td class="h"><a id="L233">233</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;script_name&quot;})</td></tr>
+<tr><td class="h"><a id="L242">242</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__))</td></tr>
+<tr><td class="h"><a id="L248">248</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless &quot;File::Basename&quot;-&gt;can(&quot;basename&quot;)</td></tr>
+<tr><td class="h"><a id="L257">257</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $script_path = $self-&gt;_get_env(&#39;SCRIPT_FILENAME&#39;)) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($script_name = $self-&gt;_get_env(&#39;SCRIPT_NAME&#39;)) { }</td></tr>
 <tr><td class="h"></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">elsif (&#39;File::Spec&#39;-&gt;file_name_is_absolute($0)) { }</td></tr>
-<tr><td class="h"><a id="L264">264</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $document_root = $self-&gt;_get_env(&#39;DOCUMENT_ROOT&#39;)) { }</td></tr>
-<tr><td class="h"><a id="L272">272</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&#39;File::Spec&#39;-&gt;file_name_is_absolute($script_name) and -r $script_name) { }</td></tr>
-<tr><td class="h"><a id="L276">276</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless &quot;Cwd&quot;-&gt;can(&quot;abs_path&quot;)</td></tr>
-<tr><td class="h"><a id="L278">278</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($script_name =~ m[^/(.+)])</td></tr>
-<tr><td class="h"><a id="L321">321</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;script_path&quot;})</td></tr>
-<tr><td class="h"><a id="L348">348</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
-<tr><td class="h"><a id="L351">351</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $$self{&quot;script_path&quot;}</td></tr>
-<tr><td class="h"><a id="L355">355</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">$^O eq &#39;MSWin32&#39; ? :</td></tr>
-<tr><td class="h"><a id="L357">357</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">$$self{&#39;script_path&#39;} =~ /$dir_regex/ ? :</td></tr>
-<tr><td class="h"><a id="L384">384</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;site&quot;})</td></tr>
-<tr><td class="h"><a id="L398">398</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $$self{&quot;site&quot;} and $$self{&quot;cgi_site&quot;}</td></tr>
-<tr><td class="h"><a id="L401">401</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $host = $ENV{&#39;HTTP_HOST&#39;} || $ENV{&#39;SERVER_NAME&#39;} || $ENV{&#39;SSL_TLS_SNI&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L403">403</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless &quot;URI::Heuristic&quot;-&gt;can(&quot;uf_uristr&quot;)</td></tr>
-<tr><td class="h"><a id="L410">410</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;SERVER_NAME&quot;} and $host eq $ENV{&quot;SERVER_NAME&quot;} and my $protocol = $self-&gt;protocol and $self-&gt;protocol ne &quot;http&quot;)</td></tr>
-<tr><td class="h"><a id="L415">415</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless &quot;Sys::Hostname&quot;-&gt;can(&quot;hostname&quot;)</td></tr>
-<tr><td class="h"><a id="L425">425</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $$self{&quot;cgi_site&quot;} =~ m[^https?://]</td></tr>
-<tr><td class="h"><a id="L428">428</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $$self{&quot;site&quot;} and $$self{&quot;cgi_site&quot;}</td></tr>
-<tr><td class="h"><a id="L446">446</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (ref $self)</td></tr>
-<tr><td class="h"><a id="L449">449</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $$self{&quot;domain&quot;}</td></tr>
-<tr><td class="h"><a id="L453">453</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $site = $$self{&quot;site&quot;})</td></tr>
-<tr><td class="h"><a id="L454">454</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">$site =~ /^www\.(.+)/ ? :</td></tr>
-<tr><td class="h"><a id="L469">469</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;cgi_site&quot;})</td></tr>
-<tr><td class="h"><a id="L638">638</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;paramref&quot;} and !defined($$params{&#39;allow&#39;}) || defined $$self{&#39;allow&#39;} &amp;&amp; $$params{&#39;allow&#39;} eq $$self{&#39;allow&#39;})</td></tr>
-<tr><td class="h"><a id="L642">642</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;allow&quot;})</td></tr>
-<tr><td class="h"><a id="L653">653</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;upload_dir&quot;})</td></tr>
-<tr><td class="h"><a id="L656">656</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L665">665</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not $ENV{&#39;GATEWAY_INTERFACE&#39;} &amp;&amp; $ENV{&#39;REQUEST_METHOD&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L260">260</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $document_root = $self-&gt;_get_env(&#39;DOCUMENT_ROOT&#39;)) { }</td></tr>
+<tr><td class="h"><a id="L268">268</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&#39;File::Spec&#39;-&gt;file_name_is_absolute($script_name) and -r $script_name) { }</td></tr>
+<tr><td class="h"><a id="L272">272</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless &quot;Cwd&quot;-&gt;can(&quot;abs_path&quot;)</td></tr>
+<tr><td class="h"><a id="L274">274</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($script_name =~ m[^/(.+)])</td></tr>
+<tr><td class="h"><a id="L317">317</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;script_path&quot;})</td></tr>
+<tr><td class="h"><a id="L344">344</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
+<tr><td class="h"><a id="L347">347</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $$self{&quot;script_path&quot;}</td></tr>
+<tr><td class="h"><a id="L351">351</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">$^O eq &#39;MSWin32&#39; ? :</td></tr>
+<tr><td class="h"><a id="L353">353</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">$$self{&#39;script_path&#39;} =~ /$dir_regex/ ? :</td></tr>
+<tr><td class="h"><a id="L380">380</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;site&quot;})</td></tr>
+<tr><td class="h"><a id="L394">394</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $$self{&quot;site&quot;} and $$self{&quot;cgi_site&quot;}</td></tr>
+<tr><td class="h"><a id="L397">397</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $host = $ENV{&#39;HTTP_HOST&#39;} || $ENV{&#39;SERVER_NAME&#39;} || $ENV{&#39;SSL_TLS_SNI&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L399">399</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless &quot;URI::Heuristic&quot;-&gt;can(&quot;uf_uristr&quot;)</td></tr>
+<tr><td class="h"><a id="L406">406</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;SERVER_NAME&quot;} and $host eq $ENV{&quot;SERVER_NAME&quot;} and my $protocol = $self-&gt;protocol and $self-&gt;protocol ne &quot;http&quot;)</td></tr>
+<tr><td class="h"><a id="L411">411</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless &quot;Sys::Hostname&quot;-&gt;can(&quot;hostname&quot;)</td></tr>
+<tr><td class="h"><a id="L421">421</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $$self{&quot;cgi_site&quot;} =~ m[^https?://]</td></tr>
+<tr><td class="h"><a id="L424">424</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $$self{&quot;site&quot;} and $$self{&quot;cgi_site&quot;}</td></tr>
+<tr><td class="h"><a id="L442">442</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (ref $self)</td></tr>
+<tr><td class="h"><a id="L445">445</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $$self{&quot;domain&quot;}</td></tr>
+<tr><td class="h"><a id="L449">449</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $site = $$self{&quot;site&quot;})</td></tr>
+<tr><td class="h"><a id="L450">450</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">$site =~ /^www\.(.+)/ ? :</td></tr>
+<tr><td class="h"><a id="L465">465</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;cgi_site&quot;})</td></tr>
+<tr><td class="h"><a id="L634">634</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;paramref&quot;} and !defined($$params{&#39;allow&#39;}) || defined $$self{&#39;allow&#39;} &amp;&amp; $$params{&#39;allow&#39;} eq $$self{&#39;allow&#39;})</td></tr>
+<tr><td class="h"><a id="L638">638</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;allow&quot;})</td></tr>
+<tr><td class="h"><a id="L649">649</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;upload_dir&quot;})</td></tr>
+<tr><td class="h"><a id="L652">652</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$params{&quot;logger&quot;})</td></tr>
+<tr><td class="h"><a id="L661">661</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not $ENV{&#39;GATEWAY_INTERFACE&#39;} &amp;&amp; $ENV{&#39;REQUEST_METHOD&#39;}) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($ENV{&#39;REQUEST_METHOD&#39;} eq &#39;GET&#39; or $ENV{&#39;REQUEST_METHOD&#39;} eq &#39;HEAD&#39;) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($ENV{&#39;REQUEST_METHOD&#39;} eq &#39;POST&#39;) { }</td></tr>
 <tr><td class="h"></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">elsif ($ENV{&#39;REQUEST_METHOD&#39;} eq &#39;OPTIONS&#39;) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($ENV{&#39;REQUEST_METHOD&#39;} eq &#39;DELETE&#39;) { }</td></tr>
-<tr><td class="h"><a id="L669">669</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (@ARGV) { }</td></tr>
+<tr><td class="h"><a id="L665">665</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (@ARGV) { }</td></tr>
 <tr><td class="h"></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">elsif ($stdin_data) { }</td></tr>
 <tr><td class="h"></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">elsif (IO::Interactive::is_interactive() and not $$self{&#39;args_read&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L671">671</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $pairs[0])</td></tr>
-<tr><td class="h"><a id="L672">672</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($pairs[0] eq &#39;--robot&#39;) { }</td></tr>
+<tr><td class="h"><a id="L667">667</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $pairs[0])</td></tr>
+<tr><td class="h"><a id="L668">668</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($pairs[0] eq &#39;--robot&#39;) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($pairs[0] eq &#39;--mobile&#39;) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($pairs[0] eq &#39;--search-engine&#39;) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($pairs[0] eq &#39;--tablet&#39;) { }</td></tr>
-<tr><td class="h"><a id="L701">701</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if $line eq &quot;quit&quot;</td></tr>
-<tr><td class="h"><a id="L707">707</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $query = $ENV{&#39;QUERY_STRING&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L708">708</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $content_type and $content_type =~ m[multipart/form-data]i)</td></tr>
-<tr><td class="h"><a id="L718">718</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not defined $content_length or $content_length =~ /\D/)</td></tr>
-<tr><td class="h"><a id="L722">722</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;max_upload_size&quot;} &gt;= 0 and $content_length &gt; $$self{&quot;max_upload_size&quot;})</td></tr>
-<tr><td class="h"><a id="L730">730</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not defined $content_type or $content_type =~ m[application/x-www-form-urlencoded]) { }</td></tr>
+<tr><td class="h"><a id="L697">697</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if $line eq &quot;quit&quot;</td></tr>
+<tr><td class="h"><a id="L703">703</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $query = $ENV{&#39;QUERY_STRING&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L704">704</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $content_type and $content_type =~ m[multipart/form-data]i)</td></tr>
+<tr><td class="h"><a id="L714">714</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not defined $content_length or $content_length =~ /\D/)</td></tr>
+<tr><td class="h"><a id="L718">718</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;max_upload_size&quot;} &gt;= 0 and $content_length &gt; $$self{&quot;max_upload_size&quot;})</td></tr>
+<tr><td class="h"><a id="L726">726</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not defined $content_type or $content_type =~ m[application/x-www-form-urlencoded]) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($content_type =~ m[multipart/form-data]i) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($content_type =~ m[text/xml]i) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($content_type =~ m[application/json]i) { }</td></tr>
-<tr><td class="h"><a id="L732">732</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
-<tr><td class="h"><a id="L735">735</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
-<tr><td class="h"><a id="L747">747</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $$self{&quot;upload_dir&quot;})</td></tr>
-<tr><td class="h"><a id="L759">759</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (&quot;File::Spec&quot;-&gt;file_name_is_absolute($$self{&quot;upload_dir&quot;}))</td></tr>
-<tr><td class="h"><a id="L767">767</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (-d $$self{&quot;upload_dir&quot;})</td></tr>
-<tr><td class="h"><a id="L775">775</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (-w $$self{&quot;upload_dir&quot;})</td></tr>
-<tr><td class="h"><a id="L785">785</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;upload_dir&quot;} =~ /^\Q$tmpdir\E/)</td></tr>
-<tr><td class="h"><a id="L793">793</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($content_type =~ /boundary=(\S+)$/)</td></tr>
-<tr><td class="h"><a id="L801">801</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
-<tr><td class="h"><a id="L804">804</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
-<tr><td class="h"><a id="L818">818</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">unless &quot;JSON::MaybeXS&quot;-&gt;can(&quot;parse_json&quot;)</td></tr>
-<tr><td class="h"><a id="L824">824</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
-<tr><td class="h"><a id="L827">827</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
-<tr><td class="h"><a id="L842">842</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
-<tr><td class="h"><a id="L845">845</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
-<tr><td class="h"><a id="L872">872</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (scalar @pairs)</td></tr>
-<tr><td class="h"><a id="L884">884</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $key</td></tr>
-<tr><td class="h"><a id="L890">890</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $value) { }</td></tr>
-<tr><td class="h"><a id="L901">901</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;allow&quot;})</td></tr>
-<tr><td class="h"><a id="L903">903</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (exists $$self{&quot;allow&quot;}{$key})</td></tr>
-<tr><td class="h"><a id="L910">910</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined(my $schema = $$self{&quot;allow&quot;}{$key}))</td></tr>
-<tr><td class="h"><a id="L911">911</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not ref $schema) { }</td></tr>
+<tr><td class="h"><a id="L728">728</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
+<tr><td class="h"><a id="L731">731</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
+<tr><td class="h"><a id="L743">743</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $$self{&quot;upload_dir&quot;})</td></tr>
+<tr><td class="h"><a id="L755">755</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (&quot;File::Spec&quot;-&gt;file_name_is_absolute($$self{&quot;upload_dir&quot;}))</td></tr>
+<tr><td class="h"><a id="L763">763</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (-d $$self{&quot;upload_dir&quot;})</td></tr>
+<tr><td class="h"><a id="L771">771</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (-w $$self{&quot;upload_dir&quot;})</td></tr>
+<tr><td class="h"><a id="L781">781</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;upload_dir&quot;} =~ /^\Q$tmpdir\E/)</td></tr>
+<tr><td class="h"><a id="L789">789</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($content_type =~ /boundary=(\S+)$/)</td></tr>
+<tr><td class="h"><a id="L797">797</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
+<tr><td class="h"><a id="L800">800</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
+<tr><td class="h"><a id="L814">814</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">unless &quot;JSON::MaybeXS&quot;-&gt;can(&quot;parse_json&quot;)</td></tr>
+<tr><td class="h"><a id="L820">820</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
+<tr><td class="h"><a id="L823">823</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
+<tr><td class="h"><a id="L838">838</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($stdin_data) { }</td></tr>
+<tr><td class="h"><a id="L841">841</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (read(STDIN, $buffer, $content_length) != $content_length)</td></tr>
+<tr><td class="h"><a id="L868">868</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (scalar @pairs)</td></tr>
+<tr><td class="h"><a id="L880">880</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $key</td></tr>
+<tr><td class="h"><a id="L886">886</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $value) { }</td></tr>
+<tr><td class="h"><a id="L897">897</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;allow&quot;})</td></tr>
+<tr><td class="h"><a id="L899">899</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (exists $$self{&quot;allow&quot;}{$key})</td></tr>
+<tr><td class="h"><a id="L906">906</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined(my $schema = $$self{&quot;allow&quot;}{$key}))</td></tr>
+<tr><td class="h"><a id="L907">907</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not ref $schema) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif (ref $schema eq &#39;Regexp&#39;) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif (ref $schema eq &#39;CODE&#39;) { }</td></tr>
-<tr><td class="h"><a id="L913">913</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value ne $schema)</td></tr>
-<tr><td class="h"><a id="L919">919</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($value =~ /$schema/)</td></tr>
-<tr><td class="h"><a id="L926">926</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (&amp;$schema($key, $value, $self))</td></tr>
-<tr><td class="h"><a id="L940">940</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($@)</td></tr>
-<tr><td class="h"><a id="L945">945</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar keys %{$value;}) { }</td></tr>
-<tr><td class="h"><a id="L962">962</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not defined $ENV{&quot;REQUEST_METHOD&quot;} or $ENV{&quot;REQUEST_METHOD&quot;} eq &quot;GET&quot;)</td></tr>
-<tr><td class="h"><a id="L966">966</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value =~ /(\%27)|(\&#39;)|(\%23)|(\#)/xi or $value =~ /((\%3D)|(=))[^\n]*((\%27)|(\&#39;)|(\-\-)|(\%3B)|(;))/i or $value =~ /\w*((\%27)|(\&#39;))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/xi or $value =~ /((\%27)|(\&#39;))union/xi or $value =~ /select[[a-z]\s\*]from/xi or $value =~ /\sAND\s1=1/xi or $value =~ /\sOR\s.+\sAND\s/ or $value =~ m[/\*\*/ORDER/\*\*/BY/\*\*]xi or $value =~ m[/AND/.+\(SELECT/] or $value =~ /exec(\s|\+)+(s|x)p\w+/xi)</td></tr>
-<tr><td class="h"><a id="L977">977</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L984">984</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (my $agent = $ENV{&quot;HTTP_USER_AGENT&quot;})</td></tr>
-<tr><td class="h"><a id="L985">985</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($agent =~ /SELECT.+AND.+/ or $agent =~ /ORDER BY / or $agent =~ / OR NOT / or $agent =~ / AND \d+=\d+/ or $agent =~ /THEN.+ELSE.+END/ or $agent =~ /.+AND.+SELECT.+/ or $agent =~ /\sAND\s.+\sAND\s/)</td></tr>
-<tr><td class="h"><a id="L987">987</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L995">995</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value =~ m[((\%3C)|&lt;)((\%2F)|/)*[a-z0-9\%]+((\%3E)|&gt;)]xi or $value =~ /((\%3C)|&lt;)[^\n]+((\%3E)|&gt;)/i or $orig_value =~ m[((\%3C)|&lt;)((\%2F)|/)*[a-z0-9\%]+((\%3E)|&gt;)]xi or $orig_value =~ /((\%3C)|&lt;)[^\n]+((\%3E)|&gt;)/i)</td></tr>
-<tr><td class="h"><a id="L1003">1003</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($value =~ m[mustleak\.com/])</td></tr>
-<tr><td class="h"><a id="L1008">1008</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value =~ m[\.\./])</td></tr>
-<tr><td class="h"><a id="L1014">1014</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (length $value &gt; 0)</td></tr>
-<tr><td class="h"><a id="L1016">1016</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($FORM{$key} and $FORM{$key} ne $value) { }</td></tr>
-<tr><td class="h"><a id="L1024">1024</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (%FORM)</td></tr>
-<tr><td class="h"><a id="L1028">1028</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L1067">1067</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $field)</td></tr>
-<tr><td class="h"><a id="L1071">1071</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;allow&quot;} and not exists $$self{&quot;allow&quot;}{$field})</td></tr>
-<tr><td class="h"><a id="L1080">1080</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;in_param&quot;} and $$self{&quot;allow&quot;})</td></tr>
-<tr><td class="h"><a id="L1088">1088</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $allow</td></tr>
-<tr><td class="h"><a id="L1090">1090</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($params)</td></tr>
-<tr><td class="h"><a id="L1098">1098</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless defined $arg</td></tr>
-<tr><td class="h"><a id="L1123">1123</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($total_bytes == 0)</td></tr>
-<tr><td class="h"><a id="L1127">1127</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">unless ($stdin_data)</td></tr>
-<tr><td class="h"><a id="L1133">1133</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ($stdin_data)</td></tr>
-<tr><td class="h"><a id="L1148">1148</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($line =~ /^--\Q$boundary\E--$/)</td></tr>
-<tr><td class="h"><a id="L1151">1151</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($line =~ /^--\Q$boundary\E$/) { }</td></tr>
+<tr><td class="h"><a id="L909">909</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value ne $schema)</td></tr>
+<tr><td class="h"><a id="L915">915</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($value =~ /$schema/)</td></tr>
+<tr><td class="h"><a id="L922">922</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (&amp;$schema($key, $value, $self))</td></tr>
+<tr><td class="h"><a id="L936">936</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($@)</td></tr>
+<tr><td class="h"><a id="L941">941</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar keys %{$value;}) { }</td></tr>
+<tr><td class="h"><a id="L958">958</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (not defined $ENV{&quot;REQUEST_METHOD&quot;} or $ENV{&quot;REQUEST_METHOD&quot;} eq &quot;GET&quot;)</td></tr>
+<tr><td class="h"><a id="L962">962</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value =~ /(\%27)|(\&#39;)|(\%23)|(\#)/xi or $value =~ /((\%3D)|(=))[^\n]*((\%27)|(\&#39;)|(\-\-)|(\%3B)|(;))/i or $value =~ /\w*((\%27)|(\&#39;))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/xi or $value =~ /((\%27)|(\&#39;))union/xi or $value =~ /select[[a-z]\s\*]from/xi or $value =~ /\sAND\s1=1/xi or $value =~ /\sOR\s.+\sAND\s/ or $value =~ m[/\*\*/ORDER/\*\*/BY/\*\*]xi or $value =~ m[/AND/.+\(SELECT/] or $value =~ /exec(\s|\+)+(s|x)p\w+/xi)</td></tr>
+<tr><td class="h"><a id="L973">973</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L980">980</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (my $agent = $ENV{&quot;HTTP_USER_AGENT&quot;})</td></tr>
+<tr><td class="h"><a id="L981">981</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($agent =~ /SELECT.+AND.+/ or $agent =~ /ORDER BY / or $agent =~ / OR NOT / or $agent =~ / AND \d+=\d+/ or $agent =~ /THEN.+ELSE.+END/ or $agent =~ /.+AND.+SELECT.+/ or $agent =~ /\sAND\s.+\sAND\s/)</td></tr>
+<tr><td class="h"><a id="L983">983</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L991">991</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value =~ m[((\%3C)|&lt;)((\%2F)|/)*[a-z0-9\%]+((\%3E)|&gt;)]xi or $value =~ /((\%3C)|&lt;)[^\n]+((\%3E)|&gt;)/i or $orig_value =~ m[((\%3C)|&lt;)((\%2F)|/)*[a-z0-9\%]+((\%3E)|&gt;)]xi or $orig_value =~ /((\%3C)|&lt;)[^\n]+((\%3E)|&gt;)/i)</td></tr>
+<tr><td class="h"><a id="L999">999</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($value =~ m[mustleak\.com/])</td></tr>
+<tr><td class="h"><a id="L1004">1004</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($value =~ m[\.\./])</td></tr>
+<tr><td class="h"><a id="L1010">1010</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (length $value &gt; 0)</td></tr>
+<tr><td class="h"><a id="L1012">1012</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($FORM{$key} and $FORM{$key} ne $value) { }</td></tr>
+<tr><td class="h"><a id="L1020">1020</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (%FORM)</td></tr>
+<tr><td class="h"><a id="L1024">1024</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;logger&quot;})</td></tr>
+<tr><td class="h"><a id="L1063">1063</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $field)</td></tr>
+<tr><td class="h"><a id="L1067">1067</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;allow&quot;} and not exists $$self{&quot;allow&quot;}{$field})</td></tr>
+<tr><td class="h"><a id="L1076">1076</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;in_param&quot;} and $$self{&quot;allow&quot;})</td></tr>
+<tr><td class="h"><a id="L1084">1084</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $allow</td></tr>
+<tr><td class="h"><a id="L1086">1086</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($params)</td></tr>
+<tr><td class="h"><a id="L1094">1094</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless defined $arg</td></tr>
+<tr><td class="h"><a id="L1119">1119</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($total_bytes == 0)</td></tr>
+<tr><td class="h"><a id="L1123">1123</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">unless ($stdin_data)</td></tr>
+<tr><td class="h"><a id="L1129">1129</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ($stdin_data)</td></tr>
+<tr><td class="h"><a id="L1144">1144</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($line =~ /^--\Q$boundary\E--$/)</td></tr>
+<tr><td class="h"><a id="L1147">1147</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($line =~ /^--\Q$boundary\E$/) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($in_header) { }</td></tr>
-<tr><td class="h"><a id="L1152">1152</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($writing_file) { }</td></tr>
+<tr><td class="h"><a id="L1148">1148</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($writing_file) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif (defined $key) { }</td></tr>
-<tr><td class="h"><a id="L1161">1161</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (length $line == 0) { }</td></tr>
+<tr><td class="h"><a id="L1157">1157</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (length $line == 0) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($line =~ /^Content-Disposition: (.+)/i) { }</td></tr>
-<tr><td class="h"><a id="L1165">1165</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($field =~ /name=&quot;(.+?)&quot;/)</td></tr>
-<tr><td class="h"><a id="L1168">1168</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($field =~ /filename=&quot;(.+)?&quot;/)</td></tr>
-<tr><td class="h"><a id="L1170">1170</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">do {
+<tr><td class="h"><a id="L1161">1161</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($field =~ /name=&quot;(.+?)&quot;/)</td></tr>
+<tr><td class="h"><a id="L1164">1164</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($field =~ /filename=&quot;(.+)?&quot;/)</td></tr>
+<tr><td class="h"><a id="L1166">1166</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">do {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$filename =~ m[[\\/\|]]
 } ? :</td></tr>
 <tr><td class="h"></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">defined $filename ? :</td></tr>
-<tr><td class="h"><a id="L1183">1183</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (open $fout, &quot;&gt;&quot;, $full_path)</td></tr>
-<tr><td class="h"><a id="L1193">1193</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($writing_file) { }</td></tr>
-<tr><td class="h"><a id="L1201">1201</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($writing_file)</td></tr>
-<tr><td class="h"><a id="L1219">1219</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">$counter ? :</td></tr>
-<tr><td class="h"><a id="L1230">1230</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$args{&quot;filename&quot;} =~ m&lt;(^[\w\+_\040\#\(\)\{\}\[\]/\-\^,\.:;&amp;%\@\\~]+\$?$)&gt;)</td></tr>
-<tr><td class="h"><a id="L1249">1249</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_mobile&quot;})</td></tr>
-<tr><td class="h"><a id="L1253">1253</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;IS_MOBILE&quot;})</td></tr>
-<tr><td class="h"><a id="L1258">1258</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $ch_ua_mobile = $ENV{&quot;HTTP_SEC_CH_UA_MOBILE&quot;})</td></tr>
-<tr><td class="h"><a id="L1259">1259</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ch_ua_mobile eq &quot;?1&quot;)</td></tr>
-<tr><td class="h"><a id="L1265">1265</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;HTTP_X_WAP_PROFILE&quot;})</td></tr>
-<tr><td class="h"><a id="L1272">1272</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $agent = $ENV{&quot;HTTP_USER_AGENT&quot;})</td></tr>
-<tr><td class="h"><a id="L1273">1273</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /.+(Android|iPhone).+/)</td></tr>
-<tr><td class="h"><a id="L1279">1279</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[(android|bb\d+|meego).+mobile|avantgo|bada/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino]i or substr($ENV{&quot;HTTP_USER_AGENT&quot;}, 0, 4) =~ m[1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-]i)</td></tr>
-<tr><td class="h"><a id="L1286">1286</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (defined $remote and $$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1287">1287</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $type = $$self{&quot;cache&quot;}-&gt;get(&quot;$remote/$agent&quot;))</td></tr>
-<tr><td class="h"><a id="L1292">1292</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;browser_detect&quot;})</td></tr>
-<tr><td class="h"><a id="L1293">1293</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
+<tr><td class="h"><a id="L1179">1179</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (open $fout, &quot;&gt;&quot;, $full_path)</td></tr>
+<tr><td class="h"><a id="L1189">1189</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($writing_file) { }</td></tr>
+<tr><td class="h"><a id="L1197">1197</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($writing_file)</td></tr>
+<tr><td class="h"><a id="L1215">1215</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">$counter ? :</td></tr>
+<tr><td class="h"><a id="L1226">1226</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$args{&quot;filename&quot;} =~ m&lt;(^[\w\+_\040\#\(\)\{\}\[\]/\-\^,\.:;&amp;%\@\\~]+\$?$)&gt;)</td></tr>
+<tr><td class="h"><a id="L1245">1245</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_mobile&quot;})</td></tr>
+<tr><td class="h"><a id="L1249">1249</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;IS_MOBILE&quot;})</td></tr>
+<tr><td class="h"><a id="L1254">1254</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $ch_ua_mobile = $ENV{&quot;HTTP_SEC_CH_UA_MOBILE&quot;})</td></tr>
+<tr><td class="h"><a id="L1255">1255</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ch_ua_mobile eq &quot;?1&quot;)</td></tr>
+<tr><td class="h"><a id="L1261">1261</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;HTTP_X_WAP_PROFILE&quot;})</td></tr>
+<tr><td class="h"><a id="L1268">1268</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $agent = $ENV{&quot;HTTP_USER_AGENT&quot;})</td></tr>
+<tr><td class="h"><a id="L1269">1269</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /.+(Android|iPhone).+/)</td></tr>
+<tr><td class="h"><a id="L1275">1275</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[(android|bb\d+|meego).+mobile|avantgo|bada/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino]i or substr($ENV{&quot;HTTP_USER_AGENT&quot;}, 0, 4) =~ m[1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-]i)</td></tr>
+<tr><td class="h"><a id="L1282">1282</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (defined $remote and $$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1283">1283</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $type = $$self{&quot;cache&quot;}-&gt;get(&quot;$remote/$agent&quot;))</td></tr>
+<tr><td class="h"><a id="L1288">1288</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;browser_detect&quot;})</td></tr>
+<tr><td class="h"><a id="L1289">1289</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;require HTTP::BrowserDetect
 }
 })</td></tr>
-<tr><td class="h"><a id="L1299">1299</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;browser_detect&quot;})</td></tr>
-<tr><td class="h"><a id="L1302">1302</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">defined $device &amp;&amp; $device =~ /blackberry|webos|iphone|ipod|ipad|android/i ? :</td></tr>
-<tr><td class="h"><a id="L1303">1303</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($is_mobile and $$self{&quot;cache&quot;} and defined $remote)</td></tr>
-<tr><td class="h"><a id="L1322">1322</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_tablet&quot;})</td></tr>
-<tr><td class="h"><a id="L1326">1326</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;HTTP_USER_AGENT&#39;} and $ENV{&#39;HTTP_USER_AGENT&#39;} =~ /.+(iPad|TabletPC).+/) { }</td></tr>
-<tr><td class="h"><a id="L1355">1355</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$args{&#39;raw&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L1371">1371</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if $rc</td></tr>
-<tr><td class="h"><a id="L1386">1386</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;SCRIPT_URI&quot;} and $ENV{&quot;SCRIPT_URI&quot;} =~ m[^(.+)://.+])</td></tr>
-<tr><td class="h"><a id="L1389">1389</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;SERVER_PROTOCOL&quot;} and $ENV{&quot;SERVER_PROTOCOL&quot;} =~ m[^HTTP/])</td></tr>
-<tr><td class="h"><a id="L1393">1393</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $port = $ENV{&quot;SERVER_PORT&quot;})</td></tr>
-<tr><td class="h"><a id="L1394">1394</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined(my $name = getservbyport($port, &#39;tcp&#39;))) { }</td></tr>
+<tr><td class="h"><a id="L1295">1295</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;browser_detect&quot;})</td></tr>
+<tr><td class="h"><a id="L1298">1298</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">defined $device &amp;&amp; $device =~ /blackberry|webos|iphone|ipod|ipad|android/i ? :</td></tr>
+<tr><td class="h"><a id="L1299">1299</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($is_mobile and $$self{&quot;cache&quot;} and defined $remote)</td></tr>
+<tr><td class="h"><a id="L1318">1318</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_tablet&quot;})</td></tr>
+<tr><td class="h"><a id="L1322">1322</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;HTTP_USER_AGENT&#39;} and $ENV{&#39;HTTP_USER_AGENT&#39;} =~ /.+(iPad|TabletPC).+/) { }</td></tr>
+<tr><td class="h"><a id="L1351">1351</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($$args{&#39;raw&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L1367">1367</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if $rc</td></tr>
+<tr><td class="h"><a id="L1382">1382</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;SCRIPT_URI&quot;} and $ENV{&quot;SCRIPT_URI&quot;} =~ m[^(.+)://.+])</td></tr>
+<tr><td class="h"><a id="L1385">1385</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;SERVER_PROTOCOL&quot;} and $ENV{&quot;SERVER_PROTOCOL&quot;} =~ m[^HTTP/])</td></tr>
+<tr><td class="h"><a id="L1389">1389</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $port = $ENV{&quot;SERVER_PORT&quot;})</td></tr>
+<tr><td class="h"><a id="L1390">1390</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined(my $name = getservbyport($port, &#39;tcp&#39;))) { }</td></tr>
 <tr><td class="h"></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">elsif ($port == 80) { }</td></tr>
 <tr><td class="h"></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">elsif ($port == 443) { }</td></tr>
-<tr><td class="h"><a id="L1395">1395</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($name =~ /https?/) { }</td></tr>
+<tr><td class="h"><a id="L1391">1391</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($name =~ /https?/) { }</td></tr>
 <tr><td class="h"></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">elsif ($name eq &#39;www&#39;) { }</td></tr>
-<tr><td class="h"><a id="L1410">1410</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;REMOTE_ADDR&quot;})</td></tr>
-<tr><td class="h"><a id="L1447">1447</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($^O eq &quot;MSWin32&quot;)</td></tr>
-<tr><td class="h"><a id="L1453">1453</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (ref $self)</td></tr>
-<tr><td class="h"><a id="L1458">1458</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;C_DOCUMENT_ROOT&quot;} and -d $ENV{&quot;C_DOCUMENT_ROOT&quot;})</td></tr>
-<tr><td class="h"><a id="L1460">1460</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (-d $dir and -w $dir)</td></tr>
-<tr><td class="h"><a id="L1464">1464</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (-d $dir and -w $dir)</td></tr>
-<tr><td class="h"><a id="L1468">1468</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;DOCUMENT_ROOT&quot;} and -d $ENV{&quot;DOCUMENT_ROOT&quot;})</td></tr>
-<tr><td class="h"><a id="L1470">1470</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (-d $dir and -w $dir)</td></tr>
-<tr><td class="h"><a id="L1474">1474</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">$$params{&#39;default&#39;} ? :</td></tr>
-<tr><td class="h"><a id="L1492">1492</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;C_DOCUMENT_ROOT&#39;} and -d $ENV{&#39;C_DOCUMENT_ROOT&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L1406">1406</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;REMOTE_ADDR&quot;})</td></tr>
+<tr><td class="h"><a id="L1443">1443</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($^O eq &quot;MSWin32&quot;)</td></tr>
+<tr><td class="h"><a id="L1449">1449</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (ref $self)</td></tr>
+<tr><td class="h"><a id="L1454">1454</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;C_DOCUMENT_ROOT&quot;} and -d $ENV{&quot;C_DOCUMENT_ROOT&quot;})</td></tr>
+<tr><td class="h"><a id="L1456">1456</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (-d $dir and -w $dir)</td></tr>
+<tr><td class="h"><a id="L1460">1460</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (-d $dir and -w $dir)</td></tr>
+<tr><td class="h"><a id="L1464">1464</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;DOCUMENT_ROOT&quot;} and -d $ENV{&quot;DOCUMENT_ROOT&quot;})</td></tr>
+<tr><td class="h"><a id="L1466">1466</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (-d $dir and -w $dir)</td></tr>
+<tr><td class="h"><a id="L1470">1470</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">$$params{&#39;default&#39;} ? :</td></tr>
+<tr><td class="h"><a id="L1488">1488</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;C_DOCUMENT_ROOT&#39;} and -d $ENV{&#39;C_DOCUMENT_ROOT&#39;}) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif ($ENV{&#39;DOCUMENT_ROOT&#39;} and -d $ENV{&#39;DOCUMENT_ROOT&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L1499">1499</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">unless (&quot;File::Spec&quot;-&gt;file_name_is_absolute($script_name))</td></tr>
-<tr><td class="h"><a id="L1502">1502</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($script_name =~ /.cgi\-bin.*/)</td></tr>
-<tr><td class="h"><a id="L1505">1505</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (-f $script_name)</td></tr>
-<tr><td class="h"><a id="L1506">1506</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($^O eq &#39;MSWin32&#39;) { }</td></tr>
-<tr><td class="h"><a id="L1507">1507</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($script_name =~ /(.+)\\.+?$/)</td></tr>
-<tr><td class="h"><a id="L1511">1511</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($script_name =~ m[(.+)/.+?$])</td></tr>
-<tr><td class="h"><a id="L1527">1527</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($_[0] and ref $_[0])</td></tr>
-<tr><td class="h"><a id="L1543">1543</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($_[0] and ref $_[0])</td></tr>
-<tr><td class="h"><a id="L1561">1561</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (ref $self)</td></tr>
-<tr><td class="h"><a id="L1565">1565</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($dir)</td></tr>
-<tr><td class="h"><a id="L1566">1566</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (length $dir and -d $dir and -w $dir)</td></tr>
-<tr><td class="h"><a id="L1574">1574</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $rc and length $rc and -d $rc and -w $rc)</td></tr>
-<tr><td class="h"><a id="L1579">1579</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if not defined $dir or length $dir == 0</td></tr>
-<tr><td class="h"><a id="L1605">1605</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_robot&quot;})</td></tr>
-<tr><td class="h"><a id="L1612">1612</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
-<tr><td class="h"><a id="L1618">1618</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /SELECT.+AND.+/ or $agent =~ /ORDER BY / or $agent =~ / OR NOT / or $agent =~ / AND \d+=\d+/ or $agent =~ /THEN.+ELSE.+END/ or $agent =~ /.+AND.+SELECT.+/ or $agent =~ /\sAND\s.+\sAND\s/)</td></tr>
-<tr><td class="h"><a id="L1621">1621</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L1628">1628</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[.+bot|axios/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak/1\.0|ZoominfoBot]i)</td></tr>
-<tr><td class="h"><a id="L1639">1639</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $referrer = $ENV{&quot;HTTP_REFERER&quot;})</td></tr>
-<tr><td class="h"><a id="L1681">1681</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($referrer =~ /\)/ or &amp;List::Util::any(sub {
+<tr><td class="h"><a id="L1495">1495</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">unless (&quot;File::Spec&quot;-&gt;file_name_is_absolute($script_name))</td></tr>
+<tr><td class="h"><a id="L1498">1498</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($script_name =~ /.cgi\-bin.*/)</td></tr>
+<tr><td class="h"><a id="L1501">1501</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (-f $script_name)</td></tr>
+<tr><td class="h"><a id="L1502">1502</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($^O eq &#39;MSWin32&#39;) { }</td></tr>
+<tr><td class="h"><a id="L1503">1503</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($script_name =~ /(.+)\\.+?$/)</td></tr>
+<tr><td class="h"><a id="L1507">1507</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($script_name =~ m[(.+)/.+?$])</td></tr>
+<tr><td class="h"><a id="L1523">1523</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($_[0] and ref $_[0])</td></tr>
+<tr><td class="h"><a id="L1539">1539</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($_[0] and ref $_[0])</td></tr>
+<tr><td class="h"><a id="L1557">1557</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (ref $self)</td></tr>
+<tr><td class="h"><a id="L1561">1561</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($dir)</td></tr>
+<tr><td class="h"><a id="L1562">1562</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (length $dir and -d $dir and -w $dir)</td></tr>
+<tr><td class="h"><a id="L1570">1570</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $rc and length $rc and -d $rc and -w $rc)</td></tr>
+<tr><td class="h"><a id="L1575">1575</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if not defined $dir or length $dir == 0</td></tr>
+<tr><td class="h"><a id="L1601">1601</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_robot&quot;})</td></tr>
+<tr><td class="h"><a id="L1608">1608</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
+<tr><td class="h"><a id="L1614">1614</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /SELECT.+AND.+/ or $agent =~ /ORDER BY / or $agent =~ / OR NOT / or $agent =~ / AND \d+=\d+/ or $agent =~ /THEN.+ELSE.+END/ or $agent =~ /.+AND.+SELECT.+/ or $agent =~ /\sAND\s.+\sAND\s/)</td></tr>
+<tr><td class="h"><a id="L1617">1617</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L1624">1624</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[.+bot|axios/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak/1\.0|ZoominfoBot]i)</td></tr>
+<tr><td class="h"><a id="L1635">1635</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $referrer = $ENV{&quot;HTTP_REFERER&quot;})</td></tr>
+<tr><td class="h"><a id="L1677">1677</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($referrer =~ /\)/ or &amp;List::Util::any(sub {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$_ =~ /^$referrer/;
 }
 , @crawler_lists))</td></tr>
-<tr><td class="h"><a id="L1684">1684</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1692">1692</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (defined $remote and $$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1693">1693</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $type = $$self{&quot;cache&quot;}-&gt;get(&quot;$remote/$agent&quot;))</td></tr>
-<tr><td class="h"><a id="L1700">1700</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
-<tr><td class="h"><a id="L1702">1702</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1708">1708</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;browser_detect&quot;})</td></tr>
-<tr><td class="h"><a id="L1709">1709</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
+<tr><td class="h"><a id="L1680">1680</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1688">1688</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (defined $remote and $$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1689">1689</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $type = $$self{&quot;cache&quot;}-&gt;get(&quot;$remote/$agent&quot;))</td></tr>
+<tr><td class="h"><a id="L1696">1696</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
+<tr><td class="h"><a id="L1698">1698</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1704">1704</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;browser_detect&quot;})</td></tr>
+<tr><td class="h"><a id="L1705">1705</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;require HTTP::BrowserDetect
 }
 })</td></tr>
-<tr><td class="h"><a id="L1714">1714</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;browser_detect&quot;})</td></tr>
-<tr><td class="h"><a id="L1716">1716</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $is_robot)</td></tr>
-<tr><td class="h"><a id="L1719">1719</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">defined $is_robot &amp;&amp; $is_robot ? :</td></tr>
-<tr><td class="h"><a id="L1722">1722</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($is_robot)</td></tr>
-<tr><td class="h"><a id="L1723">1723</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1731">1731</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1756">1756</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_search_engine&quot;})</td></tr>
-<tr><td class="h"><a id="L1760">1760</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;IS_SEARCH_ENGINE&quot;})</td></tr>
-<tr><td class="h"><a id="L1767">1767</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
-<tr><td class="h"><a id="L1774">1774</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1776">1776</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (defined $remote and $$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1777">1777</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $type = $$self{&quot;cache&quot;}-&gt;get(&quot;$remote/$agent&quot;))</td></tr>
-<tr><td class="h"><a id="L1785">1785</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
-<tr><td class="h"><a id="L1787">1787</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1793">1793</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;browser_detect&quot;})</td></tr>
-<tr><td class="h"><a id="L1794">1794</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
+<tr><td class="h"><a id="L1710">1710</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;browser_detect&quot;})</td></tr>
+<tr><td class="h"><a id="L1712">1712</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $is_robot)</td></tr>
+<tr><td class="h"><a id="L1715">1715</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">defined $is_robot &amp;&amp; $is_robot ? :</td></tr>
+<tr><td class="h"><a id="L1718">1718</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($is_robot)</td></tr>
+<tr><td class="h"><a id="L1719">1719</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1727">1727</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1752">1752</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $$self{&quot;is_search_engine&quot;})</td></tr>
+<tr><td class="h"><a id="L1756">1756</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&quot;IS_SEARCH_ENGINE&quot;})</td></tr>
+<tr><td class="h"><a id="L1763">1763</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
+<tr><td class="h"><a id="L1770">1770</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1772">1772</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (defined $remote and $$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1773">1773</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $type = $$self{&quot;cache&quot;}-&gt;get(&quot;$remote/$agent&quot;))</td></tr>
+<tr><td class="h"><a id="L1781">1781</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
+<tr><td class="h"><a id="L1783">1783</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1789">1789</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;browser_detect&quot;})</td></tr>
+<tr><td class="h"><a id="L1790">1790</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;require HTTP::BrowserDetect
 }
 })</td></tr>
-<tr><td class="h"><a id="L1799">1799</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $browser = $$self{&quot;browser_detect&quot;})</td></tr>
-<tr><td class="h"><a id="L1801">1801</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($is_search)</td></tr>
-<tr><td class="h"><a id="L1802">1802</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[SeznamBot/] or $agent =~ m[Google-InspectionTool/] or $agent =~ m[Googlebot/])</td></tr>
-<tr><td class="h"><a id="L1808">1808</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($is_search and $$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1819">1819</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (defined $hostname and $hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/ and not $hostname =~ /^google-proxy/ or Net::CIDR::cidrlookup($remote, @cidr_blocks))</td></tr>
-<tr><td class="h"><a id="L1821">1821</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
-<tr><td class="h"><a id="L1859">1859</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_mobile)</td></tr>
-<tr><td class="h"><a id="L1862">1862</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_search_engine)</td></tr>
-<tr><td class="h"><a id="L1865">1865</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_robot)</td></tr>
-<tr><td class="h"><a id="L1893">1893</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $$params{&quot;cookie_name&quot;})</td></tr>
-<tr><td class="h"><a id="L1899">1899</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;jar&quot;})</td></tr>
-<tr><td class="h"><a id="L1900">1900</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $ENV{&quot;HTTP_COOKIE&quot;})</td></tr>
-<tr><td class="h"><a id="L1927">1927</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $field)</td></tr>
-<tr><td class="h"><a id="L1933">1933</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;jar&quot;})</td></tr>
-<tr><td class="h"><a id="L1934">1934</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $ENV{&quot;HTTP_COOKIE&quot;})</td></tr>
-<tr><td class="h"><a id="L1957">1957</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if defined $status</td></tr>
-<tr><td class="h"><a id="L1960">1960</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $$self{&quot;status&quot;})</td></tr>
-<tr><td class="h"><a id="L1963">1963</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and $method eq &#39;OPTIONS&#39; || $method eq &#39;DELETE&#39;</td></tr>
-<tr><td class="h"><a id="L1964">1964</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and ($method eq &quot;POST&quot; and not defined $ENV{&quot;CONTENT_LENGTH&quot;})</td></tr>
-<tr><td class="h"><a id="L2004">2004</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar $$self{&quot;messages&quot;})</td></tr>
-<tr><td class="h"><a id="L2027">2027</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
-<tr><td class="h"><a id="L2047">2047</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $$params{&#39;logger&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L2048">2048</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
-<tr><td class="h"><a id="L2069">2069</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages and my $logger = $$self{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L2100">2100</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L2111">2111</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $ENV{$var}</td></tr>
-<tr><td class="h"><a id="L2114">2114</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{$var} =~ m(^[\w\.\-/:\\]+$))</td></tr>
-<tr><td class="h"><a id="L2133">2133</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L2145">2145</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
-<tr><td class="h"><a id="L2151">2151</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
-<tr><td class="h"><a id="L2153">2153</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
-<tr><td class="h"><a id="L2156">2156</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($$self{&quot;auto_load&quot;})-&gt;isFalse</td></tr>
-<tr><td class="h"><a id="L2159">2159</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L2162">2162</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
+<tr><td class="h"><a id="L1795">1795</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $browser = $$self{&quot;browser_detect&quot;})</td></tr>
+<tr><td class="h"><a id="L1797">1797</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($is_search)</td></tr>
+<tr><td class="h"><a id="L1798">1798</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[SeznamBot/] or $agent =~ m[Google-InspectionTool/] or $agent =~ m[Googlebot/])</td></tr>
+<tr><td class="h"><a id="L1804">1804</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($is_search and $$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1815">1815</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (defined $hostname and $hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/ and not $hostname =~ /^google-proxy/ or Net::CIDR::cidrlookup($remote, @cidr_blocks))</td></tr>
+<tr><td class="h"><a id="L1817">1817</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($$self{&quot;cache&quot;})</td></tr>
+<tr><td class="h"><a id="L1855">1855</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_mobile)</td></tr>
+<tr><td class="h"><a id="L1858">1858</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_search_engine)</td></tr>
+<tr><td class="h"><a id="L1861">1861</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_robot)</td></tr>
+<tr><td class="h"><a id="L1953">1953</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $field)</td></tr>
+<tr><td class="h"><a id="L1959">1959</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($$self{&quot;jar&quot;})</td></tr>
+<tr><td class="h"><a id="L1960">1960</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $ENV{&quot;HTTP_COOKIE&quot;})</td></tr>
+<tr><td class="h"><a id="L1983">1983</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if defined $status</td></tr>
+<tr><td class="h"><a id="L1986">1986</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $$self{&quot;status&quot;})</td></tr>
+<tr><td class="h"><a id="L1989">1989</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and $method eq &#39;OPTIONS&#39; || $method eq &#39;DELETE&#39;</td></tr>
+<tr><td class="h"><a id="L1990">1990</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and ($method eq &quot;POST&quot; and not defined $ENV{&quot;CONTENT_LENGTH&quot;})</td></tr>
+<tr><td class="h"><a id="L2030">2030</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar $$self{&quot;messages&quot;})</td></tr>
+<tr><td class="h"><a id="L2053">2053</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
+<tr><td class="h"><a id="L2073">2073</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $$params{&#39;logger&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L2074">2074</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
+<tr><td class="h"><a id="L2095">2095</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages and my $logger = $$self{&quot;logger&quot;})</td></tr>
+<tr><td class="h"><a id="L2126">2126</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
+<tr><td class="h"><a id="L2137">2137</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $ENV{$var}</td></tr>
+<tr><td class="h"><a id="L2140">2140</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{$var} =~ m(^[\w\.\-/:\\]+$))</td></tr>
+<tr><td class="h"><a id="L2159">2159</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L2171">2171</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
+<tr><td class="h"><a id="L2177">2177</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
+<tr><td class="h"><a id="L2179">2179</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
+<tr><td class="h"><a id="L2182">2182</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($$self{&quot;auto_load&quot;})-&gt;isFalse</td></tr>
+<tr><td class="h"><a id="L2185">2185</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L2188">2188</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
 </table>
 </body>
 </html>
