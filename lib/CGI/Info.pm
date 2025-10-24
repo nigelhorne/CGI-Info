@@ -12,7 +12,7 @@ use Object::Configure 0.12;
 use File::Spec;
 use Log::Abstraction 0.10;
 use Params::Get 0.13;
-use Params::Validate::Strict 0.11;
+use Params::Validate::Strict 0.21;
 use Net::CIDR;
 use Return::Set;
 use Scalar::Util;
@@ -933,7 +933,8 @@ sub params {
 						$value = Params::Validate::Strict::validate_strict({
 							schema => { $key => $schema },
 							args => { $key => $value },
-							unknown_parameter_handler => 'warn',
+							unknown_parameter_handler => 'die',
+							logger => $self->{'logger'}
 						});
 					};
 					if($@) {
@@ -941,7 +942,13 @@ sub params {
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
-					$value = $value->{$key};
+					if(scalar keys %{$value}) {
+						$value = $value->{$key};
+					} else {
+						$self->_info("Block $key = $value");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
 				}
 			}
 		}
@@ -1087,6 +1094,8 @@ sub param {
 
 sub _sanitise_input($) {
 	my $arg = shift;
+
+	return if(!defined($arg));
 
 	# Remove hacking attempts and spaces
 	$arg =~ s/[\r\n]//g;

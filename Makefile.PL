@@ -67,7 +67,7 @@ WriteMakefile(
 		'Net::CIDR' => 0,
 		'Object::Configure' => 0.12,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.11,
+		'Params::Validate::Strict' => 0.21,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
 		'Sys::Hostname' => 0,
