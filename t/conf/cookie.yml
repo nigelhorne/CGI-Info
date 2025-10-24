@@ -1,0 +1,13 @@
+---
+# Pass through App::Test::Generator/fuzz-harness-generator
+
+module: CGI::Info
+function: cookie
+
+new:
+
+input:
+  cookie_name:
+    type: string
+    min: 1
+    matches: "^[!#-'*+\\-\\.\\^_`|~0-9A-Za-z]+$"  # RFC6265

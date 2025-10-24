@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 32;
+use Test::Most tests => 33;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -50,7 +50,8 @@ COOKIES: {
 
 	# Check for missing field
 	diag('Ignore message about what cookie would you like');
-	is($obj->cookie(), undef, 'undef if no cookie field is provided');
+	throws_ok { $obj->cookie() } qr/^Usage/ , 'undef if no cookie field is provided';
+	cmp_ok($obj->cookie('user'), 'eq', 'JohnDoe');
 }
 
 # Cookie jar is populated correctly with valid cookies

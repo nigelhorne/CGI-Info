@@ -218,10 +218,6 @@ None.
 
 =head4 OUTPUT
 
-=over 4
-
-=back
-
   {
     type => 'string',
     'min' => 1,
@@ -1887,23 +1883,8 @@ Deprecated - use cookie() instead.
 
 sub get_cookie {
 	my $self = shift;
-	my $params = Params::Get::get_params('cookie_name', @_);
 
-	# Validate field argument
-	if(!defined($params->{'cookie_name'})) {
-		$self->_warn('cookie_name argument not given');
-		return;
-	}
-
-	# Load cookies if not already loaded
-	unless($self->{jar}) {
-		if(defined $ENV{'HTTP_COOKIE'}) {
-			$self->{jar} = { map { split(/=/, $_, 2) } split(/; /, $ENV{'HTTP_COOKIE'}) };
-		}
-	}
-
-	# Return the cookie value if it exists, otherwise return undef
-	return $self->{jar}->{$params->{'cookie_name'}};
+	return $self->cookie(\@_);
 }
 
 =head2 cookie
@@ -1918,10 +1899,55 @@ it will replace the "get_cookie" method in the future.
     my $name = CGI::Info->new()->cookie('name');
     print "Your name is $name\n";
 
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    cookie_name => {
+      'type' => 'string',
+      'min' => 1,
+      'matches' => qr/^[!#-'*+\-.\^_`|~0-9A-Za-z]+$/	# RFC6265
+    }
+  }
+
+=head4 OUTPUT
+
+Cookie not set: C<undef>
+
+Cookie set:
+
+  {
+    type => 'string',
+    optional => 1,
+    matches => qr/	# RFC6265
+      ^
+      (?:
+        "[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*"   # quoted
+      | [\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*     # unquoted
+      )
+      $
+    /x
+  }
+
 =cut
 
-sub cookie {
-	my ($self, $field) = @_;
+sub cookie
+{
+	my $self = shift;
+        my $params = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params('cookie_name', @_),
+		schema => {
+			cookie_name => {
+				'type' => 'string',
+				'min' => 1,
+				'matches' => qr/^[!#-'*+\-.\^_`|~0-9A-Za-z]+$/	# RFC6265
+			}
+		}
+	});
+
+	my $field = $params->{'cookie_name'};
 
 	# Validate field argument
 	if(!defined($field)) {

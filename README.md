@@ -528,6 +528,37 @@ it will replace the "get\_cookie" method in the future.
     my $name = CGI::Info->new()->cookie('name');
     print "Your name is $name\n";
 
+### API SPECIFICATION
+
+#### INPUT
+
+    {
+      cookie_name => {
+        'type' => 'string',
+        'min' => 1,
+        'matches' => qr/^[!#-'*+\-.\^_`|~0-9A-Za-z]+$/    # RFC6265
+      }
+    }
+
+#### OUTPUT
+
+Cookie not set: `undef`
+
+Cookie set:
+
+    {
+      type => 'string',
+      optional => 1,
+      matches => qr/      # RFC6265
+        ^
+        (?:
+          "[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*"   # quoted
+        | [\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*     # unquoted
+        )
+        $
+      /x
+    }
+
 ## status
 
 Sets or returns the status of the object,

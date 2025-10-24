@@ -1,0 +1,12 @@
+---
+# Pass through App::Test::Generator/fuzz-harness-generator
+
+module: CGI::Info
+function: script_name
+
+new:
+
+output:
+  type: string
+  min: 1
+  nomatch: "^[\/\\]"	# Does not return absolute path
