@@ -1951,7 +1951,7 @@ sub cookie
 
 	# Validate field argument
 	if(!defined($field)) {
-		$self->_warn('what cookie do you want?');
+		$self->_error('what cookie do you want?');
 		return;
 	}
 
@@ -2125,6 +2125,17 @@ sub _warn {
 	$self->_log('warn', $params->{'warning'});
 	if(!defined($self->{'logger'})) {
 		Carp::carp($params->{'warning'});
+	}
+}
+
+# Emit an error message somewhere
+sub _error {
+	my $self = shift;
+	my $params = Params::Get::get_params('warning', @_);
+
+	$self->_log('error', $params->{'warning'});
+	if(!defined($self->{'logger'})) {
+		Carp::croak($params->{'warning'});
 	}
 }
 

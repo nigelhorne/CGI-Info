@@ -19,7 +19,7 @@ COOKIES: {
 	ok($i->get_cookie(cookie_name => 'foo') eq 'bar');
 	ok(!defined($i->get_cookie(cookie_name => 'bar')));
 	diag('Ignore message about cookie_name argument not given');
-	ok(!defined($i->get_cookie(cookie_name => undef)));
+	throws_ok { $i->get_cookie(cookie_name => undef) } qr/^what cookie do you want/ , 'dies when the cookie name is not defined';
 
 	$ENV{'HTTP_COOKIE'} = 'fred=wilma; foo=bar';
 	$i = new_ok('CGI::Info');
@@ -29,7 +29,7 @@ COOKIES: {
 	ok($i->get_cookie({cookie_name => 'fred'}) eq 'wilma');
 	ok(!defined($i->get_cookie(cookie_name => 'bar')));
 	ok(!defined($i->get_cookie({cookie_name => 'bar'})));
-	ok(!defined($i->get_cookie({cookie_name => undef})));
+	throws_ok { $i->get_cookie(cookie_name => undef) } qr/^what cookie do you want/ , 'dies when the cookie name is not defined';
 
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval {
