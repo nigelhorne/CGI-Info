@@ -1952,7 +1952,7 @@ sub cookie
 	# Validate field argument
 	if(!defined($field)) {
 		$self->_error('what cookie do you want?');
-		return;
+		Carp::croak('what cookie do you want?');
 	}
 
 	# Load cookies if not already loaded
