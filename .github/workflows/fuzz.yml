@@ -29,7 +29,7 @@ jobs:
       - name: Update Ubuntu Packages
         run: |
           sudo apt-get update
-          sudo apt-get -y upgrade && sudo apt-get install -y libdb-dev libwww-perl mailx
+          sudo apt-get -y upgrade && sudo apt-get install -y libdb-dev libwww-perl mailutils
         if: runner.os == 'Linux'
 
       - name: Install Perl dependencies

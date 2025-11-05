@@ -1,6 +1,6 @@
 ---
 # Create https://nigelhorne.github.io/CGI-Info/coverage/
-name: CI
+name: Test Dashboard
 
 permissions:
   contents: write  # needed to push to gh-pages
