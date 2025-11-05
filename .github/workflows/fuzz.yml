@@ -1,0 +1,75 @@
+---
+name: Fuzz Testing
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: '29 5 6 * *'
+
+jobs:
+  generate-fuzz-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.42'
+
+      - name: Update Ubuntu Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get -y upgrade && sudo apt-get install -y libdb-dev libwww-perl mailx
+        if: runner.os == 'Linux'
+
+      - name: Install Perl dependencies
+        run: |
+          cpanm --notest LWP::UserAgent LWP::Protocol::https Data::Throttler CGI::IDS DB_File Config::Abstraction
+
+      - name: Install App::Test::Generator this module's dependencies
+        run: |
+          cpanm App::Test::Generator
+          cpanm --installdeps .
+
+      - name: Make Module
+        run: |
+          # find . -name build.log | xargs cat
+          perl Makefile.PL
+          make
+        env:
+          AUTOMATED_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+
+      - name: Generate fuzz tests
+        run: |
+          mkdir t/fuzz
+          find t/conf -name '*.yml' | while read config; do
+            test_name=$(basename "$config" .conf)
+            fuzz-harness-generator "$config" > "t/fuzz/${test_name}_fuzz.t"
+          done
+
+      - name: Run generated fuzz tests
+        run: |
+          prove -lr t/fuzz/
+        env:
+          AUTOMATED_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+
+      - name: Show cpanm build log on failure (non-Windows)
+        if: runner.os != 'Windows' && failure()
+        run: tail -100 "$HOME/.cpanm/work/*/build.log"
+
+      - name: Send email on failure
+        if: failure()
+        run: |
+          echo "Fuzz Testing workflow failed" | mailx -s "GitHub Action Failed" alerts@nigelhorne.com
