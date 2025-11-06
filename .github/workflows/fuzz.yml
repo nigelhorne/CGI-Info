@@ -67,9 +67,6 @@ jobs:
 
       - name: Show cpanm build log on failure (non-Windows)
         if: runner.os != 'Windows' && failure()
-        run: tail -100 "$HOME/.cpanm/work/*/build.log"
-
-      - name: Send email on failure
-        if: failure()
         run: |
           echo "Fuzz Testing workflow failed" | mailx -s "GitHub Action Failed" alerts@nigelhorne.com
+          tail -100 "$HOME/.cpanm/work/*/build.log"
