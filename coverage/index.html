@@ -84,29 +84,33 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/0fb2d5749b59efea679f1a1b939042c5957d8fcb/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/7c28f6e950afe58cf52ca250b3cd376a12eae751/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
 
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/0fb2d5749b59efea679f1a1b939042c5957d8fcb/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.3,79.3,79.1,79.0,79.0,79.0"></canvas></td><td>87.4</td><td>75.9</td><td>58.4</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.0%</span></td><td class="neutral" title="Previous: 79.0%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/7c28f6e950afe58cf52ca250b3cd376a12eae751/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.4,79.3,79.3,79.1,79.0,79.0,79.0,79.0"></canvas></td><td>87.4</td><td>75.9</td><td>58.4</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">79.0%</span></td><td class="neutral" title="Previous: 79.0%">&#9679; 0.0%</td></tr>
 
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 
 <tr class="med nosort"><td><strong>Total</strong></td><td>86.8</td><td>75.1</td><td>58.4</td><td>98.5</td><td colspan="2"><strong>78.7</strong></td></tr>
 
 </tbody></table>
-<p>
-	<h2>Coverage Trend</h2>
-	<label>
-		<input type="checkbox" id="toggleTrend" checked>
-		Show regression trend
-	</label>
-</p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
+	<div>
+		<h2>Coverage Trend</h2>
+		<label>
+			<input type="checkbox" id="toggleTrend" checked>
+			Show regression trend
+		</label>
+		<div>
+		</div>
+	</div>
+	<div id="zoomControls" style="margin-top:8px;">
+		<input type="button" value="Refresh" onClick="refresh(this)">
+		<button id="resetZoomBtn" type="button">Reset Zoom</button>
+	</div>
+</div>
 
 <canvas id="coverageTrend" width="600" height="300"></canvas>
 <!-- Zoom controls for the trend chart -->
-<div id="zoomControls" style="margin-top:8px;">
-	<button id="resetZoomBtn" type="button">Reset Zoom</button>
-	<span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Add chartjs-plugin-zoom (required for wheel/pinch/drag zoom & pan) -->
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.1.1/dist/chartjs-plugin-zoom.min.js"></script>
@@ -131,8 +135,7 @@ function linearRegression(data) {
 	}));
 }
 
-const dataPoints = [ { x: "2025-08-30T16:33:19-04:00", y: 79.0953545232274, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/a48702f", label: "2025-08-30T16:33:19-04:00", pointBackgroundColor: "gray", comment: "Show deltas on tooltips" },
-{ x: "2025-09-11T13:13:22-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dff77b5", label: "2025-09-11T13:13:22-04:00", pointBackgroundColor: "gray", comment: "Latest test page generation code from SEO::Inspector" },
+const dataPoints = [ { x: "2025-09-11T13:13:22-04:00", y: 79.0953545232274, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/dff77b5", label: "2025-09-11T13:13:22-04:00", pointBackgroundColor: "gray", comment: "Latest test page generation code from SEO::Inspector" },
 { x: "2025-09-11T15:14:26-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/86c803b", label: "2025-09-11T15:14:26-04:00", pointBackgroundColor: "gray", comment: "Latest testing dashboard from SEO::Inspector" },
 { x: "2025-09-11T16:22:01-04:00", y: 79.0953545232274, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/ef2bc2d", label: "2025-09-11T16:22:01-04:00", pointBackgroundColor: "gray", comment: "Test dashboard: show a sparkline against each file" },
 { x: "2025-09-14T09:16:31-04:00", y: 79.0853658536585, delta: -0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/eefbb4a", label: "2025-09-14T09:16:31-04:00", pointBackgroundColor: "gray", comment: "Release 1.07" },
@@ -140,7 +143,8 @@ const dataPoints = [ { x: "2025-08-30T16:33:19-04:00", y: 79.0953545232274, delt
 { x: "2025-10-16T09:38:32-04:00", y: 79.0018259281802, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/19af1bf", label: "2025-10-16T09:38:32-04:00", pointBackgroundColor: "gray", comment: "Formally specify script_name" },
 { x: "2025-10-24T09:27:19-04:00", y: 78.8263762855414, delta: -0.2, url: "https://github.com/nigelhorne/CGI-Info/commit/08dedc7", label: "2025-10-24T09:27:19-04:00", pointBackgroundColor: "red", comment: "Invalid args could get through if the logger is set" },
 { x: "2025-11-02T18:48:50-05:00", y: 78.7143723468769, delta: -0.1, url: "https://github.com/nigelhorne/CGI-Info/commit/22cebb3", label: "2025-11-02T18:48:50-05:00", pointBackgroundColor: "red", comment: "Fix test failure when logger not set" },
-{ x: "2025-11-05T09:52:35-05:00", y: 78.7143723468769, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8afc842", label: "2025-11-05T09:52:35-05:00", pointBackgroundColor: "gray", comment: "Use different package" } ];
+{ x: "2025-11-05T09:52:35-05:00", y: 78.7143723468769, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8afc842", label: "2025-11-05T09:52:35-05:00", pointBackgroundColor: "gray", comment: "Use different package" },
+{ x: "2025-11-05T21:35:20-05:00", y: 78.7143723468769, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/0fb2d57", label: "2025-11-05T21:35:20-05:00", pointBackgroundColor: "gray", comment: "Combine the failure lines" } ];
 
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
@@ -393,11 +397,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 });
 
+function refresh(){
+	window.location.reload("Refresh")
+}
 </script>
 
 <footer>
+	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2025-11-06 02:40:54 - <a href="https://github.com/nigelhorne/CGI-Info/commit/0fb2d5749b59efea679f1a1b939042c5957d8fcb">commit <code>0fb2d57</code></a></em></p>
+	<p><em>Last updated: 2025-11-06 22:17:40 - <a href="https://github.com/nigelhorne/CGI-Info/commit/7c28f6e950afe58cf52ca250b3cd376a12eae751">commit <code>7c28f6e</code></a></em></p>
 </footer>
 </body>
 </html>
