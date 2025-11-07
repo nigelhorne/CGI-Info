@@ -14,9 +14,17 @@ on:
 
 jobs:
   generate-fuzz-tests:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        perl: ['5.42', '5.40', '5.38', '5.36', '5.34', '5.32', '5.30', '5.28', '5.22']
+
+    runs-on: ${{ matrix.os }}
+    name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v5
@@ -24,7 +32,7 @@ jobs:
       - name: Set up Perl
         uses: shogo82148/actions-setup-perl@v1
         with:
-          perl-version: '5.42'
+          perl-version: ${{ matrix.perl }}
 
       - name: Update Ubuntu Packages
         run: |
