@@ -14,7 +14,7 @@ my $dirname = "$Bin/conf";
 if((-d $dirname) && opendir(my $dh, $dirname)) {
 	while (my $filename = readdir($dh)) {
 		# Skip '.' and '..' entries
-		next if ($filename eq '.' || $filename eq '..');
+		next if ($filename eq '.' || $filename eq '..') || ($filename =~ /\.swp$/);
 
 		my $filepath = "$dirname/$filename";
 
