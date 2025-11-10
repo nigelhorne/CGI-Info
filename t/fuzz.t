@@ -35,6 +35,7 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 			diag($stderr) if(length($stderr));
 		}
 	}
+	closedir($dh);
 }
 
 done_testing();
