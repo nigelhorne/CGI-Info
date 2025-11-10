@@ -1,0 +1,26 @@
+---
+module: CGI::Info
+function: script_dir
+
+new:
+
+# script_dir takes no arguments
+input: undef
+
+# Returns an absolute path
+output:
+  type: string
+  min: 2
+  # Matches absolute paths on both Windows and Linux
+  # Linux: /path/to/file or Windows: C:\path\to\file or C:/path/to/file
+  # 'matches' => qr{^[A-Za-z]:\[/\]|/}, 'min' => 1, 'type' => 'string'
+  matches: ^[A-Za-z]:[/\\]|\/
+
+config:
+  test_undef: yes
+  test_empty: no
+  test_nuls: no
+  dedup: yes
+
+seed: 43
+iterations: 50
