@@ -19,6 +19,7 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 		my $filepath = "$dirname/$filename";
 
 		if(-f $filepath) {	# Check if it's a regular file
+			diag($filepath) if ($ENV{'TEST_VERBOSE'});
 			my ($stdout, $stderr);
 			run3 ['fuzz-harness-generator', '-r', $filepath], undef, \$stdout, \$stderr;
 
@@ -30,7 +31,7 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 					diag("$1 tests run");
 				}
 			} else {
-				diag("STDOUT:\n$stdout");
+				diag("$filepath: STDOUT:\n$stdout");
 			}
 			diag($stderr) if(length($stderr));
 		}
