@@ -37,6 +37,7 @@ WriteMakefile(
 		'File::Slurp' => 0,
 		'File::stat' => 0,
 		'File::Temp' => 0,
+		'FindBin' => 0,
 		'LWP::UserAgent' => 0,
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		'POSIX' => 0,
@@ -53,6 +54,7 @@ WriteMakefile(
 		'autodie' => 0,
 		'strict' => 0,
 		'warnings' => 0,
+		'IPC::Run3' => 0,
 		'IPC::System::Simple' => 0,
 		'Taint::Runtime' => 0,
 		'Test::Returns' => 0,
