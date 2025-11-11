@@ -2087,13 +2087,15 @@ sub _log
 {
 	my ($self, $level, @messages) = @_;
 
-	# FIXME: add caller's function
-	# if(($level eq 'warn') || ($level eq 'info')) {
-		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
-	# }
+	if(scalar(@messages)) {
+		# FIXME: add caller's function
+		# if(($level eq 'warn') || ($level eq 'info')) {
+			push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
+		# }
 
-	if(scalar(@messages) && (my $logger = $self->{'logger'})) {
-		$self->{'logger'}->$level(join('', grep defined, @messages));
+		if(scalar(@messages) && (my $logger = $self->{'logger'})) {
+			$self->{'logger'}->$level(join('', grep defined, @messages));
+		}
 	}
 }
 
