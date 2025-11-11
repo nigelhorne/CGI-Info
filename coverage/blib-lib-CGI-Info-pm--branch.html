@@ -271,7 +271,7 @@ https://pjcj.net
 <tr><td class="h"><a id="L2053">2053</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
 <tr><td class="h"><a id="L2073">2073</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $$params{&#39;logger&#39;}) { }</td></tr>
 <tr><td class="h"><a id="L2074">2074</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
-<tr><td class="h"><a id="L2090">2090</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages)</td></tr>
+<tr><td class="h"><a id="L2090">2090</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (ref $self and scalar @messages)</td></tr>
 <tr><td class="h"><a id="L2096">2096</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages and my $logger = $$self{&quot;logger&quot;})</td></tr>
 <tr><td class="h"><a id="L2128">2128</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
 <tr><td class="h"><a id="L2139">2139</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
