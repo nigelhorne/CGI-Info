@@ -2087,7 +2087,7 @@ sub _log
 {
 	my ($self, $level, @messages) = @_;
 
-	if(scalar(@messages)) {
+	if(ref($self) && scalar(@messages)) {
 		# FIXME: add caller's function
 		# if(($level eq 'warn') || ($level eq 'info')) {
 			push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
