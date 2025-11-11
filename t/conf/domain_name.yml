@@ -1,0 +1,22 @@
+---
+module: CGI::Info
+function: domain_name
+
+new:
+
+# domain_name takes no arguments
+input: undef
+
+# Returns an absolute path
+output:
+  type: string
+  min: 1
+
+config:
+  test_undef: yes
+  test_empty: no
+  test_nuls: no
+  dedup: yes
+
+seed: 45
+iterations: 5
