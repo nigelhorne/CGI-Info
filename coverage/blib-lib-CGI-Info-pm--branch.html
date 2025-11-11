@@ -20,7 +20,7 @@ https://pjcj.net
 <h1>Branch Coverage</h1>
 <table>
 <tr><td class="h" align="right">File:</td><td align="left">blib/lib/CGI/Info.pm</td></tr>
-<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">75.9%</td></tr>
+<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">75.8%</td></tr>
 </table>
 <div><br/></div>
 <table>
@@ -271,18 +271,19 @@ https://pjcj.net
 <tr><td class="h"><a id="L2053">2053</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
 <tr><td class="h"><a id="L2073">2073</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $$params{&#39;logger&#39;}) { }</td></tr>
 <tr><td class="h"><a id="L2074">2074</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
-<tr><td class="h"><a id="L2095">2095</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages and my $logger = $$self{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L2126">2126</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L2137">2137</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
-<tr><td class="h"><a id="L2148">2148</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $ENV{$var}</td></tr>
-<tr><td class="h"><a id="L2151">2151</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{$var} =~ m(^[\w\.\-/:\\]+$))</td></tr>
-<tr><td class="h"><a id="L2170">2170</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L2182">2182</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
-<tr><td class="h"><a id="L2188">2188</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
-<tr><td class="h"><a id="L2190">2190</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
-<tr><td class="h"><a id="L2193">2193</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($$self{&quot;auto_load&quot;})-&gt;isFalse</td></tr>
-<tr><td class="h"><a id="L2196">2196</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L2199">2199</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
+<tr><td class="h"><a id="L2090">2090</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages)</td></tr>
+<tr><td class="h"><a id="L2096">2096</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages and my $logger = $$self{&quot;logger&quot;})</td></tr>
+<tr><td class="h"><a id="L2128">2128</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
+<tr><td class="h"><a id="L2139">2139</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $$self{&quot;logger&quot;})</td></tr>
+<tr><td class="h"><a id="L2150">2150</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $ENV{$var}</td></tr>
+<tr><td class="h"><a id="L2153">2153</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{$var} =~ m(^[\w\.\-/:\\]+$))</td></tr>
+<tr><td class="h"><a id="L2172">2172</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L2184">2184</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
+<tr><td class="h"><a id="L2190">2190</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
+<tr><td class="h"><a id="L2192">2192</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
+<tr><td class="h"><a id="L2195">2195</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($$self{&quot;auto_load&quot;})-&gt;isFalse</td></tr>
+<tr><td class="h"><a id="L2198">2198</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L2201">2201</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
 </table>
 </body>
 </html>
