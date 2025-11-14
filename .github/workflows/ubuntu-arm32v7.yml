@@ -11,13 +11,12 @@ on:
   pull_request:
 jobs:
   build:
-    big-endian:
-      runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Set up QEMU for multi-architecture
-          uses: docker/setup-qemu-action@v3
-          with:
-            platforms: all
-        - name: Run tests on arm32v7/ubuntu
-          run: docker run --rm --interactive --platform linux/arm32v7 arm32v7/ubuntu bash -c "apt update; apt dist-upgrade; apt -y install git curl build-essential; git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY; cd $( echo $GITHUB_REPOSITORY | cut -d/ -f2 ); curl -L https://cpanmin.us | perl - --notest --installdeps .; perl Makefile.PL; make; prove -wlvmb t"
+    steps:
+      - name: Set up QEMU for multi-architecture
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+      - name: Run tests on arm32v7/ubuntu
+        run: docker run --rm --interactive --platform linux/arm32v7 arm32v7/ubuntu bash -c "apt update; apt dist-upgrade; apt -y install git curl build-essential; git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY; cd $( echo $GITHUB_REPOSITORY | cut -d/ -f2 ); curl -L https://cpanmin.us | perl - --notest --installdeps .; perl Makefile.PL; make; prove -wlvmb t"
