@@ -19,4 +19,4 @@ jobs:
         with:
           platforms: all
       - name: Run tests on arm64/ubuntu
-        run: docker run --rm --interactive --platform linux/arm64 arm64/ubuntu bash -c "apt update; apt dist-upgrade; apt -y install git curl build-essential; git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY; cd $( echo $GITHUB_REPOSITORY | cut -d/ -f2 ); curl -L https://cpanmin.us | perl - --notest --installdeps .; perl Makefile.PL; make; prove -wlvmb t"
+        run: docker run --rm --interactive --platform linux/arm64 ubuntu:latest bash -c "apt update; apt dist-upgrade; apt -y install git curl build-essential; git clone --recurse-submodules $GITHUB_SERVER_URL/$GITHUB_REPOSITORY; cd $( echo $GITHUB_REPOSITORY | cut -d/ -f2 ); curl -L https://cpanmin.us | perl - --notest --installdeps .; perl Makefile.PL; make; prove -wlvmb t"
