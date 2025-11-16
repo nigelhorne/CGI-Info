@@ -397,6 +397,24 @@ Useful for debugging or generating keys for a cache.
     my $string_representation = $info->as_string();
     my $raw_string = $info->as_string({ raw => 1 });
 
+### API SPECIFICATION
+
+#### INPUT
+
+    {
+      raw => {
+        'type' => 'boolean',
+        'optional' => 1,
+      }
+    }
+
+#### OUTPUT
+
+    {
+      type => 'string',
+      optional => 1,
+    }
+
 ## protocol
 
 Returns the connection protocol, presumably 'http' or 'https', or undef if

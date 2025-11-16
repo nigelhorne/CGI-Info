@@ -682,6 +682,7 @@ sub params {
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
 		} elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
+			# TODO:  Do I really need this anymore?
 			my $oldfh = select(STDOUT);
 			print "Entering debug mode\n",
 				"Enter key=value pairs - end with quit\n";
@@ -1337,6 +1338,24 @@ Useful for debugging or generating keys for a cache.
     my $string_representation = $info->as_string();
     my $raw_string = $info->as_string({ raw => 1 });
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    raw => {
+      'type' => 'boolean',
+      'optional' => 1,
+    }
+  }
+
+=head4 OUTPUT
+
+  {
+    type => 'string',
+    optional => 1,
+  }
+
 =cut
 
 sub as_string
@@ -1345,7 +1364,16 @@ sub as_string
 
 	# Retrieve object parameters
 	my $params = $self->params() || return '';
-	my $args = Params::Get::get_params(undef, @_);
+
+	my $args = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params(undef, @_) || {},
+		schema => {
+			raw => {
+				'type' => 'boolean',
+				'optional' => 1
+			}
+		}
+	});
 	my $rc;
 
 	if($args->{'raw'}) {
