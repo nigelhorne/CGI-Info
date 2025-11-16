@@ -1,0 +1,23 @@
+---
+module: CGI::Info
+function: as_string
+
+new:
+
+input:
+  raw:
+    type: boolean
+    optional: true
+
+output:
+  type: string
+  optional: true
+
+config:
+  test_undef: no
+  test_empty: no
+  test_nuls: no
+  dedup: yes
+
+seed: 41
+iterations: 50

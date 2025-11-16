@@ -1362,9 +1362,6 @@ sub as_string
 {
 	my $self = shift;
 
-	# Retrieve object parameters
-	my $params = $self->params() || return '';
-
 	my $args = Params::Validate::Strict::validate_strict({
 		args => Params::Get::get_params(undef, @_) || {},
 		schema => {
@@ -1374,6 +1371,10 @@ sub as_string
 			}
 		}
 	});
+
+	# Retrieve object parameters
+	my $params = $self->params() || return '';
+
 	my $rc;
 
 	if($args->{'raw'}) {
