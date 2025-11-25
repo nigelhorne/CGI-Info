@@ -1496,6 +1496,9 @@ sub tmpdir {
 			return $self->_untaint_filename({ filename => $dir });
 		}
 	}
+	if($params->{'default'} && ref($params->{'default'})) {
+		croak(ref($self), ': tmpdir must be given a scalar');
+	}
 	return $params->{default} ? $params->{default} : File::Spec->tmpdir();
 }
 

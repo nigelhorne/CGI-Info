@@ -5,6 +5,7 @@ Revision history for CGI-Info
 	Make get_cookie() just call cookie()
 	Verify the format of the cookie name
 	Added test dashboard
+	Croak if tmpdir is given a non-scalar for default
 
 1.07	Sun Sep 14 09:16:12 EDT 2025
 	Fix https://ci.appveyor.com/project/nigelhorne/cgi-info-vqpj8/builds/52537979/job/bnag8kvc2htkl3vf
