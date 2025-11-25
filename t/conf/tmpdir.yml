@@ -1,0 +1,23 @@
+---
+module: CGI::Info
+function: tmpdir
+
+# To test at the class level, remove this line
+new:
+
+input:
+  default:
+    type: string
+    optional: 1
+
+output:
+  type: string
+
+config:
+  test_undef: no
+  test_empty: yes
+  test_nuls: no
+  dedup: yes
+
+seed: 49
+iterations: 50
