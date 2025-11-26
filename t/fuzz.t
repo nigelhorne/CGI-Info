@@ -3,11 +3,13 @@
 use strict;
 use warnings;
 
+use Test::Needs {
+	'App::Test::Generator' => '0.19'
+};
 use FindBin qw($Bin);
 use IPC::Run3;
 use IPC::System::Simple qw(system);
 use Test::Most;
-use Test::Needs 'App::Test::Generator';
 
 my $dirname = "$Bin/conf";
 
@@ -32,6 +34,9 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 				}
 			} else {
 				diag("$filepath: STDOUT:\n$stdout");
+				diag($stderr) if(length($stderr));
+				diag("$filepath Failed");
+				last;
 			}
 			diag($stderr) if(length($stderr));
 		}
