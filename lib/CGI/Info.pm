@@ -18,7 +18,6 @@ use Return::Set;
 use Scalar::Util;
 use Socket;	# For AF_INET
 use 5.008;
-use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
 use List::Util ();	# Can go when expect goes
