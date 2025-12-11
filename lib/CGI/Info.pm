@@ -703,6 +703,8 @@ sub params {
 		if(my $query = $ENV{'QUERY_STRING'}) {
 			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
 				$self->_warn('Multipart/form-data not supported for GET');
+				$self->{status} = 501;	# Not implemented
+				return;
 			}
 			$query =~ s/\\u0026/\&/g;
 			@pairs = split(/&/, $query);

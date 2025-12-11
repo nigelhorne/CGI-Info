@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: |
           cpanm --notest --installdeps .
-          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover Devel::Cover::Report::Html POSIX File::Glob File::Slurp File::stat Readonly
+          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover Devel::Cover::Report::Html POSIX File::Glob File::Slurp File::stat Readonly IPC::System::Simple
 
       # Optional: run Perl::Critic static checks
       # - name: Run Perl::Critic

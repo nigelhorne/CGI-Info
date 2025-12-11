@@ -7,6 +7,7 @@ Revision history for CGI-Info
 	Added test dashboard
 	Croak if tmpdir is given a non-scalar for default
 	No longer use Log::Any
+	Set HTTP status 501 when GET is given Multipart/form-data
 
 1.07	Sun Sep 14 09:16:12 EDT 2025
 	Fix https://ci.appveyor.com/project/nigelhorne/cgi-info-vqpj8/builds/52537979/job/bnag8kvc2htkl3vf
