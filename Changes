@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-1.08
+1.08	Thu Dec 18 08:12:56 EST 2025
 	Invalid args could get through if the logger is set
 	Make get_cookie() just call cookie()
 	Verify the format of the cookie name
