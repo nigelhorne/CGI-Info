@@ -1,0 +1,20 @@
+# .github/workflows/optimize-workflows.yml
+name: Optimize Workflows
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: nigelhorne/ghgen@v1
+        with:
+          mode: comment
