@@ -1,20 +1,27 @@
-# .github/workflows/optimize-workflows.yml
-name: Optimize Workflows
+---
+name: GHGen Auto-Fix
 
-on:
-  pull_request:
-    paths:
-      - '.github/workflows/**'
+'on':
+  schedule:
+    # Run weekly on Monday at 9am UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allows manual triggering
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
-  analyze:
+  auto-fix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: nigelhorne/ghgen@v1
         with:
-          mode: comment
+          fetch-depth: 0  # Need full history for creating PR
+      
+      - name: Analyze and fix workflows
+        uses: nigelhorne/ghgen-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-fix: true
+          create-pr: true
