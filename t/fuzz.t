@@ -4,7 +4,8 @@ use strict;
 use warnings;
 
 use Test::Needs {
-	'App::Test::Generator' => '0.19'
+	'App::Test::Generator' => '0.19',
+	'perl' => 5.036,	# Later A::T::G need this version
 };
 use Test::Which 'fuzz-harness-generator';
 use FindBin qw($Bin);
