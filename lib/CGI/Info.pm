@@ -1034,7 +1034,7 @@ sub params {
 	return Return::Set::set_return(\%FORM, { type => 'hashref', min => 1 });
 }
 
-=head2 param
+=head2 param($field)
 
 Get a single parameter from the query string.
 Takes an optional single string parameter which is the argument to return. If
@@ -1056,6 +1056,15 @@ be thrown:
 	my $bar = $info->param('bar');  # Gives an error message
 
 Returns undef if the requested parameter was not given
+
+=over 4
+
+=item $field
+
+Optional field to be retrieved.
+If omitted, all the parameters are returned.
+
+=back
 
 =cut
 
