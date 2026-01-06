@@ -2120,6 +2120,7 @@ sub cache
 	my $cache = shift;
 
 	if($cache) {
+		croak(ref($self), ':cache($cache) is not an object') if(!Scalar::Util::blessed($cache));
 		$self->{'cache'} = $cache;
 	}
 	return $self->{'cache'};
