@@ -2252,6 +2252,8 @@ sub AUTOLOAD
 
 	my $self = shift or return;
 
+	return if(!defined($AUTOLOAD));
+
 	# Extract the method name from the AUTOLOAD variable
 	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
 
