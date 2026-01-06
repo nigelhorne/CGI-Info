@@ -1586,9 +1586,17 @@ sub documentroot
 	return __PACKAGE__->rootdir(@_);
 }
 
-=head2 logdir
+=head2 logdir($dir)
 
 Gets and sets the name of a directory that you can use to store logs in.
+
+=over 4
+
+=item $dir
+
+Path to the directory where logs will be stored
+
+=back
 
 =cut
 
@@ -2008,11 +2016,20 @@ sub cookie
 	return $self->{jar}{$field};
 }
 
-=head2 status
+=head2 status($status)
 
 Sets or returns the status of the object,
 200 for OK,
 otherwise an HTTP error code
+
+=over 4
+
+=item $status
+
+Optional integer value to be set or retrieved.
+If omitted, the value is retrived.
+
+=back
 
 =cut
 
@@ -2076,7 +2093,7 @@ sub messages_as_string
 	return '';
 }
 
-=head2 cache
+=head2 cache($cache)
 
 Get/set the internal cache system.
 
@@ -2084,6 +2101,16 @@ Use this rather than pass the cache argument to C<new()> if you see these error 
 "(in cleanup) Failed to get MD5_CTX pointer".
 It's some obscure problem that I can't work out,
 but calling this after C<new()> works.
+
+=over 4
+
+=item $cache
+
+Optional cache object.
+When not given,
+returns the current cache object.
+
+=back
 
 =cut
 
@@ -2316,7 +2343,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2010-2025 Nigel Horne.
+Copyright 2010-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

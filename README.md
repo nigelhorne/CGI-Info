@@ -354,7 +354,7 @@ Advanced features:
         return 1;
     }
 
-## param
+## param($field)
 
 Get a single parameter from the query string.
 Takes an optional single string parameter which is the argument to return. If
@@ -376,6 +376,11 @@ be thrown:
         my $bar = $info->param('bar');  # Gives an error message
 
 Returns undef if the requested parameter was not given
+
+- $field
+
+    Optional field to be retrieved.
+    If omitted, all the parameters are returned.
 
 ## is\_mobile
 
@@ -466,9 +471,13 @@ Synonym of rootdir(), for compatibility with [CHI](https://metacpan.org/pod/CHI)
 
 Synonym of rootdir(), for compatibility with Apache.
 
-## logdir
+## logdir($dir)
 
 Gets and sets the name of a directory that you can use to store logs in.
+
+- $dir
+
+    Path to the directory where logs will be stored
 
 ## is\_robot
 
@@ -577,11 +586,16 @@ Cookie set:
       /x
     }
 
-## status
+## status($status)
 
 Sets or returns the status of the object,
 200 for OK,
 otherwise an HTTP error code
+
+- $status
+
+    Optional integer value to be set or retrieved.
+    If omitted, the value is retrived.
 
 ## messages
 
@@ -599,7 +613,7 @@ Returns the messages that the object has generated as a ref to an array of hashe
 
 Returns the messages of that the object has generated as a string.
 
-## cache
+## cache($cache)
 
 Get/set the internal cache system.
 
@@ -607,6 +621,12 @@ Use this rather than pass the cache argument to `new()` if you see these error m
 "(in cleanup) Failed to get MD5\_CTX pointer".
 It's some obscure problem that I can't work out,
 but calling this after `new()` works.
+
+- $cache
+
+    Optional cache object.
+    When not given,
+    returns the current cache object.
 
 ## set\_logger
 
@@ -680,7 +700,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2010-2025 Nigel Horne.
+Copyright 2010-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 
