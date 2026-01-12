@@ -55,9 +55,13 @@ jobs:
 
       # Run the tests with Devel::Cover for coverage
       - name: Run tests with coverage
-        run: |
-          COVER_VERBOSE=1 cover -test
+        env:
+          PERL5LIB: ${{ github.workspace }}/local/lib/perl5
+          COVER_VERBOSE: 1
         working-directory: ${{ github.workspace }}
+        run: |
+          perl Makefile.PL
+          cover -test
 
       # Generate HTML coverage report
       - name: Generate HTML report

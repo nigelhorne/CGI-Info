@@ -472,12 +472,13 @@ sub cgi_host_url {
 
 Returns a reference to a hash list of the CGI arguments.
 
-CGI::Info helps you to test your script prior to deployment on a website:
-if it is not in a CGI environment (e.g. the script is being tested from the
+CGI::Info helps you to test your script before deployment on a website:
+if it is not in a CGI environment (e.g., the script is being tested from the
 command line), the program's command line arguments (a list of key=value pairs)
-are used, if there are no command line arguments then they are read from stdin
-as a list of key=value lines.
-Also you can give one of --tablet, --search-engine,
+are used, if there are no command line arguments,
+then they are read from stdin as a list of key=value lines.
+Also,
+you can give one of --tablet, --search-engine,
 --mobile and --robot to mimic those agents. For example:
 
 	./script.cgi --mobile name=Nigel
@@ -504,7 +505,6 @@ This works alongside existing regex and Params::Validate::Strict patterns.
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
-
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
