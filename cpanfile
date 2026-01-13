@@ -1,6 +1,6 @@
-# Generated from Makefile.PL
+# Generated from Makefile.PL using makefilepl2cpanfile
 
-perl '5.008';
+requires 'perl', '5.008';
 
 requires 'Carp';
 requires 'Class::Autouse';
@@ -30,33 +30,37 @@ requires 'boolean';
 requires 'namespace::clean';
 
 on 'configure' => sub {
-    requires 'ExtUtils::MakeMaker', '6.64';
+	requires 'ExtUtils::MakeMaker', '6.64';
 };
-
 on 'test' => sub {
-    requires 'File::Temp';
-    requires 'FindBin';
-    requires 'IPC::Run3';
-    requires 'IPC::System::Simple';
-    requires 'JSON::PP', '4.02';
-    requires 'LWP::UserAgent';
-    requires 'Taint::Runtime';
-    requires 'Test::Carp';
-    requires 'Test::CleanNamespaces';
-    requires 'Test::Compile';
-    requires 'Test::DescribeMe';
-    requires 'Test::Kwalitee';
-    requires 'Test::Most';
-    requires 'Test::Needs';
-    requires 'Test::NoWarnings';
-    requires 'Test::RequiresInternet';
-    requires 'Test::Returns';
-    requires 'Test::Script', '1.12';
-    requires 'Test::Warn';
-    requires 'Test::Which';
-    requires 'Tie::Filehandle::Preempt::Stdin';
-    requires 'autodie';
-    requires 'strict';
-    requires 'warnings';
+	requires 'File::Temp';
+	requires 'FindBin';
+	requires 'IPC::Run3';
+	requires 'IPC::System::Simple';
+	requires 'JSON::PP', '4.02';
+	requires 'LWP::UserAgent';
+	requires 'Taint::Runtime';
+	requires 'Test::Carp';
+	requires 'Test::CleanNamespaces';
+	requires 'Test::Compile';
+	requires 'Test::DescribeMe';
+	requires 'Test::Kwalitee';
+	requires 'Test::Most';
+	requires 'Test::Needs';
+	requires 'Test::NoWarnings';
+	requires 'Test::RequiresInternet';
+	requires 'Test::Returns';
+	requires 'Test::Script', '1.12';
+	requires 'Test::Warn';
+	requires 'Test::Which';
+	requires 'Tie::Filehandle::Preempt::Stdin';
+	requires 'autodie';
+	requires 'strict';
+	requires 'warnings';
 };
-
+on 'develop' => sub {
+	requires 'Devel::Cover';
+	requires 'Perl::Critic';
+	requires 'Test::Pod';
+	requires 'Test::Pod::Coverage';
+};
