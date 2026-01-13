@@ -7,6 +7,8 @@ use autodie qw(:all);
 use File::Glob ':glob';
 use File::Slurp;
 use File::stat;
+use HTML::Entities;
+use IPC::Run3:
 use JSON::MaybeXS;
 use POSIX qw(strftime);
 use Readonly;
@@ -155,8 +157,7 @@ if ($prev_data) {
 	}
 }
 
-my $commit_sha = `git rev-parse HEAD`;
-chomp $commit_sha;
+my $commit_sha = run_git('rev-parse HEAD');
 my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/blob/$commit_sha/";
 
 # Add rows
@@ -692,3 +693,13 @@ HTML
 
 # Write to index.html
 write_file($config{output}, join("\n", @html));
+
+# Safe git command execution
+sub run_git {
+	my @cmd = @_;
+	my ($out, $err);
+	run3 ['git', @cmd], \undef, \$out, \$err;
+	return unless $? == 0;
+	chomp $out;
+	return $out;
+}
