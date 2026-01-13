@@ -82,7 +82,7 @@ push @html, <<"HTML";
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
 		td.neutral { color: gray; }
-		// Show cursor points on the headers to show that they are clickable
+		/* Show cursor points on the headers to show that they are clickable */
 		th { background-color: #f2f2f2; cursor: pointer; }
 		th.sortable {
 			cursor: pointer;
@@ -284,11 +284,6 @@ if (my $total_info = $data->{summary}{Total}) {
 	);
 }
 
-my $timestamp = 'Unknown';
-if (my $stat = stat($config{cover_db})) {
-	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
-}
-
 Readonly my $commit_url => "https://github.com/$config{github_user}/$config{github_repo}/commit/$commit_sha";
 my $short_sha = substr($commit_sha, 0, 7);
 
@@ -343,9 +338,18 @@ foreach my $file (reverse sort @history_files) {
 	next unless $commit_messages{$sha};	# Skip merge commits
 
 	my $timestamp = $commit_times{$sha} // strftime('%Y-%m-%dT%H:%M:%S', localtime((stat($file))->mtime));
-	$timestamp =~ s/ /T/;
-	$timestamp =~ s/\s+([+-]\d{2}):?(\d{2})$/$1:$2/;	# Fix space before timezone
-	$timestamp =~ s/ //g;	# Remove any remaining spaces
+
+	# Git log returns format like: "2024-01-15 14:30:45 -0500" or "2024-01-15 14:30:45 +0000"
+	# We need ISO 8601 format: "2024-01-15T14:30:45-05:00"
+
+	# Replace space between date and time with 'T'
+	$timestamp =~ s/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})/$1T$2/;
+
+	# Fix timezone format: convert "-0500" to "-05:00" or " -05:00" to "-05:00"
+	$timestamp =~ s/\s*([+-])(\d{2}):?(\d{2})$/$1$2:$3/;
+
+	# Remove any remaining spaces (safety cleanup)
+	$timestamp =~ s/\s+//g;
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
 	my $color = 'gray';	# Will be set properly after sorting
@@ -689,6 +693,11 @@ function refresh(){
 }
 </script>
 HTML
+
+my $timestamp = 'Unknown';
+if (my $stat = stat($config{cover_db})) {
+	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
+}
 
 push @html, <<"HTML";
 <footer>
