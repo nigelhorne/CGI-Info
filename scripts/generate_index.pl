@@ -157,7 +157,15 @@ if ($prev_data) {
 	}
 }
 
-my $commit_sha = run_git('rev-parse HEAD');
+# Check if we're in a git repository first
+unless (run_git('rev-parse', '--git-dir')) {
+	die 'Error: Not in a git repository or git is not available';
+}
+
+my $commit_sha = run_git('rev-parse', 'HEAD');
+unless (defined $commit_sha && $commit_sha =~ /^[0-9a-f]{40}$/i) {
+	die 'Error: Could not get valid git commit SHA';
+}
 my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/blob/$commit_sha/";
 
 # Add rows
@@ -300,26 +308,26 @@ foreach my $file (sort @history_files) {
 
 # Inject chart if we have data
 my %commit_times;
-open(my $log, '-|', 'git log --all --pretty=format:"%H %h %ci"') or die "Can't run git log: $!";
-while (<$log>) {
-	chomp;
-	my ($full_sha, $short_sha, $datetime) = split ' ', $_, 3;
-	$commit_times{$short_sha} = $datetime;
-}
-close $log;
-
-my %commit_messages;
-open($log, '-|', 'git log --pretty=format:"%h %s"') or die "Can't run git log: $!";
-while (<$log>) {
-	chomp;
-	my ($short_sha, $message) = /^(\w+)\s+(.*)$/;
-	if($message =~ /^Merge branch /) {
-		delete $commit_times{$short_sha};
-	} else {
-		$commit_messages{$short_sha} = $message;
+my $log_output = run_git('log', '--all', '--pretty=format:%H %h %ci');
+if ($log_output) {
+	for my $line (split /\n/, $log_output) {
+		my ($full_sha, $short_sha, $datetime) = split ' ', $line, 3;
+		$commit_times{$short_sha} = $datetime if $short_sha;
 	}
 }
-close $log;
+
+my %commit_messages;
+$log_output = run_git('log', '--pretty=format:%h %s');
+if ($log_output) {
+	for my $line (split /\n/, $log_output) {
+		my ($short_sha, $message) = $line =~ /^(\w+)\s+(.*)$/;
+		if ($message && $message =~ /^Merge branch /) {
+			delete $commit_times{$short_sha};
+		} else {
+			$commit_messages{$short_sha} = $message if $message;
+		}
+	}
+}
 
 # Collect data points from non-merge commits
 my @data_points_with_time;
