@@ -231,21 +231,19 @@ for my $file (sort keys %{$data->{summary}}) {
 		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
 	# Create the sparkline
-	# There's probably some duplication of code here
 	my @file_history;
-	my @history_files = sort <coverage_history/*.json>;
 
-	my %history;
+	# Use the already-cached historical data
 	for my $hist_file (sort @history_files) {
 		my $json = $historical_cache{$hist_file};
-
-		$history{$hist_file} = $json;
+		next unless $json;  # Skip if not cached (shouldn't happen, but be safe)
 
 		if($json->{summary}{$file}) {
 			my $pct = $json->{summary}{$file}{total}{percentage} // 0;
 			push @file_history, sprintf('%.1f', $pct);
 		}
 	}
+
 	my $points_attr = join(',', @file_history);
 
 	push @html, sprintf(
