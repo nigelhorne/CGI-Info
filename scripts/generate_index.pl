@@ -25,15 +25,14 @@ Readonly my %config => (
 );
 
 # Read and decode coverage data
-my $json_text = read_file($config{cover_db});
-my $data = decode_json($json_text);
+my $data = eval { decode_json(read_file($config{cover_db})) };
 
 my $coverage_pct = 0;
 my $badge_color = 'red';
 
 if(my $total_info = $data->{summary}{Total}) {
 	$coverage_pct = int($total_info->{total}{percentage} // 0);
-	$badge_color = $coverage_pct > 80 ? 'brightgreen' : $coverage_pct > 50 ? 'yellow' : 'red';
+	$badge_color = $coverage_pct > $config{med_threshold} ? 'brightgreen' : $coverage_pct > $config{low_threshold} ? 'yellow' : 'red';
 }
 
 Readonly my $coverage_badge_url => "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
@@ -230,13 +229,18 @@ for my $file (sort keys %{$data->{summary}}) {
 		? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
 		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
-	# Create the sparkline
+	# Create the sparkline - limit to last N points like the main trend chart
 	my @file_history;
 
+	# Get the last max_points history files (same as trend chart)
+	my @limited_history = (scalar(@history_files) > $config{max_points})
+		? @history_files[-$config{max_points} .. -1]
+		: @history_files;
+
 	# Use the already-cached historical data
-	for my $hist_file (sort @history_files) {
+	for my $hist_file (sort @limited_history) {
 		my $json = $historical_cache{$hist_file};
-		next unless $json;  # Skip if not cached (shouldn't happen, but be safe)
+		next unless $json;	# Skip if not cached (shouldn't happen, but be safe)
 
 		if($json->{summary}{$file}) {
 			my $pct = $json->{summary}{$file}{total}{percentage} // 0;
