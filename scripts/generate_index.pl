@@ -8,7 +8,7 @@ use File::Glob ':glob';
 use File::Slurp;
 use File::stat;
 use HTML::Entities;
-use IPC::Run3:
+use IPC::Run3;
 use JSON::MaybeXS;
 use POSIX qw(strftime);
 use Readonly;
@@ -368,7 +368,8 @@ foreach my $point (@data_points_with_time) {
 
 	my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
 
-	push @data_points, qq{{ x: "$point->{timestamp}", y: $point->{pct}, delta: $delta, url: "$point->{url}", label: "$point->{timestamp}", pointBackgroundColor: "$color", comment: "$point->{comment}" }};
+	my $comment = js_escape($point->{comment});
+	push @data_points, qq{{ x: "$point->{timestamp}", y: $point->{pct}, delta: $delta, url: "$point->{url}", label: "$point->{timestamp}", pointBackgroundColor: "$color", comment: "$comment" }};
 }
 
 my $js_data = join(",\n", @data_points);
@@ -702,4 +703,12 @@ sub run_git {
 	return unless $? == 0;
 	chomp $out;
 	return $out;
+}
+
+sub js_escape {
+	my $str = $_[0];
+	$str =~ s/\\/\\\\/g;
+	$str =~ s/"/\\"/g;
+	$str =~ s/\n/\\n/g;
+	return $str;
 }
