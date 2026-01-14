@@ -50,6 +50,9 @@ jobs:
       #     perlcritic --verbose 5 lib || true
 
       - name: Run tests manually
+        env:
+          AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
         run: |
           prove -l -b -v t
 
