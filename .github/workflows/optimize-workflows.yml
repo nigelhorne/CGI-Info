@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0  # Need full history for creating PR
       
       - name: Analyze and fix workflows
-        uses: nigelhorne/ghgen-action@v1
+        uses: nigelhorne/App-GHGen@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-fix: true
