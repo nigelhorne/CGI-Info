@@ -100,10 +100,11 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/CGI-Info',
 				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
-				mailto => 'bug-CGI-Info@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/CGI-Info/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
-				web => 'https://github.com/nigelhorne/CGI-Info/issues'
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
+				# web => 'https://github.com/nigelhorne/CGI-Info/issues',
+				# url => 'https://github.com/nigelhorne/CGI-Info/issues',
+				mailto => 'bug-CGI-Info@rt.cpan.org'
 			}
 		},
 	},

@@ -10,17 +10,23 @@ name: GHGen Auto-Fix
 permissions:
   contents: write
   pull-requests: write
+  actions: read
+
+concurrency:
+  group: ghgen-auto-fix
+  cancel-in-progress: true
 
 jobs:
   auto-fix:
+    name: Run GHGen Auto-Fix
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Need full history for creating PR
-      
+
       - name: Analyze and fix workflows
-        uses: nigelhorne/App-GHGen@v1
+        uses: nigelhorne/App-GHGen@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-fix: true
