@@ -84,9 +84,9 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/fc77730f363b8a18675f1d8f861944fed7081e8f/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/681dec16f2015655a9727a573c98fcbacadc4a40/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
 
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/fc77730f363b8a18675f1d8f861944fed7081e8f/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5"></canvas></td><td>86.9</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.5%</span></td><td class="neutral" title="Previous: 78.5%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/681dec16f2015655a9727a573c98fcbacadc4a40/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5"></canvas></td><td>86.9</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.5%</span></td><td class="neutral" title="Previous: 78.5%">&#9679; 0.0%</td></tr>
 
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 
@@ -126,6 +126,9 @@ function linearRegression(data) {
 	const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
 	const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
 
+	if (n < 2 || (n * sumX2 - sumX * sumX) === 0) {
+		return [];
+	}
 	const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 	const intercept = (sumY - slope * sumX) / n;
 
@@ -135,8 +138,7 @@ function linearRegression(data) {
 	}));
 }
 
-const dataPoints = [ { x: "2026-01-13T14:26:50-05:00", y: 78.1643671265747, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/70a4736", label: "2026-01-13T14:26:50-05:00", pointBackgroundColor: "gray", comment: "Remove the duplicated read" },
-{ x: "2026-01-13T15:09:56-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a43bf64", label: "2026-01-13T15:09:56-05:00", pointBackgroundColor: "gray", comment: "Limit the sparkline to max_points" },
+const dataPoints = [ { x: "2026-01-13T15:09:56-05:00", y: 78.1643671265747, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/a43bf64", label: "2026-01-13T15:09:56-05:00", pointBackgroundColor: "gray", comment: "Limit the sparkline to max_points" },
 { x: "2026-01-13T21:53:32-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a8cf848", label: "2026-01-13T21:53:32-05:00", pointBackgroundColor: "gray", comment: "Turn off network testing on the dashboard building" },
 { x: "2026-01-14T08:05:55-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/cfe54c1", label: "2026-01-14T08:05:55-05:00", pointBackgroundColor: "gray", comment: "Fix GHGen repo" },
 { x: "2026-01-24T09:06:26-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8901dbd", label: "2026-01-24T09:06:26-05:00", pointBackgroundColor: "gray", comment: "distrib.t does not need Test::Most" },
@@ -144,7 +146,8 @@ const dataPoints = [ { x: "2026-01-13T14:26:50-05:00", y: 78.1643671265747, delt
 { x: "2026-01-29T12:42:46-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8020a10", label: "2026-01-29T12:42:46-05:00", pointBackgroundColor: "gray", comment: "Try again CPAN testers failing table at the end" },
 { x: "2026-01-29T13:08:55-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/cba4186", label: "2026-01-29T13:08:55-05:00", pointBackgroundColor: "gray", comment: "Debug why cpantesters table does not appear" },
 { x: "2026-01-29T13:41:01-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/1a56aa8", label: "2026-01-29T13:41:01-05:00", pointBackgroundColor: "gray", comment: "Message was not appearing" },
-{ x: "2026-01-29T14:50:20-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c77da4a", label: "2026-01-29T14:50:20-05:00", pointBackgroundColor: "gray", comment: "Added CPAN version to dashboard" } ];
+{ x: "2026-01-29T14:50:20-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c77da4a", label: "2026-01-29T14:50:20-05:00", pointBackgroundColor: "gray", comment: "Added CPAN version to dashboard" },
+{ x: "2026-01-29T15:17:03-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/fc77730", label: "2026-01-29T15:17:03-05:00", pointBackgroundColor: "gray", comment: "Bumped version of Params::Validate::Strict to see if that fixes https://www.cpantesters.org/cpan/report/a2d57ccc-dca6-11f0-8c44-bc72dd65bc3d" } ];
 
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
@@ -479,7 +482,7 @@ function refresh(){
 <footer>
 	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-01-29 20:27:06 - <a href="https://github.com/nigelhorne/CGI-Info/commit/fc77730f363b8a18675f1d8f861944fed7081e8f">commit <code>fc77730</code></a></em></p>
+	<p><em>Last updated: 2026-01-29 20:57:46 - <a href="https://github.com/nigelhorne/CGI-Info/commit/681dec16f2015655a9727a573c98fcbacadc4a40">commit <code>681dec1</code></a></em></p>
 </footer>
 
 </body>
