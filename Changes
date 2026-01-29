@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+1.09
+	Updated test dashboard shows CPAN test failures
+	Bumped version of Object::Configure to see if that fixes https://www.cpantesters.org/cpan/report/a8dc0030-dc5d-11f0-baa1-832b6e8775ea
+	Bumped version of Params::Validate::Strict to see if that fixes https://www.cpantesters.org/cpan/report/a2d57ccc-dca6-11f0-8c44-bc72dd65bc3d
+
 1.08	Thu Dec 18 08:12:56 EST 2025
 	Invalid args could get through if the logger is set
 	Make get_cookie() just call cookie()

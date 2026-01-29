@@ -722,7 +722,7 @@ if ($res->{success}) {
 		}
 	}
 
-	push @html, "<p>CPAN Release: $version</p>";
+	# push @html, "<p>CPAN Release: $version</p>";
 }
 
 $version ||= 'latest';
