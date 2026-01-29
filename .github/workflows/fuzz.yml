@@ -12,6 +12,10 @@ on:
   schedule:
     - cron: '29 5 6 * *'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   generate-fuzz-tests:
     strategy:

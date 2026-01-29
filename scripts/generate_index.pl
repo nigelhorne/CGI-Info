@@ -698,19 +698,6 @@ function refresh(){
 </script>
 HTML
 
-my $timestamp = 'Unknown';
-if (my $stat = stat($config{cover_db})) {
-	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
-}
-
-push @html, <<"HTML";
-<footer>
-	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
-	<p>Project: <a href="https://github.com/$config{github_user}/$config{github_repo}">$config{github_repo}</a></p>
-	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
-</footer>
-HTML
-
 # -------------------------------
 # Add CPAN Testers failing reports table
 # -------------------------------
@@ -718,9 +705,9 @@ my $dist_name = $config{package_name};	# e.g., CGI::Info
 my $version = eval { $data->{summary}{Total}{total}{version} } // 'latest';
 
 my $cpan_api = "https://api.cpantesters.org/v3/summary/" 
-             . uri_escape($dist_name)
-             . '/' . uri_escape($version)
-             . "?grade=fail";
+		. uri_escape($dist_name)
+		. '/' . uri_escape($version)
+		. "?grade=fail";
 
 my $http = HTTP::Tiny->new(agent => "cpan-coverage-html/1.0", timeout => 15);
 my $res = $http->get($cpan_api);
@@ -742,27 +729,38 @@ if ($res->{success}) {
 <tbody>
 HTML
 
-        for my $r (@$fail_reports) {
-            my $date = $r->{date} // '';
-            my $perl = $r->{perl} // '';
-            my $os   = $r->{osname} // '';
-            my $tester = $r->{tester} // '';
-            my $guid   = $r->{guid} // '';
-            my $url    = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
+		for my $r (@$fail_reports) {
+			my $date = $r->{date} // '';
+			my $perl = $r->{perl} // '';
+			my $os = $r->{osname} // '';
+			my $tester = $r->{tester} // '';
+			my $guid = $r->{guid} // '';
+			my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
 
-            push @html, sprintf(
-                qq{<tr><td>%s</td><td>%s / %s</td><td>%s</td><td><a href="%s" target="_blank">View</a></td></tr>\n},
-                $date, $os, $perl, $tester, $url
-            );
-        }
+			push @html, sprintf(
+				qq{<tr><td>%s</td><td>%s / %s</td><td>%s</td><td><a href="%s" target="_blank">View</a></td></tr>\n},
+				$date, $os, $perl, $tester, $url
+			);
+		}
 
 		push @html, "</tbody></table>\n";
 	}
 } else {
-	print "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n"
+	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n";
 }
 
-	push @html, <<"HTML";
+my $timestamp = 'Unknown';
+if (my $stat = stat($config{cover_db})) {
+	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
+}
+
+push @html, <<"HTML";
+<footer>
+	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
+	<p>Project: <a href="https://github.com/$config{github_user}/$config{github_repo}">$config{github_repo}</a></p>
+	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
+</footer>
+
 </body>
 </html>
 HTML
