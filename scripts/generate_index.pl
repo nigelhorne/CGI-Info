@@ -140,7 +140,7 @@ for my $hist_file (@history_files) {
 }
 
 # Load previous snapshot for delta comparison
-my @history = sort { $a cmp $b } bsd_glob("coverage_history/*.json");
+my @history = sort { $a cmp $b } @history_files;
 my $prev_data;
 
 if (@history >= 1) {
@@ -303,7 +303,9 @@ foreach my $file (sort @history_files) {
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
 	my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
-	push @trend_points, { date => $date, coverage => sprintf('%.1f', $pct) };
+	if(defined($date)) {
+		push @trend_points, { date => $date, coverage => sprintf('%.1f', $pct) };
+	}
 }
 
 # Inject chart if we have data
@@ -429,6 +431,9 @@ function linearRegression(data) {
 	const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
 	const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
 
+	if (n < 2 || (n * sumX2 - sumX * sumX) === 0) {
+		return [];
+	}
 	const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 	const intercept = (sumY - slope * sumX) / n;
 
@@ -706,7 +711,7 @@ my $dist_name = $config{github_repo};	# e.g., CGI-Info
 my $cpan_api = "https://api.cpantesters.org/v3/summary/"
 		. uri_escape($dist_name);
 
-my $http = HTTP::Tiny->new(agent => "cpan-coverage-html/1.0", timeout => 15);
+my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 15);
 
 my $res = $http->get($cpan_api);
 
@@ -736,7 +741,9 @@ $res = $http->get($cpan_api);
 
 if ($res->{success}) {
 	my $fail_reports = eval { decode_json($res->{content}) };
-	if ($fail_reports && ref($fail_reports) eq 'ARRAY' && @$fail_reports) {
+	if ($@) {
+		push @html, "<p>Error decoding CPAN Testers JSON: $@</p>";
+	} elsif($fail_reports && ref($fail_reports) eq 'ARRAY' && @{$fail_reports}) {
 		push @html, <<"HTML";
 <h2>CPAN Testers Failures for $dist_name $version</h2>
 <table>
@@ -755,7 +762,7 @@ HTML
 			my $date = $r->{date} // '';
 			my $perl = $r->{perl} // '';
 			my $os = $r->{osname} // '';
-			my $tester = $r->{tester} // '';
+			my $tester = encode_entities($r->{tester} // '');
 			my $guid = $r->{guid} // '';
 			my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
 
@@ -768,6 +775,8 @@ HTML
 		push @html, "</tbody></table>\n";
 	}
 } elsif($res->{status} != 404) {	# 404 means no fail reports
+	push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
+} else {
 	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n";
 }
 
