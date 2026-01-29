@@ -14,6 +14,7 @@ use POSIX qw(strftime);
 use Readonly;
 use HTTP::Tiny;
 use URI::Escape qw(uri_escape);
+use version;
 
 Readonly my %config => (
 	github_user => 'nigelhorne',
@@ -701,16 +702,37 @@ HTML
 # -------------------------------
 # Add CPAN Testers failing reports table
 # -------------------------------
-my $dist_name = $config{package_name};	# e.g., CGI::Info
-my $version = eval { $data->{summary}{Total}{total}{version} } // 'latest';
-
-my $cpan_api = "https://api.cpantesters.org/v3/summary/" 
-		. uri_escape($dist_name)
-		. '/' . uri_escape($version)
-		. "?grade=fail";
+my $dist_name = $config{github_repo};	# e.g., CGI-Info
+my $cpan_api = "https://api.cpantesters.org/v3/summary/"
+		. uri_escape($dist_name);
 
 my $http = HTTP::Tiny->new(agent => "cpan-coverage-html/1.0", timeout => 15);
+
 my $res = $http->get($cpan_api);
+
+my $version;
+
+if ($res->{success}) {
+	my $releases = eval { decode_json($res->{content}) };
+	foreach my $release(@{$releases}) {
+		if(!defined($version)) {
+			$version = $release->{version};
+		} elsif(version->parse($release->{version}) > version->parse($version)) {
+			$version = $release->{version};
+		}
+	}
+
+	push @html, "<p>CPAN Release: $version</p>";
+}
+
+$version ||= 'latest';
+
+$cpan_api = "https://api.cpantesters.org/v3/summary/"
+		. uri_escape($dist_name)
+		. '/' . uri_escape($version)
+		. '?grade=fail';
+
+$res = $http->get($cpan_api);
 
 if ($res->{success}) {
 	my $fail_reports = eval { decode_json($res->{content}) };
@@ -745,7 +767,7 @@ HTML
 
 		push @html, "</tbody></table>\n";
 	}
-} else {
+} elsif($res->{status} != 404) {	# 404 means no fail reports
 	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n";
 }
 
