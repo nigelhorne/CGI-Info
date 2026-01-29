@@ -704,6 +704,8 @@ function refresh(){
 </script>
 HTML
 
+push @html, '<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>';
+
 # -------------------------------
 # Add CPAN Testers failing reports table
 # -------------------------------
@@ -746,6 +748,7 @@ if ($res->{success}) {
 	} elsif($fail_reports && ref($fail_reports) eq 'ARRAY' && @{$fail_reports}) {
 		push @html, <<"HTML";
 <h2>CPAN Testers Failures for $dist_name $version</h2>
+<p><em>Showing one failure per OS/Perl combination.</em></p>
 <table>
 <thead>
 <tr>
@@ -758,7 +761,22 @@ if ($res->{success}) {
 <tbody>
 HTML
 
+		my %seen;	# key = "$os|$perl"
+		my @deduped;	# final rows
+
 		for my $r (@$fail_reports) {
+			my $os = $r->{osname} // 'unknown';
+			my $perl = $r->{perl} // 'unknown';
+
+			my $key = join('|', $os, $perl);
+
+			# Skip duplicates
+			next if $seen{$key}++;
+
+			push @deduped, $r;
+		}
+
+		for my $r (@deduped) {
 			my $date = $r->{date} // '';
 			my $perl = $r->{perl} // '';
 			my $os = $r->{osname} // '';
@@ -787,7 +805,6 @@ if (my $stat = stat($config{cover_db})) {
 
 push @html, <<"HTML";
 <footer>
-	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
 	<p>Project: <a href="https://github.com/$config{github_user}/$config{github_repo}">$config{github_repo}</a></p>
 	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
 </footer>
