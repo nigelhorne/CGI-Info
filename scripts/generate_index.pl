@@ -714,7 +714,7 @@ HTML
 # -------------------------------
 # Add CPAN Testers failing reports table
 # -------------------------------
-my $dist_name = $config{package_name};    # e.g., CGI::Info
+my $dist_name = $config{package_name};	# e.g., CGI::Info
 my $version = eval { $data->{summary}{Total}{total}{version} } // 'latest';
 
 my $cpan_api = "https://api.cpantesters.org/v3/summary/" 
@@ -726,18 +726,17 @@ my $http = HTTP::Tiny->new(agent => "cpan-coverage-html/1.0", timeout => 15);
 my $res = $http->get($cpan_api);
 
 if ($res->{success}) {
-    my $fail_reports = eval { decode_json($res->{content}) };
-    if ($fail_reports && ref($fail_reports) eq 'ARRAY' && @$fail_reports) {
-
-        push @html, <<"HTML";
+	my $fail_reports = eval { decode_json($res->{content}) };
+	if ($fail_reports && ref($fail_reports) eq 'ARRAY' && @$fail_reports) {
+		push @html, <<"HTML";
 <h2>CPAN Testers Failures for $dist_name $version</h2>
 <table>
 <thead>
 <tr>
-  <th>Date</th>
-  <th>OS / Perl</th>
-  <th>Tester</th>
-  <th>Report</th>
+	<th>Date</th>
+	<th>OS / Perl</th>
+	<th>Tester</th>
+	<th>Report</th>
 </tr>
 </thead>
 <tbody>
@@ -757,10 +756,11 @@ HTML
             );
         }
 
-        push @html, "</tbody></table>\n";
-    }
+		push @html, "</tbody></table>\n";
+	}
+} else {
+	print "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n"
 }
-
 
 	push @html, <<"HTML";
 </body>
