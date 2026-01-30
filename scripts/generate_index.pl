@@ -7,7 +7,6 @@ use autodie qw(:all);
 use File::Glob ':glob';
 use File::Slurp;
 use File::stat;
-use HTML::Entities;
 use IPC::Run3;
 use JSON::MaybeXS;
 use POSIX qw(strftime);
@@ -815,7 +814,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <tr>
 	<th>Date</th>
 	<th>OS / Perl</th>
-	<th>Tester</th>
+	<th>Reporter</th>
 	<th>Report</th>
 </tr>
 </thead>
@@ -844,14 +843,14 @@ HTML
 			my $os = $r->{osname} // '';
 			my $grade = lc($r->{grade} // 'unknown');
 			my $row_class = "cpan-$grade";	# cpan-fail or cpan-unknown
-			my $tester = encode_entities($r->{tester} // '');
+			my $reporter = $r->{reporter} // '';
 			my $guid = $r->{guid} // '';
 			my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
 
 			push @html, sprintf(
 				qq{<tr class="%s"><td>%s</td><td>%s / %s</td><td>%s</td>
 				<td><a href="%s" target="_blank">View</a></td></tr>\n},
-				$row_class, $date, $os, $perl, $tester, $url
+				$row_class, $date, $os, $perl, $reporter, $url
 			);
 		}
 
