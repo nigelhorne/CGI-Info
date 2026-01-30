@@ -13,6 +13,7 @@ use JSON::MaybeXS;
 use POSIX qw(strftime);
 use Readonly;
 use HTTP::Tiny;
+use Time::HiRes qw(sleep);
 use URI::Escape qw(uri_escape);
 use version;
 
@@ -24,7 +25,8 @@ Readonly my %config => (
 	med_threshold => 90,
 	max_points => 10,	# Only display the last 10 commits in the coverage trend graph
 	cover_db => 'cover_db/cover.json',
-	output => 'cover_html/index.html'
+	output => 'cover_html/index.html',
+	max_retry => 3
 );
 
 # Read and decode coverage data
@@ -715,11 +717,25 @@ my $cpan_api = "https://api.cpantesters.org/v3/summary/"
 
 my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 15);
 
-my $res = $http->get($cpan_api);
+my $retry = 0;
+my $success = 0;
+
+my $res;
+
+# Try a number of times because the cpantesters website can get overloaded
+while($retry < $config{max_retry}) {
+	$res = $http->get($cpan_api);
+	if($res->{success}) {
+		$success = 1;
+		last;
+	}
+	$retry++;
+	sleep(2 ** $retry);
+}
 
 my $version;
 
-if ($res->{success}) {
+if($success) {
 	my $releases = eval { decode_json($res->{content}) };
 	foreach my $release(@{$releases}) {
 		if(!defined($version)) {
