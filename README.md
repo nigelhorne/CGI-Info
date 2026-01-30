@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.08
+Version 1.09
 
 # SYNOPSIS
 
@@ -209,12 +209,13 @@ Return the URL of the machine running the CGI script.
 
 Returns a reference to a hash list of the CGI arguments.
 
-CGI::Info helps you to test your script prior to deployment on a website:
-if it is not in a CGI environment (e.g. the script is being tested from the
+CGI::Info helps you to test your script before deployment on a website:
+if it is not in a CGI environment (e.g., the script is being tested from the
 command line), the program's command line arguments (a list of key=value pairs)
-are used, if there are no command line arguments then they are read from stdin
-as a list of key=value lines.
-Also you can give one of --tablet, --search-engine,
+are used, if there are no command line arguments,
+then they are read from stdin as a list of key=value lines.
+Also,
+you can give one of --tablet, --search-engine,
 \--mobile and --robot to mimic those agents. For example:
 
         ./script.cgi --mobile name=Nigel
@@ -657,7 +658,7 @@ things to happen.
 
 # SEE ALSO
 
-- Test coverage report: [https://nigelhorne.github.io/CGI-Info/coverage/](https://nigelhorne.github.io/CGI-Info/coverage/)
+- [Test Coverage Report](https://nigelhorne.github.io/CGI-Info/coverage/)
 - [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
