@@ -1986,7 +1986,7 @@ Cookie set:
 sub cookie
 {
 	my $self = shift;
-        my $params = Params::Validate::Strict::validate_strict({
+	my $params = Params::Validate::Strict::validate_strict({
 		args => Params::Get::get_params('cookie_name', @_),
 		schema => {
 			cookie_name => {
@@ -2027,7 +2027,7 @@ otherwise an HTTP error code
 =item $status
 
 Optional integer value to be set or retrieved.
-If omitted, the value is retrived.
+If omitted, the value is retrieved.
 
 =back
 
