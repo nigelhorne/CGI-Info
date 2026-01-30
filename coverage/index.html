@@ -58,6 +58,13 @@
 			display: inline-block;
 			vertical-align: middle;
 		}
+		tr.cpan-fail td {
+			background-color: #fdd;
+		}
+		tr.cpan-unknown td {
+			background-color: #eee;
+			color: #666;
+		}
 	</style>
 </head>
 <body>
@@ -84,9 +91,9 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/a0f84c60f3a0ecaf2738544a6a31bdb84da0aced/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/944f486a37a5e07c892683931fc38c9228e31b2a/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
 
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/a0f84c60f3a0ecaf2738544a6a31bdb84da0aced/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5"></canvas></td><td>86.9</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.5%</span></td><td class="neutral" title="Previous: 78.5%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/944f486a37a5e07c892683931fc38c9228e31b2a/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5,78.5"></canvas></td><td>86.9</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.5%</span></td><td class="neutral" title="Previous: 78.5%">&#9679; 0.0%</td></tr>
 
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 
@@ -138,8 +145,7 @@ function linearRegression(data) {
 	}));
 }
 
-const dataPoints = [ { x: "2026-01-14T08:05:55-05:00", y: 78.1643671265747, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/cfe54c1", label: "2026-01-14T08:05:55-05:00", pointBackgroundColor: "gray", comment: "Fix GHGen repo" },
-{ x: "2026-01-24T09:06:26-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8901dbd", label: "2026-01-24T09:06:26-05:00", pointBackgroundColor: "gray", comment: "distrib.t does not need Test::Most" },
+const dataPoints = [ { x: "2026-01-24T09:06:26-05:00", y: 78.1643671265747, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/8901dbd", label: "2026-01-24T09:06:26-05:00", pointBackgroundColor: "gray", comment: "distrib.t does not need Test::Most" },
 { x: "2026-01-28T08:40:26-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/f4d1626", label: "2026-01-28T08:40:26-05:00", pointBackgroundColor: "gray", comment: "Use the latest version of GHGen" },
 { x: "2026-01-29T12:42:46-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8020a10", label: "2026-01-29T12:42:46-05:00", pointBackgroundColor: "gray", comment: "Try again CPAN testers failing table at the end" },
 { x: "2026-01-29T13:08:55-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/cba4186", label: "2026-01-29T13:08:55-05:00", pointBackgroundColor: "gray", comment: "Debug why cpantesters table does not appear" },
@@ -147,7 +153,8 @@ const dataPoints = [ { x: "2026-01-14T08:05:55-05:00", y: 78.1643671265747, delt
 { x: "2026-01-29T14:50:20-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c77da4a", label: "2026-01-29T14:50:20-05:00", pointBackgroundColor: "gray", comment: "Added CPAN version to dashboard" },
 { x: "2026-01-29T15:17:03-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/fc77730", label: "2026-01-29T15:17:03-05:00", pointBackgroundColor: "gray", comment: "Bumped version of Params::Validate::Strict to see if that fixes https://www.cpantesters.org/cpan/report/a2d57ccc-dca6-11f0-8c44-bc72dd65bc3d" },
 { x: "2026-01-29T15:53:24-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/681dec1", label: "2026-01-29T15:53:24-05:00", pointBackgroundColor: "gray", comment: "Don't glob twice" },
-{ x: "2026-01-29T16:26:35-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dbc4ae3", label: "2026-01-29T16:26:35-05:00", pointBackgroundColor: "gray", comment: "Dedup CPAN failures list" } ];
+{ x: "2026-01-29T16:26:35-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dbc4ae3", label: "2026-01-29T16:26:35-05:00", pointBackgroundColor: "gray", comment: "Dedup CPAN failures list" },
+{ x: "2026-01-29T20:40:31-05:00", y: 78.1643671265747, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a0f84c6", label: "2026-01-29T20:40:31-05:00", pointBackgroundColor: "gray", comment: "Centre the help text" } ];
 
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
@@ -406,70 +413,132 @@ function refresh(){
 </script>
 
 <p><center>Use mouse wheel or pinch to zoom; drag to pan</center></p>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	function updateCpanVisibility() {
+		const showFail = document.getElementById('toggleFail').checked;
+		const showUnknown = document.getElementById('toggleUnknown').checked;
+
+		document.querySelectorAll('tr.cpan-fail').forEach(row => {
+			row.style.display = showFail ? '' : 'none';
+		});
+
+		document.querySelectorAll('tr.cpan-unknown').forEach(row => {
+			row.style.display = showUnknown ? '' : 'none';
+		});
+	}
+
+	const failBox = document.getElementById('toggleFail');
+	const unknownBox = document.getElementById('toggleUnknown');
+
+	if (failBox && unknownBox) {
+		failBox.addEventListener('change', updateCpanVisibility);
+		unknownBox.addEventListener('change', updateCpanVisibility);
+
+		// Apply initial state
+		updateCpanVisibility();
+	}
+});
+</script>
+
 <h2>CPAN Testers Failures for CGI-Info 1.08</h2>
 <p><em>Showing one failure per OS/Perl combination.</em></p>
+<div style="margin-bottom: 0.5em;">
+	<label>
+		<input type="checkbox" id="toggleFail" checked>
+		FAIL
+	</label>
+	<label style="margin-left: 1em;">
+		<input type="checkbox" id="toggleUnknown">
+		UNKNOWN
+	</label>
+</div>
+
 <table>
 <thead>
 <tr>
 	<th>Date</th>
 	<th>OS / Perl</th>
-	<th>Tester</th>
+	<th>Reporter</th>
 	<th>Report</th>
 </tr>
 </thead>
 <tbody>
 
-<tr><td>2025-12-18T22:00:00Z</td><td>freebsd / 5.16.3</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/e8dd9640-dc5c-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T06:36:00Z</td><td>linux / 5.32.0</td><td>"Andreas J. K&ouml;nig (ANDK)" <andreas.koenig.gmwojprw@franz.ak.mind.de ((Andreas J. Koenig))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/049d072e-dca5-11f0-b32c-af9d40319cdc" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:04:00Z</td><td>freebsd / 5.20.0</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/82fbb64e-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-20T11:28:00Z</td><td>freebsd / 5.20.2</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/f51c3f66-dd96-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:04:00Z</td><td>freebsd / 5.18.2</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/90209f38-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:04:00Z</td><td>freebsd / 5.18.2</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/90209f38-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:05:00Z</td><td>freebsd / 5.14.4</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/9cb63a3c-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:05:00Z</td><td>linux / 5.32.1</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/ad6b95d4-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:05:00Z</td><td>freebsd / 5.10.1</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/a5ca55d6-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T07:07:00Z</td><td>linux / 5.16.1</td><td>"Andreas J. K&ouml;nig (ANDK)" <andreas.koenig.gmwojprw@franz.ak.mind.de ((Andreas J. Koenig))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/7066d60c-dca9-11f0-81c0-caed507980e2" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:05:00Z</td><td>linux / 5.42.0</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/a8dc0030-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:00:00Z</td><td>freebsd / 5.16.3</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/e8dd9640-dc5c-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:05:00Z</td><td>linux / 5.34.3</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/aa5dcede-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:04:00Z</td><td>freebsd / 5.20.0</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/82fbb64e-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:05:00Z</td><td>linux / 5.40.0</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/abe57996-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-20T11:19:00Z</td><td>freebsd / 5.20.3</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/d0e75d16-dd95-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-18T22:05:00Z</td><td>linux / 5.32.1</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/ad6b95d4-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T06:13:00Z</td><td>linux / 5.43.3</td><td>"Andreas J. K&ouml;nig (ANDK)" <andreas.koenig.gmwojprw@franz.ak.mind.de ((Andreas J. Koenig))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/dd5c132e-dca1-11f0-a32e-dac005df8e57" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T06:13:00Z</td><td>linux / 5.43.3</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/dd5c132e-dca1-11f0-a32e-dac005df8e57" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2026-01-15T15:03:00Z</td><td>openbsd / 5.42.0</td><td>"Nigel Horne" <njh@bandsman.co.uk ((root))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/5c17b092-f223-11f0-8b2e-f80675d1017c" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T06:16:00Z</td><td>linux / 5.43.2</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/32a296be-dca2-11f0-a6d6-f9d20862f4b5" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T06:46:00Z</td><td>linux / 5.24.0</td><td>"Andreas J. K&ouml;nig (ANDK)" <andreas.koenig.gmwojprw@franz.ak.mind.de ((Andreas J. Koenig))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/7c3dbda4-dca6-11f0-adae-860e352a7a97" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T06:20:00Z</td><td>linux / 5.40.3</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/d81e17d0-dca2-11f0-9fe0-a699a1d00f3d" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T06:44:00Z</td><td>linux / 5.24.4</td><td>"Andreas J. K&ouml;nig (ANDK)" <andreas.koenig.gmwojprw@franz.ak.mind.de ((Andreas J. Koenig))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/236b57f4-dca6-11f0-8c5b-fb61d0667b31" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T06:36:00Z</td><td>linux / 5.32.0</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/049d072e-dca5-11f0-b32c-af9d40319cdc" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:05:00Z</td><td>linux / 5.34.3</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/aa5dcede-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T06:44:00Z</td><td>linux / 5.24.4</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/236b57f4-dca6-11f0-8c5b-fb61d0667b31" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-20T11:22:00Z</td><td>freebsd / 5.20.1</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/355d2294-dd96-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T06:46:00Z</td><td>linux / 5.24.0</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/7c3dbda4-dca6-11f0-adae-860e352a7a97" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T11:37:00Z</td><td>cygwin / 5.40.3</td><td>"Peter John Acklam (PJACKLAM)" <pjacklam@online.no></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/fc68f394-6d67-1014-ae11-87a1be7c892a" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T07:07:00Z</td><td>linux / 5.16.1</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/7066d60c-dca9-11f0-81c0-caed507980e2" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:05:00Z</td><td>freebsd / 5.14.4</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/9cb63a3c-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T11:37:00Z</td><td>cygwin / 5.40.3</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/fc68f394-6d67-1014-ae11-87a1be7c892a" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:05:00Z</td><td>freebsd / 5.10.1</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/a5ca55d6-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-19T18:54:00Z</td><td>linux / 5.34.0</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/2803ef4a-dd0c-11f0-bbda-d459feacbf9b" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:05:00Z</td><td>linux / 5.40.0</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/abe57996-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-20T11:15:00Z</td><td>freebsd / 5.18.4</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/295cb956-dd95-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T06:20:00Z</td><td>linux / 5.40.3</td><td>"Andreas J. K&ouml;nig (ANDK)" <andreas.koenig.gmwojprw@franz.ak.mind.de ((Andreas J. Koenig))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/d81e17d0-dca2-11f0-9fe0-a699a1d00f3d" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-20T11:19:00Z</td><td>freebsd / 5.20.3</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/d0e75d16-dd95-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-18T22:05:00Z</td><td>linux / 5.42.0</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/a8dc0030-dc5d-11f0-baa1-832b6e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-20T11:22:00Z</td><td>freebsd / 5.20.1</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/355d2294-dd96-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-20T11:15:00Z</td><td>freebsd / 5.18.4</td><td>"Slaven Rezi&#x107;" <srezic@cpan.org></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/295cb956-dd95-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
 
-<tr><td>2025-12-20T11:28:00Z</td><td>freebsd / 5.20.2</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/f51c3f66-dd96-11f0-875e-e2426e8775ea" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T06:16:00Z</td><td>linux / 5.43.2</td><td>"Andreas J. K&ouml;nig (ANDK)" <andreas.koenig.gmwojprw@franz.ak.mind.de ((Andreas J. Koenig))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/32a296be-dca2-11f0-a6d6-f9d20862f4b5" target="_blank">View</a></td></tr>
 
-<tr><td>2026-01-15T15:03:00Z</td><td>openbsd / 5.42.0</td><td></td><td><a href="https://www.cpantesters.org/cpan/report/5c17b092-f223-11f0-8b2e-f80675d1017c" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2025-12-19T18:54:00Z</td><td>linux / 5.34.0</td><td>"Nigel Horne" <njh@bandsman.co.uk ((root))></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/2803ef4a-dd0c-11f0-bbda-d459feacbf9b" target="_blank">View</a></td></tr>
 
 </tbody></table>
 
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-01-30 01:45:57 - <a href="https://github.com/nigelhorne/CGI-Info/commit/a0f84c60f3a0ecaf2738544a6a31bdb84da0aced">commit <code>a0f84c6</code></a></em></p>
+	<p><em>Last updated: 2026-01-30 02:59:46 - <a href="https://github.com/nigelhorne/CGI-Info/commit/944f486a37a5e07c892683931fc38c9228e31b2a">commit <code>944f486</code></a></em></p>
 </footer>
 
 </body>
