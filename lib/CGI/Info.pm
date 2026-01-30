@@ -2294,7 +2294,7 @@ things to happen.
 
 =over 4
 
-=item * L<Test Coverage Report|https://nigelhorne.github.io/CGI-Info/coverage/>
+=item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/>
 
 =item * L<Object::Configure>
 

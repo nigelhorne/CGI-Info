@@ -790,37 +790,33 @@ if($version) {
 		push @html, <<"HTML";
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-	function updateCpanVisibility() {
-		const showFail = document.getElementById('toggleFail').checked;
-		const showUnknown = document.getElementById('toggleUnknown').checked;
+	const toggleFail = document.getElementById('toggleFail');
+	const toggleUnknown = document.getElementById('toggleUnknown');
+	const toggleNew = document.getElementById('toggleNew');
 
-		document.querySelectorAll('tr.cpan-fail').forEach(row => {
-			row.style.display = showFail ? '' : 'none';
-		});
-
-		document.querySelectorAll('tr.cpan-unknown').forEach(row => {
-			row.style.display = showUnknown ? '' : 'none';
-		});
+	function update() {
+		if (toggleFail) {
+			document.querySelectorAll('tr.cpan-fail')
+				.forEach(r => r.style.display = toggleFail.checked ? '' : 'none');
+		}
+		if (toggleUnknown) {
+			document.querySelectorAll('tr.cpan-unknown')
+				.forEach(r => r.style.display = toggleUnknown.checked ? '' : 'none');
+		}
+		if (toggleNew) {
+			document.querySelectorAll('tr').forEach(row => {
+				const cell = row.querySelector('.new-failure');
+				if (!cell) return;
+				row.style.display = toggleNew.checked ? '' : 'none';
+			});
+		}
 	}
 
-	const failBox = document.getElementById('toggleFail');
-	const unknownBox = document.getElementById('toggleUnknown');
-
-	if (failBox && unknownBox) {
-		failBox.addEventListener('change', updateCpanVisibility);
-		unknownBox.addEventListener('change', updateCpanVisibility);
-
-		// Apply initial state
-		updateCpanVisibility();
-	}
-});
-document.getElementById('toggleNew').addEventListener('change', function () {
-	const show = this.checked;
-	document.querySelectorAll('tr').forEach(row => {
-		const cell = row.querySelector('.new-failure');
-		if (!cell) return;
-		row.style.display = show ? '' : 'none';
+	[toggleFail, toggleUnknown, toggleNew].forEach(cb => {
+		if (cb) cb.addEventListener('change', update);
 	});
+
+	update();
 });
 document.addEventListener("DOMContentLoaded", () => {
 	const th = document.querySelector("table.sortable-table th");
@@ -840,7 +836,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		UNKNOWN
 	</label>
 	<label style="margin-left: 1em;">
-		<input type="checkbox" id="toggleNew" checked>
+		<input type="checkbox" id="toggleNew">
 		NEW only
 	</label>
 </div>
