@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+# Generates the HTML for use as a testing dashboard on GitHub
+# The location will be https://nigelhorne.github.io/$config{github_repo}/coverage/
+# The script is automatically run by each 'git push' by the script .github/workflows/dashboard.yml
+
 use strict;
 use warnings;
 use autodie qw(:all);
@@ -110,6 +114,14 @@ push @html, <<"HTML";
 		tr.cpan-unknown td {
 			background-color: #eee;
 			color: #666;
+		}
+		.new-failure {
+			background: #c00;
+			color: #fff;
+			font-weight: bold;
+			padding: 2px 6px;
+			border-radius: 4px;
+			font-size: 0.85em;
 		}
 	</style>
 </head>
@@ -732,17 +744,22 @@ while($retry < $config{max_retry}) {
 	sleep(2 ** $retry);
 }
 
-my $version;
+my $version;	# current version
+my $prev_version;	# may be undef
 
 if($success) {
 	my $releases = eval { decode_json($res->{content}) };
-	foreach my $release(@{$releases}) {
-		if(!defined($version)) {
-			$version = $release->{version};
-		} elsif(version->parse($release->{version}) > version->parse($version)) {
-			$version = $release->{version};
-		}
+	my @versions;
+
+	foreach my $release (@{$releases}) {
+		next unless defined $release->{version};
+		push @versions, $release->{version};
 	}
+
+	@versions = sort { version->parse($b) <=> version->parse($a) } @versions;
+
+	$version = $versions[0];	# current
+	$prev_version = $versions[1];	# previous (may be undef)
 
 	# push @html, "<p>CPAN Release: $version</p>";
 } else {
@@ -760,6 +777,16 @@ if($version) {
 	);
 
 	if(scalar(@fail_reports)) {
+		my @prev_fail_reports;
+		if ($prev_version) {
+			@prev_fail_reports = fetch_reports_by_grades(
+				$dist_name,
+				$prev_version,
+				'fail',
+				'unknown',
+			);
+		}
+
 		push @html, <<"HTML";
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -787,6 +814,14 @@ document.addEventListener("DOMContentLoaded", function () {
 		updateCpanVisibility();
 	}
 });
+document.getElementById('toggleNew').addEventListener('change', function () {
+	const show = this.checked;
+	document.querySelectorAll('tr').forEach(row => {
+		const cell = row.querySelector('.new-failure');
+		if (!cell) return;
+		row.style.display = show ? '' : 'none';
+	});
+});
 document.addEventListener("DOMContentLoaded", () => {
 	const th = document.querySelector("table.sortable-table th");
 	if (th) sortTable(th, 0);
@@ -804,6 +839,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		<input type="checkbox" id="toggleUnknown">
 		UNKNOWN
 	</label>
+	<label style="margin-left: 1em;">
+		<input type="checkbox" id="toggleNew" checked>
+		NEW only
+	</label>
 </div>
 
 <table class="sortable-table" data-sort-col="0" data-sort-order="asc">
@@ -820,6 +859,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	</th>
 	<th class="sortable" onclick="sortTable(this, 3)">
 		<span class="label">Reporter</span> <span class="arrow">&#x25B2;</span>
+	</th>
+	<th class="sortable" onclick="sortTable(this, 4)">
+		<span class="label">New</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th>Report</th>
 </tr>
@@ -843,6 +885,14 @@ HTML
 
 		my @deduped = values %best;
 
+		my %prev_fail_set;
+
+		for my $r (@prev_fail_reports) {
+			my $key = join '|', $r->{osname} // '', $r->{perl} // '', $r->{arch} // '';
+
+			$prev_fail_set{$key} = 1;
+		}
+
 		for my $r (@deduped) {
 			my $date = $r->{date} // '';
 			my $perl = $r->{perl} // '';
@@ -856,10 +906,19 @@ HTML
 			my $guid = $r->{guid} // '';
 			my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
 
+			my $is_new = !$prev_fail_set{ join '|', $r->{osname} // '', $r->{perl} // '', $r->{arch} // '' };
+			my $new_html = $is_new ? '<span class="new-failure">NEW</span>' : '';
+
 			push @html, sprintf(
-				qq{<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+				qq{<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
 				<td><a href="%s" target="_blank">View</a></td></tr>},
-				$row_class, $date, $os, $perl, $reporter, $url
+				$row_class,
+				$date,
+				$os,
+				$perl,
+				$reporter,
+				$new_html,
+				$url
 			);
 		}
 
