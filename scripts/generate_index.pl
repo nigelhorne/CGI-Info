@@ -810,17 +810,18 @@ document.addEventListener("DOMContentLoaded", () => {
 <thead>
 <tr>
 	<th class="sortable" onclick="sortTable(this, 0)">
-		Date <span class="arrow">&#x25B2;</span>
+		<span class="label">Date</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th class="sortable" onclick="sortTable(this, 1)">
-		OS / Perl <span class="arrow">&#x25B2;</span>
+		<span class="label">OS</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th class="sortable" onclick="sortTable(this, 2)">
-		Reporter <span class="arrow">&#x25B2;</span>
+		<span class="label">Perl</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th class="sortable" onclick="sortTable(this, 3)">
-		Report <span class="arrow">&#x25B2;</span>
+		<span class="label">Reporter</span> <span class="arrow">&#x25B2;</span>
 	</th>
+	<th>Report</th>
 </tr>
 </thead>
 <tbody>
@@ -849,12 +850,15 @@ HTML
 			my $grade = lc($r->{grade} // 'unknown');
 			my $row_class = "cpan-$grade";	# cpan-fail or cpan-unknown
 			my $reporter = $r->{reporter} // '';
+			$reporter =~ s/"//g;
+			$reporter =~ s/<.+>//g;
+			$reporter =~ s/\s+$//g;
 			my $guid = $r->{guid} // '';
 			my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
 
 			push @html, sprintf(
-				qq{<tr class="%s"><td>%s</td><td>%s / %s</td><td>%s</td>
-				<td><a href="%s" target="_blank">View</a></td></tr>\n},
+				qq{<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+				<td><a href="%s" target="_blank">View</a></td></tr>},
 				$row_class, $date, $os, $perl, $reporter, $url
 			);
 		}
