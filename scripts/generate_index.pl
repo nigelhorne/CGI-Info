@@ -262,7 +262,7 @@ for my $file (sort keys %{$data->{summary}}) {
 	my $points_attr = join(',', @file_history);
 
 	push @html, sprintf(
-		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line" target="_blank">%s</a> %s<canvas class="sparkline" width="80" height="20" data-points="$points_attr"></canvas></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>\n},
+		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line" target="_blank">%s</a> %s<canvas class="sparkline" width="80" height="20" data-points="$points_attr"></canvas></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>},
 		$row_class, $html_file, $file, $source_link,
 		$info->{statement}{percentage} // 0,
 		$info->{branch}{percentage} // 0,
@@ -277,7 +277,7 @@ for my $file (sort keys %{$data->{summary}}) {
 my $avg_coverage = $total_files ? int($total_coverage / $total_files) : 0;
 
 push @html, sprintf(
-	qq{<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>\n},
+	qq{<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>},
 	$total_files, $avg_coverage, $low_coverage_count
 );
 
@@ -287,7 +287,7 @@ if (my $total_info = $data->{summary}{Total}) {
 	my $class = $total_pct > 80 ? 'high' : $total_pct > 50 ? 'med' : 'low';
 
 	push @html, sprintf(
-		qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>\n},
+		qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>},
 		$class,
 		$total_info->{statement}{percentage} // 0,
 		$total_info->{branch}{percentage} // 0,
@@ -746,7 +746,7 @@ if($success) {
 
 	# push @html, "<p>CPAN Release: $version</p>";
 } else {
-	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n";
+	push @html, "<p><a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}</p>";
 }
 
 # $version ||= 'latest';
@@ -863,13 +863,16 @@ HTML
 			);
 		}
 
-		push @html, "</tbody></table>\n";
+		push @html, '</tbody></table>';
+	} else {
+		# @fail_reports is empty
+		push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
 	}
-} elsif($res->{status} != 404) {	# 404 means no fail reports
-	push @html, "<A HREF=\"$cpan_api\">$cpan_api</A>";
+} elsif($res->{status} == 404) {	# 404 means no fail reports
+	# push @html, "<A HREF=\"$cpan_api\">$cpan_api</A>";
 	push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
 } else {
-	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n";
+	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}";
 }
 
 my $timestamp = 'Unknown';
@@ -915,7 +918,7 @@ sub fetch_reports_by_grades {
 	my @reports;
 
 	for my $grade (@grades) {
-		my $url = "https://api.cpantesters.org/v3/summary/"
+		my $url = 'https://api.cpantesters.org/v3/summary/'
 			. uri_escape($dist)
 			. '/' . uri_escape($version)
 			. "?grade=$grade";
