@@ -56,7 +56,8 @@ $ENV{'QUERY_STRING'} = 'foo=123&fred=wilma';
 
 $i = new_ok('CGI::Info' => [
 	allow => \%allowed,
-	logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
+	logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} },
+	config_file => '/',	# Ensure system config files aren't used during testing
 ]);
 %p = %{$i->params()};
 ok($p{foo} eq '123');
