@@ -105,6 +105,13 @@ push @html, <<"HTML";
 			display: inline-block;
 			vertical-align: middle;
 		}
+		tr.cpan-fail td {
+			background-color: #fdd;
+		}
+		tr.cpan-unknown td {
+			background-color: #eee;
+			color: #666;
+		}
 	</style>
 </head>
 <body>
@@ -751,22 +758,58 @@ if($success) {
 }
 
 # $version ||= 'latest';
+my @fail_reports;
 if($version) {
-	$cpan_api = "https://api.cpantesters.org/v3/summary/"
-			. uri_escape($dist_name)
-			. '/' . uri_escape($version)
-			. '?grade=fail';
+	@fail_reports = fetch_reports_by_grades(
+		$dist_name,
+		$version,
+		'fail',
+		'unknown',
+	);
 
-	$res = $http->get($cpan_api);
+	if(scalar(@fail_reports)) {
+		push @html, <<"HTML";
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	function updateCpanVisibility() {
+		const showFail = document.getElementById('toggleFail').checked;
+		const showUnknown = document.getElementById('toggleUnknown').checked;
 
-	if ($res->{success}) {
-		my $fail_reports = eval { decode_json($res->{content}) };
-		if ($@) {
-			push @html, "<p>Error decoding CPAN Testers JSON: $@</p>";
-		} elsif($fail_reports && ref($fail_reports) eq 'ARRAY' && @{$fail_reports}) {
-			push @html, <<"HTML";
+		document.querySelectorAll('tr.cpan-fail').forEach(row => {
+			row.style.display = showFail ? '' : 'none';
+		});
+
+		document.querySelectorAll('tr.cpan-unknown').forEach(row => {
+			row.style.display = showUnknown ? '' : 'none';
+		});
+	}
+
+	const failBox = document.getElementById('toggleFail');
+	const unknownBox = document.getElementById('toggleUnknown');
+
+	if (failBox && unknownBox) {
+		failBox.addEventListener('change', updateCpanVisibility);
+		unknownBox.addEventListener('change', updateCpanVisibility);
+
+		// Apply initial state
+		updateCpanVisibility();
+	}
+});
+</script>
+
 <h2>CPAN Testers Failures for $dist_name $version</h2>
 <p><em>Showing one failure per OS/Perl combination.</em></p>
+<div style="margin-bottom: 0.5em;">
+	<label>
+		<input type="checkbox" id="toggleFail" checked>
+		FAIL
+	</label>
+	<label style="margin-left: 1em;">
+		<input type="checkbox" id="toggleUnknown">
+		UNKNOWN
+	</label>
+</div>
+
 <table>
 <thead>
 <tr>
@@ -779,42 +822,46 @@ if($version) {
 <tbody>
 HTML
 
-			my %seen;	# key = "$os|$perl"
-			my @deduped;	# final rows
+		my %best;
 
-			for my $r (@$fail_reports) {
-				my $os = $r->{osname} // 'unknown';
-				my $perl = $r->{perl} // 'unknown';
+		for my $r (@fail_reports) {
+			my $os = $r->{osname} // 'unknown';
+			my $perl = $r->{perl} // 'unknown';
+			my $grade = lc($r->{grade} // 'unknown');
 
-				my $key = join('|', $os, $perl);
+			my $key = join '|', $os, $perl, $grade;
 
-				# Skip duplicates
-				next if $seen{$key}++;
-
-				push @deduped, $r;
+			if(!exists $best{$key} || (!$best{$key}{guid} && $r->{guid})) {
+				$best{$key} = $r;
 			}
-
-			for my $r (@deduped) {
-				my $date = $r->{date} // '';
-				my $perl = $r->{perl} // '';
-				my $os = $r->{osname} // '';
-				my $tester = encode_entities($r->{tester} // '');
-				my $guid = $r->{guid} // '';
-				my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
-
-				push @html, sprintf(
-					qq{<tr><td>%s</td><td>%s / %s</td><td>%s</td><td><a href="%s" target="_blank">View</a></td></tr>\n},
-					$date, $os, $perl, $tester, $url
-				);
-			}
-
-			push @html, "</tbody></table>\n";
 		}
-	} elsif($res->{status} != 404) {	# 404 means no fail reports
-		push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
-	} else {
-		push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n";
+
+		my @deduped = values %best;
+
+		for my $r (@deduped) {
+			my $date = $r->{date} // '';
+			my $perl = $r->{perl} // '';
+			my $os = $r->{osname} // '';
+			my $grade = lc($r->{grade} // 'unknown');
+			my $row_class = "cpan-$grade";	# cpan-fail or cpan-unknown
+			my $tester = encode_entities($r->{tester} // '');
+			my $guid = $r->{guid} // '';
+			my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
+
+			push @html, sprintf(
+				qq{<tr class="%s"><td>%s</td><td>%s / %s</td><td>%s</td>
+				<td><a href="%s" target="_blank">View</a></td></tr>\n},
+				$row_class, $date, $os, $perl, $tester, $url
+			);
+		}
+
+		push @html, "</tbody></table>\n";
 	}
+} elsif($res->{status} != 404) {	# 404 means no fail reports
+	push @html, "<A HREF=\"$cpan_api\">$cpan_api</A>";
+	push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
+} else {
+	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}\n";
 }
 
 my $timestamp = 'Unknown';
@@ -851,4 +898,36 @@ sub js_escape {
 	$str =~ s/"/\\"/g;
 	$str =~ s/\n/\\n/g;
 	return $str;
+}
+
+sub fetch_reports_by_grades {
+	my ($dist, $version, @grades) = @_;
+
+	my %seen;
+	my @reports;
+
+	for my $grade (@grades) {
+		my $url = "https://api.cpantesters.org/v3/summary/"
+			. uri_escape($dist)
+			. '/' . uri_escape($version)
+			. "?grade=$grade";
+
+		my $res = $http->get($url);
+		next unless $res->{success};
+
+		my $arr = eval { decode_json($res->{content}) };
+		next unless ref $arr eq 'ARRAY';
+
+		for my $r (@$arr) {
+			my $key = join '|',
+				$r->{osname} // '',
+				$r->{perl} // '',
+				$r->{arch} // '';
+
+			next if $seen{$key}++;
+			push @reports, $r;
+		}
+	}
+
+	return @reports;
 }
