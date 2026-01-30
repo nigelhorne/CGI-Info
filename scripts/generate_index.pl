@@ -706,7 +706,7 @@ function refresh(){
 </script>
 HTML
 
-push @html, '<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>';
+push @html, '<p><center>Use mouse wheel or pinch to zoom; drag to pan</center></p>';
 
 # -------------------------------
 # Add CPAN Testers failing reports table
