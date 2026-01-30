@@ -10,7 +10,10 @@ BEGIN { use_ok('CGI::Info') }
 
 # my $info = new_ok('CGI::Info');
 my @messages;
-my $info = CGI::Info->new({ logger => \@messages });
+my $info = CGI::Info->new({
+	logger => \@messages,
+	config_file => '/',	# Ensure system config files aren't used during testing
+});
 $info->{logger}->level('debug');
 
 my $name = $info->script_name();
