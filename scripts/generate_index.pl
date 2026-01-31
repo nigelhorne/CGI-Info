@@ -789,7 +789,7 @@ if($version) {
 	);
 
 	if(scalar(@fail_reports)) {
-
+		push @html, "<h2>CPAN Testers Failures for $dist_name $version</h2>";
 		my @prev_fail_reports;
 		if ($prev_version) {
 			@prev_fail_reports = fetch_reports_by_grades(
@@ -798,6 +798,100 @@ if($version) {
 				'fail',
 				'unknown',
 			);
+		}
+
+		if ($ENABLE_DEP_ANALYSIS) {
+			my %dep_stats;
+
+			# Split GUIDs by grade
+			my @fail_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'FAIL' } @fail_reports;
+			my @unknown_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'UNKNOWN' } @fail_reports;
+
+			# FAIL reports
+			aggregate_dependency_stats(
+				guids => \@fail_guids,
+				grade => 'fail',
+				stats_ref => \%dep_stats,
+			);
+
+			# UNKNOWN reports (optional but useful)
+			aggregate_dependency_stats(
+				guids => \@unknown_guids,
+				grade => 'unknown',
+				stats_ref => \%dep_stats,
+			);
+
+			my @suspects = find_suspected_dependencies(\%dep_stats);
+
+			if (@suspects) {
+				push @html, '<h3>Suspected Dependency Interactions</h3>';
+				push @html, '<ul>';
+
+				for my $s (@suspects) {
+					my $line = sprintf(
+						'%s — FAIL: %d%s (%s)',
+						$s->{module},
+						$s->{fail},
+						defined $s->{pass} ? ", PASS: $s->{pass}" : '',
+						$s->{reason},
+					);
+					push @html, "<li>$line</li>";
+				}
+
+				push @html, '</ul>';
+			}
+			my %dep_versions;
+
+			collect_dependency_versions(
+				reports => \@fail_reports,
+				grade => 'fail',
+				store => \%dep_versions,
+			);
+
+			collect_dependency_versions(
+				reports => \@pass_reports,
+				grade => 'pass',
+				store => \%dep_versions,
+			);
+
+			my @cliffs = detect_version_cliffs(\%dep_versions);
+
+			if (@cliffs) {
+				push @html, '<h3>Dependency Version Cliffs</h3>';
+				push @html, '<ul>';
+
+				for my $c (@cliffs) {
+					push @html, sprintf(
+						'<li><b>%s</b>: %s</li>',
+						$c->{module},
+						$c->{message},
+					);
+				}
+
+				push @html, '</ul>';
+			}
+
+			my $perl_cliff = detect_perl_version_cliff(
+				\@fail_reports,
+				\@pass_reports,
+			);
+
+			if ($perl_cliff) {
+				my $delta = perldelta_url($perl_cliff->{passes_from});
+
+				push @html,
+					'<p class="notice perl-version-cliff">',
+					sprintf(
+						'Fails on Perl &leq; %s; passes on Perl &geq; %s. ',
+						$perl_cliff->{fails_up_to},
+						$perl_cliff->{passes_from},
+					),
+					sprintf(
+						'<a href="%s" target="_blank">See perldelta for this release</a>',
+						$delta,
+					),
+					'</p>';
+			}
 		}
 
 		push @html, <<"HTML";
@@ -837,7 +931,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-<h2>CPAN Testers Failures for $dist_name $version</h2>
 <p><em>Showing one failure per OS/Perl combination.</em></p>
 <div style="margin-bottom: 0.5em;">
 	<label>
@@ -932,78 +1025,6 @@ HTML
 		}
 
 		push @html, '</tbody></table>';
-
-		if ($ENABLE_DEP_ANALYSIS) {
-			my %dep_stats;
-
-			# Split GUIDs by grade
-			my @fail_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'FAIL' } @fail_reports;
-			my @unknown_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'UNKNOWN' } @fail_reports;
-
-			# FAIL reports
-			aggregate_dependency_stats(
-				guids => \@fail_guids,
-				grade => 'fail',
-				stats_ref => \%dep_stats,
-			);
-
-			# UNKNOWN reports (optional but useful)
-			aggregate_dependency_stats(
-				guids => \@unknown_guids,
-				grade => 'unknown',
-				stats_ref => \%dep_stats,
-			);
-
-			my @suspects = find_suspected_dependencies(\%dep_stats);
-
-			if (@suspects) {
-				push @html, '<h3>Suspected Dependency Interactions</h3>';
-				push @html, '<ul>';
-
-				for my $s (@suspects) {
-					my $line = sprintf(
-						'%s — FAIL: %d%s (%s)',
-						$s->{module},
-						$s->{fail},
-						defined $s->{pass} ? ", PASS: $s->{pass}" : '',
-						$s->{reason},
-					);
-					push @html, "<li>$line</li>";
-				}
-
-				push @html, '</ul>';
-			}
-			my %dep_versions;
-
-			collect_dependency_versions(
-				reports => \@fail_reports,
-				grade => 'fail',
-				store => \%dep_versions,
-			);
-
-			collect_dependency_versions(
-				reports => \@pass_reports,
-				grade => 'pass',
-				store => \%dep_versions,
-			);
-
-			my @cliffs = detect_version_cliffs(\%dep_versions);
-
-			if (@cliffs) {
-				push @html, '<h3>Dependency Version Cliffs</h3>';
-				push @html, '<ul>';
-
-				for my $c (@cliffs) {
-					push @html, sprintf(
-						'<li><b>%s</b>: %s</li>',
-						$c->{module},
-						$c->{message},
-					);
-				}
-
-				push @html, '</ul>';
-			}
-		}
 	} else {
 		# @fail_reports is empty
 		push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
@@ -1231,7 +1252,7 @@ sub detect_version_cliffs {
 				module => $mod,
 				type => 'soft',
 				message => sprintf(
-					'FAIL median %s > PASS median %s',
+					'FAIL median %s &gt; PASS median %s',
 					$fail_median,
 					$pass_median,
 				),
@@ -1240,4 +1261,38 @@ sub detect_version_cliffs {
 	}
 
 	return @suspects;
+}
+
+sub detect_perl_version_cliff {
+	my ($fail_reports, $pass_reports) = @_;
+
+	my @fail_perls = extract_perl_versions($fail_reports);
+	my @pass_perls = extract_perl_versions($pass_reports);
+
+	return unless @fail_perls && @pass_perls;
+
+	my $max_fail = (sort { $b <=> $a } @fail_perls)[0];
+	my $min_pass = (sort { $a <=> $b } @pass_perls)[0];
+
+	return unless $min_pass > $max_fail;
+
+	return { fails_up_to => $max_fail, passes_from => $min_pass };
+}
+
+sub extract_perl_versions {
+	my ($reports) = @_;
+	my @v;
+
+	for my $r (@$reports) {
+		next unless $r->{perl};
+		push @v, version->parse($r->{perl});
+	}
+
+	return @v;
+}
+
+sub perldelta_url {
+	my ($v) = @_;
+	my ($maj, $min) = $v =~ /^v?(\d+)\.(\d+)/;
+	return "https://perldoc.perl.org/perl${maj}${min}0delta";
 }
