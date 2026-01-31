@@ -32,6 +32,12 @@ Readonly my %config => (
 	max_retry => 3
 );
 
+# -------------------------------
+# Dependency correlation analysis
+# -------------------------------
+my $MAX_REPORTS_PER_GRADE = 20;	# safety rail
+my $ENABLE_DEP_ANALYSIS = 1;
+
 # Read and decode coverage data
 my $data = eval { decode_json(read_file($config{cover_db})) };
 
@@ -768,6 +774,7 @@ if($success) {
 
 # $version ||= 'latest';
 my @fail_reports;
+my @pass_reports;
 if($version) {
 	@fail_reports = fetch_reports_by_grades(
 		$dist_name,
@@ -775,8 +782,14 @@ if($version) {
 		'fail',
 		'unknown',
 	);
+	@pass_reports = fetch_reports_by_grades(
+		$dist_name,
+		$version,
+		'pass',
+	);
 
 	if(scalar(@fail_reports)) {
+
 		my @prev_fail_reports;
 		if ($prev_version) {
 			@prev_fail_reports = fetch_reports_by_grades(
@@ -919,6 +932,78 @@ HTML
 		}
 
 		push @html, '</tbody></table>';
+
+		if ($ENABLE_DEP_ANALYSIS) {
+			my %dep_stats;
+
+			# Split GUIDs by grade
+			my @fail_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'FAIL' } @fail_reports;
+			my @unknown_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'UNKNOWN' } @fail_reports;
+
+			# FAIL reports
+			aggregate_dependency_stats(
+				guids => \@fail_guids,
+				grade => 'fail',
+				stats_ref => \%dep_stats,
+			);
+
+			# UNKNOWN reports (optional but useful)
+			aggregate_dependency_stats(
+				guids => \@unknown_guids,
+				grade => 'unknown',
+				stats_ref => \%dep_stats,
+			);
+
+			my @suspects = find_suspected_dependencies(\%dep_stats);
+
+			if (@suspects) {
+				push @html, '<h3>Suspected Dependency Interactions</h3>';
+				push @html, '<ul>';
+
+				for my $s (@suspects) {
+					my $line = sprintf(
+						'%s — FAIL: %d%s (%s)',
+						$s->{module},
+						$s->{fail},
+						defined $s->{pass} ? ", PASS: $s->{pass}" : '',
+						$s->{reason},
+					);
+					push @html, "<li>$line</li>";
+				}
+
+				push @html, '</ul>';
+			}
+			my %dep_versions;
+
+			collect_dependency_versions(
+				reports => \@fail_reports,
+				grade => 'fail',
+				store => \%dep_versions,
+			);
+
+			collect_dependency_versions(
+				reports => \@pass_reports,
+				grade => 'pass',
+				store => \%dep_versions,
+			);
+
+			my @cliffs = detect_version_cliffs(\%dep_versions);
+
+			if (@cliffs) {
+				push @html, '<h3>Dependency Version Cliffs</h3>';
+				push @html, '<ul>';
+
+				for my $c (@cliffs) {
+					push @html, sprintf(
+						'<li><b>%s</b>: %s</li>',
+						$c->{module},
+						$c->{message},
+					);
+				}
+
+				push @html, '</ul>';
+			}
+		}
 	} else {
 		# @fail_reports is empty
 		push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
@@ -996,4 +1081,163 @@ sub fetch_reports_by_grades {
 	}
 
 	return @reports;
+}
+
+sub fetch_report_html {
+	my ($guid) = @_;
+	return unless $guid;
+
+	my $url = "https://www.cpantesters.org/cpan/report/$guid";
+	v("    fetching report HTML $guid");
+
+	my $res = $http->get($url);
+	return unless $res->{success};
+
+	return $res->{content};
+}
+
+sub aggregate_dependency_stats {
+	my (%args) = @_;
+
+	my $guids = $args{guids} || [];
+	my $grade = $args{grade} || 'fail';
+	my $stats = $args{stats_ref} || {};
+
+	my $count = 0;
+
+	for my $guid (@$guids) {
+		last if $count++ >= $MAX_REPORTS_PER_GRADE;
+
+		my $html = fetch_report_html($guid) or next;
+		my $mods = extract_installed_modules($html);
+
+		for my $m (keys %$mods) {
+			$stats->{$m}{$grade}++;
+			$stats->{$m}{versions}{ $mods->{$m} }{$grade}++;
+		}
+	}
+
+	return $stats;
+}
+
+sub extract_installed_modules {
+	my ($html) = @_;
+	my %mods;
+
+	return \%mods unless $html;
+
+	while ($html =~ /^\s*([A-Z]\w*(?:::\w+)*)\s+v?([\d._]+)/mg) {
+		my ($module, $version) = ($1, $2);
+
+		# skip obvious noise
+		next if $module =~ /^(Perl|OS|Reporter|Tester)$/;
+
+		$mods{$module} = $version;
+	}
+
+	return \%mods;
+}
+
+sub find_suspected_dependencies {
+	my ($stats) = @_;
+	my @suspects;
+
+	for my $mod (sort keys %$stats) {
+		my $fail = $stats->{$mod}{fail} || 0;
+		my $pass = $stats->{$mod}{pass} || 0;
+
+		next unless $fail >= 2;
+
+		# signal 1: fail-only
+		if ($fail && !$pass) {
+			push @suspects, {
+				module => $mod,
+				fail => $fail,
+				pass => 0,
+				reason => 'Seen only in FAIL reports',
+			};
+			next;
+		}
+
+		# signal 2: strong skew
+		my $ratio = $fail / ($fail + $pass);
+		if ($fail >= 3 && $ratio >= 0.7) {
+			push @suspects, {
+				module => $mod,
+				fail => $fail,
+				pass => $pass,
+				ratio => sprintf("%.2f", $ratio),
+				reason => 'Strong FAIL skew',
+			};
+		}
+	}
+
+	return @suspects;
+}
+
+sub collect_dependency_versions {
+	my (%args) = @_;
+
+	my $reports = $args{reports};	# arrayref of report hashrefs
+	my $dep_store = $args{store};	# hashref
+	my $grade = lc($args{grade});	# fail / pass / unknown
+
+	for my $r (@$reports) {
+		my $pr = $r->{prereqs} or next;
+		my $rt = $pr->{runtime}{requires} or next;
+
+		while (my ($mod, $ver) = each %$rt) {
+			next unless defined $ver && $ver =~ /\d/;
+			push @{ $dep_store->{$mod}{$grade} }, $ver;
+		}
+	}
+}
+
+sub detect_version_cliffs {
+	my ($deps) = @_;
+	my @suspects;
+
+	for my $mod (sort keys %$deps) {
+		my $d = $deps->{$mod};
+
+		next unless $d->{fail} && $d->{pass};
+
+		my @fail = sort { version->parse($a) <=> version->parse($b) } @{ $d->{fail} };
+		my @pass = sort { version->parse($a) <=> version->parse($b) } @{ $d->{pass} };
+
+		my $fail_min = version->parse($fail[0]);
+		my $pass_max = version->parse($pass[-1]);
+
+		# Classic cliff: PASS versions entirely below FAIL versions
+		if ($pass_max < $fail_min) {
+			push @suspects, {
+				module => $mod,
+				type => 'hard',
+				message => sprintf(
+					'PASS ≤ %s, FAIL ≥ %s',
+					$pass[-1],
+					$fail[0],
+				),
+			};
+			next;
+		}
+
+		# Soft cliff: FAIL skewed higher than PASS
+		my $fail_median = $fail[ int(@fail / 2) ];
+		my $pass_median = $pass[ int(@pass / 2) ];
+
+		if (version->parse($fail_median) > version->parse($pass_median)) {
+			push @suspects, {
+				module => $mod,
+				type => 'soft',
+				message => sprintf(
+					'FAIL median %s > PASS median %s',
+					$fail_median,
+					$pass_median,
+				),
+			};
+		}
+	}
+
+	return @suspects;
 }
