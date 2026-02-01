@@ -3,10 +3,15 @@
 use strict;
 use warnings;
 
-use Test::Needs {
-	'App::Test::Generator' => '0.27',
-	'perl' => 5.036,	# Later A::T::G need this version
-};
+# Don't use this - it sometimes skips with no reason, causing the tests to bomb out
+# use Test::Needs {
+	# 'App::Test::Generator' => '0.27',
+	# 'perl' => 5.036,	# Later A::T::G need this version
+# };
+
+use Test::Needs { perl => '5.036' };
+use Test::Needs { 'App::Test::Generator' => '0.27' };
+
 use Test::Which 'fuzz-harness-generator';
 use FindBin qw($Bin);
 use IPC::Run3;
