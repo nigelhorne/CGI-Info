@@ -1294,12 +1294,13 @@ sub find_suspected_dependencies {
 
 		# signal 2: strong skew
 		my $ratio = $fail / ($fail + $pass);
-		if ($fail >= 3 && $ratio >= 0.7) {
+		my $ratio_pct = $ratio * 100;
+		if ($fail >= 3 && $ratio_pct >= $config{low_threshold}) {
 			push @suspects, {
 				module => $mod,
 				fail => $fail,
 				pass => $pass,
-				ratio => sprintf("%.2f", $ratio),
+				ratio => sprintf('%.2f', $ratio),
 				reason => 'Strong FAIL skew',
 			};
 		}
