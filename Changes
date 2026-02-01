@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+1.10
+	Fix test failures on non English systems https://www.cpantesters.org/cpan/report/23060ef6-feb3-11f0-b888-30156e8775ea
+
 1.09	Fri Jan 30 08:54:26 EST 2026
 	Updated test dashboard shows CPAN test failures
 	Bumped version of Object::Configure to see if that fixes https://www.cpantesters.org/cpan/report/a8dc0030-dc5d-11f0-baa1-832b6e8775ea

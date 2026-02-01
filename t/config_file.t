@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
+use Errno qw(ENOENT);
 use Test::Most;
 use File::Spec;
 use File::Temp qw/tempfile tempdir/;
+use POSIX qw(strerror);	# Import the strerror function
 use YAML::XS qw/DumpFile/;
 
 use_ok('CGI::Info');
@@ -42,9 +44,10 @@ if($^O ne 'MSWin32') {
 };
 
 # Nonexistent config file is ignored
+my $mess = strerror(ENOENT);
 throws_ok {
 	CGI::Info->new(config_file => '/nonexistent/path/to/config.yml');
-} qr/No such file or directory/, 'Throws error for nonexistent config file';
+} qr/\Q$mess\E/, 'Dies with non-existent config file';
 
 # Malformed config file (not a hashref)
 # my ($badfh, $badfile) = tempfile();

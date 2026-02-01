@@ -1,4 +1,4 @@
-# Generated from Makefile.PL
+# Generated from Makefile.PL using makefilepl2cpanfile
 
 requires 'perl', '5.008';
 
@@ -14,9 +14,9 @@ requires 'JSON::MaybeXS';
 requires 'List::Util', '1.33';
 requires 'Log::Abstraction', '0.10';
 requires 'Net::CIDR';
-requires 'Object::Configure', '0.12';
+requires 'Object::Configure', '0.19';
 requires 'Params::Get', '0.13';
-requires 'Params::Validate::Strict', '0.21';
+requires 'Params::Validate::Strict', '0.28';
 requires 'Return::Set';
 requires 'Scalar::Util';
 requires 'Socket';
@@ -33,12 +33,14 @@ on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';
 };
 on 'test' => sub {
+	requires 'Errno';
 	requires 'File::Temp';
 	requires 'FindBin';
 	requires 'IPC::Run3';
 	requires 'IPC::System::Simple';
 	requires 'JSON::PP', '4.02';
 	requires 'LWP::UserAgent';
+	requires 'POSIX';
 	requires 'Taint::Runtime';
 	requires 'Test::Carp';
 	requires 'Test::CleanNamespaces';
