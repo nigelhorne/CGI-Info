@@ -139,7 +139,7 @@ push @html, <<"HTML";
 			font-weight: bold;
 		}
 		.notice.perl-version-cliff {
-			background-color: #fff3cd;   /* soft amber */
+			background-color: #fff3cd; /* soft amber */
 			border: 1px solid #ffeeba;
 			color: #856404;
 		}
@@ -898,6 +898,30 @@ if($version) {
 			);
 
 			if ($perl_cliff) {
+				my $perl_cutoff = version->parse($perl_cliff->{fails_up_to});
+
+				my $fail_support = 0;
+				my $pass_contra = 0;
+
+				for my $r (@fail_reports) {
+					next unless $r->{perl};
+					$fail_support++ if version->parse($r->{perl}) < $perl_cutoff;
+				}
+
+				for my $r (@pass_reports) {
+					next unless $r->{perl};
+					$pass_contra++ if version->parse($r->{perl}) < $perl_cutoff;
+				}
+				my ($score, $label) = confidence_score(
+					fail => $fail_support,
+					pass => $pass_contra,
+				);
+
+				my $confidence_html = confidence_badge_html(
+					$score, $label,
+					$fail_support, $pass_contra,
+				);
+
 				my $delta = perldelta_url($perl_cliff->{passes_from});
 
 				push @html,
@@ -911,7 +935,7 @@ if($version) {
 						'<a href="%s" target="_blank">See perldelta for this release</a>',
 						$delta,
 					),
-					'</p>';
+					"<br>$confidence_html</p>";
 			}
 		}
 
@@ -1316,4 +1340,46 @@ sub perldelta_url {
 	my ($v) = @_;
 	my ($maj, $min) = $v =~ /^v?(\d+)\.(\d+)/;
 	return "https://perldoc.perl.org/perl${maj}${min}0delta";
+}
+
+sub confidence_score {
+	my (%args) = @_;
+
+	my $fail = $args{fail} // 0;
+	my $pass = $args{pass} // 0;
+
+	return (0, 'none') if ($fail + $pass) == 0;
+
+	my $score = $fail / ($fail + $pass);
+
+	# Convert config thresholds from percent → fraction
+	my $med = ($config{med_threshold} // 90) / 100;
+	my $low = ($config{low_threshold} // 70) / 100;
+
+	my $label =
+		$score >= $med ? 'strong' :
+		$score >= $low ? 'moderate' :
+		'weak';
+
+	return ($score, $label);
+}
+
+sub confidence_badge_html {
+	my ($score, $label, $fail, $pass) = @_;
+
+	my %class_for = (
+		strong => 'badge-good',
+		moderate => 'badge-warn',
+		weak => 'badge-bad',
+		none => 'badge-bad',
+	);
+
+	my $pct = sprintf('%.0f%%', $score * 100);
+
+	return sprintf(
+		q{<span class="coverage-badge %s" title="%d fails, %d passes">%s confidence</span>},
+		$class_for{$label} // 'badge-bad',
+		$fail, $pass,
+		ucfirst($label)
+	);
 }
