@@ -937,6 +937,73 @@ if($version) {
 					),
 					"<br>$confidence_html</p>";
 			}
+			push @html, '<h3>Failure Clustering Summary</h3>';
+			push @html, '<ul>';
+
+			my %clusters = (
+				perl_series => {},
+				os => {},
+				perl_os => {},
+			);
+
+			for my $r (@fail_reports) {
+				my $perl = perl_series($r->{perl});
+				my $os = $r->{osname} // 'unknown';
+
+				$clusters{perl_series}{$perl}++ if $perl;
+				$clusters{os}{$os}++;
+				$clusters{perl_os}{"$perl / $os"}++ if $perl;
+			}
+
+			my @top_perl_series = sort { $clusters{perl_series}{$b} <=> $clusters{perl_series}{$a} }
+				keys %{ $clusters{perl_series} };
+
+			my @top_os = sort { $clusters{os}{$b} <=> $clusters{os}{$a} }
+				keys %{ $clusters{os} };
+
+			my @top_perl_os = sort { $clusters{perl_os}{$b} <=> $clusters{perl_os}{$a} }
+				keys %{ $clusters{perl_os} };
+
+			if (@top_perl_series) {
+				my $k = $top_perl_series[0];
+				push @html, sprintf(
+					'<li><b>Perl %s.x</b>: %d failures</li>',
+					$k,
+					$clusters{perl_series}{$k},
+				);
+				my $total = scalar @fail_reports;
+				my $ratio_pct = ($clusters{perl_series}{$k} / $total) * 100;
+
+				if ($ratio_pct >= $config{low_threshold}) {
+					push @html, sprintf(
+						'<p><em>%d%% of failures occur on Perl %s.x</em></p>',
+						int($ratio_pct),
+						$k,
+					);
+				}
+			}
+
+			if (@top_os) {
+				my $k = $top_os[0];
+				push @html, sprintf(
+					'<li><b>%s</b>: %d failures</li>',
+					$k,
+					$clusters{os}{$k},
+				);
+			}
+
+			if (@top_perl_os) {
+				my $k = $top_perl_os[0];
+				push @html, sprintf(
+					'<li><b>%s</b>: %d failures</li>',
+					$k,
+					$clusters{perl_os}{$k},
+				);
+			}
+
+
+
+			push @html, '</ul>';
 		}
 
 		push @html, <<"HTML";
@@ -1382,4 +1449,15 @@ sub confidence_badge_html {
 		$fail, $pass,
 		ucfirst($label)
 	);
+}
+
+sub perl_series {
+	my ($perl) = @_;
+	return unless defined $perl;
+
+	# "5.16.3" → "5.16"
+	if ($perl =~ /^(\d+\.\d+)/) {
+		return $1;
+	}
+	return;
 }
