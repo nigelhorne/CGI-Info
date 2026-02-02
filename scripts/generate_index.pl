@@ -150,6 +150,11 @@ push @html, <<"HTML";
 		.notice.perl-version-cliff a:hover {
 			text-decoration: none;
 		}
+		.notice.locale-cliff {
+			border-left: 4px solid #d97706;
+			background: #fffbeb;
+			padding: 0.5em 1em;
+		}
 	</style>
 </head>
 <body>
@@ -937,7 +942,7 @@ if($version) {
 					),
 					"<br>$confidence_html</p>";
 			}
-			push @html, '<h3>Failure Clustering Summary</h3>';
+			push @html, '<h3>Failure Summary</h3>';
 			push @html, '<ul>';
 
 			my %clusters = (
@@ -1001,6 +1006,8 @@ if($version) {
 				);
 			}
 
+			push @html, '</ul>';
+
 			my %locale_stats;
 
 			for my $r (@fail_reports) {
@@ -1013,7 +1020,38 @@ if($version) {
 				$locale_stats{$locale}{pass}++;
 			}
 
-			push @html, '</ul>';
+			my @locale_clusters;
+
+			for my $loc (keys %locale_stats) {
+				next if $loc eq 'unknown';
+
+				my $fail = $locale_stats{$loc}{fail} // 0;
+				my $pass = $locale_stats{$loc}{pass} // 0;
+				my $total = $fail + $pass;
+
+				next if $total < 3;
+
+				my $ratio = $fail / $total * 100;
+
+				if ($ratio >= $config{low_threshold} && is_non_english_locale($loc)) {
+					push @locale_clusters, {
+						locale => $loc,
+						fail => $fail,
+						pass => $pass,
+						ratio => $ratio,
+					};
+				}
+			}
+			if(scalar(@locale_clusters)) {
+				push @html,
+					'<h3>Locale-sensitive failures detected</h3>',
+					'<div class="notice locale-cliff">',
+					'<ul>';
+				foreach my $locale(@locale_clusters) {
+					push @html, "<li><code>$locale->{locale}</code> - $locale->{fail} FAIL / $locale->{pass} PASS ($locale->{ratio}%)</li>";
+				}
+				push @html, '</ul>', '</div>';
+			}
 		}
 
 		push @html, <<"HTML";
@@ -1463,10 +1501,10 @@ sub confidence_badge_html {
 }
 
 sub perl_series {
-	my ($perl) = @_;
+	my $perl = $_[0];
 	return unless defined $perl;
 
-	# "5.16.3" → "5.16"
+	# map "5.16.3" to "5.16"
 	if ($perl =~ /^(\d+\.\d+)/) {
 		return $1;
 	}
@@ -1504,7 +1542,8 @@ sub extract_locale {
 }
 
 sub is_non_english_locale {
-	my ($locale) = @_;
+	my $locale = $_[0];
+
 	return 0 unless $locale;
 
 	# Treat C / POSIX / en_* as English
