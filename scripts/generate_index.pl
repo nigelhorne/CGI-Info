@@ -13,6 +13,7 @@ use File::Slurp;
 use File::stat;
 use IPC::Run3;
 use JSON::MaybeXS;
+use List::Util;
 use POSIX qw(strftime);
 use Readonly;
 use HTTP::Tiny;
@@ -163,6 +164,26 @@ push @html, <<"HTML";
 		.notice.rt-issues {
 			background: #fff6e5;
 			border-left: 4px solid #d9822b;
+		}
+		table.root-causes {
+			border-collapse: collapse;
+			width: 100%;
+			margin-bottom: 1.5em;
+		}
+		table.root-causes th,
+		table.root-causes td {
+			border: 1px solid #ccc;
+			padding: 8px;
+			vertical-align: top;
+		}
+		table.root-causes tr.high {
+			background-color: #dfd;
+		}
+		table.root-causes tr.med {
+			background-color: #ffd;
+		}
+		table.root-causes tr.low {
+			background-color: #fdd;
 		}
 	</style>
 </head>
@@ -1088,6 +1109,79 @@ if($version) {
 				}
 				push @html, '</ul>', '</div>';
 			}
+
+			my @fail_perl_versions = extract_perl_versions(\@fail_reports);
+			my @pass_perl_versions = extract_perl_versions(\@pass_reports);
+
+			my @root_causes = detect_root_causes(
+				fail_reports        => \@fail_reports,
+				pass_reports        => \@pass_reports,
+				fail_perl_versions  => \@fail_perl_versions,
+				pass_perl_versions  => \@pass_perl_versions,
+			);
+			if (@root_causes) {
+				push @html, <<'HTML';
+<h3>Likely Root Causes</h3>
+<table class="root-causes">
+<thead>
+<tr>
+    <th>Cause</th>
+    <th>Confidence</th>
+    <th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+HTML
+
+				for my $rc (@root_causes) {
+
+					my $confidence_pct = int($rc->{confidence} * 100);
+
+					my $confidence_class =
+						$confidence_pct >= $config{med_threshold} ? 'high'
+						: $confidence_pct >= $config{low_threshold} ? 'med'
+						: 'low';
+
+					my $confidence_label =
+						$confidence_class eq 'high' ? 'Strong'
+						: $confidence_class eq 'med'  ? 'Moderate'
+						: 'Weak';
+
+					my $evidence_html = join(
+						'',
+						map { "<li>$_</li>" } @{ $rc->{evidence} || [] }
+					);
+
+					my $label = $rc->{label};
+
+					# Optional perldelta link
+					if ($rc->{type} eq 'perl' && $rc->{perldelta}) {
+						$label .= sprintf(
+							q{ (<a href="%s" target="_blank">perldelta</a>)},
+							$rc->{perldelta}
+						);
+					}
+
+					push @html, sprintf(<<'ROW',
+<tr class="%s">
+	<td><strong>%s</strong></td>
+	<td>%s (%d%%)</td>
+	<td><ul>%s</ul></td>
+</tr>
+ROW
+						$confidence_class,
+						$label,
+						$confidence_label,
+						$confidence_pct,
+						$evidence_html,
+					);
+				}
+
+				push @html, <<'HTML';
+</tbody>
+</table>
+HTML
+			}
 		}
 
 		push @html, <<"HTML";
@@ -1619,4 +1713,107 @@ sub fetch_open_rt_ticket_count {
 	my $tickets = $rc[2] && ref $rc[2] eq 'ARRAY' ? $rc[2] : [];
 
 	return scalar @$tickets;
+}
+
+sub detect_os_root_cause {
+	my ($reports, $config) = @_;
+
+	my %count;
+	$count{ $_->{osname} // 'unknown' }++ for @$reports;
+
+	my $total = @$reports;
+	return unless $total >= 3;
+
+	for my $os (keys %count) {
+		my $ratio = $count{$os} / $total;
+		next unless $ratio >= ($config->{med_threshold} / 100);
+
+		return {
+			type       => 'os',
+			label      => "OS-specific behavior ($os)",
+			confidence => sprintf("%.2f", $ratio),
+			evidence   => [
+				sprintf("%d/%d failures on %s", $count{$os}, $total, $os),
+					"Passes observed on other operating systems",
+				],
+		};
+	}
+
+	return;
+}
+
+sub detect_perl_version_root_cause {
+	my ($fail_versions, $pass_versions) = @_;
+
+	return unless @$fail_versions && @$pass_versions;
+
+	my $max_fail = List::Util::max(@$fail_versions);
+	my $min_pass = List::Util::min(@$pass_versions);
+
+	return unless $max_fail < $min_pass;
+
+	return {
+		type       => 'perl',
+		label      => "Perl version regression (Perl < $min_pass)",
+		confidence => 1.00,
+		evidence   => [
+		"All failures on Perl ≤ $max_fail",
+		"All passes on Perl ≥ $min_pass",
+		],
+		perldelta  => "https://perldoc.perl.org/perldelta$min_pass",
+	};
+}
+
+sub detect_locale_root_cause {
+	my ($reports, $config) = @_;
+
+	my %count;
+	my $total = 0;
+
+	for my $r (@$reports) {
+		my $loc = extract_locale($r) or next;
+		next if $loc =~ /^en_/i;
+		$count{$loc}++;
+		$total++;
+	}
+
+	return unless $total >= 2;
+
+	for my $loc (keys %count) {
+		my $ratio = $count{$loc} / $total;
+		next unless $ratio >= ($config->{low_threshold} / 100);
+
+		return {
+			type       => 'locale',
+			label      => "Locale-sensitive behavior ($loc)",
+			confidence => sprintf("%.2f", $ratio),
+			evidence   => [
+				"$count{$loc}/$total failures with LANG=$loc",
+				"English locales show fewer or no failures",
+			],
+		};
+	}
+
+	return;
+}
+
+sub detect_root_causes {
+	my (%args) = @_;
+	my @hints;
+
+	push @hints, detect_os_root_cause($args{fail_reports}, \%config) if $args{fail_reports};
+	push @hints, detect_locale_root_cause($args{fail_reports}, \%config);
+
+	if ($args{fail_perl_versions} && $args{pass_perl_versions}) {
+		push @hints,
+		detect_perl_version_root_cause(
+			$args{fail_perl_versions},
+			$args{pass_perl_versions},
+		);
+	}
+
+	@hints = grep { defined } @hints;
+	@hints = sort { $b->{confidence} <=> $a->{confidence} } @hints;
+
+	return @hints;
 }
