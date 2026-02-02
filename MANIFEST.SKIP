@@ -43,7 +43,6 @@
 \.tmp$
 \.#
 \.rej$
-\.yml$
 \.swp$
 
 # Avoid OS-specific files/dirs
@@ -63,7 +62,13 @@
 #!end included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
 
 \.travis\.yml
-\.appveyor\.yml
+\.circleci/config\.yml$
+\.appveyor\.yml$
+\.tachikoma\.yml$
+azure-pipelines\.yml$
+circle\.yml$
+\.codeclimate\.yml$
+\.codecov\.yml$
 \.releaserc
 \.lwpcookies
 CGI-.*
