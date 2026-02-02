@@ -1134,7 +1134,6 @@ if($version) {
 HTML
 
 				for my $rc (@root_causes) {
-
 					my $confidence_pct = int($rc->{confidence} * 100);
 
 					my $confidence_class =
@@ -1164,9 +1163,9 @@ HTML
 
 					push @html, sprintf(<<'ROW',
 <tr class="%s">
-	<td><strong>%s</strong></td>
-	<td>%s (%d%%)</td>
-	<td><ul>%s</ul></td>
+	<td halign="center"><strong>%s</strong></td>
+	<td halign="center">%s (%d%%)</td>
+	<td halign="center"><ul>%s</ul></td>
 </tr>
 ROW
 						$confidence_class,
@@ -1754,11 +1753,11 @@ sub detect_perl_version_root_cause {
 
 	return {
 		type       => 'perl',
-		label      => "Perl version regression (Perl < $min_pass)",
+		label      => "Perl version regression (Perl &lt; $min_pass)",
 		confidence => 1.00,
 		evidence   => [
-		"All failures on Perl ≤ $max_fail",
-		"All passes on Perl ≥ $min_pass",
+			"All failures on Perl &leq; $max_fail",
+			"All passes on Perl &geq; $min_pass",
 		],
 		perldelta  => "https://perldoc.perl.org/perldelta$min_pass",
 	};
@@ -1771,10 +1770,13 @@ sub detect_locale_root_cause {
 	my $total = 0;
 
 	for my $r (@$reports) {
-		my $loc = extract_locale($r) or next;
-		next if $loc =~ /^en_/i;
-		$count{$loc}++;
-		$total++;
+		# Can get FPs if we take NA or Unknown into account
+		if(lc($r->{grade} // '') eq 'fail') {
+			my $loc = extract_locale($r) or next;
+			next if $loc =~ /^en_/i;
+			$count{$loc}++;
+			$total++;
+		}
 	}
 
 	return unless $total >= 2;
