@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.09
+Version 1.10
 
 # SYNOPSIS
 
@@ -596,7 +596,7 @@ otherwise an HTTP error code
 - $status
 
     Optional integer value to be set or retrieved.
-    If omitted, the value is retrived.
+    If omitted, the value is retrieved.
 
 ## messages
 
@@ -658,7 +658,7 @@ things to happen.
 
 # SEE ALSO
 
-- [Test Coverage Report](https://nigelhorne.github.io/CGI-Info/coverage/)
+- [Test Dashboard](https://nigelhorne.github.io/CGI-Info/coverage/)
 - [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
