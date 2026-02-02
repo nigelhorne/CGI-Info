@@ -974,6 +974,8 @@ if($version) {
 				perl_os => {},
 			);
 
+			my %locale_stats;
+
 			for my $r (@fail_reports) {
 				my $perl = perl_series($r->{perl});
 				my $os = $r->{osname} // 'unknown';
@@ -981,7 +983,16 @@ if($version) {
 				$clusters{perl_series}{$perl}++ if $perl;
 				$clusters{os}{$os}++;
 				$clusters{perl_os}{"$perl / $os"}++ if $perl;
+
+				my $locale = extract_locale($r) // 'unknown';
+				$locale_stats{$locale}{fail}++;
 			}
+
+			for my $r (@pass_reports) {
+				my $locale = extract_locale($r) // 'unknown';
+				$locale_stats{$locale}{pass}++;
+			}
+
 
 			my @top_perl_series = sort { $clusters{perl_series}{$b} <=> $clusters{perl_series}{$a} }
 				keys %{ $clusters{perl_series} };
@@ -1030,18 +1041,6 @@ if($version) {
 			}
 
 			push @html, '</ul>';
-
-			my %locale_stats;
-
-			for my $r (@fail_reports) {
-				my $locale = extract_locale($r) // 'unknown';
-				$locale_stats{$locale}{fail}++;
-			}
-
-			for my $r (@pass_reports) {
-				my $locale = extract_locale($r) // 'unknown';
-				$locale_stats{$locale}{pass}++;
-			}
 
 			my @locale_clusters;
 
@@ -1210,7 +1209,7 @@ HTML
 		push @html, '</tbody></table>';
 	} else {
 		# @fail_reports is empty
-		push @html, "<p>No CPAN Testers failures reported for $dist_name $version</p>";
+		push @html, "<p>No <A HREF=\"https://fast2-matrix.cpantesters.org/?dist=$dist_name+$version\">CPAN Testers</A> failures reported for $dist_name $version</p>";
 	}
 } elsif($res->{status} == 404) {	# 404 means no fail reports
 	# push @html, "<A HREF=\"$cpan_api\">$cpan_api</A>";
@@ -1317,7 +1316,7 @@ sub fetch_report_html {
 	return unless $guid;
 
 	my $url = "https://www.cpantesters.org/cpan/report/$guid";
-	print "fetching report HTML $url\n";
+	# print "fetching report HTML $url\n";
 
 	my $res = $http->get($url);
 	return unless $res->{success};
