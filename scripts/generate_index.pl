@@ -1210,7 +1210,7 @@ HTML
 		push @html, '</tbody></table>';
 	} else {
 		# @fail_reports is empty
-		push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
+		push @html, "<p>No CPAN Testers failures reported for $dist_name $version</p>";
 	}
 } elsif($res->{status} == 404) {	# 404 means no fail reports
 	# push @html, "<A HREF=\"$cpan_api\">$cpan_api</A>";
