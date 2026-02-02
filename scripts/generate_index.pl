@@ -1001,7 +1001,17 @@ if($version) {
 				);
 			}
 
+			my %locale_stats;
 
+			for my $r (@fail_reports) {
+				my $locale = extract_locale($r) // 'unknown';
+				$locale_stats{$locale}{fail}++;
+			}
+
+			for my $r (@pass_reports) {
+				my $locale = extract_locale($r) // 'unknown';
+				$locale_stats{$locale}{pass}++;
+			}
 
 			push @html, '</ul>';
 		}
@@ -1216,19 +1226,6 @@ sub fetch_reports_by_grades {
 	return @reports;
 }
 
-sub fetch_report_html {
-	my ($guid) = @_;
-	return unless $guid;
-
-	my $url = "https://www.cpantesters.org/cpan/report/$guid";
-	v("    fetching report HTML $guid");
-
-	my $res = $http->get($url);
-	return unless $res->{success};
-
-	return $res->{content};
-}
-
 sub aggregate_dependency_stats {
 	my (%args) = @_;
 
@@ -1251,6 +1248,19 @@ sub aggregate_dependency_stats {
 	}
 
 	return $stats;
+}
+
+sub fetch_report_html {
+	my ($guid) = @_;
+	return unless $guid;
+
+	my $url = "https://www.cpantesters.org/cpan/report/$guid";
+	print "fetching report HTML $url\n";
+
+	my $res = $http->get($url);
+	return unless $res->{success};
+
+	return $res->{content};
 }
 
 sub extract_installed_modules {
@@ -1461,4 +1471,44 @@ sub perl_series {
 		return $1;
 	}
 	return;
+}
+
+sub extract_locale {
+	my ($r) = @_;
+
+	# Preferred: explicit environment
+	for my $k (qw(LANG LC_ALL LC_CTYPE)) {
+		if (my $v = $r->{env}{$k}) {
+			return $v;
+		}
+	}
+
+	# Fallback: scan report body
+	if (my $body = $r->{raw} || $r->{body}) {
+		if ($body =~ /\b([a-z]{2}_[A-Z]{2})\b/) {
+			return $1;
+		}
+	}
+
+	my $url = "https://api.cpantesters.org/v3/report/$r->{guid}";
+
+	my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 15);
+	my $res = $http->get($url);
+	return unless $res->{success};
+
+	my $report = eval { decode_json($res->{content}) };
+
+	if($report->{result}->{output}->{uncategorized} =~ /\b([a-z]{2}_[A-Z]{2})\b/) {
+		return $1;
+	}
+}
+
+sub is_non_english_locale {
+	my ($locale) = @_;
+	return 0 unless $locale;
+
+	# Treat C / POSIX / en_* as English
+	return 0 if $locale =~ /^(C|POSIX|en(_|$))/i;
+
+	return 1;
 }
