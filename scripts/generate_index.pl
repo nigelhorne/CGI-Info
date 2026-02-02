@@ -788,7 +788,7 @@ if($success) {
 		push @versions, $release->{version};
 	}
 
-	@versions = sort { version->parse($b) <=> version->parse($a) } @versions;
+	@versions = sort { parse_version($b) <=> parse_version($a) } @versions;
 
 	$version = $versions[0];	# current
 	$prev_version = $versions[1];	# previous (may be undef)
@@ -830,8 +830,8 @@ if($version) {
 			my %dep_stats;
 
 			# Split GUIDs by grade
-			my @fail_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'FAIL' } @fail_reports;
-			my @unknown_guids = map { $_->{guid} } grep { ($_->{grade} // '') eq 'UNKNOWN' } @fail_reports;
+			my @fail_guids = map { $_->{guid} } grep { lc($_->{grade} // '') eq 'fail' } @fail_reports;
+			my @unknown_guids = map { $_->{guid} } grep { lc($_->{grade} // '') eq 'unknown' } @fail_reports;
 
 			# FAIL reports
 			aggregate_dependency_stats(
@@ -903,19 +903,19 @@ if($version) {
 			);
 
 			if ($perl_cliff) {
-				my $perl_cutoff = version->parse($perl_cliff->{fails_up_to});
+				my $perl_cutoff = parse_version($perl_cliff->{fails_up_to});
 
 				my $fail_support = 0;
 				my $pass_contra = 0;
 
 				for my $r (@fail_reports) {
 					next unless $r->{perl};
-					$fail_support++ if version->parse($r->{perl}) < $perl_cutoff;
+					$fail_support++ if parse_version($r->{perl}) < $perl_cutoff;
 				}
 
 				for my $r (@pass_reports) {
 					next unless $r->{perl};
-					$pass_contra++ if version->parse($r->{perl}) < $perl_cutoff;
+					$pass_contra++ if parse_version($r->{perl}) < $perl_cutoff;
 				}
 				my ($score, $label) = confidence_score(
 					fail => $fail_support,
@@ -1307,13 +1307,16 @@ sub extract_installed_modules {
 
 	return \%mods unless $html;
 
-	while ($html =~ /^\s*([A-Z]\w*(?:::\w+)*)\s+v?([\d._]+)/mg) {
-		my ($module, $version) = ($1, $2);
+	if ($html =~ /Installed modules:(.*?)(?:\n\n|\z)/s) {
+		my $block = $1;
+		while ($block =~ /^\s*([A-Z]\w*(?:::\w+)*)\s+v?([\d._]+)/mg) {
+			my ($module, $version) = ($1, $2);
 
-		# skip obvious noise
-		next if $module =~ /^(Perl|OS|Reporter|Tester)$/;
+			# skip obvious noise
+			next if $module =~ /^(Perl|OS|Reporter|Tester)$/;
 
-		$mods{$module} = $version;
+			$mods{$module} = $version;
+		}
 	}
 
 	return \%mods;
@@ -1384,11 +1387,11 @@ sub detect_version_cliffs {
 
 		next unless $d->{fail} && $d->{pass};
 
-		my @fail = sort { version->parse($a) <=> version->parse($b) } @{ $d->{fail} };
-		my @pass = sort { version->parse($a) <=> version->parse($b) } @{ $d->{pass} };
+		my @fail = sort { parse_version($a) <=> parse_version($b) } @{ $d->{fail} };
+		my @pass = sort { parse_version($a) <=> parse_version($b) } @{ $d->{pass} };
 
-		my $fail_min = version->parse($fail[0]);
-		my $pass_max = version->parse($pass[-1]);
+		my $fail_min = parse_version($fail[0]);
+		my $pass_max = parse_version($pass[-1]);
 
 		# Classic cliff: PASS versions entirely below FAIL versions
 		if ($pass_max < $fail_min) {
@@ -1408,7 +1411,7 @@ sub detect_version_cliffs {
 		my $fail_median = $fail[ int(@fail / 2) ];
 		my $pass_median = $pass[ int(@pass / 2) ];
 
-		if (version->parse($fail_median) > version->parse($pass_median)) {
+		if (parse_version($fail_median) > parse_version($pass_median)) {
 			push @suspects, {
 				module => $mod,
 				type => 'soft',
@@ -1446,7 +1449,7 @@ sub extract_perl_versions {
 
 	for my $r (@$reports) {
 		next unless $r->{perl};
-		push @v, version->parse($r->{perl});
+		push @v, parse_version($r->{perl});
 	}
 
 	return @v;
@@ -1512,7 +1515,7 @@ sub perl_series {
 }
 
 sub extract_locale {
-	my ($r) = @_;
+	my $r = $_[0];
 
 	# Preferred: explicit environment
 	for my $k (qw(LANG LC_ALL LC_CTYPE)) {
@@ -1550,4 +1553,9 @@ sub is_non_english_locale {
 	return 0 if $locale =~ /^(C|POSIX|en(_|$))/i;
 
 	return 1;
+}
+
+sub parse_version {
+	my $v = shift;
+	return eval { version->parse($v) };
 }
