@@ -1114,10 +1114,10 @@ if($version) {
 			my @pass_perl_versions = extract_perl_versions(\@pass_reports);
 
 			my @root_causes = detect_root_causes(
-				fail_reports        => \@fail_reports,
-				pass_reports        => \@pass_reports,
-				fail_perl_versions  => \@fail_perl_versions,
-				pass_perl_versions  => \@pass_perl_versions,
+				fail_reports => \@fail_reports,
+				pass_reports => \@pass_reports,
+				fail_perl_versions => \@fail_perl_versions,
+				pass_perl_versions => \@pass_perl_versions,
 			);
 			if (@root_causes) {
 				push @html, <<'HTML';
@@ -1125,9 +1125,9 @@ if($version) {
 <table class="root-causes">
 <thead>
 <tr>
-    <th>Cause</th>
-    <th>Confidence</th>
-    <th>Evidence</th>
+	<th>Cause</th>
+	<th>Confidence</th>
+	<th>Evidence</th>
 </tr>
 </thead>
 <tbody>
@@ -1143,7 +1143,7 @@ HTML
 
 					my $confidence_label =
 						$confidence_class eq 'high' ? 'Strong'
-						: $confidence_class eq 'med'  ? 'Moderate'
+						: $confidence_class eq 'med' ? 'Moderate'
 						: 'Weak';
 
 					my $evidence_html = join(
@@ -1728,11 +1728,11 @@ sub detect_os_root_cause {
 		next unless $ratio >= ($config->{med_threshold} / 100);
 
 		return {
-			type       => 'os',
-			label      => "OS-specific behavior ($os)",
+			type => 'os',
+			label => "OS-specific behavior ($os)",
 			confidence => sprintf("%.2f", $ratio),
-			evidence   => [
-				sprintf("%d/%d failures on %s", $count{$os}, $total, $os),
+			evidence => [
+				sprintf('%d/%d failures on %s', $count{$os}, $total, $os),
 					"Passes observed on other operating systems",
 				],
 		};
@@ -1752,14 +1752,14 @@ sub detect_perl_version_root_cause {
 	return unless $max_fail < $min_pass;
 
 	return {
-		type       => 'perl',
-		label      => "Perl version regression (Perl &lt; $min_pass)",
+		type => 'perl',
+		label => "Perl version regression (Perl &lt; $min_pass)",
 		confidence => 1.00,
-		evidence   => [
+		evidence => [
 			"All failures on Perl &leq; $max_fail",
 			"All passes on Perl &geq; $min_pass",
 		],
-		perldelta  => "https://perldoc.perl.org/perldelta$min_pass",
+		perldelta => "https://perldoc.perl.org/perldelta$min_pass",
 	};
 }
 
@@ -1786,12 +1786,12 @@ sub detect_locale_root_cause {
 		next unless $ratio >= ($config->{low_threshold} / 100);
 
 		return {
-			type       => 'locale',
-			label      => "Locale-sensitive behavior ($loc)",
+			type => 'locale',
+			label => "Locale-sensitive behavior ($loc)",
 			confidence => sprintf("%.2f", $ratio),
-			evidence   => [
+			evidence => [
 				"$count{$loc}/$total failures with LANG=$loc",
-				"English locales show fewer or no failures",
+				'English locales show fewer or no failures',
 			],
 		};
 	}
