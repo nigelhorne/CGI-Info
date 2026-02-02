@@ -19,6 +19,7 @@ use HTTP::Tiny;
 use Time::HiRes qw(sleep);
 use URI::Escape qw(uri_escape);
 use version;
+use WWW::RT::CPAN;
 
 Readonly my %config => (
 	github_user => 'nigelhorne',
@@ -154,6 +155,10 @@ push @html, <<"HTML";
 			border-left: 4px solid #d97706;
 			background: #fffbeb;
 			padding: 0.5em 1em;
+		}
+		.notice.rt-issues {
+			background: #fff6e5;
+			border-left: 4px solid #d9822b;
 		}
 	</style>
 </head>
@@ -752,11 +757,29 @@ HTML
 push @html, '<p><center>Use mouse wheel or pinch to zoom; drag to pan</center></p>';
 
 # -------------------------------
-# Add CPAN Testers failing reports table
+# Issues flagged on RT
+# -------------------------------
+{
+	my $rt_count = fetch_open_rt_ticket_count($config{github_repo});
+	my $rt_url = "https://rt.cpan.org/Public/Dist/Display.html?Name=$config{github_repo}";
+
+	if(defined $rt_count && $rt_count > 0) {
+		push @html, '<p class="notice rt-issues">',
+			'<strong>RT issues:</strong>',
+			"<a href=\"$rt_url\" target=\"_blank\" rel=\"noopener\">",
+			"$rt_count open ticket" . @{[ $rt_count == 1 ? '' : 's' ]},
+			'</a>',
+			'</p>';
+	} else {
+		push @html, "<p>No issues active on <a href=\"$rt_url\">RT</a></p>";
+	}
+}
+
+# -------------------------------
+# CPAN Testers failing reports table
 # -------------------------------
 my $dist_name = $config{github_repo};	# e.g., CGI-Info
-my $cpan_api = "https://api.cpantesters.org/v3/summary/"
-		. uri_escape($dist_name);
+my $cpan_api = "https://api.cpantesters.org/v3/summary/" . uri_escape($dist_name);
 
 my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 15);
 
@@ -1289,7 +1312,8 @@ sub aggregate_dependency_stats {
 }
 
 sub fetch_report_html {
-	my ($guid) = @_;
+	my $guid = $_[0];
+
 	return unless $guid;
 
 	my $url = "https://www.cpantesters.org/cpan/report/$guid";
@@ -1556,6 +1580,20 @@ sub is_non_english_locale {
 }
 
 sub parse_version {
-	my $v = shift;
+	my $v = $_[0];
 	return eval { version->parse($v) };
+}
+
+sub fetch_open_rt_ticket_count {
+	my $dist = $_[0];
+
+	my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => $dist)};
+
+	# Defensive checks
+	return undef unless @rc >= 3;
+	return undef unless $rc[0] == 200 && $rc[1] eq 'OK';
+
+	my $tickets = $rc[2] && ref $rc[2] eq 'ARRAY' ? $rc[2] : [];
+
+	return scalar @$tickets;
 }
