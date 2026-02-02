@@ -31,7 +31,8 @@ Readonly my %config => (
 	max_points => 10,	# Only display the last 10 commits in the coverage trend graph
 	cover_db => 'cover_db/cover.json',
 	output => 'cover_html/index.html',
-	max_retry => 3
+	max_retry => 3,
+	min_locale_samples => 3,
 );
 
 # -------------------------------
@@ -1086,7 +1087,7 @@ if($version) {
 				my $pass = $locale_stats{$loc}{pass} // 0;
 				my $total = $fail + $pass;
 
-				next if $total < 3;
+				next if $total < $config{min_locale_samples};
 
 				my $ratio = $fail / $total * 100;
 
@@ -1800,7 +1801,7 @@ sub detect_locale_root_cause {
 }
 
 sub detect_root_causes {
-	my (%args) = @_;
+	my %args = $_[0];
 	my @hints;
 
 	push @hints, detect_os_root_cause($args{fail_reports}, \%config) if $args{fail_reports};
@@ -1808,10 +1809,10 @@ sub detect_root_causes {
 
 	if ($args{fail_perl_versions} && $args{pass_perl_versions}) {
 		push @hints,
-		detect_perl_version_root_cause(
-			$args{fail_perl_versions},
-			$args{pass_perl_versions},
-		);
+			detect_perl_version_root_cause(
+				$args{fail_perl_versions},
+				$args{pass_perl_versions},
+			);
 	}
 
 	@hints = grep { defined } @hints;
