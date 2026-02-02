@@ -122,6 +122,10 @@ push @html, <<"HTML";
 			background-color: #eee;
 			color: #666;
 		}
+		tr.cpan-na td {
+			background-color: #f77f50;
+			color: #666;
+		}
 		.new-failure {
 			background: #c00;
 			color: #fff;
@@ -830,6 +834,7 @@ if($version) {
 		$version,
 		'fail',
 		'unknown',
+		'na',
 	);
 	@pass_reports = fetch_reports_by_grades(
 		$dist_name,
@@ -846,6 +851,7 @@ if($version) {
 				$prev_version,
 				'fail',
 				'unknown',
+				'na',
 			);
 		}
 
@@ -855,6 +861,7 @@ if($version) {
 			# Split GUIDs by grade
 			my @fail_guids = map { $_->{guid} } grep { lc($_->{grade} // '') eq 'fail' } @fail_reports;
 			my @unknown_guids = map { $_->{guid} } grep { lc($_->{grade} // '') eq 'unknown' } @fail_reports;
+			my @na_guids = map { $_->{guid} } grep { lc($_->{grade} // '') eq 'na' } @fail_reports;
 
 			# FAIL reports
 			aggregate_dependency_stats(
@@ -867,6 +874,11 @@ if($version) {
 			aggregate_dependency_stats(
 				guids => \@unknown_guids,
 				grade => 'unknown',
+				stats_ref => \%dep_stats,
+			);
+			aggregate_dependency_stats(
+				guids => \@na_guids,
+				grade => 'na',
 				stats_ref => \%dep_stats,
 			);
 
@@ -963,7 +975,7 @@ if($version) {
 						'<a href="%s" target="_blank">See perldelta for this release</a>',
 						$delta,
 					),
-					"<br>$confidence_html</p>";
+					" $confidence_html</p>";
 			}
 			push @html, '<h3>Failure Summary</h3>';
 			push @html, '<ul>';
@@ -1081,6 +1093,7 @@ if($version) {
 document.addEventListener("DOMContentLoaded", function () {
 	const toggleFail = document.getElementById('toggleFail');
 	const toggleUnknown = document.getElementById('toggleUnknown');
+	const toggleNA = document.getElementById('toggleNA');
 	const toggleNew = document.getElementById('toggleNew');
 
 	function update() {
@@ -1092,6 +1105,10 @@ document.addEventListener("DOMContentLoaded", function () {
 			document.querySelectorAll('tr.cpan-unknown')
 				.forEach(r => r.style.display = toggleUnknown.checked ? '' : 'none');
 		}
+		if (toggleNA) {
+			document.querySelectorAll('tr.cpan-na')
+				.forEach(r => r.style.display = toggleNA.checked ? '' : 'none');
+		}
 		if (toggleNew) {
 			document.querySelectorAll('tr').forEach(row => {
 				const cell = row.querySelector('.new-failure');
@@ -1101,7 +1118,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	}
 
-	[toggleFail, toggleUnknown, toggleNew].forEach(cb => {
+	[toggleFail, toggleUnknown, toggleNA, toggleNew].forEach(cb => {
 		if (cb) cb.addEventListener('change', update);
 	});
 
@@ -1123,6 +1140,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		<input type="checkbox" id="toggleUnknown">
 		UNKNOWN
 	</label>
+	<label style="margin-left: 1em;">
+		<input type="checkbox" id="toggleNA">
+		NA
+	</label>
+	<label style="margin-left: 1em;">
 	<label style="margin-left: 1em;">
 		<input type="checkbox" id="toggleNew">
 		NEW only
