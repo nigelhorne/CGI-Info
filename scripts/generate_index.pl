@@ -996,15 +996,12 @@ if($version) {
 				$clusters{os}{$os}++;
 				$clusters{perl_os}{"$perl / $os"}++ if $perl;
 
-				my $locale = extract_locale($r) // 'unknown';
-				$locale_stats{$locale}{fail}++;
+				if(lc($r->{grade} // '') eq 'fail') {
+					# Don't include NA or Unknown in this list
+					my $locale = extract_locale($r) // 'unknown';
+					$locale_stats{$locale}{fail}++;
+				}
 			}
-
-			for my $r (@pass_reports) {
-				my $locale = extract_locale($r) // 'unknown';
-				$locale_stats{$locale}{pass}++;
-			}
-
 
 			my @top_perl_series = sort { $clusters{perl_series}{$b} <=> $clusters{perl_series}{$a} }
 				keys %{ $clusters{perl_series} };
@@ -1055,6 +1052,11 @@ if($version) {
 			push @html, '</ul>';
 
 			my @locale_clusters;
+
+			for my $r (@pass_reports) {
+				my $locale = extract_locale($r) // 'unknown';
+				$locale_stats{$locale}{pass}++;
+			}
 
 			for my $loc (keys %locale_stats) {
 				next if $loc eq 'unknown';
