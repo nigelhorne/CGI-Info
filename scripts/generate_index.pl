@@ -858,6 +858,11 @@ if($version) {
 		'unknown',
 		'na',
 	);
+
+	# warn 'Fetched ', scalar(@fail_reports), ' rows from API';
+	# use Data::Dumper;
+	# warn Dumper($fail_reports[0]) if scalar(@fail_reports);
+
 	@pass_reports = fetch_reports_by_grades(
 		$dist_name,
 		$version,
@@ -1274,11 +1279,7 @@ HTML
 		my %best;
 
 		for my $r (@fail_reports) {
-			my $os = $r->{osname} // 'unknown';
-			my $perl = $r->{perl} // 'unknown';
-			my $grade = lc($r->{grade} // 'unknown');
-
-			my $key = join '|', $os, $perl, $grade;
+			my $key = make_key($r);
 
 			if(!exists $best{$key} || (!$best{$key}{guid} && $r->{guid})) {
 				$best{$key} = $r;
@@ -1290,7 +1291,7 @@ HTML
 		my %prev_fail_set;
 
 		for my $r (@prev_fail_reports) {
-			my $key = join '|', $r->{osname} // '', $r->{perl} // '', $r->{arch} // '';
+			my $key = make_key($r);
 
 			$prev_fail_set{$key} = 1;
 		}
@@ -1308,7 +1309,7 @@ HTML
 			my $guid = $r->{guid} // '';
 			my $url = $guid ? "https://www.cpantesters.org/cpan/report/$guid" : '#';
 
-			my $is_new = !$prev_fail_set{ join '|', $r->{osname} // '', $r->{perl} // '', $r->{arch} // '' };
+			my $is_new = !$prev_fail_set{make_key($r)};
 			my $new_html = $is_new ? '<span class="new-failure">NEW</span>' : '';
 
 			push @html, sprintf(
@@ -1391,10 +1392,7 @@ sub fetch_reports_by_grades {
 		next unless ref $arr eq 'ARRAY';
 
 		for my $r (@$arr) {
-			my $key = join '|',
-				$r->{osname} // '',
-				$r->{perl} // '',
-				$r->{arch} // '';
+			my $key = make_key($r);
 
 			next if $seen{$key}++;
 			push @reports, $r;
@@ -1801,7 +1799,7 @@ sub detect_locale_root_cause {
 }
 
 sub detect_root_causes {
-	my %args = $_[0];
+	my (%args) = @_;
 	my @hints;
 
 	push @hints, detect_os_root_cause($args{fail_reports}, \%config) if $args{fail_reports};
@@ -1820,3 +1818,11 @@ sub detect_root_causes {
 
 	return @hints;
 }
+
+sub make_key
+{
+	my $r = $_[0];
+
+	return lc(join '|', $r->{osname} // '', $r->{perl} // '', $r->{arch} // '', $r->{platform} // '' );
+}
+
