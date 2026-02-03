@@ -1198,25 +1198,26 @@ document.addEventListener("DOMContentLoaded", function () {
 	const toggleNew = document.getElementById('toggleNew');
 
 	function update() {
-		if (toggleFail) {
-			document.querySelectorAll('tr.cpan-fail')
-				.forEach(r => r.style.display = toggleFail.checked ? '' : 'none');
-		}
-		if (toggleUnknown) {
-			document.querySelectorAll('tr.cpan-unknown')
-				.forEach(r => r.style.display = toggleUnknown.checked ? '' : 'none');
-		}
-		if (toggleNA) {
-			document.querySelectorAll('tr.cpan-na')
-				.forEach(r => r.style.display = toggleNA.checked ? '' : 'none');
-		}
-		if (toggleNew) {
-			document.querySelectorAll('tr').forEach(row => {
-				const cell = row.querySelector('.new-failure');
-				if (!cell) return;
-				row.style.display = toggleNew.checked ? '' : 'none';
-			});
-		}
+		document.querySelectorAll('tr').forEach(row => {
+			// Skip header rows
+			if (row.querySelector('th')) return;
+
+			// Determine row status
+			const isFail = row.classList.contains('cpan-fail');
+			const isUnknown = row.classList.contains('cpan-unknown');
+			const isNA = row.classList.contains('cpan-na');
+			const isNew = !!row.querySelector('.new-failure');
+
+			// Decide whether to show the row
+			let show = true;
+
+			if (toggleFail && !toggleFail.checked && isFail) show = false;
+			if (toggleUnknown && !toggleUnknown.checked && isUnknown) show = false;
+			if (toggleNA && !toggleNA.checked && isNA) show = false;
+			if (toggleNew && toggleNew.checked && !isNew) show = false;
+
+			row.style.display = show ? '' : 'none';
+		});
 	}
 
 	[toggleFail, toggleUnknown, toggleNA, toggleNew].forEach(cb => {
@@ -1267,7 +1268,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	<th class="sortable" onclick="sortTable(this, 3)">
 		<span class="label">Reporter</span> <span class="arrow">&#x25B2;</span>
 	</th>
-	<th class="sortable" onclick="sortTable(this, 4)">
+	<th class="sortable" onclick="sortTable(this, 4)" title="Marks failures that did not occur in the previous release. The same OS, Perl version, architecture, and platform were passing before.">
 		<span class="label">New</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th>Report</th>
