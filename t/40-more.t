@@ -207,7 +207,8 @@ subtest 'Custom validation subroutines' => sub {
 subtest 'Strict validation rules' => sub {
 	test_needs 'Params::Validate::Strict';
 
-	my $info = CGI::Info->new();
+	my @messages;
+	my $info = CGI::Info->new(logger => \@messages);
 
 	local @ARGV = ('age=25', 'invalid_age=200');
 
@@ -228,6 +229,7 @@ subtest 'Strict validation rules' => sub {
 
 	is($params->{age}, 25, 'Strict validation passed for valid age');
 	ok(!exists($params->{invalid_age}), 'Strict validation failed for invalid age');
+	ok(scalar(@messages));
 };
 
 # Test security features - SQL injection detection
@@ -238,7 +240,7 @@ subtest 'SQL injection detection' => sub {
 		QUERY_STRING => "search=' OR 1=1--"
 	);
 
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $params = $info->params();
 
 	is($info->{status}, 403, 'SQL injection blocked with 403 status');
