@@ -205,8 +205,7 @@ subtest 'Custom validation subroutines' => sub {
 
 # Test Params::Validate::Strict integration
 subtest 'Strict validation rules' => sub {
-	plan skip_all => 'Params::Validate::Strict not available'
-		unless eval { require Params::Validate::Strict; 1 };
+	test_needs 'Params::Validate::Strict';
 
 	my $info = CGI::Info->new();
 
