@@ -49,7 +49,7 @@ jobs:
         run: |
           cpanm --notest --installdeps .
           cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover Devel::Cover::Report::Html POSIX File::Glob File::Slurp File::stat Readonly
-          cpanm -iqn IPC::System::Simple WWW::RT::CPAN
+          cpanm -iqn IPC::System::Simple WWW::RT::CPAN IPC::Run3
         timeout-minutes: 10
 
       # Optional: run Perl::Critic static checks
