@@ -136,7 +136,7 @@ push @html, <<"HTML";
 			color: #666;
 		}
 		tr.cpan-na td {
-			background-color: #f77f50;
+			background-color: #ffffde;
 			color: #666;
 		}
 		.new-failure {
@@ -1837,4 +1837,3 @@ sub make_key
 
 	return lc(join '|', $r->{osname} // '', $r->{perl} // '', $r->{arch} // '', $r->{platform} // '' );
 }
-
