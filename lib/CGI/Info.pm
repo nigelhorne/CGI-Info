@@ -1403,7 +1403,9 @@ sub as_string
 		} sort keys %{$params};
 	}
 
-	$self->_trace("as_string: returning '$rc'") if($rc);
+	$rc ||= '';
+
+	$self->_trace("as_string: returning '$rc'");
 
 	return $rc;
 }
