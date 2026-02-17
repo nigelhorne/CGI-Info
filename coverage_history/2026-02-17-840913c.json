@@ -1,0 +1,994 @@
+{
+   "runs" : [
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292926.52164,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292926.52133,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292926.69021,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292926.69,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292926.859,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292926.85871,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292927.03332,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292927.03304,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292927.21583,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292927.21561,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292927.38361,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292927.38329,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292927.5519,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292927.55169,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292927.71843,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292927.71823,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292927.90709,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292927.89343,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292956.58546,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292928.11193,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292928.26404,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "-e",
+         "start" : 1771292928.26394,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292928.62428,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/00-load.t",
+         "start" : 1771292928.62321,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292929.34608,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/10-compile.t",
+         "start" : 1771292929.08358,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292929.74347,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/20-new.t",
+         "start" : 1771292929.71461,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292930.43679,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/30-basics.t",
+         "start" : 1771292930.3247,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292930.9662,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/40-more.t",
+         "start" : 1771292930.96598,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292931.42626,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/allow.t",
+         "start" : 1771292931.33392,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292931.87969,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/apoc.t",
+         "start" : 1771292931.87964,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292932.25746,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/as_string.t",
+         "start" : 1771292932.22048,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292933.5788,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/bin.t",
+         "start" : 1771292932.76511,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292933.32036,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "bin/info.pl",
+         "start" : 1771292933.29118,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292933.88137,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/boiler.t",
+         "start" : 1771292933.85967,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292934.29684,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/carp.t",
+         "start" : 1771292934.24768,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292934.77781,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/changes.t",
+         "start" : 1771292934.77749,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292935.01818,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/comment-spelling.t",
+         "start" : 1771292935.01793,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292935.39758,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/config_file.t",
+         "start" : 1771292935.29104,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292936.03608,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/cookies.t",
+         "start" : 1771292935.98904,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292936.51755,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/cover.t",
+         "start" : 1771292936.51731,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292936.75528,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/critic.t",
+         "start" : 1771292936.75505,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292936.99324,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/cv.t",
+         "start" : 1771292936.99301,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292937.23189,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/dependent-modules.t",
+         "start" : 1771292937.23165,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292937.46938,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/dist.t",
+         "start" : 1771292937.46917,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292937.70455,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/eof.t",
+         "start" : 1771292937.70431,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292937.94335,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/eol.t",
+         "start" : 1771292937.94314,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292938.20552,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/expect.t",
+         "start" : 1771292938.20494,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292938.45441,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/fixme.t",
+         "start" : 1771292938.45418,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292938.64043,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/fuzz.t",
+         "start" : 1771292938.64039,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292938.86322,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/gv.t",
+         "start" : 1771292938.86301,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292939.27759,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/is_mobile.t",
+         "start" : 1771292939.2246,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292939.92484,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/is_robot.t",
+         "start" : 1771292939.87217,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292940.59328,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/is_search.t",
+         "start" : 1771292940.53966,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292941.23563,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/is_tablet.t",
+         "start" : 1771292941.19488,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292941.84635,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/json.t",
+         "start" : 1771292941.82332,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292942.31043,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/kwalitee.t",
+         "start" : 1771292942.31022,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292942.69424,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/logdir.t",
+         "start" : 1771292942.6671,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292943.31363,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/logger.t",
+         "start" : 1771292943.28214,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292943.78396,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/manifest.t",
+         "start" : 1771292943.78376,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292944.02113,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/metrics.t",
+         "start" : 1771292944.02092,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292944.25994,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/minimum.t",
+         "start" : 1771292944.2597,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292944.49897,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/modules-used.t",
+         "start" : 1771292944.49876,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292944.73603,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/namespaces.t",
+         "start" : 1771292944.73575,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292944.97719,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/no404s.t",
+         "start" : 1771292944.97696,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292945.22032,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/noopentickets.t",
+         "start" : 1771292945.22005,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292945.46055,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/noplan.t",
+         "start" : 1771292945.46031,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292945.80925,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/object_configure.t",
+         "start" : 1771292945.73092,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292946.45449,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/param.t",
+         "start" : 1771292946.38825,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292947.25822,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/params.t",
+         "start" : 1771292947.06267,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292947.80425,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/pod-cm.t",
+         "start" : 1771292947.80405,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292948.03942,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/pod-coverage.t",
+         "start" : 1771292948.03922,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292948.27617,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/pod-links.t",
+         "start" : 1771292948.27595,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292948.51498,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/pod-snippets.t",
+         "start" : 1771292948.51478,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292948.75183,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/pod-spelling.t",
+         "start" : 1771292948.75162,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292948.98855,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/pod-synopsis.t",
+         "start" : 1771292948.98833,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292949.22508,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/pod.t",
+         "start" : 1771292949.22486,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292949.48769,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/port.t",
+         "start" : 1771292949.48746,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292949.7308,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/prereq.t",
+         "start" : 1771292949.73058,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292950.12494,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/protocol.t",
+         "start" : 1771292950.08875,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292950.74956,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/rootdir.t",
+         "start" : 1771292950.71843,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292951.39253,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/script.t",
+         "start" : 1771292951.33998,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292952.04219,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/site.t",
+         "start" : 1771292952.00775,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292952.67792,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/status.t",
+         "start" : 1771292952.63728,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292953.15042,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/strict.t",
+         "start" : 1771292953.15019,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292953.39125,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/tabs.t",
+         "start" : 1771292953.39102,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292953.63272,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/taint.t",
+         "start" : 1771292953.63245,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292954.03005,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/tmpdir.t",
+         "start" : 1771292953.98872,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292954.53799,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/untaint.t",
+         "start" : 1771292954.5376,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292954.7848,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/unused.t",
+         "start" : 1771292954.7846,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292955.02053,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/vars.t",
+         "start" : 1771292955.02031,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292955.25753,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/version.t",
+         "start" : 1771292955.25731,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292955.6736,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/waf.t",
+         "start" : 1771292955.61234,
+         "version" : "1.11"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1771292956.31173,
+         "name" : "CGI-Info",
+         "perl" : "5.40.3",
+         "run" : "t/xml.t",
+         "start" : 1771292956.28612,
+         "version" : "1.11"
+      }
+   ],
+   "summary" : {
+      "Total" : {
+         "branch" : {
+            "covered" : 369,
+            "error" : 129,
+            "percentage" : 74.0963855421687,
+            "total" : 498,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 178,
+            "error" : 125,
+            "percentage" : 58.7458745874587,
+            "total" : 303,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 694,
+            "error" : 111,
+            "percentage" : 86.2111801242236,
+            "total" : 805
+         },
+         "subroutine" : {
+            "covered" : 64,
+            "error" : 1,
+            "percentage" : 98.4615384615385,
+            "total" : 65
+         },
+         "total" : {
+            "covered" : 1305,
+            "error" : 366,
+            "percentage" : 78.096947935368,
+            "total" : 1671,
+            "uncoverable" : 0
+         }
+      },
+      "bin/info.pl" : {
+         "branch" : {
+            "covered" : 2,
+            "error" : 6,
+            "percentage" : 25,
+            "total" : 8,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 27,
+            "error" : 9,
+            "percentage" : 75,
+            "total" : 36
+         },
+         "subroutine" : {
+            "covered" : 3,
+            "percentage" : 100,
+            "total" : 3
+         },
+         "total" : {
+            "covered" : 32,
+            "error" : 15,
+            "percentage" : 68.0851063829787,
+            "total" : 47,
+            "uncoverable" : 0
+         }
+      },
+      "blib/lib/CGI/Info.pm" : {
+         "branch" : {
+            "covered" : 367,
+            "error" : 123,
+            "percentage" : 74.8979591836735,
+            "total" : 490,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 178,
+            "error" : 125,
+            "percentage" : 58.7458745874587,
+            "total" : 303,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 667,
+            "error" : 102,
+            "percentage" : 86.7360208062419,
+            "total" : 769
+         },
+         "subroutine" : {
+            "covered" : 61,
+            "error" : 1,
+            "percentage" : 98.3870967741936,
+            "total" : 62
+         },
+         "total" : {
+            "covered" : 1273,
+            "error" : 351,
+            "percentage" : 78.3866995073892,
+            "total" : 1624,
+            "uncoverable" : 0
+         }
+      }
+   }
+}
