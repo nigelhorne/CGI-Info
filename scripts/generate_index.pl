@@ -42,6 +42,8 @@ Readonly my %config => (
 	max_points => 10,	# Only display the last 10 commits in the coverage trend graph
 	cover_db => 'cover_db/cover.json',
 	output => 'cover_html/index.html',
+	mutation_db => 'mutation.json',
+	mutation => 'mutation_html/index.html',
 	max_retry => 3,
 	min_locale_samples => 3,
 );
@@ -52,13 +54,14 @@ Readonly my %config => (
 my $MAX_REPORTS_PER_GRADE = 20;	# safety rail
 my $ENABLE_DEP_ANALYSIS = 1;
 
-# Read and decode coverage data
-my $data = eval { decode_json(read_file($config{cover_db})) };
+# Read and decode data
+my $cover_db = eval { decode_json(read_file($config{cover_db})) };
+my $mutation_db = eval { decode_json(read_file($config{mutation_db})) };
 
 my $coverage_pct = 0;
 my $badge_color = 'red';
 
-if(my $total_info = $data->{summary}{Total}) {
+if(my $total_info = $cover_db->{summary}{Total}) {
 	$coverage_pct = int($total_info->{total}{percentage} // 0);
 	$badge_color = $coverage_pct > $config{med_threshold} ? 'brightgreen' : $coverage_pct > $config{low_threshold} ? 'yellow' : 'red';
 }
@@ -244,9 +247,9 @@ if (@history >= 1) {
 
 my %deltas;
 if ($prev_data) {
-	for my $file (keys %{$data->{summary}}) {
+	for my $file (keys %{$cover_db->{summary}}) {
 		next if $file eq 'Total';
-		my $curr = $data->{summary}{$file}{total}{percentage} // 0;
+		my $curr = $cover_db->{summary}{$file}{total}{percentage} // 0;
 		my $prev = $prev_data->{summary}{$file}{total}{percentage} // 0;
 		my $delta = sprintf('%.1f', $curr - $prev);
 		$deltas{$file} = $delta;
@@ -267,10 +270,16 @@ my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/
 # Add rows
 my ($total_files, $total_coverage, $low_coverage_count) = (0, 0, 0);
 
-for my $file (sort keys %{$data->{summary}}) {
+for my $file (sort keys %{$cover_db->{summary}}) {
 	next if $file eq 'Total';
 
-	my $info = $data->{summary}{$file};
+	# Check it's in our repo e.g. bin or blib
+	if($file =~ /^\//) {
+		delete $cover_db->{summary};
+		next;
+	}
+
+	my $info = $cover_db->{summary}{$file};
 	my $html_file = $file;
 	$html_file =~ s|/|-|g;
 	$html_file =~ s|\.pm$|-pm|;
@@ -368,7 +377,7 @@ push @html, sprintf(
 );
 
 # Add totals row
-if (my $total_info = $data->{summary}{Total}) {
+if (my $total_info = $cover_db->{summary}{Total}) {
 	my $total_pct = $total_info->{total}{percentage} // 0;
 	my $class = $total_pct > 80 ? 'high' : $total_pct > 50 ? 'med' : 'low';
 
@@ -1347,6 +1356,11 @@ HTML
 	push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
 } else {
 	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}";
+}
+
+# Output the Mutation Overview
+if($mutation_db) {
+	push @html, "<h2>Mutation Test Overview</h2>";
 }
 
 my $timestamp = 'Unknown';

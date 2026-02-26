@@ -98,7 +98,7 @@ jobs:
           mv cover_html/coverage.html cover_html/index.html
 
       # Run the mutation tests with App::Test::Generator
-      - name: Run tests with mutation
+      - name: Install mutation tester
         run: |
           cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String App::Test::Generator
           echo "$(pwd)/local/bin" >> $GITHUB_PATH
@@ -110,18 +110,17 @@ jobs:
           NONINTERACTIVE_TESTING: 1
         working-directory: ${{ github.workspace }}
 
-      # Generate HTML mutation report
+      # Generate HTML mutation report, do this after the coverage report, so you don't get a coverage report for the mutants
       - name: Generate Mutation HTML report
         run: |
-          cover -report html -outputdir cover_html
           app-test-generator-mutate \
               --lib lib \
               --min-score 85 \
               --json mutation.json \
-              --html mutation_html
+              --html mutation_html < /dev/null
       # working-directory: ${{ github.workspace }}
 
-      - name: Generate custom coverage index
+      - name: Generate custom coverage page index
         run: |
           mkdir -p cover_db
           # cover -dump > cover_db/cover.json

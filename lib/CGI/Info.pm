@@ -2005,10 +2005,12 @@ sub cookie
 	if(!defined($field)) {
 		$self->_error('what cookie do you want?');
 		Carp::croak('what cookie do you want?');
+		return;
 	}
 	if(ref($field)) {
 		$self->_error('Cookie name should be a string');
 		Carp::croak('Cookie name should be a string');
+		return;
 	}
 
 	# Load cookies if not already loaded
