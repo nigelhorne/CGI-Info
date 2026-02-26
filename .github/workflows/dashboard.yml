@@ -100,7 +100,7 @@ jobs:
       # Run the mutation tests with App::Test::Generator
       - name: Run tests with mutation
         run: |
-          cpanm -iqn Data::Random::String::Matches Data::Random Data::Random::String App::Test::Generator
+          cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String App::Test::Generator
           echo "$(pwd)/local/bin" >> $GITHUB_PATH
         env:
           PERL5LIB: ${{ github.workspace }}/local/lib/perl5
