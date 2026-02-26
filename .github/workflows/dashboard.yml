@@ -101,7 +101,7 @@ jobs:
       - name: Run tests with mutation
         run: |
           cpanm -iqn Data::Random::String::Matches Data::Random Data::Random::String App::Test::Generator
-         echo "$(pwd)/local/bin" >> $GITHUB_PATH
+          echo "$(pwd)/local/bin" >> $GITHUB_PATH
         env:
           PERL5LIB: ${{ github.workspace }}/local/lib/perl5
           COVER_VERBOSE: 1
@@ -118,7 +118,7 @@ jobs:
               --lib lib \
               --min-score 85 \
               --json mutation.json \
-	      --html mutation_html
+              --html mutation_html
       # working-directory: ${{ github.workspace }}
 
       - name: Generate custom coverage index
