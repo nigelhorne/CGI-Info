@@ -114,7 +114,7 @@ jobs:
       - name: Generate Mutation HTML report
         run: |
           cover -report html -outputdir cover_html
-          bin/app-test-generator-mutate \
+          app-test-generator-mutate \
               --lib lib \
               --min-score 85 \
               --json mutation.json \
