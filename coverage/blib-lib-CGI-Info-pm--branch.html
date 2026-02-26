@@ -261,32 +261,32 @@ https://pjcj.net
 <tr><td class="h"><a id="L1910">1910</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_search_engine)</td></tr>
 <tr><td class="h"><a id="L1913">1913</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_robot)</td></tr>
 <tr><td class="h"><a id="L2005">2005</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $field)</td></tr>
-<tr><td class="h"><a id="L2009">2009</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (ref $field)</td></tr>
-<tr><td class="h"><a id="L2015">2015</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;jar&#39;})</td></tr>
-<tr><td class="h"><a id="L2016">2016</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $ENV{&#39;HTTP_COOKIE&#39;})</td></tr>
-<tr><td class="h"><a id="L2048">2048</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if defined $status</td></tr>
-<tr><td class="h"><a id="L2051">2051</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $self-&gt;{&#39;status&#39;})</td></tr>
-<tr><td class="h"><a id="L2054">2054</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and $method eq &#39;OPTIONS&#39; || $method eq &#39;DELETE&#39;</td></tr>
-<tr><td class="h"><a id="L2055">2055</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and ($method eq &quot;POST&quot; and not defined $ENV{&#39;CONTENT_LENGTH&#39;})</td></tr>
-<tr><td class="h"><a id="L2095">2095</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar $self-&gt;{&#39;messages&#39;})</td></tr>
-<tr><td class="h"><a id="L2128">2128</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
-<tr><td class="h"><a id="L2129">2129</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">unless &amp;Scalar::Util::blessed($cache)</td></tr>
-<tr><td class="h"><a id="L2149">2149</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $params-&gt;{&#39;logger&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L2150">2150</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
-<tr><td class="h"><a id="L2166">2166</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages)</td></tr>
-<tr><td class="h"><a id="L2172">2172</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages and my $logger = $self-&gt;{&#39;logger&#39;})</td></tr>
-<tr><td class="h"><a id="L2204">2204</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $self-&gt;{&#39;logger&#39;})</td></tr>
-<tr><td class="h"><a id="L2215">2215</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $self-&gt;{&#39;logger&#39;})</td></tr>
-<tr><td class="h"><a id="L2226">2226</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $ENV{$var}</td></tr>
-<tr><td class="h"><a id="L2229">2229</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{$var} =~ m(^[\w\.\-/:\\]+$))</td></tr>
-<tr><td class="h"><a id="L2248">2248</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L2260">2260</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
-<tr><td class="h"><a id="L2262">2262</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless defined $AUTOLOAD</td></tr>
-<tr><td class="h"><a id="L2268">2268</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
-<tr><td class="h"><a id="L2270">2270</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
-<tr><td class="h"><a id="L2273">2273</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($self-&gt;{&#39;auto_load&#39;})-&gt;isFalse</td></tr>
-<tr><td class="h"><a id="L2276">2276</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L2279">2279</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
+<tr><td class="h"><a id="L2010">2010</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (ref $field)</td></tr>
+<tr><td class="h"><a id="L2017">2017</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;jar&#39;})</td></tr>
+<tr><td class="h"><a id="L2018">2018</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $ENV{&#39;HTTP_COOKIE&#39;})</td></tr>
+<tr><td class="h"><a id="L2050">2050</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if defined $status</td></tr>
+<tr><td class="h"><a id="L2053">2053</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $self-&gt;{&#39;status&#39;})</td></tr>
+<tr><td class="h"><a id="L2056">2056</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and $method eq &#39;OPTIONS&#39; || $method eq &#39;DELETE&#39;</td></tr>
+<tr><td class="h"><a id="L2057">2057</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and ($method eq &quot;POST&quot; and not defined $ENV{&#39;CONTENT_LENGTH&#39;})</td></tr>
+<tr><td class="h"><a id="L2097">2097</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar $self-&gt;{&#39;messages&#39;})</td></tr>
+<tr><td class="h"><a id="L2130">2130</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
+<tr><td class="h"><a id="L2131">2131</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">unless &amp;Scalar::Util::blessed($cache)</td></tr>
+<tr><td class="h"><a id="L2151">2151</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $params-&gt;{&#39;logger&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L2152">2152</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
+<tr><td class="h"><a id="L2168">2168</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages)</td></tr>
+<tr><td class="h"><a id="L2174">2174</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (scalar @messages and my $logger = $self-&gt;{&#39;logger&#39;})</td></tr>
+<tr><td class="h"><a id="L2206">2206</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $self-&gt;{&#39;logger&#39;})</td></tr>
+<tr><td class="h"><a id="L2217">2217</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (not defined $self-&gt;{&#39;logger&#39;})</td></tr>
+<tr><td class="h"><a id="L2228">2228</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $ENV{$var}</td></tr>
+<tr><td class="h"><a id="L2231">2231</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{$var} =~ m(^[\w\.\-/:\\]+$))</td></tr>
+<tr><td class="h"><a id="L2250">2250</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L2262">2262</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
+<tr><td class="h"><a id="L2264">2264</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless defined $AUTOLOAD</td></tr>
+<tr><td class="h"><a id="L2270">2270</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
+<tr><td class="h"><a id="L2272">2272</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
+<tr><td class="h"><a id="L2275">2275</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($self-&gt;{&#39;auto_load&#39;})-&gt;isFalse</td></tr>
+<tr><td class="h"><a id="L2278">2278</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L2281">2281</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
 </table>
 </body>
 </html>
