@@ -1590,13 +1590,13 @@ sub documentroot
 
 =head2 logdir($dir)
 
-Gets and sets the name of a directory that you can use to store logs in.
+Gets and sets the name of a directory where you can store logs.
 
 =over 4
 
 =item $dir
 
-Path to the directory where logs will be stored
+Path to the directory where logs will be stored.
 
 =back
 
