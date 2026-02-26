@@ -100,7 +100,7 @@ jobs:
       # Run the mutation tests with App::Test::Generator
       - name: Run tests with mutation
         run: |
-         cpanm -iqn App::Test::Generator
+         cpanm -iqn Data::Random App::Test::Generator
          echo "$(pwd)/local/bin" >> $GITHUB_PATH
         env:
           PERL5LIB: ${{ github.workspace }}/local/lib/perl5
@@ -117,8 +117,7 @@ jobs:
           app-test-generator-mutate \
               --lib lib \
               --min-score 85 \
-              --json mutation.json \
-              --html mutation_html
+              --json mutation.json
       # working-directory: ${{ github.workspace }}
 
       - name: Generate custom coverage index
