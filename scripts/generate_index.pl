@@ -310,7 +310,7 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 		$badge_class, $tooltip, $total
 	);
 
-	my $delta_html = '';
+	my $delta_html;
 	if (exists $deltas{$file}) {
 		my $delta = $deltas{$file};
 		my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
@@ -496,8 +496,6 @@ foreach my $point (@data_points_with_time) {
 	push @data_points, qq{{ x: "$point->{timestamp}", y: $point->{pct}, delta: $delta, url: "$point->{url}", label: "$point->{timestamp}", pointBackgroundColor: "$color", comment: "$comment" }};
 }
 
-my $js_data = join(",\n", @data_points);
-
 if(scalar(@data_points)) {
 	push @html, <<'HTML';
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
@@ -544,7 +542,12 @@ function linearRegression(data) {
 	}));
 }
 
-const dataPoints = [ $js_data ];
+HTML
+
+	my $js_data = join(",\n", @data_points);
+	push @html, "const dataPoints = [ $js_data ];";
+
+	push @html, <<'HTML';
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
 (function registerZoomPlugin(){
@@ -1878,7 +1881,7 @@ sub _mutation_index {
 	my @html;
 
 	# print $out _header('Mutation Report');
-	push @html, '<h2>Mutation Test Overview</h2>';
+	push @html, '<h2>Mutation Report</h2>';
 
 	push @html, '<h3>Mutation Summary</h3>';
 	push @html, '<ul>';
@@ -1901,15 +1904,40 @@ sub _mutation_index {
 
 		my $score = $total ? sprintf('%.2f', ($killed / $total) * 100) : 0;
 
-		push @html, qq{
-<tr>
-<td><a href="../$config{mutation_output_dir}/$file.html">$file</a></td>
-<td>$total</td>
-<td>$killed</td>
-<td>$survived</td>
-<td>$score%</td>
-</tr>
-};
+		my $badge_class = $score >= $config{med_threshold} ? 'badge-good'
+					: $score >= $config{low_threshold} ? 'badge-warn'
+					: 'badge-bad';
+
+		my $tooltip = $score >= $config{med_threshold} ? 'Excellent'
+				 : $score >= $config{low_threshold} ? 'Moderate'
+				 : 'Needs improvement';
+
+		my $row_class = $score >= $config{med_threshold} ? 'high'
+			: $score >= $config{low_threshold} ? 'med'
+			: 'low';
+
+		my $badge_html = sprintf(
+			'<span class="coverage-badge %s" title="%s">%.1f%%</span>',
+			$badge_class, $tooltip, $score
+		);
+		my $html_file = "../$config{mutation_output_dir}/$file.html";
+
+		my $source_url = $github_base . $file;
+		my $source_link = $total
+			? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
+			: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
+
+		push @html, sprintf(
+			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td></tr>},
+			$row_class,
+			$html_file,
+			$file,
+			$source_link,
+			$total,
+			$killed,
+			$survived,
+			$badge_html
+		);
 	}
 
 	push @html, "</table>\n";
