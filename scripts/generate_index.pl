@@ -9,6 +9,7 @@ use warnings;
 use autodie qw(:all);
 
 use File::Glob ':glob';
+use File::Path qw(make_path);
 use File::Slurp;
 use File::stat;
 use IPC::Run3;
