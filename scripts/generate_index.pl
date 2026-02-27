@@ -2017,9 +2017,13 @@ sub _mutant_file_report {
 		print $out qq{<a href="$link">⬅ Previous</a> };
 	}
 
-	print $out qq{<a href="../},
-		File::Spec->abs2rel('index.html', File::Basename::dirname("$file.html")),
-		qq{">Index</a>};
+	my $html_file = File::Spec->abs2rel('index.html', File::Basename::dirname("$file.html"));
+	if(-r "../$html_file") {
+		$html_file = "../$html_file";
+	} elsif(-r "../../$html_file") {
+		$html_file = "../../$html_file";
+	}
+	print $out "<a href=\"../$html_file\">Index</a>\n";
 
 	if ($next) {
 		my $link = _relative_link($file, $next);
@@ -2123,33 +2127,38 @@ sub _mutant_file_report {
 
 		if (@line_mutants) {
 			# Count totals for summary label
-			my $total = scalar @line_mutants;
-			my $survived = scalar @{ $survived_by_line{$line_no} || [] };
 			my $killed = scalar @{ $killed_by_line{$line_no} || [] };
+			my $total = scalar @line_mutants;
 
 			# Create expandable section
-			$details = qq{
-				<details class="mutant-details">
-				<summary>Mutants (Total: $total, Killed: $killed, Survived: $survived)</summary>
-				<ul>
-			};
+			if(my $survived = scalar @{ $survived_by_line{$line_no} || [] }) {
+				$details = qq{
+					<details class="mutant-details">
+					<summary>Mutants (Total: $total, Killed: $killed, Survived: $survived)</summary>
+					<ul>
+				};
 
-			for my $m (@line_mutants) {
-				my $id = $m->{id} // 'unknown';
-				my $type = $m->{type} // '';
-				my $description = $m->{description} // '';
+				for my $m (@line_mutants) {
+					if($m->{status} eq 'Survived') {
+						my $id = $m->{id} // 'unknown';
+						my $type = $m->{type} // '';
+						my $description = $m->{description} // '';
 
-				$details .= "<li><b>$id: $description</b>";
+						$details .= "<li><b>$id: $description</b>";
 
-				# Show mutation type if available
-				if ($type) {
-					$details .= " ($type)";
+						# Show mutation type if available
+						if ($type) {
+							$details .= " ($type)";
+						}
+
+						$details .= "</li>\n";
+					}
 				}
 
-				$details .= "</li>\n";
+				$details .= "</ul></details>\n";
+			} else {
+				$details = "<p> <b> Mutants (Total: $total, Killed: $killed, Survived: 0)</b><p>";
 			}
-
-			$details .= "</ul></details>\n";
 		}
 
 		print $out "</span>$details";
