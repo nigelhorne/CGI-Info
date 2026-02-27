@@ -153,8 +153,8 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/91b986852f971cc6b2ac78be0c4d279128378dac/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/91b986852f971cc6b2ac78be0c4d279128378dac/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.3"></canvas></td><td>86.5</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.3%</span></td><td class="neutral" title="Previous: 78.3%">&#9679; 0.0%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/d67f527ebf971feffbbb0ea9ffd9e1cecd588e81/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/d67f527ebf971feffbbb0ea9ffd9e1cecd588e81/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.3,78.3"></canvas></td><td>86.5</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.3%</span></td><td class="neutral" title="Previous: 78.3%">&#9679; 0.0%</td></tr>
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 <tr class="med nosort"><td><strong>Total</strong></td><td>86.0</td><td>74.1</td><td>58.7</td><td>98.5</td><td colspan="2"><strong>78.0</strong></td></tr>
 </tbody></table>
@@ -203,7 +203,8 @@ function linearRegression(data) {
 }
 
 
-const dataPoints = [ { x: "2026-02-26T19:18:34-05:00", y: 78.0035863717872, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/10f9528", label: "2026-02-26T19:18:34-05:00", pointBackgroundColor: "gray", comment: "Fix return to index from Mutation page" } ];
+const dataPoints = [ { x: "2026-02-26T19:18:34-05:00", y: 78.0035863717872, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/10f9528", label: "2026-02-26T19:18:34-05:00", pointBackgroundColor: "gray", comment: "Fix return to index from Mutation page" },
+{ x: "2026-02-27T08:35:03-05:00", y: 78.0035863717872, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/91b9868", label: "2026-02-27T08:35:03-05:00", pointBackgroundColor: "gray", comment: "Make the mutation files table look like the coverage files table" } ];
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
 (function registerZoomPlugin(){
@@ -460,7 +461,7 @@ function refresh(){
 <ul>
 <li><b>Perl 5.42.x</b>: 1 failures</li>
 <li><b>linux</b>: 2 failures</li>
-<li><b>5.36 / linux</b>: 1 failures</li>
+<li><b>5.42 / linux</b>: 1 failures</li>
 </ul>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -556,13 +557,13 @@ document.addEventListener("DOMContentLoaded", () => {
 <h2>Mutation Report</h2>
 <h3>Mutation Summary</h3>
 <ul>
-<li><b>Score</b>: 97.56%</li>
+<li><b>Score</b>: 97.07%</li>
 <li><b>Total</b>: 205</li>
 <li><b>Killed</b>: 
-200
+199
 </li>
 <li><b>Survived</b>: 
-5
+6
 </li>
 </ul>
 <h3>Mutation Files</h3>
@@ -570,12 +571,12 @@ document.addEventListener("DOMContentLoaded", () => {
 <table border='1' cellpadding='5'>
 
 <tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th></tr>
-<tr class="high"><td><a href="../coverage/mutation_html/lib/CGI/Info.pm.html" title="View mutation line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/91b986852f971cc6b2ac78be0c4d279128378dac/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>205</td><td>200</td><td>5</td><td><span class="coverage-badge badge-good" title="Excellent">97.6%</span></td></tr>
+<tr class="high"><td><a href="../coverage/mutation_html/lib/CGI/Info.pm.html" title="View mutation line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/d67f527ebf971feffbbb0ea9ffd9e1cecd588e81/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>205</td><td>199</td><td>6</td><td><span class="coverage-badge badge-good" title="Excellent">97.1%</span></td></tr>
 </table>
 
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-02-27 14:58:31 - <a href="https://github.com/nigelhorne/CGI-Info/commit/91b986852f971cc6b2ac78be0c4d279128378dac">commit <code>91b9868</code></a></em></p>
+	<p><em>Last updated: 2026-02-27 17:37:36 - <a href="https://github.com/nigelhorne/CGI-Info/commit/d67f527ebf971feffbbb0ea9ffd9e1cecd588e81">commit <code>d67f527</code></a></em></p>
 </footer>
 
 </body>

@@ -1071,16 +1071,16 @@ pre details.mutant-details ul {
 <span class="">  717: 			$self-&gt;{status} = 411;
 </span><span class="">  718: 			return;
 </span><span class="">  719: 		}
-</span><span class="survived-1 tooltip" data-tooltip="Boundary mutation survived. Add tests around edge values (e.g. min, max, off-by-one).">  720: 		if(($self-&gt;{max_upload_size} &gt;= 0) &amp;&amp; ($content_length &gt; $self-&gt;{max_upload_size})) {	# Set maximum posts
+</span><span class="survived-2 tooltip" data-tooltip="Boundary mutation survived. Add tests around edge values (e.g. min, max, off-by-one).">  720: 		if(($self-&gt;{max_upload_size} &gt;= 0) &amp;&amp; ($content_length &gt; $self-&gt;{max_upload_size})) {	# Set maximum posts
 </span>
 				<details class="mutant-details">
-				<summary>Mutants (Total: 8, Killed: 7, Survived: 1)</summary>
+				<summary>Mutants (Total: 8, Killed: 6, Survived: 2)</summary>
 				<ul>
 			<li><b>NUM_BOUNDARY_720: Numeric boundary flip >= to ></b></li>
+<li><b>NUM_BOUNDARY_720: Numeric boundary flip > to >=</b></li>
 <li><b>NUM_BOUNDARY_720: Numeric boundary flip >= to <</b></li>
 <li><b>NUM_BOUNDARY_720: Numeric boundary flip >= to <=</b></li>
 <li><b>NUM_BOUNDARY_720: Numeric boundary flip > to <</b></li>
-<li><b>NUM_BOUNDARY_720: Numeric boundary flip > to >=</b></li>
 <li><b>NUM_BOUNDARY_720: Numeric boundary flip > to <=</b></li>
 <li><b>NUM_BOUNDARY_720: Numeric boundary flip > to ==</b></li>
 <li><b>COND_INV_720: Invert condition</b></li>
