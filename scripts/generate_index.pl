@@ -44,7 +44,7 @@ Readonly my %config => (
 	cover_db => 'cover_db/cover.json',
 	output => 'cover_html/index.html',
 	mutation_db => 'mutation.json',
-	mutation_output_dir => 'cover_html/mutation_html',
+	mutation_output_dir => 'coverage/mutation_html',
 	max_retry => 3,
 	min_locale_samples => 3,
 );
