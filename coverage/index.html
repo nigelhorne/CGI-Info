@@ -153,19 +153,314 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/10f95287ea5bd12bb85954ece8cb75453765c489/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points=""></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="No previous data">&#9679;</td></tr>
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/10f95287ea5bd12bb85954ece8cb75453765c489/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points=""></canvas></td><td>86.5</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.3%</span></td><td class="neutral" title="No previous data">&#9679;</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/91b986852f971cc6b2ac78be0c4d279128378dac/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/91b986852f971cc6b2ac78be0c4d279128378dac/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.3"></canvas></td><td>86.5</td><td>74.9</td><td>58.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">78.3%</span></td><td class="neutral" title="Previous: 78.3%">&#9679; 0.0%</td></tr>
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 73%, Low: 1</td></tr>
 <tr class="med nosort"><td><strong>Total</strong></td><td>86.0</td><td>74.1</td><td>58.7</td><td>98.5</td><td colspan="2"><strong>78.0</strong></td></tr>
 </tbody></table>
-<p><i>No history to show coverage trend</i></p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
+	<div>
+		<h2>Coverage Trend</h2>
+		<label>
+			<input type="checkbox" id="toggleTrend" checked>
+			Show regression trend
+		</label>
+		<div>
+		</div>
+	</div>
+	<div id="zoomControls" style="margin-top:8px;">
+		<input type="button" value="Refresh" onClick="refresh(this)">
+		<button id="resetZoomBtn" type="button">Reset Zoom</button>
+	</div>
+</div>
+<canvas id="coverageTrend" width="600" height="300"></canvas>
+<!-- Zoom controls for the trend chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add chartjs-plugin-zoom (required for wheel/pinch/drag zoom & pan) -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom\@2.1.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script>
+function linearRegression(data) {
+	const xs = data.map(p => new Date(p.x).getTime());
+	const ys = data.map(p => p.y);
+	const n = xs.length;
+
+	const sumX = xs.reduce((a, b) => a + b, 0);
+	const sumY = ys.reduce((a, b) => a + b, 0);
+	const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
+	const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
+
+	if (n < 2 || (n * sumX2 - sumX * sumX) === 0) {
+		return [];
+	}
+	const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+	const intercept = (sumY - slope * sumX) / n;
+
+	return xs.map(x => ({
+		x: new Date(x).toISOString(),
+		y: slope * x + intercept
+	}));
+}
+
+
+const dataPoints = [ { x: "2026-02-26T19:18:34-05:00", y: 78.0035863717872, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/10f9528", label: "2026-02-26T19:18:34-05:00", pointBackgroundColor: "gray", comment: "Fix return to index from Mutation page" } ];
+const regressionPoints = linearRegression(dataPoints);
+// Try to register the zoom plugin (handles different UMD builds)
+(function registerZoomPlugin(){
+	try {
+		const candidates = ['chartjsPluginZoom','ChartZoom','zoomPlugin','chartjs_plugin_zoom','ChartjsPluginZoom','chartjsPluginZoom'];
+		for (const name of candidates) {
+			if (window[name]) {
+				try { Chart.register(window[name]); console.log('Registered zoom plugin:', name); return; } catch(e) { console.warn('zoom register failed for', name, e); }
+			}
+		}
+		// Some CDN builds auto-register the plugin; if nothing found that's OK (feature disabled).
+	} catch(e) {
+		console.warn('registerZoomPlugin error', e);
+	}
+})();
+const ctx = document.getElementById('coverageTrend').getContext('2d');
+const chart = new Chart(ctx, {
+	type: 'line',
+	data: {
+		datasets: [{
+			label: 'Total Coverage (%)',
+			data: dataPoints,
+			borderColor: 'green',
+			backgroundColor: 'rgba(0,128,0,0.1)',
+			pointRadius: 5,
+			pointHoverRadius: 7,
+			pointStyle: 'circle',
+			fill: false,
+			tension: 0.3,
+			pointBackgroundColor: function(context) {
+				return context.raw.pointBackgroundColor || 'gray';
+			}
+		}, {
+			label: 'Regression Line',
+			data: regressionPoints,
+			borderColor: 'blue',
+			borderDash: [5, 5],
+			pointRadius: 0,
+			fill: false,
+			tension: 0.0
+		}]
+	}, options: {
+		scales: {
+			x: {
+				type: 'time',
+				time: {
+					tooltipFormat: 'MMM d, yyyy HH:mm:ss',
+					unit: 'day'
+				},
+				title: { display: true, text: 'Commit Date' }
+			},
+			y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
+		}, plugins: {
+			legend: {
+				display: true,
+				position: 'top', // You can also use 'bottom', 'left', or 'right'
+				labels: {
+					boxWidth: 12,
+					padding: 10,
+					font: {
+						size: 12,
+						weight: 'bold'
+					}
+				}
+			}, tooltip: {
+				callbacks: {
+					label: function(context) {
+						const raw = context.raw;
+						const coverage = raw.y.toFixed(1);
+						const delta = raw.delta?.toFixed(1) ?? '0.0';
+						const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
+						// const baseLine = `${raw.label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
+						const baseLine = `${coverage}% (${sign}${Math.abs(delta)}%)`;
+						const commentLine = raw.comment ? raw.comment : null;
+						return commentLine ? [baseLine, commentLine] : [baseLine];
+					}
+				}
+			} , zoom: {	// Enable zoom & pan on the x-axis for the trend chart
+				pan: {
+					enabled: true,
+					mode: 'x'
+				}, zoom: {
+					wheel: {
+						enabled: true
+					}, pinch: {
+						enabled: true
+					}, mode: 'x'
+				}
+			}
+		}, onClick: (e) => {
+			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+			if (points.length) {
+				const url = chart.data.datasets[0].data[points[0].index].url;
+				window.open(url, '_blank');
+			}
+		}
+	}
+});
+
+document.getElementById('toggleTrend').addEventListener('change', function(e) {
+	const show = e.target.checked;
+	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
+	trendDataset.hidden = !show;
+	chart.update();
+});
+
+// Reset Zoom button handler (calls plugin API if available)
+const resetBtn = document.getElementById('resetZoomBtn');
+if (resetBtn) {
+	resetBtn.addEventListener('click', function() {
+		try {
+			if (chart && typeof chart.resetZoom === 'function') {
+				chart.resetZoom();
+			} else {
+				console.warn('resetZoom not available; zoom plugin may not be registered.');
+			}
+		} catch (e) {
+			console.warn('resetZoom call failed', e);
+		}
+	});
+}
+
+function sortTable(th, colIndex) {
+	const table = th.closest("table");
+	if (!table || !table.tBodies.length) return;
+
+	const tbody = table.tBodies[0];
+	const rows = Array.from(tbody.rows);
+
+	const prevCol = table.getAttribute("data-sort-col");
+	const prevOrder = table.getAttribute("data-sort-order") || "desc";
+	const asc = (prevCol != colIndex) ? true : (prevOrder === "desc");
+
+	const isNumeric = colIndex === 0; // Date column
+
+	const normalRows = rows.filter(r => !r.classList.contains("nosort"));
+	const fixedRows = rows.filter(r => r.classList.contains("nosort"));
+
+	normalRows.sort((a, b) => {
+		let x = a.cells[colIndex]?.innerText.trim() || "";
+		let y = b.cells[colIndex]?.innerText.trim() || "";
+
+		if (isNumeric) {
+			x = Date.parse(x) || 0;
+			y = Date.parse(y) || 0;
+		} else {
+			x = x.toLowerCase();
+			y = y.toLowerCase();
+		}
+
+		if (x < y) return asc ? -1 : 1;
+		if (x > y) return asc ? 1 : -1;
+		return 0;
+	});
+
+	normalRows.forEach(r => tbody.appendChild(r));
+	fixedRows.forEach(r => tbody.appendChild(r));
+
+	// Update arrows
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+
+		if (i === colIndex) {
+			arrow.textContent = asc ? "▲" : "▼";
+			arrow.classList.add("active");
+		} else {
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
+
+	table.setAttribute("data-sort-col", colIndex);
+	table.setAttribute("data-sort-order", asc ? "asc" : "desc");
+}
+
+
+// Initial display.
+// The table has been set up sorted in ascending order on the filename; reflect that in the GUI
+document.addEventListener("DOMContentLoaded", () => {
+	const table = document.querySelector("table");
+	if (!table) return;
+
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+
+		if (i === 0) {
+			arrow.textContent = "▲";
+			arrow.classList.add("active");
+		} else {
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.querySelectorAll("canvas.sparkline").forEach(canvas => {
+		const raw = canvas.getAttribute("data-points");
+		if (!raw) return;
+		const points = raw.split(",").map(v => parseFloat(v));
+
+		new Chart(canvas.getContext("2d"), {
+			type: 'line',
+			data: {
+				labels: points.map((_, i) => i+1),
+				datasets: [{
+					data: points,
+					borderColor: points.length > 1 && points[points.length-1] >= points[0] ? "green" : "red",
+					borderWidth: 1,
+					fill: false,
+					tension: 0.3,
+					pointRadius: 0
+				}]
+			}, options: {
+				responsive: false,
+				maintainAspectRatio: false,
+				elements: { line: { borderJoinStyle: 'round' } },
+				plugins: {
+					legend: { display: false },
+					tooltip: { enabled: false },
+					zoom: {	// Enable zoom and pan
+						pan: {
+							enabled: true,
+							mode: 'x',
+						}, zoom: {
+							wheel: {
+								enabled: true,
+							},
+							pinch: {
+								enabled: true
+							},
+							mode: 'x',
+						}
+					}
+				}, scales: { x: { display: false }, y: { display: false } }
+			}
+		});
+	});
+});
+
+function refresh(){
+	window.location.reload("Refresh")
+}
+</script>
+
+<p><center>Use mouse wheel or pinch to zoom; drag to pan</center></p>
 <p>No issues active on <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info">RT</a></p>
 <h2>CPAN Testers Failures for CGI-Info 1.11</h2>
 <h3>Failure Summary</h3>
 <ul>
-<li><b>Perl 5.36.x</b>: 1 failures</li>
+<li><b>Perl 5.42.x</b>: 1 failures</li>
 <li><b>linux</b>: 2 failures</li>
-<li><b>5.42 / linux</b>: 1 failures</li>
+<li><b>5.36 / linux</b>: 1 failures</li>
 </ul>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -253,12 +548,12 @@ document.addEventListener("DOMContentLoaded", () => {
 </thead>
 <tbody>
 
-<tr class="cpan-fail"><td>2026-02-15T15:15:00Z</td><td>linux</td><td>5.36.0</td><td></td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/33bb3e04-0a81-11f1-aabc-a97dd52e69d2" target="_blank">View</a></td></tr>
 <tr class="cpan-fail"><td>2026-02-03T09:41:00Z</td><td>linux</td><td>5.42.0</td><td>gregor herrmann</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/904aa7a0-00e4-11f1-b498-ea8e0bc523ca" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2026-02-15T15:15:00Z</td><td>linux</td><td>5.36.0</td><td></td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/33bb3e04-0a81-11f1-aabc-a97dd52e69d2" target="_blank">View</a></td></tr>
 </tbody></table>
-<h2>Mutation Test Overview</h2>
+<h2>Mutation Report</h2>
 <h3>Mutation Summary</h3>
 <ul>
 <li><b>Score</b>: 97.56%</li>
@@ -275,20 +570,12 @@ document.addEventListener("DOMContentLoaded", () => {
 <table border='1' cellpadding='5'>
 
 <tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th></tr>
-
-<tr>
-<td><a href="../cover_html/mutation_html/lib/CGI/Info.pm.html">lib/CGI/Info.pm</a></td>
-<td>205</td>
-<td>200</td>
-<td>5</td>
-<td>97.56%</td>
-</tr>
-
+<tr class="high"><td><a href="../coverage/mutation_html/lib/CGI/Info.pm.html" title="View mutation line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/91b986852f971cc6b2ac78be0c4d279128378dac/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>205</td><td>200</td><td>5</td><td><span class="coverage-badge badge-good" title="Excellent">97.6%</span></td></tr>
 </table>
 
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-02-27 01:33:44 - <a href="https://github.com/nigelhorne/CGI-Info/commit/10f95287ea5bd12bb85954ece8cb75453765c489">commit <code>10f9528</code></a></em></p>
+	<p><em>Last updated: 2026-02-27 14:58:31 - <a href="https://github.com/nigelhorne/CGI-Info/commit/91b986852f971cc6b2ac78be0c4d279128378dac">commit <code>91b9868</code></a></em></p>
 </footer>
 
 </body>
