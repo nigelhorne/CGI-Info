@@ -117,7 +117,7 @@ jobs:
               --lib lib \
               --min-score 85 \
               --json mutation.json \
-              --html mutation_html < /dev/null
+              --html cover_html/mutation_html < /dev/null
       # working-directory: ${{ github.workspace }}
 
       - name: Generate custom coverage page index

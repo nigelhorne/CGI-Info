@@ -44,7 +44,7 @@ Readonly my %config => (
 	cover_db => 'cover_db/cover.json',
 	output => 'cover_html/index.html',
 	mutation_db => 'mutation.json',
-	mutation_output_dir => 'mutation_html',
+	mutation_output_dir => 'cover_html/mutation_html',
 	max_retry => 3,
 	min_locale_samples => 3,
 );
@@ -514,10 +514,6 @@ if(scalar(@data_points)) {
 		<button id="resetZoomBtn" type="button">Reset Zoom</button>
 	</div>
 </div>
-HTML
-}
-
-push @html, <<"HTML";
 <canvas id="coverageTrend" width="600" height="300"></canvas>
 <!-- Zoom controls for the trend chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -548,9 +544,6 @@ function linearRegression(data) {
 }
 
 const dataPoints = [ $js_data ];
-HTML
-
-push @html, <<'HTML';
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
 (function registerZoomPlugin(){
@@ -801,7 +794,10 @@ function refresh(){
 </script>
 HTML
 
-push @html, '<p><center>Use mouse wheel or pinch to zoom; drag to pan</center></p>';
+	push @html, '<p><center>Use mouse wheel or pinch to zoom; drag to pan</center></p>';
+} else {
+	push @html, '<p><i>No history to show coverage trend</i></p>';
+}
 
 # -------------------------------
 # Issues flagged on RT
@@ -1716,7 +1712,6 @@ sub extract_locale {
 
 	my $url = "https://api.cpantesters.org/v3/report/$r->{guid}";
 
-	my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 15);
 	my $res = $http->get($url);
 	return unless $res->{success};
 
@@ -1993,8 +1988,8 @@ sub _mutant_file_report {
 		print $out qq{<a href="$link">⬅ Previous</a> };
 	}
 
-	print $out qq{<a href="},
-		File::Spec->abs2rel('../cover_html/index.html', File::Basename::dirname("$file.html")),
+	print $out qq{<a href="../},
+		File::Spec->abs2rel('index.html', File::Basename::dirname("$file.html")),
 		qq{">Index</a>};
 
 	if ($next) {
@@ -2076,7 +2071,7 @@ sub _mutant_file_report {
 		# --------------------------------------------------
 
 		# Add tooltip class only if tooltip text exists
-		my $extra_class = $tooltip ? " tooltip" : "";
+		my $extra_class = $tooltip ? ' tooltip' : '';
 
 		# Escape tooltip text for HTML safety
 		$tooltip =~ s/"/&quot;/g if $tooltip;
