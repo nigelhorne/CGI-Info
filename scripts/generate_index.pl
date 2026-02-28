@@ -2018,10 +2018,10 @@ sub _mutant_file_report {
 	}
 
 	my $html_file = File::Spec->abs2rel('index.html', File::Basename::dirname("$file.html"));
-	if(-r "../$html_file") {
-		$html_file = "../$html_file";
-	} elsif(-r "../../$html_file") {
+	if(-r "../../$html_file") {
 		$html_file = "../../$html_file";
+	} elsif(-r "../$html_file") {
+		$html_file = "../$html_file";
 	}
 	print $out "<a href=\"../$html_file\">Index</a>\n";
 
