@@ -2070,7 +2070,7 @@ sub _mutant_file_report {
 		my $killed_count = scalar @{ $killed_by_line{$line_no} || [] };
 
 		my $class = '';
-		my $tooltip = '';
+		my $tooltip;
 
 		# -----------------------------
 		# Survived mutations (red shades)

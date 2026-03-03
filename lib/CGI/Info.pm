@@ -743,9 +743,12 @@ sub params {
 			# }
 		} elsif($content_type =~ /multipart\/form-data/i) {
 			if(!defined($self->{upload_dir})) {
-				$self->_warn({
-					warning => 'Attempt to upload a file when upload_dir has not been set'
-				});
+				if($ENV{'REMOTE_ADDR'}) {
+					# This could be an attack
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file when upload_dir has not been set" });
+				} else {
+					$self->_warn({ warning => 'Attempt to upload a file when upload_dir has not been set' });
+				}
 				return;
 			}
 
