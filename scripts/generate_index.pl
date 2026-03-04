@@ -2190,15 +2190,69 @@ sub _mutation_advice {
 	return 'Tests did not detect this behavioural change. Consider adding assertions.' unless $type;
 
 	# Advice per mutation type
-	return "Boundary mutation survived. Add tests around edge values (e.g. min, max, off-by-one)." if $type =~ /NUM|BOUNDARY/;
+	return 'Boundary mutation survived. Add tests around edge values (e.g. min, max, off-by-one).' if $type =~ /NUM|BOUNDARY/;
 
-	return "Return value mutation survived. Add tests asserting exact return values." if $type =~ /RETURN/;
+	return 'Return value mutation survived. Add tests asserting exact return values.' if $type =~ /RETURN/;
 
-	return "Boolean logic mutation survived. Add tests covering both true and false paths." if $type =~ /BOOL|NEGATION/;
+	return 'Boolean logic mutation survived. Add tests covering both true and false paths.' if $type =~ /BOOL|NEGATION/;
 
-	return "Comparison mutation survived. Verify equality and inequality cases explicitly." if $type =~ /COMPARE|EQUAL/;
+	return 'Comparison mutation survived. Verify equality and inequality cases explicitly.' if $type =~ /COMPARE|EQUAL/;
 
 	return 'Mutation survived. Add targeted tests to validate this branch.'
+}
+
+sub _suggest_test {
+	my $m = $_[0];
+
+	# ---------------------------------------------------------
+	# Determine mutation type
+	# ---------------------------------------------------------
+
+	# Prefer explicit type if present
+	my $type = $m->{type};
+
+	# Fallback: infer from ID prefix
+	if((!$type || (length($type) == 0)) && $m->{id}) {
+		($type) = $m->{id} =~ /^([A-Z_]+)/;
+	}
+
+	# my $orig = $m->{original} // '';
+	# my $new = $m->{transform} // '';
+
+	# ---------------------------------------------------------
+	# Boundary condition mutation
+	# ---------------------------------------------------------
+
+	if ($type && $type =~ /NUM|BOUNDARY/) {
+		return <<"TEST";
+# Boundary test suggestion
+is( func(VALUE_AT_BOUNDARY), EXPECTED, 'Test boundary behaviour' );
+TEST
+	}
+
+	# ---------------------------------------------------------
+	# Boolean mutation
+	# ---------------------------------------------------------
+
+	if ($type && $type =~ /BOOL|NEGATION/) {
+		return <<"TEST";
+# Boolean branch test suggestion
+ok( !func(INPUT), 'Verify boolean branch behaviour' );
+TEST
+	}
+
+	# ---------------------------------------------------------
+	# Return value mutation
+	# ---------------------------------------------------------
+
+	if ($type && $type =~ /RETURN/) {
+		return <<"TEST";
+# Return value assertion
+is( func(INPUT), EXPECTED, 'Verify correct return value' );
+TEST
+	}
+
+	return;
 }
 
 sub _survivor_class {
@@ -2307,6 +2361,39 @@ th {
 /* White box for non-mutated lines */
 .legend-box.none {
 	background-color: var(--bg);
+}
+
+/* --------------------------------------------------
+   Suggested Test Box Styling
+   Theme-aware and readable in light & dark modes
+-------------------------------------------------- */
+
+.suggested-test {
+    margin-top: 6px;
+
+    /* Use theme variables instead of hardcoded colors */
+    background: var(--bg);
+    color: var(--text);
+
+    padding: 8px;
+    border-radius: 4px;
+
+    /* Subtle border for visual separation */
+    border: 1px solid var(--border);
+}
+
+/* Label styling */
+.suggest-label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+/* Ensure the test code block inherits readable colors */
+.suggested-test pre {
+    background: transparent;   /* Prevent nested dark blocks */
+    color: inherit;            /* Match theme text color */
+    margin: 0;
+    font-family: monospace;
 }
 
 pre { line-height: 1.4; }
