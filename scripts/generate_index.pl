@@ -1945,7 +1945,6 @@ sub _mutation_index {
 	# --------------------------------------------------
 	# Structural Coverage Summary (if provided)
 	# --------------------------------------------------
-
 	if ($coverage_data) {
 		my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = _coverage_totals($coverage_data);
 
@@ -1959,6 +1958,9 @@ sub _mutation_index {
 		push @html, "Branch Coverage: $branch_pct% ($branch_hit / $branch_total)<br>\n";
 		push @html, "<em>Approximate LCSAJ derived from branch and statement coverage.</em>\n";
 		push @html, '</div>';
+
+		push @html, "<h2>Executive Summary</h2>\n";
+		push @html, "<div class='summary'>Tests execute $stmt_pct% of the code, but only detects $data->{score}% of the code</div>\n";
 	}
 
 	# print $out _footer();
@@ -2054,20 +2056,26 @@ sub _mutant_file_report {
 	# --------------------------------------------------
 	# File-level structural coverage (if available)
 	# --------------------------------------------------
-	if ($coverage_data && $coverage_data->{$file}) {
-		my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = _coverage_totals({ $file => $coverage_data->{$file} });
+	if ($coverage_data) {
+		if(my $file_cov = _coverage_for_file($coverage_data, $file)) {
+			my $stmt_total  = $file_cov->{statement}{total}   || 0;
+			my $stmt_hit    = $file_cov->{statement}{covered} || 0;
 
-		my $stmt_pct = $stmt_total ? sprintf('%.2f', ($stmt_hit / $stmt_total) * 100) : 0;
+			my $branch_total = $file_cov->{branch}{total}   || 0;
+			my $branch_hit   = $file_cov->{branch}{covered} || 0;
 
-		my $branch_pct = $branch_total ? sprintf('%.2f', ($branch_hit / $branch_total) * 100) : 0;
+			my $stmt_pct = $stmt_total ? sprintf('%.2f', ($stmt_hit / $stmt_total) * 100) : 0;
 
-		my $approx_lcsaj = $branch_total + 1;
-		print $out "<div class='summary'>\n";
-		print $out "<strong>Structural Coverage (Approximate)</strong><br>\n";
-		print $out "Statement: $stmt_pct%<br>\n";
-		print $out "Branch: $branch_pct%<br>\n";
-		print $out "Approximate LCSAJ segments: $approx_lcsaj<br>\n";
-		print $out "</div>\n";
+			my $branch_pct = $branch_total ? sprintf('%.2f', ($branch_hit / $branch_total) * 100) : 0;
+
+			my $approx_lcsaj = $branch_total + 1;
+			print $out "<div class='summary'>\n";
+			print $out "<strong>Structural Coverage (Approximate)</strong><br>\n";
+			print $out "Statement: $stmt_pct%<br>\n";
+			print $out "Branch: $branch_pct%<br>\n";
+			print $out "Approximate LCSAJ segments: $approx_lcsaj<br>\n";
+			print $out "</div>\n";
+		}
 	}
 
 	# --------------------------------------------------
@@ -2183,6 +2191,17 @@ sub _mutant_file_report {
 						my $description = $m->{description} // '';
 
 						$details .= "<li><b>$id: $description</b>";
+
+						if(my $suggest = _suggest_test($m)) {
+							$suggest = encode_entities($suggest);
+
+							$details .= qq{
+								<div class="suggested-test">
+								<div class="suggest-label">🧪 Suggested Test</div>
+								<pre>$suggest</pre>
+								</div>
+							};
+						}
 
 						# Show mutation type if available
 						if ($type) {
@@ -2538,50 +2557,81 @@ function toggleTheme() {
 	};
 }
 
-# --------------------------------------------------
-# _coverage_totals()
+# ------------------------------------------------------------
+# _coverage_totals
 #
-# Extract global statement and branch totals
-# from Devel::Cover JSON structure.
+# Extract structural coverage totals from a Devel::Cover JSON
+# report. Returns four scalar values in list context:
 #
-# This is intentionally tolerant of structure changes.
-# --------------------------------------------------
+#   ($statement_total, $statement_hit,
+#    $branch_total,    $branch_hit)
+#
+# This matches how the routine is used elsewhere in this file.
+#
+# NOTE:
+# Devel::Cover stores totals under:
+#
+#   $cov->{summary}->{Total}
+#
+# while per-file data appears under:
+#
+#   $cov->{summary}->{filename}
+#
+# This routine extracts only the aggregated totals.
+# ------------------------------------------------------------
 
 sub _coverage_totals
 {
 	my $cov = $_[0];
 
-	return (0,0,0,0) unless $cov && ref $cov eq 'HASH';
+	# Defensive checks to avoid warnings
+	return (0,0,0,0) unless $cov;
+	return (0,0,0,0) unless ref $cov eq 'HASH';
+	return (0,0,0,0) unless $cov->{summary};
 
-	my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = (0,0,0,0);
+	my $total = $cov->{summary}->{Total} || {};
 
-	for my $file (values %$cov) {
-		next unless ref $file eq 'HASH';
+	# Extract statement coverage
+	my $stmt_total = $total->{statement}{total}   || 0;
+	my $stmt_hit   = $total->{statement}{covered} || 0;
 
-		# -----------------------------
-		# Statement coverage
-		# -----------------------------
-
-		if (my $stmt = $file->{statement}) {
-			for my $line (values %$stmt) {
-				$stmt_total++;
-				$stmt_hit++ if $line;
-			}
-		}
-
-		# -----------------------------
-		# Branch coverage
-		# -----------------------------
-
-		if (my $branch = $file->{branch}) {
-			for my $b (values %$branch) {
-				for my $path (values %$b) {
-					$branch_total++;
-					$branch_hit++ if $path;
-				}
-			}
-		}
-	}
+	# Extract branch coverage
+	my $branch_total = $total->{branch}{total}   || 0;
+	my $branch_hit   = $total->{branch}{covered} || 0;
 
 	return ($stmt_total, $stmt_hit, $branch_total, $branch_hit);
+}
+
+# ------------------------------------------------------------
+# _coverage_for_file
+#
+# Attempts to find coverage data for a given source file.
+# Devel::Cover JSON keys may store paths relative to project
+# root, so we try multiple match strategies.
+# ------------------------------------------------------------
+
+sub _coverage_for_file {
+
+    my ($cov, $file) = @_;
+
+    return unless $cov;
+    return unless $cov->{summary};
+
+    # Exact match first
+    return $cov->{summary}{$file}
+        if exists $cov->{summary}{$file};
+
+    # Try matching by basename
+    require File::Basename;
+    my $base = File::Basename::basename($file);
+
+    foreach my $k (keys %{ $cov->{summary} }) {
+        next if $k eq 'Total';
+
+        if (File::Basename::basename($k) eq $base) {
+            return $cov->{summary}{$k};
+        }
+    }
+
+    return;
 }
