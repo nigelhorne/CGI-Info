@@ -1959,8 +1959,15 @@ sub _mutation_index {
 		push @html, "<em>Approximate LCSAJ derived from branch and statement coverage.</em>\n";
 		push @html, '</div>';
 
+		# --------------------------------------------------
+		# Executive summary
+		# Statement coverage shows how much code runs.
+		# Mutation score shows how well tests detect faults.
+		# --------------------------------------------------
 		push @html, "<h2>Executive Summary</h2>\n";
-		push @html, "<div class='summary'>Tests execute $stmt_pct% of the code, but only detects $data->{score}% of the code</div>\n";
+		push @html, "<div class='summary'>";
+		push @html, "Tests execute $stmt_pct% of the code, but detect only $data->{score}% of injected faults.";
+		push @html, "</div>\n";
 	}
 
 	# print $out _footer();
