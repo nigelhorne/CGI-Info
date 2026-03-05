@@ -1363,7 +1363,7 @@ HTML
 if($mutation_db) {
 	my $files = _group_by_file($mutation_db);
 
-	push @html, @{_mutation_index($mutation_db, $files)};
+	push @html, @{_mutation_index($mutation_db, $files, $cover_db)};
 
 	# Pre-sort files worst-first so navigation order matches index order
 	my @sorted_files = sort { _file_score($files->{$a}) <=> _file_score($files->{$b}) || $a cmp $b } keys %$files;
@@ -1876,7 +1876,7 @@ sub make_key
 # --------------------------------------------------
 
 sub _mutation_index {
-	my ($data, $files) = @_;
+	my ($data, $files, $coverage_data) = @_;
 
 	my @html;
 
@@ -1942,6 +1942,25 @@ sub _mutation_index {
 
 	push @html, "</table>\n";
 
+	# --------------------------------------------------
+	# Structural Coverage Summary (if provided)
+	# --------------------------------------------------
+
+	if ($coverage_data) {
+		my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = _coverage_totals($coverage_data);
+
+		my $stmt_pct = $stmt_total ? sprintf('%.2f', ($stmt_hit / $stmt_total) * 100) : 0;
+
+		my $branch_pct = $branch_total ? sprintf('%.2f', ($branch_hit / $branch_total) * 100) : 0;
+
+		push @html, "<h2>Structural Coverage (Approximate)</h2>\n";
+		push @html, "<div class='summary'>\n";
+		push @html, "Statement Coverage: $stmt_pct% ($stmt_hit / $stmt_total)<br>\n";
+		push @html, "Branch Coverage: $branch_pct% ($branch_hit / $branch_total)<br>\n";
+		push @html, "<em>Approximate LCSAJ derived from branch and statement coverage.</em>\n";
+		push @html, '</div>';
+	}
+
 	# print $out _footer();
 
 	return \@html;
@@ -1985,7 +2004,7 @@ sub _group_by_file {
 # --------------------------------------------------
 
 sub _mutant_file_report {
-	my ($dir, $file, $mutants, $prev, $next) = @_;
+	my ($dir, $file, $mutants, $prev, $next, $coverage_data) = @_;
 
 	return unless -f $file;
 
@@ -2031,6 +2050,25 @@ sub _mutant_file_report {
 	}
 
 	print $out qq{</div>};
+
+	# --------------------------------------------------
+	# File-level structural coverage (if available)
+	# --------------------------------------------------
+	if ($coverage_data && $coverage_data->{$file}) {
+		my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = _coverage_totals({ $file => $coverage_data->{$file} });
+
+		my $stmt_pct = $stmt_total ? sprintf('%.2f', ($stmt_hit / $stmt_total) * 100) : 0;
+
+		my $branch_pct = $branch_total ? sprintf('%.2f', ($branch_hit / $branch_total) * 100) : 0;
+
+		my $approx_lcsaj = $branch_total + 1;
+		print $out "<div class='summary'>\n";
+		print $out "<strong>Structural Coverage (Approximate)</strong><br>\n";
+		print $out "Statement: $stmt_pct%<br>\n";
+		print $out "Branch: $branch_pct%<br>\n";
+		print $out "Approximate LCSAJ segments: $approx_lcsaj<br>\n";
+		print $out "</div>\n";
+	}
 
 	# --------------------------------------------------
 	# Legend explaining line colours
@@ -2498,4 +2536,52 @@ function toggleTheme() {
 </body>
 </html>
 	};
+}
+
+# --------------------------------------------------
+# _coverage_totals()
+#
+# Extract global statement and branch totals
+# from Devel::Cover JSON structure.
+#
+# This is intentionally tolerant of structure changes.
+# --------------------------------------------------
+
+sub _coverage_totals
+{
+	my $cov = $_[0];
+
+	return (0,0,0,0) unless $cov && ref $cov eq 'HASH';
+
+	my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = (0,0,0,0);
+
+	for my $file (values %$cov) {
+		next unless ref $file eq 'HASH';
+
+		# -----------------------------
+		# Statement coverage
+		# -----------------------------
+
+		if (my $stmt = $file->{statement}) {
+			for my $line (values %$stmt) {
+				$stmt_total++;
+				$stmt_hit++ if $line;
+			}
+		}
+
+		# -----------------------------
+		# Branch coverage
+		# -----------------------------
+
+		if (my $branch = $file->{branch}) {
+			for my $b (values %$branch) {
+				for my $path (values %$b) {
+					$branch_total++;
+					$branch_hit++ if $path;
+				}
+			}
+		}
+	}
+
+	return ($stmt_total, $stmt_hit, $branch_total, $branch_hit);
 }

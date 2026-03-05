@@ -49,7 +49,6 @@ WriteMakefile(
 		'Test::RequiresInternet' => 0,
 		'Test::Script' => 1.12,
 		'Test::Which' => 0,
-		# 'Test::Kwalitee' => 0,
 		'autodie' => 0,
 		'strict' => 0,
 		'warnings' => 0,

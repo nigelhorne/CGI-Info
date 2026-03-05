@@ -110,6 +110,13 @@ jobs:
           NONINTERACTIVE_TESTING: 1
         working-directory: ${{ github.workspace }}
 
+      - name: Generate custom coverage page index
+        run: |
+          mkdir -p cover_db
+          # cover -dump > cover_db/cover.json
+          cover -report json -outputdir cover_db
+          perl scripts/generate_index.pl
+
       # Generate HTML mutation report, do this after the coverage report, so you don't get a coverage report for the mutants
       - name: Generate Mutation HTML report
         run: |
@@ -117,15 +124,9 @@ jobs:
               --lib lib \
               --min-score 85 \
               --json mutation.json \
+	      --cover_json cover_db/cover.json \
               --html cover_html/mutation_html < /dev/null
       # working-directory: ${{ github.workspace }}
-
-      - name: Generate custom coverage page index
-        run: |
-          mkdir -p cover_db
-          # cover -dump > cover_db/cover.json
-          cover -report json -outputdir cover_db
-          perl scripts/generate_index.pl
 
       - name: Archive coverage snapshot
         run: |

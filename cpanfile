@@ -46,7 +46,6 @@ on 'test' => sub {
 	requires 'Test::CleanNamespaces';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
-	requires 'Test::Kwalitee';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';
