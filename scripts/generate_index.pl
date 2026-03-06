@@ -1893,7 +1893,7 @@ sub _mutation_index {
 
 	push @html, "<h3>Mutation Files</h3>\n";
 	push @html, "<table border='1' cellpadding='5'>\n";
-	push @html, '<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th></tr>';
+	push @html, '<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th></tr>';
 
 	for my $file (
 		sort { _file_score($files->{$a}) <=> _file_score($files->{$b}) || $a cmp $b } keys %$files
@@ -1927,8 +1927,14 @@ sub _mutation_index {
 			? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
 			: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
+		# --------------------------------------------------
+		# Calculate cyclomatic complexity for the file
+		# --------------------------------------------------
+
+		my $complexity = _cyclomatic_complexity($file);
+
 		push @html, sprintf(
-			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td></tr>},
+			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%d</td></tr>},
 			$row_class,
 			$html_file,
 			$file,
@@ -1936,7 +1942,8 @@ sub _mutation_index {
 			$total,
 			$killed,
 			$survived,
-			$badge_html
+			$badge_html,
+			$complexity,
 		);
 	}
 
@@ -2077,7 +2084,7 @@ sub _mutant_file_report {
 
 			my $approx_lcsaj = $branch_total + 1;
 			print $out "<div class='summary'>\n";
-			print $out "<strong>Structural Coverage (Approximate)</strong><br>\n";
+			print $out "<strong>Structural Coverage (Approximate)</strong><p>\n";
 			print $out "Statement: $stmt_pct%<br>\n";
 			print $out "Branch: $branch_pct%<br>\n";
 			print $out "Approximate LCSAJ segments: $approx_lcsaj<br>\n";
@@ -2641,4 +2648,61 @@ sub _coverage_for_file {
     }
 
     return;
+}
+
+# ------------------------------------------------------------
+# _cyclomatic_complexity
+#
+# Compute a simple cyclomatic complexity metric using PPI.
+#
+# Formula:
+#   complexity = 1 + number_of_decision_points
+#
+# This is an approximation but works well for dashboards.
+# ------------------------------------------------------------
+
+sub _cyclomatic_complexity {
+
+    my ($file) = @_;
+
+    return 0 unless -f $file;
+
+    require PPI;
+
+    my $doc = PPI::Document->new($file);
+    return 0 unless $doc;
+
+    my $complexity = 1;
+
+    # --------------------------------------------------
+    # Control-flow keywords
+    # --------------------------------------------------
+
+    my $words = $doc->find('PPI::Token::Word') || [];
+
+    foreach my $w (@$words) {
+
+        my $c = $w->content;
+
+        if ($c =~ /^(if|elsif|unless|while|for|foreach|until|when)$/) {
+            $complexity++;
+        }
+    }
+
+    # --------------------------------------------------
+    # Logical operators (extra branches)
+    # --------------------------------------------------
+
+    my $ops = $doc->find('PPI::Token::Operator') || [];
+
+    foreach my $op (@$ops) {
+
+        my $c = $op->content;
+
+        if ($c eq '&&' || $c eq '||' || $c eq '?') {
+            $complexity++;
+        }
+    }
+
+    return $complexity;
 }
