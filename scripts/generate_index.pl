@@ -1952,11 +1952,11 @@ sub _mutation_index {
 
 		my $branch_pct = $branch_total ? sprintf('%.2f', ($branch_hit / $branch_total) * 100) : 0;
 
-		push @html, "<h2>Structural Coverage (Approximate)</h2>\n";
-		push @html, "<div class='summary'>\n";
-		push @html, "Statement Coverage: $stmt_pct% ($stmt_hit / $stmt_total)<br>\n";
-		push @html, "Branch Coverage: $branch_pct% ($branch_hit / $branch_total)<br>\n";
-		push @html, "<em>Approximate LCSAJ derived from branch and statement coverage.</em>\n";
+		push @html, "<h2>Structural Coverage (Approximate)</h2>";
+		push @html, "<div class='summary'>";
+		push @html, "Statement Coverage: $stmt_pct% ($stmt_hit / $stmt_total)<br>";
+		push @html, "Branch Coverage: $branch_pct% ($branch_hit / $branch_total)<br>";
+		push @html, '<em>Approximate LCSAJ derived from branch and statement coverage.</em>';
 		push @html, '</div>';
 
 		# --------------------------------------------------
@@ -1964,10 +1964,10 @@ sub _mutation_index {
 		# Statement coverage shows how much code runs.
 		# Mutation score shows how well tests detect faults.
 		# --------------------------------------------------
-		push @html, "<h2>Executive Summary</h2>\n";
+		push @html, '<h2>Executive Summary</h2>';
 		push @html, "<div class='summary'>";
 		push @html, "Tests execute $stmt_pct% of the code, but detect only $data->{score}% of injected faults.";
-		push @html, "</div>\n";
+		push @html, '</div>';
 	}
 
 	# print $out _footer();
