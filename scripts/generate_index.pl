@@ -1930,11 +1930,22 @@ sub _mutation_index {
 		# --------------------------------------------------
 		# Calculate cyclomatic complexity for the file
 		# --------------------------------------------------
-
 		my $complexity = _cyclomatic_complexity($file);
 
+		my $complexity_class = $complexity >= $config{med_threshold} ? 'badge-bad'
+					: $score >= $config{low_threshold} ? 'badge-warn'
+					: 'badge-good';
+		my $complexity_tooltip = $complexity >= $config{med_threshold} ? 'Good'
+				 : $complexity >= $config{low_threshold} ? 'Medium'
+				 : 'Bad';
+
+		my $complexity_html = sprintf(
+			'<span class="coverage-badge %s" title="%s">%d</span>',
+			$complexity_class, $complexity_tooltip, $complexity
+		);
+
 		push @html, sprintf(
-			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%d</td></tr>},
+			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td></tr>},
 			$row_class,
 			$html_file,
 			$file,
@@ -1943,7 +1954,7 @@ sub _mutation_index {
 			$killed,
 			$survived,
 			$badge_html,
-			$complexity,
+			$complexity_html,
 		);
 	}
 
