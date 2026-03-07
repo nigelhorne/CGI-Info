@@ -2083,11 +2083,11 @@ sub _mutant_file_report {
 	# --------------------------------------------------
 	if ($coverage_data) {
 		if(my $file_cov = _coverage_for_file($coverage_data, $file)) {
-			my $stmt_total  = $file_cov->{statement}{total}   || 0;
-			my $stmt_hit    = $file_cov->{statement}{covered} || 0;
+			my $stmt_total = $file_cov->{statement}{total} || 0;
+			my $stmt_hit = $file_cov->{statement}{covered} || 0;
 
-			my $branch_total = $file_cov->{branch}{total}   || 0;
-			my $branch_hit   = $file_cov->{branch}{covered} || 0;
+			my $branch_total = $file_cov->{branch}{total} || 0;
+			my $branch_hit = $file_cov->{branch}{covered} || 0;
 
 			my $stmt_pct = $stmt_total ? sprintf('%.2f', ($stmt_hit / $stmt_total) * 100) : 0;
 
@@ -2215,7 +2215,13 @@ sub _mutant_file_report {
 						my $type = $m->{type} // '';
 						my $description = $m->{description} // '';
 
-						$details .= "<li><b>$id: $description</b>";
+						$details .= "<li><b>$id: $description</b><br>";
+						$details .= "$m->{difficulty}: $m->{hint}\n";
+
+						# Show mutation type if available
+						if ($type) {
+							$details .= " ($type)";
+						}
 
 						if(my $suggest = _suggest_test($m)) {
 							$suggest = encode_entities($suggest);
@@ -2228,12 +2234,7 @@ sub _mutant_file_report {
 							};
 						}
 
-						# Show mutation type if available
-						if ($type) {
-							$details .= " ($type)";
-						}
-
-						$details .= "</li>\n";
+						$details .= '</li>';
 					}
 				}
 
@@ -2452,6 +2453,7 @@ th {
 
 .suggested-test {
     margin-top: 6px;
+    margin-bottom: 12px;
 
     /* Use theme variables instead of hardcoded colors */
     background: var(--bg);
@@ -2673,23 +2675,21 @@ sub _coverage_for_file {
 # ------------------------------------------------------------
 
 sub _cyclomatic_complexity {
+	my $file = $_[0];
 
-    my ($file) = @_;
+	return 0 unless -f $file;
 
-    return 0 unless -f $file;
+	require PPI;
 
-    require PPI;
+	my $doc = PPI::Document->new($file);
+	return 0 unless $doc;
 
-    my $doc = PPI::Document->new($file);
-    return 0 unless $doc;
+	my $complexity = 1;
 
-    my $complexity = 1;
-
-    # --------------------------------------------------
-    # Control-flow keywords
-    # --------------------------------------------------
-
-    my $words = $doc->find('PPI::Token::Word') || [];
+	# --------------------------------------------------
+	# Control-flow keywords
+	# --------------------------------------------------
+	my $words = $doc->find('PPI::Token::Word') || [];
 
     foreach my $w (@$words) {
 
@@ -2715,5 +2715,5 @@ sub _cyclomatic_complexity {
         }
     }
 
-    return $complexity;
+	return $complexity;
 }
