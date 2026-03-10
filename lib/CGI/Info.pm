@@ -745,9 +745,9 @@ sub params {
 			if(!defined($self->{upload_dir})) {
 				if($ENV{'REMOTE_ADDR'}) {
 					# This could be an attack
-					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file when upload_dir has not been set" });
+					$self->_notice({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file when upload_dir has not been set" });
 				} else {
-					$self->_warn({ warning => 'Attempt to upload a file when upload_dir has not been set' });
+					$self->_notice({ warning => 'Attempt to upload a file when upload_dir has not been set' });
 				}
 				return;
 			}
