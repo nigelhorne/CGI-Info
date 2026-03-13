@@ -37,6 +37,7 @@ PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime -Mblib" prove -l t
 
 # --- Step 6: Run mutation analysis ---
 echo "Running mutation analysis..."
+mkdir -p mutation_html/lib cover_html
 app-test-generator-mutate \
     -v \
     --lib lib \
