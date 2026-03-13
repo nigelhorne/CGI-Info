@@ -282,7 +282,7 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 
 	# Check it's in our repo e.g. bin or blib
 	if($file =~ /^\//) {
-		delete $cover_db->{summary};
+		# delete $cover_db->{summary};
 		next;
 	}
 
@@ -2165,6 +2165,54 @@ sub _mutant_file_report {
 
 	print $out "<pre>\n";
 
+	my %lcsaj_by_line;
+
+	if ($lcsaj_hits) {
+		# Normalize the filename so it matches debugger paths
+		$file = abs_path($file) if defined $file;
+
+		my $base = basename($file);
+
+		# convert absolute path to lib-relative path
+		my $rel = $file;
+		$rel =~ s{.*?/lib/}{};
+
+		my $lcsaj_file = File::Spec->catfile(
+			$lcsaj_dir,
+			"$rel.lcsaj",
+			"$base.lcsaj.json"
+		);
+
+		# warn "LCSAJ DEBUG\n";
+		# warn "  file      = $file\n";
+		# warn "  base      = $base\n";
+		# warn "  lcsaj_dir = $lcsaj_dir\n";
+		# warn "  lookup    = $lcsaj_file\n";
+		# warn "  exists    = " . (-f $lcsaj_file ? "YES" : "NO") . "\n";
+
+		if (-f $lcsaj_file) {
+			open my $fh, '<', $lcsaj_file;
+			my $paths = decode_json(do { local $/; <$fh> });
+			close $fh;
+
+			for my $p (@{ $paths || [] }) {
+				next unless ref $p eq 'HASH';
+
+				my $start = $p->{start};
+				my $end = $p->{end};
+				my $jump  = $p->{jump} // $p->{target};
+
+				next unless defined $start && defined $end;
+
+				push @{ $lcsaj_by_line{$start} }, {
+					start => $start,
+					end => $end,
+					jump  => $jump,
+				};
+			}
+		}
+	}
+
 	for my $i (0 .. $#lines) {
 		my $line_no = $i + 1;
 		my $content = encode_entities($lines[$i]);
@@ -2201,14 +2249,26 @@ sub _mutant_file_report {
 			# -----------------------------
 			# Killed mutations (green)
 			# -----------------------------
-
 			$class = 'killed';
 			$tooltip = "Mutations here were killed. Tests are effectively covering this logic.";
 		}
 
 		# --------------------------------------------------
 		# Render the line with colour + optional tooltip
+		# Render LCSAJ markers for this line
 		# --------------------------------------------------
+
+		my $lcsaj_marker = '';
+
+		if (my $paths = $lcsaj_by_line{$line_no}) {
+			for my $p (@$paths) {
+				my $start = $p->{start};
+				my $end = $p->{end};
+				my $jump = $p->{jump} // 0;
+
+				$lcsaj_marker .= qq{ <span class="lcsaj-dot" title="LCSAJ: $start → $end → $jump">●</span> };
+			}
+		}
 
 		# Add tooltip class only if tooltip text exists
 		my $extra_class = $tooltip ? ' tooltip' : '';
@@ -2219,7 +2279,7 @@ sub _mutant_file_report {
 		my $tooltip_attr = $tooltip ? qq{ data-tooltip="$tooltip"} : '';
 
 		print $out qq{<span class="$class$extra_class"$tooltip_attr>};
-		print $out sprintf("%5d: %s", $line_no, $content);
+		print $out $lcsaj_marker, sprintf('%5d: %s', $line_no, $content);
 
 		# --------------------------------------------------
 		# Build expandable mutant details for this line
@@ -2679,26 +2739,35 @@ sub _coverage_totals
 # root, so we try multiple match strategies.
 # ------------------------------------------------------------
 sub _coverage_for_file {
-	my ($cov, $file) = @_;
+    my ($cov, $file) = @_;
 
-	return unless $cov;
-	return unless $cov->{summary};
+    return unless $cov && $cov->{summary};
+    my $summary = $cov->{summary};
 
-    # Exact match first
-    return $cov->{summary}{$file}
-        if exists $cov->{summary}{$file};
+    # 1. exact match (what worked before)
+    return $summary->{$file} if exists $summary->{$file};
 
-    # Try matching by basename
     require File::Basename;
+
     my $base = File::Basename::basename($file);
 
-    foreach my $k (keys %{ $cov->{summary} }) {
+    # 2. basename match (what worked before)
+    for my $k (keys %$summary) {
         next if $k eq 'Total';
-
         if (File::Basename::basename($k) eq $base) {
-            return $cov->{summary}{$k};
+            return $summary->{$k};
         }
     }
+
+    # 3. try lib/ relative path
+    my $rel = $file;
+    $rel =~ s{.*?/lib/}{lib/};
+
+    return $summary->{$rel} if exists $summary->{$rel};
+
+    # 4. NEW: try blib/lib version
+    my $blib = "blib/$rel";
+    return $summary->{$blib} if exists $summary->{$blib};
 
     return;
 }

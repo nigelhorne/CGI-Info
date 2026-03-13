@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# run_full_pipeline.sh
+# Usage: ./run_full_pipeline.sh
+
+set -uo pipefail
+
+# --- Step 0: Cleanup old data ---
+echo "Cleaning up old coverage, LCSAJ, and mutation data..."
+rm -rf cover_db coverage lcsaj mutation_html mutation.json
+
+# --- Step 1: Build blib if needed ---
+echo "Building blib..."
+perl Makefile.PL
+make
+
+# --- Step 2: Run tests under Devel::Cover ---
+echo "Running tests with Devel::Cover..."
+PERL5OPT='-Mblib' cover -test
+
+# --- Step 3: Generate JSON coverage report ---
+echo "Generating JSON coverage report..."
+cover -report json -outputdir cover_db
+
+# --- Step 4: Export LCSAJ targets (absolute paths) ---
+echo "Finding LCSAJ targets..."
+export LCSAJ_TARGETS=$(
+  find lib -name '*.pm' -exec realpath {} \; ;
+  find blib/lib -name '*.pm' -exec realpath {} \;
+ | tr '\n' ':' | sed 's/:$//')
+export LCSAJ_TARGETS=${LCSAJ_TARGETS%:}
+echo "LCSAJ_TARGETS=$LCSAJ_TARGETS"
+
+# --- Step 5: Run tests again under LCSAJ runtime ---
+echo "Recording LCSAJ hits..."
+mkdir -p coverage
+PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime -Mblib" prove -l t
+
+# --- Step 6: Run mutation analysis ---
+echo "Running mutation analysis..."
+app-test-generator-mutate \
+    -v \
+    --lib lib \
+    --min-score 85 \
+    --tests t \
+    --json mutation.json \
+    --html mutation_html \
+    --mutation_level=fast \
+    --cover_json cover_db/cover.json \
+    --lcsaj_root mutation_html/lib < /dev/null
+
+# --- Step 7: Create the test dashboard
+GITHUB_REPOSITORY=nigelhorne/CGI-Info scripts/generate_index.pl
+
+echo "Done! Check cover_html/index.html for the main report."
