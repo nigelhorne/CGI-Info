@@ -658,8 +658,8 @@ sub params {
 	my %FORM;
 
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
-		require IO::Interactive;
-		IO::Interactive->import();
+		# require IO::Interactive;
+		# IO::Interactive->import();
 
 		if(@ARGV) {
 			@pairs = @ARGV;
@@ -680,7 +680,8 @@ sub params {
 			}
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
-		} elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
+		# } elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
+		} elsif(0) {
 			# TODO:  Do I really need this anymore?
 			my $oldfh = select(STDOUT);
 			print "Entering debug mode\n",

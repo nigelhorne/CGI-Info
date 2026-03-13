@@ -120,12 +120,21 @@ jobs:
       # Generate HTML mutation report, do this after the coverage report, so you don't get a coverage report for the mutants
       - name: Generate Mutation HTML report
         run: |
-          app-test-generator-mutate \
-              --lib lib \
-              --min-score 85 \
+          # app-test-generator-mutate \
+              # --lib lib \
+              # --min-score 85 \
+              # --json mutation.json \
+              # --cover_json cover_db/cover.json \
+              # --mutation_level=fast
+              # --lcsaj_root cover_html/mutation_html/lib
+              # --html cover_html/mutation_html < /dev/null
+          app-test-generator-mutate -v --lib lib --min-score 85 \
+              --tests t \
               --json mutation.json \
-	      --cover_json cover_db/cover.json \
-              --html cover_html/mutation_html < /dev/null
+              --html mutation_html \
+              --mutation_level=fast \
+              --cover_json cover_db/cover.json \
+              --lcsaj_root mutation_html/lib < /dev/null
       # working-directory: ${{ github.workspace }}
 
       - name: Archive coverage snapshot

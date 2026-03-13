@@ -8,9 +8,12 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
+use Cwd qw(abs_path);
+use File::Basename qw(dirname basename);
 use File::Glob ':glob';
 use File::Path qw(make_path);
 use File::Slurp;
+use File::Spec;
 use File::stat;
 use IPC::Run3;
 use JSON::MaybeXS;
@@ -46,6 +49,8 @@ Readonly my %config => (
 	output => 'cover_html/index.html',
 	mutation_db => 'mutation.json',
 	mutation_output_dir => 'coverage/mutation_html',
+	lcsaj_root => 'mutation_html/lib',
+	lcsaj_hits_file => 'cover_html/lcsaj_hits.json',
 	max_retry => 3,
 	min_locale_samples => 3,
 );
@@ -1361,9 +1366,17 @@ HTML
 
 # Output the Mutation Overview
 if($mutation_db) {
+	my $lcsaj_hits;
+
+	if($config{lcsaj_hits_file} && -f $config{lcsaj_hits_file}) {
+		open my $lfh, '<', $config{lcsaj_hits_file};
+		$lcsaj_hits = decode_json(do { local $/; <$lfh> });
+		close $lfh;
+	}
+
 	my $files = _group_by_file($mutation_db);
 
-	push @html, @{_mutation_index($mutation_db, $files, $cover_db)};
+	push @html, @{_mutation_index($mutation_db, $files, $cover_db, $config{lcsaj_root}, $lcsaj_hits)};
 
 	# Pre-sort files worst-first so navigation order matches index order
 	my @sorted_files = sort { _file_score($files->{$a}) <=> _file_score($files->{$b}) || $a cmp $b } keys %$files;
@@ -1377,7 +1390,7 @@ if($mutation_db) {
 		# Only assign next if this is NOT the last file
 		my $next = $i < $#sorted_files ? $sorted_files[$i + 1] : undef;
 
-		_mutant_file_report($config{mutation_output_dir}, $file, $files->{$file}, $prev, $next);
+		_mutant_file_report($config{mutation_output_dir}, $file, $files->{$file}, $prev, $next, $cover_db, $config{lcsaj_root}, $lcsaj_hits);
 	}
 }
 
@@ -1876,7 +1889,7 @@ sub make_key
 # --------------------------------------------------
 
 sub _mutation_index {
-	my ($data, $files, $coverage_data) = @_;
+	my ($data, $files, $coverage_data, $lcsaj_dir, $lcsaj_hits) = @_;
 
 	my @html;
 
@@ -1893,7 +1906,11 @@ sub _mutation_index {
 
 	push @html, "<h3>Mutation Files</h3>\n";
 	push @html, "<table border='1' cellpadding='5'>\n";
-	push @html, '<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th></tr>';
+	if($config{lcsaj_root}) {
+		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th><th>LCSAJ</th></tr>\n";
+	} else {
+		push @html, '<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th></tr>';
+	}
 
 	for my $file (
 		sort { _file_score($files->{$a}) <=> _file_score($files->{$b}) || $a cmp $b } keys %$files
@@ -1944,8 +1961,18 @@ sub _mutation_index {
 			$complexity_class, $complexity_tooltip, $complexity
 		);
 
+		# Approximate LSCAJ score
+		my ($lcsaj_cov, $lcsaj_total) = _lcsaj_coverage_for_file($file, $config{lcsaj_root}, $lcsaj_hits);
+
+		my $lcsaj_pct;
+		if($lcsaj_dir) {
+			$lcsaj_pct = $lcsaj_total ? sprintf('%.1f', ($lcsaj_cov / $lcsaj_total) * 100) : '-';
+		} else {
+			$lcsaj_pct = '';
+		}
+
 		push @html, sprintf(
-			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td></tr>},
+			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>},
 			$row_class,
 			$html_file,
 			$file,
@@ -1955,6 +1982,7 @@ sub _mutation_index {
 			$survived,
 			$badge_html,
 			$complexity_html,
+			$lcsaj_pct,
 		);
 	}
 
@@ -2029,9 +2057,17 @@ sub _group_by_file {
 # --------------------------------------------------
 # Write per-file report with heatmap
 # --------------------------------------------------
-
 sub _mutant_file_report {
-	my ($dir, $file, $mutants, $prev, $next, $coverage_data) = @_;
+	my (
+		$dir,
+		$file,
+		$mutants,
+		$prev,
+		$next,
+		$coverage_data,
+		$lcsaj_dir,
+		$lcsaj_hits
+	) = @_;
 
 	return unless -f $file;
 
@@ -2554,6 +2590,12 @@ pre details.mutant-details ul {
 	font-weight: bold;
 }
 
+.lcsaj-dot {
+	color: #5555ff;
+	font-size: 10px;
+	margin-right: 3px;
+}
+
 </style>
 </head>
 <body>
@@ -2636,13 +2678,11 @@ sub _coverage_totals
 # Devel::Cover JSON keys may store paths relative to project
 # root, so we try multiple match strategies.
 # ------------------------------------------------------------
-
 sub _coverage_for_file {
+	my ($cov, $file) = @_;
 
-    my ($cov, $file) = @_;
-
-    return unless $cov;
-    return unless $cov->{summary};
+	return unless $cov;
+	return unless $cov->{summary};
 
     # Exact match first
     return $cov->{summary}{$file}
@@ -2716,4 +2756,54 @@ sub _cyclomatic_complexity {
     }
 
 	return $complexity;
+}
+
+sub _lcsaj_coverage_for_file {
+	my ($file, $lcsaj_dir, $hits) = @_;
+
+	return unless $lcsaj_dir && $hits;
+
+	$file = abs_path($file) if defined $file;
+
+	my $base = basename($file);
+
+	my $rel = $file;
+	$rel =~ s{.*?/lib/}{};
+
+	my $lcsaj_file = File::Spec->catfile(
+		$lcsaj_dir,
+		"$rel.lcsaj",
+		"$base.lcsaj.json"
+	);
+
+	return unless -f $lcsaj_file;
+
+	open my $fh, '<', $lcsaj_file;
+	my $paths = decode_json(do { local $/; <$fh> });
+	close $fh;
+
+	my $file_hits = $hits->{$file} || {};
+
+	my $covered = 0;
+	my $total = scalar @$paths;
+
+	for my $p (@$paths) {
+		my $start = $p->{start};
+		my $end = $p->{end};
+
+		next unless defined $start && defined $end;
+
+		my $hit = 0;
+
+		for my $l ($start .. $end) {
+			if ($file_hits->{$l}) {
+				$hit = 1;
+				last;
+			}
+		}
+
+		$covered++ if $hit;
+	}
+
+	return ($covered, $total);
 }
