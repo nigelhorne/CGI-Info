@@ -23,10 +23,7 @@ cover -report json -outputdir cover_db
 
 # --- Step 4: Export LCSAJ targets (absolute paths) ---
 echo "Finding LCSAJ targets..."
-export LCSAJ_TARGETS=$(
-  find lib -name '*.pm' -exec realpath {} \; ;
-  find blib/lib -name '*.pm' -exec realpath {} \;
- | tr '\n' ':' | sed 's/:$//')
+export LCSAJ_TARGETS=$(find lib -name '*.pm' -exec realpath {} \; ; find blib/lib -name '*.pm' -exec realpath {} \; | tr '\n' ':' | sed 's/:$//')
 export LCSAJ_TARGETS=${LCSAJ_TARGETS%:}
 echo "LCSAJ_TARGETS=$LCSAJ_TARGETS"
 
