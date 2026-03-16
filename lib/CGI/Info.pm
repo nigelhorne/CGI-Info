@@ -703,7 +703,11 @@ sub params {
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		if(my $query = $ENV{'QUERY_STRING'}) {
 			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
-				$self->_warn('Multipart/form-data not supported for GET');
+				if($ENV{'REMOTE_ADDR'}) {
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET" });
+				} else {
+					$self->_warn('Multipart/form-data not supported for GET');
+				}
 				$self->{status} = 501;	# Not implemented
 				return;
 			}
