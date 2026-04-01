@@ -52,7 +52,7 @@ Readonly my %config => (
 	mutation_output_dir => 'cover_html/mutation_html',   # where files are written
 	lcsaj_root => 'coverage/mutation_html/lib',
 	lcsaj_hits_file     => 'cover_html/lcsaj_hits.json', # Runtime.pm writes here
-	output    => 'cover_html/index.html',	# published to gh-pages
+	output => 'cover_html/index.html',	# published to gh-pages
 	max_retry => 3,
 	min_locale_samples => 3,
 	verbose => 1,
@@ -2118,8 +2118,8 @@ sub _mutant_file_report {
 	(my $rel = $file) =~ s{^lib/}{};
 	my @parts = File::Spec->splitdir($rel);
 	my $depth = scalar(@parts) - 1;  # subdirs only, exclude filename
-	my $ups = '../' x ($depth + 4);  # +4 for lib/, mutation_html/, coverage/, and the file's own dir
-	my $index_link = "${ups}cover_html/index.html";
+	my $ups = '../' x ($depth + 3);  # +3: lib subdirs + lib/ + mutation_html/ + cover_html sibling
+	my $index_link = "${ups}index.html";  # already inside cover_html/
 
 	print $out qq{<a href="$index_link">Index</a>\n};
 
