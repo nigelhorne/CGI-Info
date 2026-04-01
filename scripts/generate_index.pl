@@ -9,6 +9,7 @@ use warnings;
 use autodie qw(:all);
 
 use Cwd qw(abs_path);
+use Data::Dumper;
 use File::Basename qw(dirname basename);
 use File::Glob ':glob';
 use File::Path qw(make_path);
@@ -45,14 +46,16 @@ Readonly my %config => (
 	low_threshold => 70,
 	med_threshold => 90,
 	max_points => 10,	# Only display the last 10 commits in the coverage trend graph
-	cover_db => 'cover_html/cover.json',
-	mutation_db => 'mutation.json',
-	mutation_output_dir => 'cover_html/mutation_html',
-	lcsaj_root => 'cover_html/mutation_html/lib',
-	lcsaj_hits_file => 'cover_html/lcsaj_hits.json',
-	output => 'cover_html/index.html',
+	cover_db            => 'cover_html/cover.json',      # Devel::Cover JSON output
+	mutation_db         => 'mutation.json',
+	mutation_dir        => 'coverage/mutation_html',     # hrefs in published pages
+	mutation_output_dir => 'cover_html/mutation_html',   # where files are written
+	lcsaj_root => 'coverage/mutation_html/lib',
+	lcsaj_hits_file     => 'cover_html/lcsaj_hits.json', # Runtime.pm writes here
+	output    => 'cover_html/index.html',	# published to gh-pages
 	max_retry => 3,
 	min_locale_samples => 3,
+	verbose => 1,
 );
 
 # -------------------------------
@@ -1273,7 +1276,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		NA
 	</label>
 	<label style="margin-left: 1em;">
-	<label style="margin-left: 1em;">
 		<input type="checkbox" id="toggleNew">
 		NEW only
 	</label>
@@ -1410,6 +1412,7 @@ push @html, <<"HTML";
 HTML
 
 # Write to index.html
+print "Writing output to $config{output}\n" if($config{verbose});
 write_file($config{output}, join("\n", @html));
 
 # Safe git command execution
@@ -1814,7 +1817,7 @@ sub detect_perl_version_root_cause {
 			"All failures on Perl &leq; $max_fail",
 			"All passes on Perl &geq; $min_pass",
 		],
-		perldelta => "https://perldoc.perl.org/perldelta$min_pass",
+		perldelta => perldelta_url($min_pass),
 	};
 }
 
@@ -1937,7 +1940,7 @@ sub _mutation_index {
 			'<span class="coverage-badge %s" title="%s">%.1f%%</span>',
 			$badge_class, $tooltip, $score
 		);
-		my $html_file = "../$config{mutation_output_dir}/$file.html";
+		my $html_file = "../$config{mutation_dir}/$file.html";
 
 		my $source_url = $github_base . $file;
 		my $source_link = $total
@@ -1961,14 +1964,26 @@ sub _mutation_index {
 			$complexity_class, $complexity_tooltip, $complexity
 		);
 
-		# Approximate LSCAJ score
-		my ($lcsaj_cov, $lcsaj_total) = _lcsaj_coverage_for_file($file, $config{lcsaj_root}, $lcsaj_hits);
+		# Try each candidate directory in turn, most-specific first.
+		# _lcsaj_coverage_for_file returns (undef, undef) when the
+		# .lcsaj.json file cannot be found, so we keep trying until
+		# we get a defined result or exhaust all candidates.
+		my ($lcsaj_cov, $lcsaj_total);
+		for my $dir ($config{lcsaj_root}, $config{mutation_dir} . '/lib', $config{mutation_dir}) {
+			next unless $dir;
+			($lcsaj_cov, $lcsaj_total) = _lcsaj_coverage_for_file($file, $dir, $lcsaj_hits, \@html);
+			last if defined $lcsaj_cov;
+		}
 
 		my $lcsaj_pct;
-		if($lcsaj_dir) {
-			$lcsaj_pct = $lcsaj_total ? sprintf('%.1f', ($lcsaj_cov / $lcsaj_total) * 100) : '-';
+		if (!$lcsaj_dir) {
+			$lcsaj_pct = '';	# LCSAJ column not enabled
+		} elsif (!defined $lcsaj_cov) {
+			$lcsaj_pct = 'n/a';	# .lcsaj.json not found in any candidate dir
+		} elsif (!$lcsaj_total) {
+			$lcsaj_pct = '-';	# file found but contains zero paths
 		} else {
-			$lcsaj_pct = '';
+			$lcsaj_pct = sprintf('%.1f%%', ($lcsaj_cov / $lcsaj_total) * 100);
 		}
 
 		push @html, sprintf(
@@ -2091,27 +2106,30 @@ sub _mutant_file_report {
 
 	print $out "<h1>$file</h1>\n";
 
-	# Nagivation bar
+	# Navigation bar
 	print $out qq{<div class="nav">};
-
 	if ($prev) {
 		my $link = _relative_link($file, $prev);
 		print $out qq{<a href="$link">⬅ Previous</a> };
 	}
 
-	my $html_file = File::Spec->abs2rel('index.html', File::Basename::dirname("$file.html"));
-	if(-r "../../$html_file") {
-		$html_file = "../../$html_file";
-	} elsif(-r "../$html_file") {
-		$html_file = "../$html_file";
-	}
-	print $out "<a href=\"../$html_file\">Index</a>\n";
+	# Calculate depth of $file within lib/ to build correct relative path back to index.html
+	# $file is something like lib/CGI/Info.pm or lib/App/Test/Generator.pm
+	(my $rel = $file) =~ s{^lib/}{};
+	my $depth = scalar(File::Spec->splitdir($rel));  # includes the filename itself
+	# From coverage/mutation_html/lib/A/B/C.pm we need to go up:
+	#   $depth levels (through the lib subdirs + lib itself)
+	#   + 2 more (mutation_html/ and coverage/)
+	# then into cover_html/index.html
+	my $ups = '../' x ($depth + 2);
+	my $index_link = "${ups}cover_html/index.html";
+
+	print $out qq{<a href="$index_link">Index</a>\n};
 
 	if ($next) {
 		my $link = _relative_link($file, $next);
 		print $out qq{ <a href="$link">Next ➡</a>};
 	}
-
 	print $out qq{</div>};
 
 	# --------------------------------------------------
@@ -2218,11 +2236,11 @@ sub _mutant_file_report {
 		);
 
 		# warn "LCSAJ DEBUG\n";
-		# warn "  file      = $file\n";
-		# warn "  base      = $base\n";
+		# warn "  file = $file\n";
+		# warn "  base = $base\n";
 		# warn "  lcsaj_dir = $lcsaj_dir\n";
-		# warn "  lookup    = $lcsaj_file\n";
-		# warn "  exists    = " . (-f $lcsaj_file ? "YES" : "NO") . "\n";
+		# warn "  lookup = $lcsaj_file\n";
+		# warn "  exists = " . (-f $lcsaj_file ? "YES" : "NO") . "\n";
 
 		if (-f $lcsaj_file) {
 			open my $fh, '<', $lcsaj_file;
@@ -2300,7 +2318,7 @@ sub _mutant_file_report {
 				my $end = $p->{end};
 				my $jump = $p->{jump} // 0;
 
-				$lcsaj_marker .= qq{ <span class="lcsaj-dot" title="LCSAJ: $start → $end → $jump">●</span> };
+				$lcsaj_marker .= qq{<span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">$start → $end → $jump</span></span>};
 			}
 		}
 
@@ -2355,7 +2373,6 @@ sub _mutant_file_report {
 
 						if(my $suggest = _suggest_test($m)) {
 							$suggest = encode_entities($suggest);
-
 							$details .= qq{
 								<div class="suggested-test">
 								<div class="suggest-label">🧪 Suggested Test</div>
@@ -2703,6 +2720,28 @@ pre details.mutant-details ul {
        margin-right: 3px;
 }
 
+.lcsaj-tip {
+	position: relative;
+	display: inline-block;
+}
+
+.lcsaj-tip .lcsaj-tip-text {
+	visibility: hidden;
+	background-color: #333;
+	color: #fff;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	white-space: nowrap;
+	position: fixed;
+	z-index: 9999;
+	pointer-events: none;
+}
+
+.lcsaj-tip:hover .lcsaj-tip-text {
+	visibility: visible;
+}
+
 </style>
 </head>
 <body>
@@ -2727,6 +2766,13 @@ function toggleTheme() {
         document.documentElement.setAttribute('data-theme', saved);
     }
 })();
+
+document.addEventListener("mousemove", function(e) {
+	document.querySelectorAll(".lcsaj-tip-text").forEach(function(tip) {
+		tip.style.left = (e.clientX + 12) + "px";
+		tip.style.top  = (e.clientY + 12) + "px";
+	});
+});
 </script>
 </body>
 </html>
@@ -2847,80 +2893,176 @@ sub _cyclomatic_complexity {
 	# --------------------------------------------------
 	my $words = $doc->find('PPI::Token::Word') || [];
 
-    foreach my $w (@$words) {
+	foreach my $w (@$words) {
+		my $c = $w->content;
 
-        my $c = $w->content;
+		if ($c =~ /^(if|elsif|unless|while|for|foreach|until|when)$/) {
+			$complexity++;
+		}
+	}
 
-        if ($c =~ /^(if|elsif|unless|while|for|foreach|until|when)$/) {
-            $complexity++;
-        }
-    }
+	# --------------------------------------------------
+	# Logical operators (extra branches)
+	# --------------------------------------------------
+	my $ops = $doc->find('PPI::Token::Operator') || [];
 
-    # --------------------------------------------------
-    # Logical operators (extra branches)
-    # --------------------------------------------------
+	foreach my $op (@$ops) {
+		my $c = $op->content;
 
-    my $ops = $doc->find('PPI::Token::Operator') || [];
-
-    foreach my $op (@$ops) {
-
-        my $c = $op->content;
-
-        if ($c eq '&&' || $c eq '||' || $c eq '?') {
-            $complexity++;
-        }
-    }
+		if ($c eq '&&' || $c eq '||' || $c eq '?') {
+			$complexity++;
+		}
+	}
 
 	return $complexity;
 }
 
+# ------------------------------------------------------------
+# _lcsaj_coverage_for_file($file, $lcsaj_dir, $hits, $html)
+#
+# Look up LCSAJ path coverage for a single source file.
+#
+# Arguments:
+#   $file      - path to the source file (relative or absolute)
+#   $lcsaj_dir - root directory where .lcsaj.json files were written
+#   $hits      - hashref of { normalised_path => { line => count } }
+#                as produced by Devel::App::Test::Generator::LCSAJ::Runtime
+#   $html      - arrayref to push HTML comments into (for diagnostics)
+#
+# Returns:
+#   ($covered, $total)  - both defined if the .lcsaj.json was found
+#   (undef, undef)      - if no .lcsaj.json could be located
+#
+# Path resolution strategy
+# ------------------------
+# The .lcsaj.json file path is derived by stripping the source tree
+# prefix from $file to get a repo-relative name, then appending
+# ".lcsaj.json" under $lcsaj_dir.  We try several prefix-strip
+# strategies to cope with:
+#
+#   1. Standard layout:   lib/Foo/Bar.pm
+#   2. Build tree:        blib/lib/Foo/Bar.pm  (same strip target)
+#   3. Non-standard:      src/Foo/Bar.pm, or Bar.pm at repo root
+#      -> falls back to basename only
+#
+# The $hits lookup also tries multiple key forms because Runtime.pm
+# writes normalised lib-relative keys (e.g. "lib/Foo/Bar.pm") while
+# callers may pass an absolute path or a blib-prefixed path.
+# ------------------------------------------------------------
+
 sub _lcsaj_coverage_for_file {
-	my ($file, $lcsaj_dir, $hits) = @_;
+	my ($file, $lcsaj_dir, $hits, $html) = @_;
 
-	return unless $lcsaj_dir && $hits;
+	# push @{$html}, "<!-- _lcsaj_coverage_for_file: dir=$lcsaj_dir file=$file -->";
 
-	my $path = $file;
-	$file = abs_path($file) if defined $file;
+	return (undef, undef) unless $lcsaj_dir && $hits && defined $file;
 
-	my $base = basename($file);
+    # ----------------------------------------------------------
+    # Resolve to an absolute path for reliable prefix stripping.
+    # Keep the original argument too — we need it for $hits lookup.
+    # ----------------------------------------------------------
+    my $original = $file;
+    my $abs      = abs_path($file) // $file;
+    my $base     = basename($abs);
 
-	my $rel = $file;
-	$rel =~ s{.*?/lib/}{};
+    # ----------------------------------------------------------
+    # Build candidate relative paths to try, most-specific first:
+    #   1. lib-relative  e.g.  Foo/Bar.pm          (strip .../lib/)
+    #   2. basename only e.g.  Bar.pm              (last resort)
+    # We deliberately do NOT include the leading "lib/" segment in
+    # the .lcsaj.json path because the LCSAJ analyser is expected to
+    # write files mirroring only the package-namespace portion of the
+    # path (i.e. what comes *after* lib/).
+    # ----------------------------------------------------------
+    my @rel_candidates;
 
-	my $lcsaj_file = File::Spec->catfile(
+    if ($abs =~ m{(?:^|/)(?:blib/)?lib/(.+)$}) {
+        push @rel_candidates, $1;               # e.g. Foo/Bar.pm
+    }
+    push @rel_candidates, $base                 # e.g. Bar.pm
+        unless @rel_candidates && $rel_candidates[0] eq $base;
+
+    # ----------------------------------------------------------
+    # Search for the .lcsaj.json file using each candidate.
+    # ----------------------------------------------------------
+    my $lcsaj_file;
+
+    for my $rel (@rel_candidates) {
+	my $base = basename($rel);
+	my $candidate = File::Spec->catfile(
 		$lcsaj_dir,
 		"$rel.lcsaj",
 		"$base.lcsaj.json"
 	);
+	# push @{$html}, "<!-- _lcsaj_coverage_for_file: trying $candidate -->";
 
-	return unless -f $lcsaj_file;
-
-	open my $fh, '<', $lcsaj_file;
-	my $paths = decode_json(do { local $/; <$fh> });
-	close $fh;
-
-	my $file_hits = $hits->{$path} || $hits->{$file} || {};
-
-	my $covered = 0;
-	my $total = scalar @$paths;
-
-	for my $p (@$paths) {
-		my $start = $p->{start};
-		my $end = $p->{end};
-
-		next unless defined $start && defined $end;
-
-		my $hit = 0;
-
-		for my $l ($start .. $end) {
-			if ($file_hits->{$l}) {
-				$hit = 1;
-				last;
-			}
-		}
-
-		$covered++ if $hit;
+	if (-f $candidate) {
+		$lcsaj_file = $candidate;
+		# push @{$html}, "<!-- _lcsaj_coverage_for_file: found $candidate -->";
+		last;
 	}
+    }
+
+    return (undef, undef) unless defined $lcsaj_file;
+
+    # ----------------------------------------------------------
+    # Load the LCSAJ path definitions.
+    # ----------------------------------------------------------
+    open my $fh, '<', $lcsaj_file
+        or do {
+            # push @{$html}, "<!-- _lcsaj_coverage_for_file: cannot open $lcsaj_file: $! -->";
+            return (undef, undef);
+        };
+    my $paths = decode_json(do { local $/; <$fh> });
+    close $fh;
+
+    my $total = scalar @{ $paths // [] };
+    return (0, 0) unless $total;
+
+    # ----------------------------------------------------------
+    # Resolve which hit-map entry belongs to this file.
+    # Runtime.pm writes keys as _normalize(abs_path(file)), which
+    # produces "lib/Foo/Bar.pm".  Try several key forms so we match
+    # regardless of what the caller passed in.
+    # ----------------------------------------------------------
+    my $norm_abs = $abs;
+    $norm_abs =~ s{^.*/blib/lib/}{lib/};
+    $norm_abs =~ s{^.*/lib/}{lib/};
+
+    my $norm_orig = $original;
+    $norm_orig =~ s{^.*/blib/lib/}{lib/};
+    $norm_orig =~ s{^.*/lib/}{lib/};
+
+    my $file_hits =
+           $hits->{$norm_abs}           # "lib/Foo/Bar.pm"  (most likely)
+        // $hits->{$norm_orig}          # same, from original arg
+        // $hits->{$abs}               # absolute path (unusual)
+        // $hits->{$original}          # raw arg as-is
+        // {};
+
+    # push @{$html}, "<!-- _lcsaj_coverage_for_file: hit key=$norm_abs hits=" . scalar(keys %$file_hits) . " -->";
+
+    # ----------------------------------------------------------
+    # Count how many LCSAJ paths had at least one line executed.
+    # A path is considered covered if any line in [start..end]
+    # appears in the hit map.
+    # ----------------------------------------------------------
+    my $covered = 0;
+
+    for my $p (@{ $paths }) {
+        next unless ref $p eq 'HASH';
+
+        my $start = $p->{start};
+        my $end   = $p->{end};
+        next unless defined $start && defined $end;
+
+        for my $line ($start .. $end) {
+            if ($file_hits->{$line}) {
+                $covered++;
+                last;
+            }
+        }
+    }
 
 	return ($covered, $total);
 }
