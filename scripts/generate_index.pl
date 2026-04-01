@@ -2116,12 +2116,9 @@ sub _mutant_file_report {
 	# Calculate depth of $file within lib/ to build correct relative path back to index.html
 	# $file is something like lib/CGI/Info.pm or lib/App/Test/Generator.pm
 	(my $rel = $file) =~ s{^lib/}{};
-	my $depth = scalar(File::Spec->splitdir($rel));  # includes the filename itself
-	# From coverage/mutation_html/lib/A/B/C.pm we need to go up:
-	#   $depth levels (through the lib subdirs + lib itself)
-	#   + 2 more (mutation_html/ and coverage/)
-	# then into cover_html/index.html
-	my $ups = '../' x ($depth + 2);
+	my @parts = File::Spec->splitdir($rel);
+	my $depth = scalar(@parts) - 1;  # subdirs only, exclude filename
+	my $ups = '../' x ($depth + 4);  # +4 for lib/, mutation_html/, coverage/, and the file's own dir
 	my $index_link = "${ups}cover_html/index.html";
 
 	print $out qq{<a href="$index_link">Index</a>\n};
