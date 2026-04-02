@@ -78,7 +78,7 @@ fi
 # --- Step 6: Run mutation analysis ---
 echo "Running mutation analysis..."
 mkdir -p mutation_html/lib cover_html
-bin/app-test-generator-mutate \
+app-test-generator-mutate \
     -v \
     --lib lib \
     --tests t \
