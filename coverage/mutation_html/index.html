@@ -46,11 +46,10 @@ html[data-theme='dark'] {
 -------------------------------------------------- */
 
 body {
-    font-family: sans-serif;
-    background: var(--bg);
-    color: var(--text);
+	font-family: sans-serif;
+	background: var(--bg);
+	color: var(--text);
 }
-
 
 table {
     border-collapse: collapse;
@@ -67,6 +66,19 @@ th {
 .survived-3 { background-color: var(--survived-3); }
 
 .killed { background-color: var(--killed); }
+
+.legend {
+    border: 1px solid #ccc;
+    background: #fafafa;
+    padding: 10px;
+    margin: 15px 0;
+    font-size: 0.9em;
+}
+
+.legend pre {
+    background: #f4f4f4;
+    padding: 5px;
+}
 
 .legend-box {
     display: inline-block;
@@ -104,6 +116,44 @@ pre li {
     margin: 0;
     padding: 0;
     line-height: 1.2;
+}
+
+/* --------------------------------------------------
+   Suggested Test Box Styling
+   Theme-aware and readable in light & dark modes
+-------------------------------------------------- */
+
+.suggested-test {
+    margin-top: 6px;
+    margin-bottom: 12px;
+
+    /* Use theme variables instead of hardcoded colors */
+    background: var(--bg);
+    color: var(--text);
+
+    padding: 8px;
+    border-radius: 4px;
+
+    /* Subtle border for visual separation */
+    border: 1px solid var(--border);
+}
+
+/* Label styling */
+.suggest-label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+/* Ensure the test code block inherits readable colors */
+.suggested-test pre {
+    background: transparent;   /* Prevent nested dark blocks */
+    color: inherit;            /* Match theme text color */
+    margin: 0;
+    font-family: monospace;
+}
+
+pre {
+    overflow-x: auto;
 }
 
 .nav { margin-bottom: 1em; }
@@ -156,29 +206,56 @@ pre details.mutant-details ul {
 	font-weight: bold;
 }
 
+.lcsaj-dot {
+       color: #5555ff;
+       font-size: 10px;
+       margin-right: 3px;
+}
+
+.lcsaj-dot:hover::after {
+    content: attr(data-lcsaj);
+    position: absolute;
+    background: #333;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
 </style>
 </head>
 <body>
 <button class="toggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
 <h1>Mutation Report</h1>
+<h2>Mutation Summary</h2>
 <div class='summary'>
-Score: 97.07%<br>
-Total: 205<br>
-Killed: 199<br>
-Survived: 6<br>
+Score: 95.17%<br>
+Total: 207<br>
+Killed: 197<br>
+Survived: 10<br>
 </div>
 <h2>Files</h2>
 <table border='1' cellpadding='5'>
-<tr><th>File</th><th>Survivors</th></tr>
+<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th><th>LCSAJ</th></tr>
 
 <tr>
 <td><a href="lib/CGI/Info.pm.html">lib/CGI/Info.pm</a></td>
-<td>205</td>
-<td>199</td>
-<td>6</td>
-<td>97.07%</td>
+<td>207</td>
+<td>197</td>
+<td>10</td>
+<td>95.17%</td>
+<td>359</td>
+<td>-</td>
 </tr>
 </table>
+<h2>Structural Coverage (Approximate)</h2>
+<div class='summary'>
+Statement Coverage: 23.87% (3839 / 16084)<br>
+Branch Coverage: 11.83% (1144 / 9674)<br>
+<em>Approximate LCSAJ derived from branch and statement coverage.</em>
+</div>
+<h2>Executive Summary</h2>
+<div class='summary'>Tests execute 23.87% of the code, but detect only 95.17% of injected faults.</div>
 
 <script>
 function toggleTheme() {
