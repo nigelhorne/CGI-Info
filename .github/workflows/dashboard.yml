@@ -35,21 +35,38 @@ jobs:
           # install cpanminus
           # cpanm-options: --notest
 
-      - name: Update Ubuntu Packages
-        run: |
-          sudo apt-get update
-          sudo apt-get -y upgrade
-        if: runner.os == 'Linux'
+      # - name: Update Ubuntu Packages
+      # Failing on GitHub Actions at the moment
+      # run: |
+      #   sudo apt-get update
+      #   sudo apt-get -y upgrade
+      # if: runner.os == 'Linux'
 
-      - name: Upgrade Toolchain
-        run: cpanm -iqn ExtUtils::MakeMaker Module::Build
+      # - name: Upgrade Toolchain
+      #   run: |
+      #   run: cpanm -iqn --skip-satisfied ExtUtils::MakeMaker Module::Build
 
       # Install module dependencies (from cpanfile or manually)
       - name: Install dependencies
         run: |
-          cpanm --notest --installdeps .
-          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover Devel::Cover::Report::Html POSIX File::Glob File::Slurp File::stat Readonly
-          cpanm -iqn IPC::System::Simple WWW::RT::CPAN IPC::Run3
+          cpanm --skip-satisfied --notest --installdeps .
+          cpanm -iqn --skip-satisfied \
+              App::Test::Generator \
+              Test::Most \
+              'Devel::Cover@1.51' \
+              Devel::Cover::Report::Html \
+              File::Slurp \
+              Readonly \
+              IPC::Run3 \
+              IPC::System::Simple \
+              WWW::RT::CPAN \
+              BSD::Resource \
+              HTML::Entities \
+              URI::Escape \
+              JSON::MaybeXS \
+              PPI \
+              App::Prove \
+              File::Copy::Recursive
         timeout-minutes: 10
 
       # Optional: run Perl::Critic static checks
@@ -58,104 +75,34 @@ jobs:
       #     cpanm Perl::Critic
       #     perlcritic --verbose 5 lib || true
 
-      - name: Run tests manually
+      - name: Generate dashboard
         env:
           AUTOMATED_TESTING: 1
           NO_NETWORK_TESTING: 1
           NONINTERACTIVE_TESTING: 1
         run: |
-          prove -l -b -v t
+          scripts/generate_test_dashboard
 
-      # Run the tests with Devel::Cover for coverage
-      - name: Run tests with coverage
-        env:
-          PERL5LIB: ${{ github.workspace }}/local/lib/perl5
-          COVER_VERBOSE: 1
-          AUTOMATED_TESTING: 1
-          NO_NETWORK_TESTING: 1
-          NONINTERACTIVE_TESTING: 1
-        working-directory: ${{ github.workspace }}
-        run: |
-          perl Makefile.PL
-          cover -test
-
-      # Generate HTML coverage report
-      - name: Generate Coverage HTML report
-        run: |
-          mkdir -p cover_html
-          cover -report html -outputdir cover_html
-      # working-directory: ${{ github.workspace }}
-
-      - name: Check for HTML report
-        run: |
-          if [ ! -f cover_html/coverage.html ]; then
-            echo "HTML report not found. Skipping deployment."
-            exit 1
-          fi
-
-      - name: Rename coverage.html to index.html
-        run: |
-          mv cover_html/coverage.html cover_html/index.html
-
-      # Run the mutation tests with App::Test::Generator
-      - name: Install mutation tester
-        run: |
-          cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String App::Test::Generator
-          echo "$(pwd)/local/bin" >> $GITHUB_PATH
-        env:
-          PERL5LIB: ${{ github.workspace }}/local/lib/perl5
-          COVER_VERBOSE: 1
-          AUTOMATED_TESTING: 1
-          NO_NETWORK_TESTING: 1
-          NONINTERACTIVE_TESTING: 1
-        working-directory: ${{ github.workspace }}
-
-      - name: Generate custom coverage page index
-        run: |
-          mkdir -p cover_db
-          # cover -dump > cover_db/cover.json
-          cover -report json -outputdir cover_db
-          perl scripts/generate_index.pl
-
-      # Generate HTML mutation report, do this after the coverage report, so you don't get a coverage report for the mutants
-      - name: Generate Mutation HTML report
-        run: |
-          # app-test-generator-mutate \
-              # --lib lib \
-              # --min-score 85 \
-              # --json mutation.json \
-              # --cover_json cover_db/cover.json \
-              # --mutation_level=fast
-              # --lcsaj_root cover_html/mutation_html/lib
-              # --html cover_html/mutation_html < /dev/null
-          app-test-generator-mutate -v --lib lib --min-score 85 \
-              --tests t \
-              --json mutation.json \
-              --html mutation_html \
-              --mutation_level=fast \
-              --cover_json cover_db/cover.json \
-              --lcsaj_root mutation_html/lib < /dev/null
-      # working-directory: ${{ github.workspace }}
-
-      - name: Archive coverage snapshot
+      - name: Add new coverage snapshot to archive
         run: |
           mkdir -p coverage_history
           TIMESTAMP=$(date +%Y-%m-%d)
           SHA=$(git rev-parse --short HEAD)
-          cp cover_db/cover.json "coverage_history/${TIMESTAMP}-${SHA}.json"
-          # Remove older history
-          # ls -t coverage_history/*.json | tail -n +31 | xargs rm -f
+          cp cover_html/cover.json "coverage_history/${TIMESTAMP}-${SHA}.json"
+          echo "SNAPSHOT_TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
+          echo "SNAPSHOT_SHA=${SHA}" >> $GITHUB_ENV
+          find cover_db cover_html coverage -print
 
-      - name: Commit coverage snapshot
+      - name: Save coverage snapshot archive
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
           git add coverage_history/
-          git commit -m "Add coverage snapshot for $TIMESTAMP ($SHA)" || echo "No changes to commit"
+          git commit -m "Add coverage snapshot for ${SNAPSHOT_TIMESTAMP} (${SNAPSHOT_SHA})" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
 
       # Deploy HTML report to GitHub Pages
-      - name: Publish coverage report
+      - name: Publish test dashboard
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
