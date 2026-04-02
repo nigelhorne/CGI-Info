@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# run_full_pipeline.sh
-# Usage: ./run_full_pipeline.sh
 
 set -uo pipefail
 
@@ -14,7 +12,7 @@ rm -rf cover_db coverage lcsaj mutation_html mutation.json cover_html
 
 # --- Step 1: Build blib if needed ---
 echo "Building blib..."
-perl Makefile.PL && make && make install
+perl Makefile.PL && make
 
 export PERL5OPT='-Ilib'
 
@@ -80,15 +78,15 @@ fi
 # --- Step 6: Run mutation analysis ---
 echo "Running mutation analysis..."
 mkdir -p mutation_html/lib cover_html
-app-test-generator-mutate \
+bin/app-test-generator-mutate \
     -v \
     --lib lib \
     --tests t \
     --json mutation.json \
-    --html coverage/mutation_html \
+    --html cover_html/mutation_html \
     --mutation_level=fast \
     --cover_json cover_html/cover.json \
-    --lcsaj_root coverage/mutation_html/lib \
+    --lcsaj_root cover_html/mutation_html/lib \
     --lcsaj_hits cover_html/lcsaj_hits.json < /dev/null
     # --min-score 85
 

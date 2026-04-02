@@ -50,7 +50,7 @@ Readonly my %config => (
 	mutation_db         => 'mutation.json',
 	mutation_dir        => 'coverage/mutation_html',     # hrefs in published pages
 	mutation_output_dir => 'cover_html/mutation_html',   # where files are written
-	lcsaj_root => 'coverage/mutation_html/lib',
+	lcsaj_root => 'cover_html/mutation_html/lib',
 	lcsaj_hits_file     => 'cover_html/lcsaj_hits.json', # Runtime.pm writes here
 	output => 'cover_html/index.html',	# published to gh-pages
 	max_retry => 3,
@@ -1940,7 +1940,7 @@ sub _mutation_index {
 			'<span class="coverage-badge %s" title="%s">%.1f%%</span>',
 			$badge_class, $tooltip, $score
 		);
-		my $html_file = "../$config{mutation_dir}/$file.html";
+		my $html_file = "mutation_html/$file.html";
 
 		my $source_url = $github_base . $file;
 		my $source_link = $total
@@ -2118,8 +2118,8 @@ sub _mutant_file_report {
 	(my $rel = $file) =~ s{^lib/}{};
 	my @parts = File::Spec->splitdir($rel);
 	my $depth = scalar(@parts) - 1;  # subdirs only, exclude filename
-	my $ups = '../' x ($depth + 3);  # +3: lib subdirs + lib/ + mutation_html/ + cover_html sibling
-	my $index_link = "${ups}index.html";  # already inside cover_html/
+	my $ups = '../' x ($depth + 2);  # +2 for lib/ and mutation_html/
+	my $index_link = "${ups}index.html";
 
 	print $out qq{<a href="$index_link">Index</a>\n};
 
