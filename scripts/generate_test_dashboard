@@ -8,7 +8,7 @@ set -e
 
 # --- Step 0: Cleanup old data ---
 echo "Cleaning up old coverage, LCSAJ, and mutation data..."
-rm -rf cover_db coverage lcsaj mutation_html mutation.json cover_html
+rm -rf cover_db coverage lcsaj mutation_html mutation.json cover_html t/tmp_*.t
 
 # --- Step 1: Build blib if needed ---
 echo "Building blib..."
