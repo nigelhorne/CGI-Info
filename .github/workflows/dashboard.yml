@@ -50,6 +50,7 @@ jobs:
       - name: Install dependencies
         run: |
           cpanm --skip-satisfied --notest --installdeps .
+          cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String App::Test::Generator
           cpanm -iqn --skip-satisfied \
               App::Test::Generator \
               Test::Most \
