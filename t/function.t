@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
 use File::Temp qw(tempdir);
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -14,8 +14,8 @@ BEGIN { use_ok('CGI::Info') }
 
 # Silence Log::Abstraction's stderr output for warn/error during the entire
 # test run.  These are expected, intentional log calls (WAF blocks, validation
-# failures, etc.) that would otherwise clutter the harness output.  We still
-# verify behaviour via status codes and return values, not log side-effects.
+# failures, etc.) that would otherwise clutter the harness output.
+# We still verify behaviour via status codes and return values, not log side-effects.
 mock 'Log::Abstraction::_high_priority' => sub { };
 
 # ---------------------------------------------------------------------------
@@ -38,7 +38,7 @@ sub reset_env {
 # ============================================================
 subtest 'new() - basic instantiation' => sub {
 	reset_env();
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	ok(blessed($info), 'new() returns a blessed object');
 	isa_ok($info, 'CGI::Info');
 };
@@ -128,13 +128,13 @@ subtest 'reset() warns when called as object method' => sub {
 # ============================================================
 subtest 'status() - defaults to 200' => sub {
 	reset_env();
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	is($info->status(), 200, 'default status is 200');
 };
 
 subtest 'status() - set and retrieve' => sub {
 	reset_env();
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	$info->status(404);
 	is($info->status(), 404, 'status round-trips correctly');
 };
@@ -143,7 +143,7 @@ subtest 'status() - OPTIONS sets 405 implicitly' => sub {
 	reset_env();
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'OPTIONS';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	$info->params();
 	is($info->status(), 405, 'OPTIONS yields 405');
 };
@@ -152,7 +152,7 @@ subtest 'status() - DELETE sets 405 implicitly' => sub {
 	reset_env();
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'DELETE';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	$info->params();
 	is($info->status(), 405, 'DELETE yields 405');
 };
@@ -165,7 +165,7 @@ subtest 'params() - GET simple query' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'foo=bar&baz=42';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	ok(defined $p, 'params() returns defined value');
 	is($p->{foo}, 'bar', 'foo=bar parsed');
@@ -177,7 +177,7 @@ subtest 'params() - GET no query string returns undef' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = '';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	ok(!defined $p, 'empty QUERY_STRING returns undef');
 };
@@ -187,7 +187,7 @@ subtest 'params() - allow filters unknown keys' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'good=1&evil=2';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params(allow => { good => qr/^\d+$/ });
 	ok(defined $p->{good}, 'allowed key present');
 	ok(!defined $p->{evil}, 'disallowed key absent');
@@ -198,7 +198,7 @@ subtest 'params() - allow regex mismatch blocks value' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'id=abc';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params(allow => { id => qr/^\d+$/ });
 	ok(!defined($p), 'regex-blocked key excluded from result');
 	is($info->status(), 422, 'status 422 set on validation failure');
@@ -209,7 +209,7 @@ subtest 'params() - allow exact-string match' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'color=blue&color=red';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params(allow => { color => 'blue' });
 	# 'blue' matches, but 'red' appears as comma-separated; blue matches first
 	ok(defined $p, 'exact-string allow passes matching value');
@@ -220,7 +220,7 @@ subtest 'params() - allow coderef validator' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'num=4&num2=3';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params(allow => {
 		num  => sub { ($_[1] % 2) == 0 },   # even => pass
 		num2 => sub { ($_[1] % 2) == 0 },   # odd  => fail
@@ -234,7 +234,7 @@ subtest 'params() - SQL injection blocked (GET)' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = "id=1'%20OR%201=1";
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	ok(!defined $p, 'SQL injection blocked');
 	is($info->status(), 403, 'status 403 on SQL injection');
@@ -245,7 +245,7 @@ subtest 'params() - XSS injection blocked (GET)' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'q=%3Cscript%3Ealert(1)%3C%2Fscript%3E';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	ok(!defined $p, 'XSS injection blocked');
 	is($info->status(), 403, 'status 403 on XSS');
@@ -256,7 +256,7 @@ subtest 'params() - directory traversal blocked (GET)' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'file=../../etc/passwd';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	ok(!defined $p, 'directory traversal blocked');
 	is($info->status(), 403, 'status 403 on directory traversal');
@@ -267,7 +267,7 @@ subtest 'params() - mustleak attack blocked (GET)' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'x=mustleak.com/probe';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	ok(!defined $p, 'mustleak attack blocked');
 	is($info->status(), 403, 'status 403 on mustleak');
@@ -278,7 +278,7 @@ subtest 'params() - duplicate values comma-joined' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'color=red&color=blue';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	like($p->{color}, qr/red.*blue|blue.*red/, 'duplicate values comma-joined');
 };
@@ -288,7 +288,7 @@ subtest 'params() - POST missing CONTENT_LENGTH => 411' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'POST';
 	# no CONTENT_LENGTH
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params();
 	ok(!defined $p, 'POST without CONTENT_LENGTH returns undef');
 	is($info->status(), 411, 'status 411');
@@ -1026,7 +1026,7 @@ subtest 'params() - POST XML stored under XML key' => sub {
 	$ENV{CONTENT_LENGTH}	= length($xml_body);
 	$CGI::Info::stdin_data  = $xml_body;
 
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p	= $info->params();
 	ok(defined $p, 'XML POST returns hashref');
 	is($p->{XML}, $xml_body, 'XML body stored under XML key');
@@ -1040,7 +1040,7 @@ subtest 'params() - Params::Validate::Strict schema passes valid value' => sub {
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'age=25';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params(allow => {
 		age => { type => 'integer', min => 0, max => 150 }
 	});
@@ -1052,7 +1052,7 @@ subtest 'params() - Params::Validate::Strict schema blocks invalid value' => sub
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'age=999';
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p = $info->params(allow => {
 		age => { type => 'integer', min => 0, max => 150 }
 	});

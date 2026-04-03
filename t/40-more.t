@@ -449,11 +449,22 @@ subtest 'Content length validation' => sub {
 	is($info->{status}, 411, 'Invalid content length returns 411');
 
 	# Test oversized content
-	$info = CGI::Info->new();
+	$info = new_ok('CGI::Info');
 	$info->{max_upload_size} = 100;
 	$ENV{CONTENT_LENGTH} = '1000';
 	$params = $info->params();
 	is($info->{status}, 413, 'Oversized content returns 413');
+
+	# Boundary test
+	$info = new_ok('CGI::Info');
+	$info->{max_upload_size} = 0;
+	$ENV{CONTENT_LENGTH} = '1';
+	$params = $info->params();
+	is($info->{status}, 413, 'Oversized content returns 413, when max_upload_size set to 0');
+
+	$info = CGI::Info->new(max_upload_size => 0);
+	$params = $info->params();
+	is($info->{status}, 413, 'Oversized content returns 413, when max_upload_size set to 0 in new');
 
 	restore_env();
 };
