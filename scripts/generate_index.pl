@@ -1909,8 +1909,12 @@ sub _mutation_index {
 
 	push @html, "<h3>Mutation Files</h3>\n";
 	push @html, "<table border='1' cellpadding='5'>\n";
+
+	# Column headers for the mutation files table.
+	# TER3 = Third level Test Effectiveness Ratio (LCSAJ path coverage).
+	# Only shown when lcsaj_root is configured.
 	if($config{lcsaj_root}) {
-		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th><th>LCSAJ</th></tr>\n";
+		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th><th>TER3 (LCSAJ)</th></tr>\n";
 	} else {
 		push @html, '<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th></tr>';
 	}
@@ -1975,15 +1979,33 @@ sub _mutation_index {
 			last if defined $lcsaj_cov;
 		}
 
+		# --------------------------------------------------
+		# Determine TER3 (LCSAJ path coverage) for this file.
+		# TER3 = covered_paths / total_paths * 100
+		# Returns one of:
+		#   ''    - LCSAJ column not enabled (no lcsaj_root configured)
+		#   'n/a' - .lcsaj.json file not found in any candidate directory
+		#   '-'   - file found but contains zero defined paths
+		#   'X.X% (covered/total)' - actual TER3 percentage with raw fraction
+		# --------------------------------------------------
 		my $lcsaj_pct;
 		if (!$lcsaj_dir) {
-			$lcsaj_pct = '';	# LCSAJ column not enabled
+			# LCSAJ column is disabled — lcsaj_root not configured
+			$lcsaj_pct = '';
 		} elsif (!defined $lcsaj_cov) {
-			$lcsaj_pct = 'n/a';	# .lcsaj.json not found in any candidate dir
+			# No .lcsaj.json found for this file in any candidate directory
+			$lcsaj_pct = 'n/a';
 		} elsif (!$lcsaj_total) {
-			$lcsaj_pct = '-';	# file found but contains zero paths
+			# .lcsaj.json exists but contains no path definitions
+			$lcsaj_pct = '-';
 		} else {
-			$lcsaj_pct = sprintf('%.1f%%', ($lcsaj_cov / $lcsaj_total) * 100);
+			# Compute TER3: percentage of LCSAJ paths covered, plus raw fraction
+			# e.g. "71.8% (352/491)"
+			$lcsaj_pct = sprintf('%.1f%% (%d/%d)',
+				($lcsaj_cov / $lcsaj_total) * 100,
+				$lcsaj_cov,
+				$lcsaj_total
+			);
 		}
 
 		push @html, sprintf(
@@ -2145,12 +2167,38 @@ sub _mutant_file_report {
 			my $branch_pct = $branch_total ? sprintf('%.2f', ($branch_hit / $branch_total) * 100) : 0;
 
 			my $approx_lcsaj = $branch_total + 1;
+
+			# Compute TER3 (LCSAJ path coverage) for this file if data is available.
+			# TER3 = covered_paths / total_paths * 100
+			my ($lcsaj_cov, $lcsaj_total) = _lcsaj_coverage_for_file(
+				$file, $lcsaj_dir, $lcsaj_hits, []
+			);
+			my $ter3_str;
+			if (!defined $lcsaj_cov) {
+				# .lcsaj.json not found — TER3 unavailable for this file
+				$ter3_str = 'n/a';
+			} elsif (!$lcsaj_total) {
+				# File found but no paths defined
+				$ter3_str = '-';
+			} else {
+				# Format as percentage with raw fraction for clarity
+				$ter3_str = sprintf('%.1f%% (%d/%d)',
+					($lcsaj_cov / $lcsaj_total) * 100,
+					$lcsaj_cov,
+					$lcsaj_total
+				);
+			}
+
+			# Display TER1/TER2/TER3 coverage metrics in the summary block.
+			# TER1 = statement, TER2 = branch, TER3 = LCSAJ path coverage.
 			print $out "<div class='summary'>\n";
 			print $out "<strong>Structural Coverage (Approximate)</strong><p>\n";
-			print $out "Statement: $stmt_pct%<br>\n";
-			print $out "Branch: $branch_pct%<br>\n";
+			print $out "TER1 (Statement): $stmt_pct%<br>\n";
+			print $out "TER2 (Branch): $branch_pct%<br>\n";
+			print $out "TER3 (LCSAJ): $ter3_str<br>\n";
 			print $out "Approximate LCSAJ segments: $approx_lcsaj<br>\n";
 			print $out "</div>\n";
+
 			print $out qq{
 				<div class="legend">
 					<h3>LCSAJ Legend</h3>
