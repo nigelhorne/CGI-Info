@@ -977,6 +977,7 @@ sub params {
 			   ($value =~ /\sAND\s1=1/ix) ||
 			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
+			   ($value =~ /var_dump.+md5/) ||
 			   ($value =~ /\/AND\/.+\(SELECT\//) ||	# United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				$self->status(403);
