@@ -69,6 +69,30 @@ subtest 'new() - expect deprecated croak' => sub {
 	like($@, qr/expect has been deprecated/i, 'expect param causes croak');
 };
 
+# Line 157 boundary: CGI::Info::new() (double-colon, undef $class) checks
+# (scalar keys %{$params}) > 0 to decide whether to croak.
+# Boundary values are 0 (should NOT croak) and 1 (should croak).
+# All four mutant flips (> to <, >=, <=, ==) are killed by testing both sides.
+subtest 'new() - ::new() with 0 params does not croak (boundary = 0)' => sub {
+	reset_env();
+	# CGI::Info::new() with no args: $class is undef, $params is empty,
+	# guard at line 157 does not fire, $class self-heals to __PACKAGE__.
+	my $info = eval { CGI::Info::new() };
+	ok(!$@, '::new() with no args does not croak');
+	ok(blessed($info), '::new() with no args still returns an object');
+};
+
+subtest 'new() - ::new() with 1+ params croaks (boundary = 1)' => sub {
+	reset_env();
+	# The guard is only reachable when $class is explicitly undef (the FIXME
+	# in the source acknowledges this).  CGI::Info::new(key => val) would make
+	# "key" become $class, hitting Params::Get before the guard.  So we pass
+	# undef explicitly to exercise the boundary.
+	eval { CGI::Info::new(undef, max_upload_size => 1024) };
+	like($@, qr/use ->new\(\) not ::new\(\)/i,
+		'::new() with undef class + 1 param croaks with helpful message');
+};
+
 subtest 'new() - bad logger guard logic is correct' => sub {
 	reset_env();
 	# Object::Configure::configure() pre-processes params before new() reaches
