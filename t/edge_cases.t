@@ -59,7 +59,7 @@ subtest 'query string: very large number of parameters' => sub {
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = join('&', map { "k$_=v$_" } 1..500);
 
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $p	= eval { $info->params() };
 	ok(!$@, 'does not die with 500 parameters');
 	ok(!defined($p) || ref($p) eq 'HASH', 'returns undef or hashref');
