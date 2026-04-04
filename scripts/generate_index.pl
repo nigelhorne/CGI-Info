@@ -2280,7 +2280,7 @@ HEADER
 				print $fh $env_hint      if $env_hint;
 				print $fh "    # NOTE: new() called with no arguments as a starting point.\n";
 				print $fh "    # If $mod requires constructor arguments, add them here.\n";
-				print $fh "    my \$obj = ${mod}->new();\n";
+				print $fh "    my \$obj = new_ok('${mod}');\n";
 				print $fh "    # TODO: exercise $location to detect the mutant\n";
 				print $fh "    fail('$id: replace with real assertion');\n";
 				print $fh "}\n\n";
@@ -2344,7 +2344,7 @@ HEADER
 				print $fh $env_hint if $env_hint;
 				print $fh "# NOTE: new() called with no arguments as a starting point.\n";
 				print $fh "# If $mod requires constructor arguments, add them here.\n";
-				print $fh "# my \$obj = ${mod}->new();\n";
+				print $fh "# my \$obj = new_ok('${mod}');\n";
 				print $fh "# ok(\$obj->..., '$id: add assertion here');\n\n";
 			}
 		}
