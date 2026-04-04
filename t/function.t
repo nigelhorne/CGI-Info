@@ -7,7 +7,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
 use Scalar::Util qw(blessed);
-use Test::Mockingbird qw(mock);
+use Test::Mockingbird qw(mock mock_scoped);
 
 # We test CGI::Info itself
 BEGIN { use_ok('CGI::Info') }
@@ -38,7 +38,7 @@ sub reset_env {
 # ============================================================
 subtest 'new() - basic instantiation' => sub {
 	reset_env();
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	ok(blessed($info), 'new() returns a blessed object');
 	isa_ok($info, 'CGI::Info');
 };
@@ -553,7 +553,7 @@ subtest 'protocol() - from SERVER_PROTOCOL' => sub {
 # lines 1449-1451.  This is what the mutant-test survivor was flagging.
 subtest 'protocol() - SERVER_PORT 443 boundary (line 1451)' => sub {
 	reset_env();
-	mock 'CGI::Info::getservbyport' => sub { return undef };
+	my $guard = mock_scoped 'CGI::Info::getservbyport' => sub { return undef };
 
 	# Exact boundary: port 443 must return 'https'
 	$ENV{SERVER_PORT} = 443;
@@ -572,7 +572,7 @@ subtest 'protocol() - SERVER_PORT 443 boundary (line 1451)' => sub {
 
 subtest 'protocol() - SERVER_PORT 80 boundary (line 1449)' => sub {
 	reset_env();
-	mock 'CGI::Info::getservbyport' => sub { return undef };
+	my $guard = mock_scoped 'CGI::Info::getservbyport' => sub { return undef };
 
 	# Exact boundary: port 80 must return 'http'
 	$ENV{SERVER_PORT} = 80;
