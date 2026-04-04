@@ -400,7 +400,7 @@ sub _find_site_details
 		$self->{cgi_site} = URI::Heuristic::uf_uristr($host);
 		# Remove trailing dots from the name.  They are legal in URLs
 		# and some sites link using them to avoid spoofing (nice)
-		$self->{cgi_site} =~ s/(.*)\.+$/$1/;  # Trim trailing dots
+		$self->{cgi_site} =~ s/\.+$//;	# Trim trailing dots
 
 		if($ENV{'SERVER_NAME'} && ($host eq $ENV{'SERVER_NAME'}) && (my $protocol = $self->protocol()) && $self->protocol() ne 'http') {
 			$self->{cgi_site} =~ s/^http/$protocol/;
@@ -2025,7 +2025,15 @@ sub cookie
 	# Load cookies if not already loaded
 	unless($self->{jar}) {
 		if(defined $ENV{'HTTP_COOKIE'}) {
-			$self->{jar} = { map { split(/=/, $_, 2) } split(/; /, $ENV{'HTTP_COOKIE'}) };
+			# grep { /=/ } filters out malformed tokens (empty strings, bare
+			# semicolons, entries with no name=value separator) that would
+			# otherwise cause split(/=/, $_, 2) to return a single-element list
+			# and make the flattened list odd-length, corrupting the hash.
+			$self->{jar} = {
+				map  { split(/=/, $_, 2) }
+				grep { /=/ }
+				split(/; /, $ENV{'HTTP_COOKIE'})
+			};
 		}
 	}
 
