@@ -16,6 +16,7 @@ use File::Path qw(make_path);
 use File::Slurp;
 use File::Spec;
 use File::stat;
+use Getopt::Long qw(GetOptions);
 use IPC::Run3;
 use JSON::MaybeXS;
 use List::Util;
@@ -57,6 +58,16 @@ Readonly my %config => (
 	min_locale_samples => 3,
 	verbose => 1,
 );
+
+# --------------------------------------------------
+# Parse command-line options.
+# --generate_mutant_tests=dir enables test stub
+# generation into the named directory.
+# --------------------------------------------------
+my $mutant_test_dir;
+GetOptions(
+	'generate_mutant_tests=s' => \$mutant_test_dir,
+) or die "Usage: $0 [--generate_mutant_tests=DIR]";
 
 # -------------------------------
 # Dependency correlation analysis
@@ -1415,6 +1426,12 @@ HTML
 print "Writing output to $config{output}\n" if($config{verbose});
 write_file($config{output}, join("\n", @html));
 
+# Generate mutant test stubs only if --generate_mutant_tests=dir was given.
+# This is opt-in to avoid surprising existing pipelines with new files.
+if($mutation_db && $mutant_test_dir) {
+	_generate_mutant_tests($mutation_db, $cover_db, $mutant_test_dir);
+}
+
 # Safe git command execution
 sub run_git {
 	my @cmd = @_;
@@ -1883,6 +1900,301 @@ sub make_key
 	my $r = $_[0];
 
 	return lc(join '|', $r->{osname} // '', $r->{perl} // '', $r->{arch} // '', $r->{platform} // '' );
+}
+
+# --------------------------------------------------
+# _generate_mutant_tests
+#
+# Generate a test stub file for surviving mutants,
+# to be placed in the project's t/ directory.
+#
+# This sub is called from generate_index.pl which
+# runs from the project root (e.g. CGI-Info/ or
+# App-Test-Generator/). The t/ directory written to
+# belongs to the project under test, not to
+# App::Test::Generator itself.
+#
+# High/Medium difficulty survivors get TODO stubs.
+# Low difficulty survivors get comment-only hints.
+# File is skipped entirely if nothing to report.
+#
+# Arguments:
+#   $mutation_db - decoded mutation JSON hashref
+#   $cover_db    - decoded Devel::Cover JSON hashref
+#   $test_dir    - directory to write the .t file (default: 't')
+#
+# Returns:
+#   The filename written, or undef if nothing written
+# --------------------------------------------------
+sub _generate_mutant_tests {
+	my ($mutation_db, $cover_db, $test_dir) = @_;
+
+	# Default output directory is the project's t/ directory
+	$test_dir //= 't';
+
+	# --------------------------------------------------
+	# Separate survivors into high/med (need TODO stubs)
+	# and low (comment hints only), based on the
+	# 'difficulty' string field in the mutation data
+	# --------------------------------------------------
+	my @stub_mutants;
+	my @hint_mutants;
+
+	for my $m (@{ $mutation_db->{survived} || [] }) {
+		# Skip malformed entries missing required fields
+		next unless ref $m && defined $m->{file} && defined $m->{line};
+
+		# Route by difficulty string; default to stub if field is absent
+		if(defined $m->{difficulty} && $m->{difficulty} eq 'LOW') {
+			push @hint_mutants, $m;
+		} else {
+			push @stub_mutants, $m;
+		}
+	}
+
+	# Skip file creation entirely if there is nothing to report
+	return undef if !@stub_mutants && !@hint_mutants;
+
+	# --------------------------------------------------
+	# Group both sets by source file for organised output
+	# --------------------------------------------------
+	my %stubs_by_file;
+	my %hints_by_file;
+
+	for my $m (@stub_mutants) {
+		push @{ $stubs_by_file{ $m->{file} } }, $m;
+	}
+	for my $m (@hint_mutants) {
+		push @{ $hints_by_file{ $m->{file} } }, $m;
+	}
+
+	# --------------------------------------------------
+	# Build sorted list of all affected source files
+	# --------------------------------------------------
+	my %all_files;
+	$all_files{$_}++ for keys %stubs_by_file, keys %hints_by_file;
+	my @files = sort keys %all_files;
+
+	# --------------------------------------------------
+	# Derive Perl module names from file paths for use_ok()
+	# e.g. lib/CGI/Info.pm       -> CGI::Info
+	#      lib/App/Test/Foo.pm   -> App::Test::Foo
+	# --------------------------------------------------
+	my %module_for;
+	for my $file (@files) {
+		(my $mod = $file) =~ s{^lib/}{};
+		$mod =~ s{\.pm$}{};
+		$mod =~ s{/}{::}g;
+		$module_for{$file} = $mod;
+	}
+
+	# --------------------------------------------------
+	# Build a unique timestamped filename.
+	# If a file for this exact second already exists,
+	# skip rather than overwrite.
+	# --------------------------------------------------
+	my $timestamp = strftime('%Y%m%d_%H%M%S', localtime);
+	my $filename  = File::Spec->catfile($test_dir, "mutant_${timestamp}.t");
+
+	if(-e $filename) {
+		warn "Mutant test file $filename already exists, skipping generation\n";
+		return undef;
+	}
+
+	# --------------------------------------------------
+	# Open the output file for writing
+	# --------------------------------------------------
+	open my $fh, '>', $filename
+		or die "Cannot write mutant test file $filename: $!";
+
+	# --------------------------------------------------
+	# File header explaining purpose and provenance
+	# --------------------------------------------------
+	my $generated_at = strftime('%Y-%m-%d %H:%M:%S', localtime);
+	print $fh <<"HEADER";
+#!/usr/bin/env perl
+# Auto-generated mutant test stubs
+# Generated: $generated_at
+# Generator: scripts/generate_index.pl
+#
+# DO NOT COMMIT without completing the TODO sections.
+#
+# HIGH/MEDIUM difficulty survivors have TODO stubs — these need real tests.
+# LOW difficulty survivors appear as comment hints — worth improving.
+#
+# Note: new() is called with no arguments as a starting point.
+# If a module requires constructor arguments, add them before running.
+
+use strict;
+use warnings;
+use Test::More;
+
+HEADER
+
+	# --------------------------------------------------
+	# Group all use_ok() calls at the top of the file,
+	# one per affected source file/module
+	# --------------------------------------------------
+	for my $file (@files) {
+		my $mod = $module_for{$file};
+		print $fh "use_ok('$mod');\n";
+	}
+	print $fh "\n";
+
+	# --------------------------------------------------
+	# Emit stubs and hints grouped by source file,
+	# sorted by line number within each file
+	# --------------------------------------------------
+	for my $file (@files) {
+		# Section header for this source file
+		print $fh '#' x 64 . "\n";
+		print $fh "# FILE: $file\n";
+		print $fh '#' x 64 . "\n\n";
+
+		# Read source lines for context in comments (1-indexed)
+		my @source_lines;
+		if(-f $file) {
+			open my $sfh, '<', $file
+				or warn "Cannot read $file for context: $!";
+			@source_lines = <$sfh>;
+			close $sfh;
+		}
+
+		# --------------------------------------------------
+		# High/Med survivors — emit TODO test stubs
+		# --------------------------------------------------
+		if(my $stubs = $stubs_by_file{$file}) {
+			print $fh "# --- SURVIVORS (TODO stubs) ---\n\n";
+
+			for my $m (sort { $a->{line} <=> $b->{line} } @$stubs) {
+				my $line_no = $m->{line};
+				my $id      = $m->{id}          // 'unknown';
+				my $desc    = $m->{description} // '';
+				my $hint    = $m->{hint}        // '';
+				my $diff    = $m->{difficulty}  // '';
+				my $mod     = $module_for{$file};
+
+				# Extract the relevant source line for context
+				my $source = '';
+				if(@source_lines && $line_no >= 1 && $line_no <= scalar @source_lines) {
+					$source = $source_lines[$line_no - 1];
+					chomp $source;
+					$source =~ s/^\s+//;    # strip leading whitespace
+				}
+
+				# --------------------------------------------------
+				# For NUM_BOUNDARY mutations, attempt to extract the
+				# boundary value from the source line and suggest
+				# testing at boundary-1, boundary, boundary+1
+				# --------------------------------------------------
+				my $boundary_hint = '';
+				if($id =~ /NUM_BOUNDARY/ && $source) {
+					my $bval;
+
+					# Try right-hand side first: op followed by number
+					if($source =~ /(?:[><=!]=?)\s*(-?\d+)/) {
+						$bval = $1;
+					# Then try left-hand side: number followed by op
+					} elsif($source =~ /(-?\d+)\s*(?:[><=!]=?)/) {
+						$bval = $1;
+					}
+
+					if(defined $bval) {
+						# Suggest the three classic boundary values
+						$boundary_hint = '    # Suggested boundary values to test: '
+							. ($bval - 1) . ", $bval, " . ($bval + 1) . "\n";
+					}
+				}
+
+				# Find the enclosing method for context
+				my $sub_name = _enclosing_sub(\@source_lines, $line_no);
+				my $location = $sub_name ? "line $line_no in $sub_name()" : "line $line_no";
+
+				# --------------------------------------------------
+				# Emit the TODO stub block with full context comments
+				# --------------------------------------------------
+
+				print $fh "# --- SURVIVOR: $id ($diff) line $line_no ---\n";
+				print $fh "# Source:  $source\n" if $source;
+				print $fh "# Mutated: $desc\n";
+				print $fh "# Hint:    $hint\n";
+				print $fh "TODO: {\n";
+				print $fh "    local \$TODO = 'Complete: $id $location';\n";
+				print $fh $boundary_hint if $boundary_hint;
+				print $fh "    # NOTE: new() called with no arguments as a starting point.\n";
+				print $fh "    # If $mod requires constructor arguments, add them here.\n";
+				print $fh "    my \$obj = ${mod}->new();\n";
+				print $fh "    # TODO: exercise line $line_no to detect the mutant\n";
+				print $fh "    ok(0, '$id: replace with real assertion');\n";
+				print $fh "}\n\n";
+			}
+		}
+
+		# --------------------------------------------------
+		# Low difficulty survivors — comment hints only,
+		# easy to uncomment and complete
+		# --------------------------------------------------
+		if(my $hints = $hints_by_file{$file}) {
+			print $fh "# --- LOW DIFFICULTY HINTS (comment stubs) ---\n\n";
+
+			for my $m (sort { $a->{line} <=> $b->{line} } @$hints) {
+				my $line_no = $m->{line};
+				my $id      = $m->{id}          // 'unknown';
+				my $desc    = $m->{description} // '';
+				my $hint    = $m->{hint}        // '';
+				my $mod     = $module_for{$file};
+
+				# Extract source line for context
+				my $source = '';
+				if(@source_lines && $line_no >= 1 && $line_no <= scalar @source_lines) {
+					$source = $source_lines[$line_no - 1];
+					chomp $source;
+					$source =~ s/^\s+//;
+				}
+
+				# Find the enclosing method for context
+				my $sub_name = _enclosing_sub(\@source_lines, $line_no);
+				my $location = $sub_name ? "line $line_no in $sub_name()" : "line $line_no";
+
+				# Emit as commented-out stub — uncomment and complete to use
+				print $fh "# --- LOW HINT: $id line $location ---\n";
+				print $fh "# Source:  $source\n" if $source;
+				print $fh "# Mutated: $desc\n";
+				print $fh "# Hint:    $hint\n";
+				print $fh "# NOTE: new() called with no arguments as a starting point.\n";
+				print $fh "# If $mod requires constructor arguments, add them here.\n";
+				print $fh "# my \$obj = ${mod}->new();\n";
+				print $fh "# ok(\$obj->..., '$id: add assertion here');\n\n";
+			}
+		}
+	}
+
+	# Standard TAP footer
+	print $fh "done_testing();\n";
+
+	close $fh;
+
+	print "Generated mutant test stubs: $filename\n" if $config{verbose};
+
+	return $filename;
+}
+
+# --------------------------------------------------
+# Scan backwards from the mutated line to find the
+# enclosing subroutine name, for context in comments
+# --------------------------------------------------
+sub _enclosing_sub {
+	my ($source_lines, $line_no) = @_;
+
+	# Walk backwards from the mutated line looking for 'sub name'
+	for(my $i = $line_no - 1; $i >= 0; $i--) {
+		if($source_lines->[$i] =~ /^\s*sub\s+(\w+)/) {
+			return $1;
+		}
+	}
+
+	# No enclosing sub found (e.g. file-level code)
+	return undef;
 }
 
 # Mutant helpers from App::Test::Generator::Report::HTML

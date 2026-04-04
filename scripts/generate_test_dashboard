@@ -93,6 +93,6 @@ app-test-generator-mutate \
 set -e
 
 # --- Step 7: Create the test dashboard
-scripts/generate_index.pl
+scripts/generate_index.pl --generate_mutant_tests=t
 
 echo "Done! Check cover_html/index.html locally, or https://nigelhorne.github.io/${GITHUB_REPOSITORY#*/}/coverage/ when deployed."
