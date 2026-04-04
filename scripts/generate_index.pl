@@ -1,9 +1,5 @@
 #!/usr/bin/env perl
 
-# Generates the HTML for use as a testing dashboard on GitHub
-# The location will be https://nigelhorne.github.io/$config{github_repo}/coverage/
-# The script is automatically run by each 'git push' by the script .github/workflows/dashboard.yml
-
 use strict;
 use warnings;
 use autodie qw(:all);
@@ -28,6 +24,87 @@ use Time::HiRes qw(sleep);
 use URI::Escape qw(uri_escape);
 use version;
 use WWW::RT::CPAN;
+
+=head1 NAME
+
+generate_index.pl - Test coverage dashboard generator
+
+=head1 SYNOPSIS
+
+Generates an HTML dashboard for use as a testing dashboard on GitHub Pages.
+The published URL will be:
+
+  https://$github_user.github.io/$github_repo/coverage/
+
+This script is automatically run by each 'git push' via the GitHub Actions
+workflow at .github/workflows/dashboard.yml, and can also be run locally
+via scripts/generate_test_dashboard.
+
+The script is shared across projects — copy it into scripts/ of each
+project that uses it:
+
+  cp ../App-Test-Generator/scripts/generate_index.pl scripts/
+
+=head1 INPUTS
+
+  cover_html/cover.json     - Devel::Cover JSON report (statement/branch/condition)
+  mutation.json             - Mutation testing results from app-test-generator-mutate
+  cover_html/lcsaj_hits.json - LCSAJ path hit data from the LCSAJ runtime debugger
+  cover_html/mutation_html/lib/ - Per-file LCSAJ path definitions (.lcsaj.json)
+  coverage_history/*.json   - Historical coverage snapshots for the trend chart
+
+=head1 OUTPUTS
+
+  cover_html/index.html     - Main dashboard (coverage table, trend chart,
+                              CPAN Testers failures, mutation report)
+  cover_html/mutation_html/ - Per-file mutation heatmap pages
+
+=head1 OPTIONS
+
+  --generate_mutant_tests=DIR
+      Generate a timestamped test stub file in DIR (typically 't/') for
+      surviving mutants. The file is named mutant_YYYYMMDD_HHMMSS.t and
+      contains:
+        - TODO test stubs for High/Medium difficulty survivors, with
+          boundary value suggestions, environment variable hints, and
+          the enclosing subroutine name for navigation context
+        - Comment-only hints for Low difficulty survivors
+      Multiple mutations on the same source line are deduplicated into
+      one stub — one good test kills all variants on that line.
+      File is skipped entirely if there are no survivors to report.
+      If not given, no test stubs are generated.
+
+=head1 DASHBOARD SECTIONS
+
+  Coverage Table    - Per-file statement/branch/condition/subroutine
+                      percentages with delta vs previous snapshot,
+                      sortable columns, and sparkline trend per file
+  Coverage Trend    - Chart of total coverage over recent commits with
+                      linear regression line, zoom and pan support
+  RT Issues         - Count of open RT tickets for the distribution
+  CPAN Testers      - Failure table for the current release, with
+                      Perl version cliff detection, locale analysis,
+                      dependency version cliff detection, and root
+                      cause confidence scoring
+  Mutation Report   - Per-file mutation score (killed/survived/total),
+                      cyclomatic complexity, and TER3 (LCSAJ path
+                      coverage) with raw fraction
+  Per-file Pages    - Line-by-line mutation heatmap with TER1/TER2/TER3
+                      metrics, LCSAJ path markers, and expandable
+                      mutant details with suggested tests
+
+=head1 DEPENDENCIES
+
+  Cwd, Data::Dumper, File::Basename, File::Glob, File::Path,
+  File::Slurp, File::Spec, File::stat, Getopt::Long, HTML::Entities,
+  HTTP::Tiny, IPC::Run3, JSON::MaybeXS, List::Util, POSIX,
+  Readonly, Time::HiRes, URI::Escape, WWW::RT::CPAN, version
+
+=head1 AUTHOR
+
+  Nigel Horne <njh@nigelhorne.com>
+
+=cut
 
 my ($github_user, $github_repo);
 
