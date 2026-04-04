@@ -153,8 +153,8 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/5c14acfe6c4dcceac4eae425af78b0b33f97ebfa/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/5c14acfe6c4dcceac4eae425af78b0b33f97ebfa/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.3,78.3,78.3,78.3,79.4,80.4,79.4,80.4,80.4"></canvas></td><td>89.0</td><td>78.6</td><td>59.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">80.7%</span></td><td class="positive" title="Previous: 80.4%">&#9650; 0.3%</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/f6dc2cbb415640633a550c0ca57e7c4018f612c7/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">blib/lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/f6dc2cbb415640633a550c0ca57e7c4018f612c7/blib/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="78.3,78.3,78.3,78.3,79.4,80.4,79.4,80.4,80.4,80.7"></canvas></td><td>89.0</td><td>78.6</td><td>59.7</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">80.7%</span></td><td class="neutral" title="Previous: 80.7%">&#9679; 0.0%</td></tr>
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 74%, Low: 1</td></tr>
 <tr class="low nosort"><td><strong>Total</strong></td><td>23.9</td><td>11.9</td><td>11.6</td><td>52.7</td><td colspan="2"><strong>19.2</strong></td></tr>
 </tbody></table>
@@ -209,7 +209,8 @@ const dataPoints = [ { x: "2026-02-26T19:18:34-05:00", y: 78.0035863717872, delt
 { x: "2026-04-02T09:50:37-04:00", y: 19.1512583461736, delta: -58.9, url: "https://github.com/nigelhorne/CGI-Info/commit/84a173f", label: "2026-04-02T09:50:37-04:00", pointBackgroundColor: "red", comment: "Added Data::Random" },
 { x: "2026-04-03T07:17:00-04:00", y: 19.1576784797124, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/bec4785", label: "2026-04-03T07:17:00-04:00", pointBackgroundColor: "gray", comment: "Merge pull request #29 from nigelhorne/dependabot/github_actions/codecov/codecov-action-6" },
 { x: "2026-04-03T09:01:11-04:00", y: 19.220028887819, delta: 0.1, url: "https://github.com/nigelhorne/CGI-Info/commit/159547a", label: "2026-04-03T09:01:11-04:00", pointBackgroundColor: "green", comment: "Added t/function.t" },
-{ x: "2026-04-03T21:45:33-04:00", y: 19.2168191301557, delta: -0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/284e142", label: "2026-04-03T21:45:33-04:00", pointBackgroundColor: "gray", comment: "Added doc for generate_index" } ];
+{ x: "2026-04-03T21:45:33-04:00", y: 19.2168191301557, delta: -0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/284e142", label: "2026-04-03T21:45:33-04:00", pointBackgroundColor: "gray", comment: "Added doc for generate_index" },
+{ x: "2026-04-04T08:17:25-04:00", y: 19.2264484031456, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/5c14acf", label: "2026-04-04T08:17:25-04:00", pointBackgroundColor: "gray", comment: "Added ::new whitebox test" } ];
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
 (function registerZoomPlugin(){
@@ -464,9 +465,9 @@ function refresh(){
 <h2>CPAN Testers Failures for CGI-Info 1.11</h2>
 <h3>Failure Summary</h3>
 <ul>
-<li><b>Perl 5.36.x</b>: 1 failures</li>
+<li><b>Perl 5.42.x</b>: 1 failures</li>
 <li><b>linux</b>: 2 failures</li>
-<li><b>5.42 / linux</b>: 1 failures</li>
+<li><b>5.36 / linux</b>: 1 failures</li>
 </ul>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -576,13 +577,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th><th>TER3 (LCSAJ)</th></tr>
 
-<tr class="high"><td><a href="mutation_html/lib/CGI/Info.pm.html" title="View mutation line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/5c14acfe6c4dcceac4eae425af78b0b33f97ebfa/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>207</td><td>203</td><td>4</td><td><span class="coverage-badge badge-good" title="Excellent">98.1%</span></td><td><span class="coverage-badge badge-bad" title="Good">360</span></td><td>74.6% (332/445)</td></tr>
+<tr class="high"><td><a href="mutation_html/lib/CGI/Info.pm.html" title="View mutation line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/f6dc2cbb415640633a550c0ca57e7c4018f612c7/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>207</td><td>203</td><td>4</td><td><span class="coverage-badge badge-good" title="Excellent">98.1%</span></td><td><span class="coverage-badge badge-bad" title="Good">360</span></td><td>74.6% (332/445)</td></tr>
 </table>
 
 <h2>Structural Coverage (Approximate)</h2>
 <div class='summary'>
-Statement Coverage: 23.94% (3850 / 16084)<br>
-Branch Coverage: 11.94% (1155 / 9674)<br>
+Statement Coverage: 23.94% (3851 / 16084)<br>
+Branch Coverage: 11.95% (1156 / 9674)<br>
 <em>Approximate LCSAJ derived from branch and statement coverage.</em>
 </div>
 <h2>Executive Summary</h2>
@@ -591,7 +592,7 @@ Tests execute 23.94% of the code, but detect only 98.07% of injected faults.
 </div>
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-04-04 12:33:34 - <a href="https://github.com/nigelhorne/CGI-Info/commit/5c14acfe6c4dcceac4eae425af78b0b33f97ebfa">commit <code>5c14acf</code></a></em></p>
+	<p><em>Last updated: 2026-04-04 14:06:36 - <a href="https://github.com/nigelhorne/CGI-Info/commit/f6dc2cbb415640633a550c0ca57e7c4018f612c7">commit <code>f6dc2cb</code></a></em></p>
 </footer>
 
 </body>
