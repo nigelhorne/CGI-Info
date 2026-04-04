@@ -553,7 +553,7 @@ subtest 'protocol() - from SERVER_PROTOCOL' => sub {
 # lines 1449-1451.  This is what the mutant-test survivor was flagging.
 subtest 'protocol() - SERVER_PORT 443 boundary (line 1451)' => sub {
 	reset_env();
-	my $guard = mock_scoped 'CGI::Info::getservbyport' => sub { return undef };
+	my $guard = mock_scoped 'Socket::getservbyport' => sub { return undef };
 
 	# Exact boundary: port 443 must return 'https'
 	$ENV{SERVER_PORT} = 443;
@@ -572,7 +572,7 @@ subtest 'protocol() - SERVER_PORT 443 boundary (line 1451)' => sub {
 
 subtest 'protocol() - SERVER_PORT 80 boundary (line 1449)' => sub {
 	reset_env();
-	my $guard = mock_scoped 'CGI::Info::getservbyport' => sub { return undef };
+	my $guard = mock_scoped 'Socket::getservbyport' => sub { return undef };
 
 	# Exact boundary: port 80 must return 'http'
 	$ENV{SERVER_PORT} = 80;
