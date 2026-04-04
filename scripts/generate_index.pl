@@ -1903,6 +1903,34 @@ sub make_key
 }
 
 # --------------------------------------------------
+# _enclosing_sub
+#
+# Scan backwards through source lines from a given
+# line number to find the enclosing subroutine name.
+#
+# Arguments:
+#   $source_lines - arrayref of source lines (1-indexed content)
+#   $line_no      - line number to search backwards from
+#
+# Returns:
+#   The subroutine name string, or undef if not found
+#   (e.g. for file-level code outside any sub)
+# --------------------------------------------------
+sub _enclosing_sub {
+	my ($source_lines, $line_no) = @_;
+
+	# Walk backwards from the mutated line looking for 'sub name'
+	for(my $i = $line_no - 1; $i >= 0; $i--) {
+		if($source_lines->[$i] =~ /^\s*sub\s+(\w+)/) {
+			return $1;
+		}
+	}
+
+	# No enclosing sub found — code is at file level
+	return undef;
+}
+
+# --------------------------------------------------
 # _generate_mutant_tests
 #
 # Generate a test stub file for surviving mutants,
@@ -1916,12 +1944,14 @@ sub make_key
 #
 # High/Medium difficulty survivors get TODO stubs.
 # Low difficulty survivors get comment-only hints.
+# Mutants on the same line are deduplicated into one
+# stub listing all variants — one test kills them all.
 # File is skipped entirely if nothing to report.
 #
 # Arguments:
-#   $mutation_db - decoded mutation JSON hashref
-#   $cover_db    - decoded Devel::Cover JSON hashref
-#   $test_dir    - directory to write the .t file (default: 't')
+#   $mutation_db  - decoded mutation JSON hashref
+#   $cover_db     - decoded Devel::Cover JSON hashref
+#   $test_dir     - directory to write the .t file (default: 't')
 #
 # Returns:
 #   The filename written, or undef if nothing written
@@ -1956,16 +1986,18 @@ sub _generate_mutant_tests {
 	return undef if !@stub_mutants && !@hint_mutants;
 
 	# --------------------------------------------------
-	# Group both sets by source file for organised output
+	# Group both sets by file then by line number.
+	# Multiple mutations on the same line are deduplicated
+	# into one stub — one good test kills all variants.
 	# --------------------------------------------------
 	my %stubs_by_file;
 	my %hints_by_file;
 
 	for my $m (@stub_mutants) {
-		push @{ $stubs_by_file{ $m->{file} } }, $m;
+		push @{ $stubs_by_file{ $m->{file} }{ $m->{line} } }, $m;
 	}
 	for my $m (@hint_mutants) {
-		push @{ $hints_by_file{ $m->{file} } }, $m;
+		push @{ $hints_by_file{ $m->{file} }{ $m->{line} } }, $m;
 	}
 
 	# --------------------------------------------------
@@ -2061,20 +2093,25 @@ HEADER
 		}
 
 		# --------------------------------------------------
-		# High/Med survivors — emit TODO test stubs
+		# High/Med survivors — one TODO stub per line,
+		# listing all mutation variants for that line.
 		# --------------------------------------------------
-		if(my $stubs = $stubs_by_file{$file}) {
+		if(my $lines = $stubs_by_file{$file}) {
 			print $fh "# --- SURVIVORS (TODO stubs) ---\n\n";
 
-			for my $m (sort { $a->{line} <=> $b->{line} } @$stubs) {
-				my $line_no = $m->{line};
-				my $id      = $m->{id}          // 'unknown';
-				my $desc    = $m->{description} // '';
-				my $hint    = $m->{hint}        // '';
-				my $diff    = $m->{difficulty}  // '';
-				my $mod     = $module_for{$file};
+			for my $line_no (sort { $a <=> $b } keys %$lines) {
+				my @variants = @{ $lines->{$line_no} };
 
-				# Extract the relevant source line for context
+				# All variants share the same file/line/source —
+				# use the first entry for the common fields
+				my $first = $variants[0];
+				my $id    = $first->{id}         // 'unknown';
+				my $hint  = $first->{hint}       // '';
+				my $diff  = $first->{difficulty} // '';
+				my $mod   = $module_for{$file};
+				my $count = scalar @variants;
+
+				# Extract the source line for context
 				my $source = '';
 				if(@source_lines && $line_no >= 1 && $line_no <= scalar @source_lines) {
 					$source = $source_lines[$line_no - 1];
@@ -2082,67 +2119,114 @@ HEADER
 					$source =~ s/^\s+//;    # strip leading whitespace
 				}
 
+				# Find the enclosing subroutine for location context
+				my $sub_name = _enclosing_sub(\@source_lines, $line_no);
+				my $location = $sub_name
+					? "line $line_no in ${sub_name}()"
+					: "line $line_no";
+
 				# --------------------------------------------------
 				# For NUM_BOUNDARY mutations, attempt to extract the
-				# boundary value from the source line and suggest
-				# testing at boundary-1, boundary, boundary+1
+				# boundary value and suggest appropriate test values.
+				# Constructs like scalar(), length(), scalar keys %h,
+				# and scalar @a are always non-negative, so we clamp
+				# the lower suggestion to 0 and deduplicate the list.
 				# --------------------------------------------------
 				my $boundary_hint = '';
 				if($id =~ /NUM_BOUNDARY/ && $source) {
 					my $bval;
 
-					# Try right-hand side first: op followed by number
+					# Try right-hand side first: operator then number
 					if($source =~ /(?:[><=!]=?)\s*(-?\d+)/) {
 						$bval = $1;
-					# Then try left-hand side: number followed by op
+					# Then try left-hand side: number then operator
 					} elsif($source =~ /(-?\d+)\s*(?:[><=!]=?)/) {
 						$bval = $1;
 					}
 
 					if(defined $bval) {
-						# Suggest the three classic boundary values
+						# Compute the naive lower boundary
+						my $lower = $bval - 1;
+
+						# --------------------------------------------------
+						# Clamp lower bound to 0 for non-negative contexts:
+						# scalar(), length(), scalar keys %h, scalar @a
+						# can never return a negative value, so suggesting
+						# -1 as a test value would be misleading
+						# --------------------------------------------------
+						if($source =~ /\b(?:scalar|length)\b/) {
+							$lower = $lower < 0 ? 0 : $lower;
+						}
+
+						# Deduplicate suggestions in case lower == bval
+						# (e.g. scalar() == 0 gives lower=0, bval=0)
+						my %seen;
+						my @suggestions = grep { !$seen{$_}++ }
+							($lower, $bval, $bval + 1);
+
 						$boundary_hint = '    # Suggested boundary values to test: '
-							. ($bval - 1) . ", $bval, " . ($bval + 1) . "\n";
+							. join(', ', @suggestions) . "\n";
 					}
 				}
 
-				# Find the enclosing method for context
-				my $sub_name = _enclosing_sub(\@source_lines, $line_no);
-				my $location = $sub_name ? "line $line_no in $sub_name()" : "line $line_no";
+				# --------------------------------------------------
+				# Check for $ENV{ references in the source line
+				# and suggest the environment variable setup needed
+				# --------------------------------------------------
+				my $env_hint = '';
+				if($source =~ /\$ENV\{['"]([\w]+)['"]\}/) {
+					$env_hint = "    # Hint: may need \$ENV{'$1'} set to exercise this line\n";
+				}
 
 				# --------------------------------------------------
-				# Emit the TODO stub block with full context comments
+				# Emit one TODO stub for this line, listing all
+				# mutation variants as comments — one good test
+				# should be sufficient to kill all of them
 				# --------------------------------------------------
+				my $variant_label = $count == 1
+					? '1 variant'
+					: "$count variants — one test should kill all";
 
-				print $fh "# --- SURVIVOR: $id ($diff) line $line_no ---\n";
+				print $fh "# --- SURVIVOR: $id ($diff) $location ---\n";
 				print $fh "# Source:  $source\n" if $source;
-				print $fh "# Mutated: $desc\n";
 				print $fh "# Hint:    $hint\n";
+				print $fh "# Mutations on this line ($variant_label):\n";
+
+				# List each distinct mutation description
+				for my $v (@variants) {
+					print $fh "#   $v->{description}\n";
+				}
+
 				print $fh "TODO: {\n";
 				print $fh "    local \$TODO = 'Complete: $id $location';\n";
 				print $fh $boundary_hint if $boundary_hint;
+				print $fh $env_hint      if $env_hint;
 				print $fh "    # NOTE: new() called with no arguments as a starting point.\n";
 				print $fh "    # If $mod requires constructor arguments, add them here.\n";
 				print $fh "    my \$obj = ${mod}->new();\n";
-				print $fh "    # TODO: exercise line $line_no to detect the mutant\n";
-				print $fh "    ok(0, '$id: replace with real assertion');\n";
+				print $fh "    # TODO: exercise $location to detect the mutant\n";
+				print $fh "    fail('$id: replace with real assertion');\n";
 				print $fh "}\n\n";
 			}
 		}
 
 		# --------------------------------------------------
-		# Low difficulty survivors — comment hints only,
-		# easy to uncomment and complete
+		# Low difficulty survivors — one comment stub per
+		# line, listing all variants. Easy to uncomment
+		# and complete when time allows.
 		# --------------------------------------------------
-		if(my $hints = $hints_by_file{$file}) {
+		if(my $lines = $hints_by_file{$file}) {
 			print $fh "# --- LOW DIFFICULTY HINTS (comment stubs) ---\n\n";
 
-			for my $m (sort { $a->{line} <=> $b->{line} } @$hints) {
-				my $line_no = $m->{line};
-				my $id      = $m->{id}          // 'unknown';
-				my $desc    = $m->{description} // '';
-				my $hint    = $m->{hint}        // '';
-				my $mod     = $module_for{$file};
+			for my $line_no (sort { $a <=> $b } keys %$lines) {
+				my @variants = @{ $lines->{$line_no} };
+
+				# Use first variant for common fields
+				my $first = $variants[0];
+				my $id    = $first->{id}         // 'unknown';
+				my $hint  = $first->{hint}       // '';
+				my $mod   = $module_for{$file};
+				my $count = scalar @variants;
 
 				# Extract source line for context
 				my $source = '';
@@ -2152,15 +2236,35 @@ HEADER
 					$source =~ s/^\s+//;
 				}
 
-				# Find the enclosing method for context
+				# Find the enclosing subroutine for location context
 				my $sub_name = _enclosing_sub(\@source_lines, $line_no);
-				my $location = $sub_name ? "line $line_no in $sub_name()" : "line $line_no";
+				my $location = $sub_name
+					? "line $line_no in ${sub_name}()"
+					: "line $line_no";
+
+				# Check for environment variable references
+				my $env_hint = '';
+				if($source =~ /\$ENV\{['"]([\w]+)['"]\}/) {
+					$env_hint = "# Hint: may need \$ENV{'$1'} set to exercise this line\n";
+				}
+
+				# Number of variants on this line
+				my $variant_label = $count == 1
+					? '1 variant'
+					: "$count variants — one test should kill all";
 
 				# Emit as commented-out stub — uncomment and complete to use
-				print $fh "# --- LOW HINT: $id line $location ---\n";
+				print $fh "# --- LOW HINT: $id $location ---\n";
 				print $fh "# Source:  $source\n" if $source;
-				print $fh "# Mutated: $desc\n";
 				print $fh "# Hint:    $hint\n";
+				print $fh "# Mutations on this line ($variant_label):\n";
+
+				# List each distinct mutation description
+				for my $v (@variants) {
+					print $fh "#   $v->{description}\n";
+				}
+
+				print $fh $env_hint if $env_hint;
 				print $fh "# NOTE: new() called with no arguments as a starting point.\n";
 				print $fh "# If $mod requires constructor arguments, add them here.\n";
 				print $fh "# my \$obj = ${mod}->new();\n";
@@ -2177,24 +2281,6 @@ HEADER
 	print "Generated mutant test stubs: $filename\n" if $config{verbose};
 
 	return $filename;
-}
-
-# --------------------------------------------------
-# Scan backwards from the mutated line to find the
-# enclosing subroutine name, for context in comments
-# --------------------------------------------------
-sub _enclosing_sub {
-	my ($source_lines, $line_no) = @_;
-
-	# Walk backwards from the mutated line looking for 'sub name'
-	for(my $i = $line_no - 1; $i >= 0; $i--) {
-		if($source_lines->[$i] =~ /^\s*sub\s+(\w+)/) {
-			return $1;
-		}
-	}
-
-	# No enclosing sub found (e.g. file-level code)
-	return undef;
 }
 
 # Mutant helpers from App::Test::Generator::Report::HTML
