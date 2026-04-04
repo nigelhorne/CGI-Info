@@ -7,6 +7,7 @@ Revision history for CGI-Info
 	Block attacks with var_dump%28md5
 	Allow the default max_upload_size to be configurable at runtime
 	Added function.t - white-box tests for all functions, including helper functions
+	Added unit.t - a set of black-box subtests to test each public function, according to their API documentation in the POD
 
 1.11	Mon Feb  2 12:59:36 EST 2026
 	Fix "skipped: (no reason given)" https://www.cpantesters.org/cpan/report/6af2b33e-fef6-11f0-9424-b5d717f4d45d
