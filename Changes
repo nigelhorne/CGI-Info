@@ -13,6 +13,7 @@ Revision history for CGI-Info
 	Added edge_cases.t - a set of destructive, pathological, boundary‑condition subtests
 		Fixed an issue that edge_cases found in scanning very long paramters for injections - the scan was slow and inefficient
 	Added extended.t - any other tests
+	Fix handling double injection NUL via %2500
 
 1.11	Mon Feb  2 12:59:36 EST 2026
 	Fix "skipped: (no reason given)" https://www.cpantesters.org/cpan/report/6af2b33e-fef6-11f0-9424-b5d717f4d45d

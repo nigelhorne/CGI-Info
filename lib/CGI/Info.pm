@@ -894,10 +894,11 @@ sub params {
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 		$key =~ tr/+/ /;
 		if(defined($value)) {
-			$value =~ s/\0//g;	# Strip NUL byte poison
-			$value =~ s/%00//g;	# Strip encoded NUL byte poison
-			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
+			$value =~ s/%00//g;   # Strip encoded NUL byte poison
+			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode
 			$value =~ tr/+/ /;
+			$value =~ s/\0//g;    # Strip NUL again: %2500 -> %00 -> \0 after second pass
+			$value =~ s/%00//g;   # Strip literal %00 again: catches %2500 -> %00
 		} else {
 			$value = '';
 		}
