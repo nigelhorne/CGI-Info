@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-1.12
+1.12	Sun Apr  5 17:46:12 EDT 2026
 	as_string should not return undef
 	Added mutation tests and LCSAJ data to the test dashboard
 	Say who is trying to upload or using unsupported multipart

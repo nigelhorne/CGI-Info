@@ -57,6 +57,7 @@ t/edge_cases.t
 t/eof.t
 t/eol.t
 t/expect.t
+t/extended_tests.t
 t/fixme.t
 t/function.t
 t/fuzz.t
@@ -100,9 +101,9 @@ t/strict.t
 t/tabs.t
 t/taint.t
 t/tmpdir.t
+t/unit.t
 t/untaint.t
 t/unused.t
-t/unit.t
 t/vars.t
 t/version.t
 t/waf.t
