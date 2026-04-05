@@ -571,6 +571,7 @@ foreach my $file (reverse sort @history_files) {
 	for my $f (keys %{ $json->{summary} }) {
 		next if $f eq 'Total';
 		next if $f =~ /^\//;
+		next unless $f =~ /^(?:lib|blib|bin)\//;	# only own project files
 		$sum += $json->{summary}{$f}{total}{percentage} // 0;
 		$count++;
 	}
@@ -3508,13 +3509,13 @@ sub _lcsaj_coverage_for_file {
 
 	return (undef, undef) unless $lcsaj_dir && $hits && defined $file;
 
-    # ----------------------------------------------------------
-    # Resolve to an absolute path for reliable prefix stripping.
-    # Keep the original argument too — we need it for $hits lookup.
-    # ----------------------------------------------------------
-    my $original = $file;
-    my $abs      = abs_path($file) // $file;
-    my $base     = basename($abs);
+	# ----------------------------------------------------------
+	# Resolve to an absolute path for reliable prefix stripping.
+	# Keep the original argument too — we need it for $hits lookup.
+	# ----------------------------------------------------------
+	my $original = $file;
+	my $abs      = abs_path($file) // $file;
+	my $base     = basename($abs);
 
     # ----------------------------------------------------------
     # Build candidate relative paths to try, most-specific first:
@@ -3642,7 +3643,8 @@ sub _own_file_coverage_pct {
 	my ($sum, $count) = (0, 0);
 	for my $f (keys %$summary) {
 		next if $f eq 'Total';
-		next if $f =~ /^\//;    # skip absolute paths (installed modules)
+		next if $f =~ /^\//;              # skip absolute paths
+		next unless $f =~ /^(?:lib|blib|bin)\//;	# only own project files
 		$sum += $summary->{$f}{total}{percentage} // 0;
 		$count++;
 	}
