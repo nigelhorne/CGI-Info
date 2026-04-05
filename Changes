@@ -11,6 +11,7 @@ Revision history for CGI-Info
 	Added integration.t - a set of subtests to black‑box, end‑to‑end behaviour across multiple routines, including the entire package, according to the POD documentation.
 		Includes as many stateful tests and tests of integration with other packages as possible.
 	Added edge_cases.t - a set of destructive, pathological, boundary‑condition subtests
+		Fixed an issue that edge_cases found in scanning very long paramters for injections - the scan was slow and inefficient
 	Added extended.t - any other tests
 
 1.11	Mon Feb  2 12:59:36 EST 2026

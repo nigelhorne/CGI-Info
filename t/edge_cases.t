@@ -43,8 +43,8 @@ subtest 'query string: single param at max realistic length (64 KB)' => sub {
 	reset_env();
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
 	$ENV{REQUEST_METHOD}	= 'GET';
-	my $long_val			= 'A' x 65_535;
-	$ENV{QUERY_STRING}	  = "note=$long_val";
+	my $long_val		= 'A' x 65_535;
+	$ENV{QUERY_STRING} = "note=$long_val";
 
 	my $info = new_ok('CGI::Info');
 	my $p	= $info->params();

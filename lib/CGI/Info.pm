@@ -964,30 +964,66 @@ sub params {
 		# }
 		my $orig_value = $value;
 		$value = _sanitise_input($value);
-
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
+			   # ($value =~ /\/AND\/.++\(SELECT\//) || # United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
 			# Facebook FBCLID can have "--"
-			# if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
-			if(($value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
-			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
-			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
-			   ($value =~ /((\%27)|(\'))union/ix) ||
-			   ($value =~ /select[[a-z]\s\*]from/ix) ||
-			   ($value =~ /\sAND\s1=1/ix) ||
-			   ($value =~ /\sOR\s.+\sAND\s/) ||
-			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
-			   ($value =~ /var_dump.+md5/) ||
-			   ($value =~ /\/AND\/.+\(SELECT\//) ||	# United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
-			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
+
+			# Pre-filter: only run quote-based regexes if value contains injection chars.
+
+			# Compute pre-filter flags from orig_value so quotes stripped by
+			# convert_XSS don't cause injection patterns to be missed
+
+			my $has_quote  = index($orig_value, "'")    >= 0 || index($orig_value, '%27') >= 0;
+			my $has_hash   = index($orig_value, '#')    >= 0 || index($orig_value, '%23') >= 0;
+			my $has_equals = index($orig_value, '=')    >= 0 || index($orig_value, '%3D') >= 0;
+			my $has_semi   = index($orig_value, ';')    >= 0 || index($orig_value, '%3B') >= 0;
+			my $has_dash   = index($orig_value, '--')   >= 0;
+
+			# All WAF patterns run on $orig_value (pre-XSS-sanitisation)
+			# convert_XSS encodes ', =, < etc. as HTML entities, which would hide
+			# injection patterns from the WAF if we checked $value instead.
+			if($has_quote || $has_hash || ($has_equals && $has_dash)) {
+				if(($orig_value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
+				   (($has_equals && ($has_quote || $has_semi || $has_dash)) &&
+				   $orig_value =~ /((\%3D)|(=))[^-]*+((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
+				   ($has_quote &&
+				    $orig_value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
+				    ($has_quote &&
+				    $orig_value =~ /((\%27)|(\'))union/ix)) {
+					$self->status(403);
+					if($ENV{'REMOTE_ADDR'}) {
+						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
+					} else {
+						$self->_warn("SQL injection attempt blocked for '$key=$orig_value'");
+					}
+					return;
+				}
+			}
+
+			my $has_select = index($orig_value, 'SELECT') >= 0 || index($orig_value, 'select') >= 0;
+			my $has_dump   = index($orig_value, 'var_dump') >= 0;
+			my $has_exec   = index($orig_value, 'exec') >= 0;
+			my $has_or  = index($orig_value, ' OR ')  >= 0;
+			my $has_and = index($orig_value, ' AND ') >= 0;
+			my $has_slash  = index($orig_value, '/**/') >= 0 || index($orig_value, '/AND/') >= 0;
+
+			if(($has_select && $orig_value =~ /select[[a-z]\s\*]from/ix) ||
+			   ($has_and    && $orig_value =~ /\sAND\s1=1/ix) ||
+			   ($has_or && $has_and && $orig_value =~ /\sOR\s.*\sAND\s/) ||
+			   ($has_slash  && $orig_value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
+			   ($has_dump   && $orig_value =~ /var_dump[^m]*+md5/) ||
+			   ($has_slash  && $has_select && $orig_value =~ /\/AND\/[^(]*+\(SELECT\//) ||
+			   ($has_exec   && $orig_value =~ /exec(\s|\+)++(s|x)p\w+/ix)) {
 				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
-					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$value'");
+					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
 				} else {
-					$self->_warn("SQL injection attempt blocked for '$key=$value'");
+					$self->_warn("SQL injection attempt blocked for '$key=$orig_value'");
 				}
 				return;
 			}
+
 			if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
 				if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 					$self->status(403);
@@ -999,6 +1035,7 @@ sub params {
 					return;
 				}
 			}
+
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i) ||
 			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
@@ -1007,11 +1044,13 @@ sub params {
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
 			}
+
 			if($value =~ /mustleak\.com\//) {
 				$self->status(403);
 				$self->_warn("Blocked mustleak attack for '$key'");
 				return;
 			}
+
 			if($value =~ /\.\.\//) {
 				$self->status(403);
 				$self->_warn("Blocked directory traversal attack for '$key'");
