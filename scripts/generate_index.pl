@@ -156,12 +156,29 @@ my $ENABLE_DEP_ANALYSIS = 1;
 my $cover_db = eval { decode_json(read_file($config{cover_db})) };
 my $mutation_db = eval { decode_json(read_file($config{mutation_db})) };
 
-my $coverage_pct = 0;
-my $badge_color = 'red';
+# --------------------------------------------------
+# Compute coverage percentage from only our own files,
+# excluding absolute paths (installed CPAN modules)
+# which inflate Devel::Cover's pre-aggregated Total.
+# --------------------------------------------------
+my ($coverage_pct, $badge_color) = (0, 'red');
 
-if(my $total_info = $cover_db->{summary}{Total}) {
-	$coverage_pct = int($total_info->{total}{percentage} // 0);
-	$badge_color = $coverage_pct > $config{med_threshold} ? 'brightgreen' : $coverage_pct > $config{low_threshold} ? 'yellow' : 'red';
+if($cover_db->{summary}) {
+	my ($sum, $count) = (0, 0);
+	for my $f (keys %{ $cover_db->{summary} }) {
+		next if $f eq 'Total';
+		next if $f =~ /^\//;    # skip absolute paths
+		$sum += $cover_db->{summary}{$f}{total}{percentage} // 0;
+		$count++;
+	}
+	if($count) {
+		my $pct = _own_file_coverage_pct($cover_db->{summary});
+
+		$coverage_pct = defined $pct ? int($pct) : 0;
+		$badge_color  = $coverage_pct > $config{med_threshold} ? 'brightgreen'
+			: $coverage_pct > $config{low_threshold} ? 'yellow'
+			: 'red';
+	}
 }
 
 Readonly my $coverage_badge_url => "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
@@ -344,9 +361,10 @@ if (@history >= 1) {
 }
 
 my %deltas;
-if ($prev_data) {
+if($prev_data) {
 	for my $file (keys %{$cover_db->{summary}}) {
 		next if $file eq 'Total';
+		next if $file =~ /^\//;    # skip absolute paths
 		my $curr = $cover_db->{summary}{$file}{total}{percentage} // 0;
 		my $prev = $prev_data->{summary}{$file}{total}{percentage} // 0;
 		my $delta = sprintf('%.1f', $curr - $prev);
@@ -494,37 +512,23 @@ for my $file (keys %{$cover_db->{summary}}) {
 }
 
 if($counted) {
-    my $avg_total = $sum_total / $counted;
-    my $class = $avg_total > 80 ? 'high' : $avg_total > 50 ? 'med' : 'low';
-    push @html, sprintf(
-        qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>},
-        $class,
-        $sum_stmt   / $counted,
-        $sum_branch / $counted,
-        $sum_cond   / $counted,
-        $sum_sub    / $counted,
-        $avg_total
-    );
+	my $avg_total = $sum_total / $counted;
+	my $class = $avg_total > 80 ? 'high' : $avg_total > 50 ? 'med' : 'low';
+	push @html, sprintf(
+		qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>},
+		$class,
+		$sum_stmt   / $counted,
+		$sum_branch / $counted,
+		$sum_cond   / $counted,
+		$sum_sub    / $counted,
+		$avg_total
+	);
 }
 
 Readonly my $commit_url => "https://github.com/$config{github_user}/$config{github_repo}/commit/$commit_sha";
 my $short_sha = substr($commit_sha, 0, 7);
 
 push @html, '</tbody></table>';
-
-# Parse historical snapshots
-my @trend_points;
-
-foreach my $file (sort @history_files) {
-	my $json = $historical_cache{$file};
-	next unless $json->{summary}{Total};
-
-	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
-	my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
-	if(defined($date)) {
-		push @trend_points, { date => $date, coverage => sprintf('%.1f', $pct) };
-	}
-}
 
 # Inject chart if we have data
 my %commit_times;
@@ -557,10 +561,20 @@ foreach my $file (reverse sort @history_files) {
 	last if $processed_count >= $config{max_points};
 
 	my $json = $historical_cache{$file};
-	next unless $json->{summary}{Total};
+	next unless $json->{summary};
 
 	my ($sha) = $file =~ /-(\w{7})\.json$/;
-	next unless $commit_messages{$sha};	# Skip merge commits
+	next unless $commit_messages{$sha};    # skip merge commits
+
+	# Compute average across our own files only
+	my ($sum, $count) = (0, 0);
+	for my $f (keys %{ $json->{summary} }) {
+		next if $f eq 'Total';
+		next if $f =~ /^\//;
+		$sum += $json->{summary}{$f}{total}{percentage} // 0;
+		$count++;
+	}
+	next unless $count;
 
 	my $timestamp = $commit_times{$sha} // strftime('%Y-%m-%dT%H:%M:%S', localtime((stat($file))->mtime));
 
@@ -576,7 +590,7 @@ foreach my $file (reverse sort @history_files) {
 	# Remove any remaining spaces (safety cleanup)
 	$timestamp =~ s/\s+//g;
 
-	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
+	my $pct = $sum / $count;
 	my $color = 'gray';	# Will be set properly after sorting
 	my $url = "https://github.com/$config{github_user}/$config{github_repo}/commit/$sha";
 	my $comment = $commit_messages{$sha};
@@ -3602,4 +3616,36 @@ sub _lcsaj_coverage_for_file {
     }
 
 	return ($covered, $total);
+}
+
+# --------------------------------------------------
+# _own_file_coverage_pct
+#
+# Compute average coverage percentage across only the
+# project's own files in a Devel::Cover summary hashref,
+# excluding Devel::Cover's pre-aggregated Total key and
+# any absolute paths (installed CPAN modules) which
+# would otherwise inflate the reported figure.
+#
+# Arguments:
+#   $summary - hashref of Devel::Cover summary data
+#
+# Returns:
+#   Average total coverage percentage, or undef if no
+#   qualifying files found
+# --------------------------------------------------
+sub _own_file_coverage_pct {
+	my ($summary) = @_;
+
+	return undef unless $summary;
+
+	my ($sum, $count) = (0, 0);
+	for my $f (keys %$summary) {
+		next if $f eq 'Total';
+		next if $f =~ /^\//;    # skip absolute paths (installed modules)
+		$sum += $summary->{$f}{total}{percentage} // 0;
+		$count++;
+	}
+
+	return $count ? $sum / $count : undef;
 }
