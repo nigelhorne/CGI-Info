@@ -475,21 +475,6 @@ push @html, sprintf(
 );
 
 # Add totals row
-if (my $total_info = $cover_db->{summary}{Total}) {
-	my $total_pct = $total_info->{total}{percentage} // 0;
-	my $class = $total_pct > 80 ? 'high' : $total_pct > 50 ? 'med' : 'low';
-
-	push @html, sprintf(
-		qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>},
-		$class,
-		$total_info->{statement}{percentage} // 0,
-		$total_info->{branch}{percentage} // 0,
-		$total_info->{condition}{percentage} // 0,
-		$total_info->{subroutine}{percentage} // 0,
-		$total_pct
-	);
-}
-
 # Compute totals only across the files we actually displayed,
 # ignoring Devel::Cover's pre-aggregated Total which includes
 # all instrumented files (CPAN modules etc.) not just our own
@@ -497,15 +482,15 @@ my ($sum_stmt, $sum_branch, $sum_cond, $sum_sub, $sum_total) = (0, 0, 0, 0, 0);
 my $counted = 0;
 
 for my $file (keys %{$cover_db->{summary}}) {
-    next if $file eq 'Total';
-    next if $file =~ /^\//;    # skip absolute paths (installed modules)
-    my $info = $cover_db->{summary}{$file};
-    $sum_stmt   += $info->{statement}{percentage}  // 0;
-    $sum_branch += $info->{branch}{percentage}     // 0;
-    $sum_cond   += $info->{condition}{percentage}  // 0;
-    $sum_sub    += $info->{subroutine}{percentage} // 0;
-    $sum_total  += $info->{total}{percentage}      // 0;
-    $counted++;
+	next if $file eq 'Total';
+	next if $file =~ /^\//;    # skip absolute paths (installed modules)
+	my $info = $cover_db->{summary}{$file};
+	$sum_stmt   += $info->{statement}{percentage}  // 0;
+	$sum_branch += $info->{branch}{percentage}     // 0;
+	$sum_cond   += $info->{condition}{percentage}  // 0;
+	$sum_sub    += $info->{subroutine}{percentage} // 0;
+	$sum_total  += $info->{total}{percentage}      // 0;
+	$counted++;
 }
 
 if($counted) {
