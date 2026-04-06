@@ -203,9 +203,15 @@ pre details.mutant-details ul {
 }
 
 .lcsaj-dot {
-       color: #5555ff;
-       font-size: 10px;
-       margin-right: 3px;
+    color: #5555ff;
+    font-size: 10px;
+    margin-right: 3px;
+}
+
+.lcsaj-dot-uncovered {
+    color: #cc4444;
+    font-size: 10px;
+    margin-right: 3px;
 }
 
 .lcsaj-tip {
@@ -244,38 +250,39 @@ TER3 (LCSAJ): 75.1% (334/445)<br>
 Approximate LCSAJ segments: 497<br>
 </div>
 
-				<div class="legend">
-					<h3>LCSAJ Legend</h3>
+    <div class="legend">
+        <h3>LCSAJ Legend</h3>
 
-					<p>
-					<span class="lcsaj-dot">●</span>
-					Marks the start of an executed <b>LCSAJ (Linear Code Sequence And Jump)</b>.
-					</p>
+        <p>
+        <span class="lcsaj-dot">●</span>
+        <b>Covered</b> — this LCSAJ path was executed during testing.
+        </p>
 
-					<p>
-					Multiple dots on a line indicate that multiple control-flow paths begin at that line.
-					</p>
+        <p>
+        <span class="lcsaj-dot-uncovered">●</span>
+        <b>Not covered</b> — this LCSAJ path was never executed. These are the paths to focus on.
+        </p>
 
-					<p>
-					Hovering over a dot shows:
-					</p>
+        <p>
+        Multiple dots on a line indicate that multiple control-flow paths begin at that line.
+        Hovering over any dot shows:
+        </p>
 
-					<pre>
-					start → end → jump
-					</pre>
+        <pre>
+        start → end → jump
+        </pre>
 
-					<ul>
-					<li><b>start</b> – first line of the executed linear sequence</li>
-					<li><b>end</b> – last line before control flow changes</li>
-					<li><b>jump</b> – line execution jumps to next</li>
-					</ul>
+        <ul>
+        <li><b>start</b> – first line of the linear sequence</li>
+        <li><b>end</b> – last line before control flow changes</li>
+        <li><b>jump</b> – line execution jumps to next</li>
+        </ul>
 
-					<p>
-					These markers help visualize which execution paths were exercised during testing.
-					</p>
+        <p>
+        Uncovered paths show <b>[NOT COVERED]</b> in the tooltip.
+	</p>
+    </div>
 
-				</div>
-			
 		<div class="legend">
 			<h3>Mutant Testing Legend</h3>
 			<span class="legend-box survived-1"></span> Survived (tests missed this)
@@ -473,7 +480,7 @@ Approximate LCSAJ segments: 497<br>
 </span><span class="">  188: 	}
 </span><span class="">  189: 
 </span><span class="">  190: 	# Return the blessed object
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">191 → 191 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">191 → 191 → 0</span></span>  191: 	return bless {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 191 → 191 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 191 → 191 → 0</span></span>  191: 	return bless {
 </span><span class="">  192: 		max_upload_size =&gt; 512 * 1024,
 </span><span class="">  193: 		allow =&gt; undef,
 </span><span class="">  194: 		upload_dir =&gt; undef,
@@ -571,7 +578,7 @@ Approximate LCSAJ segments: 497<br>
 </span><span class="">  286: 	}
 </span><span class="">  287: 
 </span><span class="">  288: 	# Untaint and finalize script path
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">289 → 289 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">289 → 289 → 0</span></span>  289: 	$self-&gt;{script_path} = $self-&gt;_untaint_filename({
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 289 → 289 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 289 → 289 → 0</span></span>  289: 	$self-&gt;{script_path} = $self-&gt;_untaint_filename({
 </span><span class="">  290: 		filename =&gt; $self-&gt;{script_path}
 </span><span class="">  291: 	});
 </span><span class="">  292: }
@@ -2215,7 +2222,7 @@ is( func(VALUE_AT_BOUNDARY), EXPECTED, &#39;Test boundary behaviour&#39; );
 </span><span class=""> 1602: 			}
 </span><span class=""> 1603: 		}
 </span><span class=""> 1604: 	}
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1605 → 1605 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1605 → 1605 → 0</span></span> 1605: 	return $script_name;
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1605 → 1605 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1605 → 1605 → 0</span></span> 1605: 	return $script_name;
 </span><span class=""> 1606: }
 </span><span class=""> 1607: 
 </span><span class=""> 1608: =head2 root_dir
@@ -2535,7 +2542,7 @@ is( func(VALUE_AT_BOUNDARY), EXPECTED, &#39;Test boundary behaviour&#39; );
 </span><span class=""> 1909: 	}
 </span><span class=""> 1910: 
 </span><span class=""> 1911: 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1912 → 1916 → 1925</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1912 → 1916 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1912 → 1916 → 1925</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1912 → 1916 → 0</span></span> 1912: 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1912 → 1916 → 1925</span></span><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1912 → 1916 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1912 → 1916 → 1925</span></span><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1912 → 1916 → 0</span></span> 1912: 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 </span><span class=""> 1913: 
 </span><span class=""> 1914: 	my @cidr_blocks = (&#39;47.235.0.0/12&#39;);	# Alibaba
 </span><span class=""> 1915: 
@@ -2548,7 +2555,7 @@ is( func(VALUE_AT_BOUNDARY), EXPECTED, &#39;Test boundary behaviour&#39; );
 </span><span class=""> 1922: 		return 1;
 </span><span class=""> 1923: 	}
 </span><span class=""> 1924: 
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1925 → 1926 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">1925 → 1926 → 0</span></span> 1925: 	$self-&gt;{is_search_engine} = 0;
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1925 → 1926 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot-uncovered">●</span><span class="lcsaj-tip-text">[NOT COVERED] 1925 → 1926 → 0</span></span> 1925: 	$self-&gt;{is_search_engine} = 0;
 </span><span class=""> 1926: 	return 0;
 </span><span class=""> 1927: }
 </span><span class=""> 1928: 
