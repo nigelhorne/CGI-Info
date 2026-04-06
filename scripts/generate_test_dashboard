@@ -43,7 +43,8 @@ if [ -z "$LCSAJ_TARGETS" ]; then
 fi
 echo "LCSAJ_TARGETS=$LCSAJ_TARGETS"
 mkdir -p coverage
-PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime -Mblib" prove -l t
+# PERL5LIB must be set separately from PERL5OPT so lib/ is in @INC when the debugger module initialises, before -Mblib takes effect
+PERL5LIB="./lib:./blib/lib" PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime" prove -l t
 
 # --- Step 5b: Merge per-process LCSAJ hit files ---
 echo "Merging LCSAJ hits..."
