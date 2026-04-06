@@ -2707,38 +2707,39 @@ sub _mutant_file_report {
 			print $out "</div>\n";
 
 			print $out qq{
-				<div class="legend">
-					<h3>LCSAJ Legend</h3>
+    <div class="legend">
+        <h3>LCSAJ Legend</h3>
 
-					<p>
-					<span class="lcsaj-dot">●</span>
-					Marks the start of an executed <b>LCSAJ (Linear Code Sequence And Jump)</b>.
-					</p>
+        <p>
+        <span class="lcsaj-dot">●</span>
+        <b>Covered</b> — this LCSAJ path was executed during testing.
+        </p>
 
-					<p>
-					Multiple dots on a line indicate that multiple control-flow paths begin at that line.
-					</p>
+        <p>
+        <span class="lcsaj-dot-uncovered">●</span>
+        <b>Not covered</b> — this LCSAJ path was never executed. These are the paths to focus on.
+        </p>
 
-					<p>
-					Hovering over a dot shows:
-					</p>
+        <p>
+        Multiple dots on a line indicate that multiple control-flow paths begin at that line.
+        Hovering over any dot shows:
+        </p>
 
-					<pre>
-					start → end → jump
-					</pre>
+        <pre>
+        start → end → jump
+        </pre>
 
-					<ul>
-					<li><b>start</b> – first line of the executed linear sequence</li>
-					<li><b>end</b> – last line before control flow changes</li>
-					<li><b>jump</b> – line execution jumps to next</li>
-					</ul>
+        <ul>
+        <li><b>start</b> – first line of the linear sequence</li>
+        <li><b>end</b> – last line before control flow changes</li>
+        <li><b>jump</b> – line execution jumps to next</li>
+        </ul>
 
-					<p>
-					These markers help visualize which execution paths were exercised during testing.
-					</p>
-
-				</div>
-			};
+        <p>
+        Uncovered paths show <b>[NOT COVERED]</b> in the tooltip.
+	</p>
+    </div>
+};
 		}
 	}
 
@@ -2770,6 +2771,17 @@ sub _mutant_file_report {
 	print $out "<pre>\n";
 
 	my %lcsaj_by_line;
+
+	# Pre-compute normalised hit map for this file so we can
+	# colour LCSAJ dots covered/uncovered when building lcsaj_by_line
+	my $norm = $file;
+	$norm =~ s{^.*/blib/lib/}{lib/};
+	$norm =~ s{^.*/lib/}{lib/};
+	my $file_hits = $lcsaj_hits
+		? (   $lcsaj_hits->{$norm}
+		// $lcsaj_hits->{ abs_path($file) // $file }
+		// {} )
+		: {};
 
 	if ($lcsaj_hits) {
 		# Normalize the filename so it matches debugger paths
@@ -2803,15 +2815,25 @@ sub _mutant_file_report {
 				next unless ref $p eq 'HASH';
 
 				my $start = $p->{start};
-				my $end = $p->{end};
+				my $end   = $p->{end};
 				my $jump  = $p->{jump} // $p->{target};
 
 				next unless defined $start && defined $end;
 
+				# Check if any line in the path range was hit
+				my $covered = 0;
+				for my $line ($start .. $end) {
+					if ($file_hits->{$line}) {
+						$covered = 1;
+						last;
+					}
+				}
+
 				push @{ $lcsaj_by_line{$start} }, {
-					start => $start,
-					end => $end,
-					jump  => $jump,
+					start   => $start,
+					end     => $end,
+					jump    => $jump,
+					covered => $covered,
 				};
 			}
 		}
@@ -2866,11 +2888,13 @@ sub _mutant_file_report {
 
 		if (my $paths = $lcsaj_by_line{$line_no}) {
 			for my $p (@$paths) {
-				my $start = $p->{start};
-				my $end = $p->{end};
-				my $jump = $p->{jump} // 0;
+				my $start     = $p->{start};
+				my $end       = $p->{end};
+				my $jump      = $p->{jump} // 0;
+				my $dot_class = $p->{covered} ? 'lcsaj-dot' : 'lcsaj-dot-uncovered';
+				my $prefix    = $p->{covered} ? '' : '[NOT COVERED] ';
 
-				$lcsaj_marker .= qq{<span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">$start → $end → $jump</span></span>};
+				$lcsaj_marker .= qq{<span class="lcsaj-tip"><span class="$dot_class">●</span><span class="lcsaj-tip-text">${prefix}$start → $end → $jump</span></span>};
 			}
 		}
 
@@ -3267,9 +3291,15 @@ pre details.mutant-details ul {
 }
 
 .lcsaj-dot {
-       color: #5555ff;
-       font-size: 10px;
-       margin-right: 3px;
+    color: #5555ff;
+    font-size: 10px;
+    margin-right: 3px;
+}
+
+.lcsaj-dot-uncovered {
+    color: #cc4444;
+    font-size: 10px;
+    margin-right: 3px;
 }
 
 .lcsaj-tip {
