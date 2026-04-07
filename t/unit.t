@@ -144,6 +144,10 @@ subtest 'script_path() - returns full path from SCRIPT_FILENAME' => sub {
 
 subtest 'script_dir() - returns directory portion of script path' => sub {
 	reset_env();
+	if($^O eq 'MSWin32') {
+		pass('script_dir() Unix-path test skipped on Windows');
+		return;
+	}
 	$ENV{SCRIPT_FILENAME} = '/var/www/cgi-bin/myapp.cgi';
 	my $dir = CGI::Info->new()->script_dir();
 	is($dir, '/var/www/cgi-bin', 'script_dir() returns containing directory');
@@ -1124,8 +1128,7 @@ subtest 'AUTOLOAD - absent field returns undef' => sub {
 	$ENV{QUERY_STRING}	  = 'x=1';
 	my $info = CGI::Info->new();
 	$info->params();
-	ok(!defined $info->nosuchparam(),
-		'AUTOLOAD on absent field returns undef');
+	ok(!defined $info->nosuchparam(), 'AUTOLOAD on absent field returns undef');
 };
 
 subtest 'AUTOLOAD - disabled with auto_load => 0' => sub {
