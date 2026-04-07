@@ -104,7 +104,13 @@ app-test-generator-mutate \
 
 set -e
 
-# --- Step 7: Create the test dashboard
-scripts/generate_index.pl --generate_mutant_tests=t
+# --- Step 7: Create the test dashboard ---
+# --generate_mutant_tests=t writes TODO stubs for surviving mutants.
+# --generate_test=mutant additionally attempts to generate runnable
+# YAML schemas in t/conf/ for NUM_BOUNDARY survivors via SchemaExtractor,
+# falling back to TODO stubs where confidence is too low.
+scripts/generate_index.pl \
+	--generate_mutant_tests=t \
+	--generate_test=mutant
 
 echo "Done! Check cover_html/index.html locally, or https://nigelhorne.github.io/${GITHUB_REPOSITORY#*/}/coverage/ when deployed."

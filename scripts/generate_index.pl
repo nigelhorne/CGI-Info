@@ -24,6 +24,7 @@ use Time::HiRes qw(sleep);
 use URI::Escape qw(uri_escape);
 use version;
 use WWW::RT::CPAN;
+use YAML::XS;
 
 =head1 NAME
 
@@ -73,6 +74,13 @@ project that uses it:
       one stub — one good test kills all variants on that line.
       File is skipped entirely if there are no survivors to report.
       If not given, no test stubs are generated.
+
+   --generate_test=CLASS
+      When set to C<mutant>, attempts to generate runnable YAML schema
+      files in t/conf/ for NUM_BOUNDARY survivors using SchemaExtractor,
+      rather than TODO stubs. Requires --generate_mutant_tests to also
+      be set. Falls back to a TODO stub if schema extraction fails or
+      confidence is too low. Future values may include other classes.
 
 =head1 DASHBOARD SECTIONS
 
@@ -142,9 +150,11 @@ Readonly my %config => (
 # generation into the named directory.
 # --------------------------------------------------
 my $mutant_test_dir;
+my $generate_test;
 GetOptions(
 	'generate_mutant_tests=s' => \$mutant_test_dir,
-) or die "Usage: $0 [--generate_mutant_tests=DIR]";
+	'generate_test=s'         => \$generate_test,
+) or die "Usage: $0 [--generate_mutant_tests=DIR] [--generate_test=mutant]";
 
 # -------------------------------
 # Dependency correlation analysis
@@ -1538,7 +1548,7 @@ write_file($config{output}, join("\n", @html));
 # Generate mutant test stubs only if --generate_mutant_tests=dir was given.
 # This is opt-in to avoid surprising existing pipelines with new files.
 if($mutation_db && $mutant_test_dir) {
-	_generate_mutant_tests($mutation_db, $cover_db, $mutant_test_dir);
+	_generate_mutant_tests($mutation_db, $cover_db, $mutant_test_dir, $generate_test);
 }
 
 # Safe git command execution
@@ -2040,6 +2050,288 @@ sub _enclosing_sub {
 }
 
 # --------------------------------------------------
+# _boundary_edge_case_key
+#
+# Detect whether a schema uses positional
+# or named parameters, to determine which
+# YAML key to use for boundary edge cases.
+# Positional functions use edge_case_array;
+# named-parameter functions use edge_cases.
+#
+# Entry:      $schema is a hashref from SchemaExtractor.
+#
+# Exit:       Returns the string 'edge_case_array' or
+#             'edge_cases'.
+#
+# Notes:      For named params, also returns the list
+#             of numeric parameter names to annotate,
+#             since we cannot always tell from the
+#             mutant context which param the boundary
+#             comparison is about.
+# --------------------------------------------------
+sub _boundary_edge_case_key {
+	my ($schema) = @_;
+
+	my $input = $schema->{input};
+
+	# No input defined at all — default to positional
+	return ('edge_case_array', []) unless $input && ref $input eq 'HASH';
+
+	# Single unnamed param: SchemaExtractor emits { type => 'string' }
+	# for simple single-argument positional functions
+	if(scalar(keys %{$input}) == 1 && exists $input->{type}) {
+		return ('edge_case_array', []);
+	}
+
+	# Count params with and without explicit positions
+	my ($has_positions, $has_names) = (0, 0);
+	my @numeric_params;
+
+	for my $name (keys %{$input}) {
+		my $p = $input->{$name};
+		next unless ref $p eq 'HASH';
+
+		# Track which params are numeric — these are the ones
+		# a NUM_BOUNDARY mutant is most likely targeting
+		if($p->{type} && $p->{type} =~ /^(integer|number|float)$/) {
+			push @numeric_params, $name;
+		}
+
+		if(defined $p->{position}) {
+			$has_positions++;
+		} else {
+			$has_names++;
+		}
+	}
+
+	# All params have positions — treat as positional calling style
+	if($has_positions && !$has_names) {
+		return ('edge_case_array', []);
+	}
+
+	# Named or mixed — attach boundary value to all numeric params
+	# since we can't know which one the mutant comparison targets
+	return ('edge_cases', \@numeric_params);
+}
+
+# --------------------------------------------------
+# _extract_schema_for_mutant
+#
+# Purpose:    Use SchemaExtractor to extract the schema
+#             for the sub that contains a surviving mutant,
+#             then augment it with the boundary value so
+#             App::Test::Generator can produce a runnable
+#             test targeting that boundary.
+#
+# Entry:      Named args:
+#               file           - path to the source .pm file
+#               enclosing_sub  - name of the sub containing
+#                                the mutant
+#               boundary_value - numeric boundary value
+#                                extracted from the mutant id
+#               module         - Perl module name (e.g.
+#                                App::Test::Generator)
+#
+# Exit:       Returns a cleaned schema hashref ready for
+#             YAML serialisation, or undef if extraction
+#             failed or confidence was too low.
+#
+# Side effects: Loads SchemaExtractor and PPI transiently.
+#               Does NOT write any files.
+#
+# Notes:      Only called when --generate_test=mutant is set.
+#             Internal _ keys from SchemaExtractor are stripped
+#             before returning, as App::Test::Generator does
+#             not understand them.
+# --------------------------------------------------
+sub _extract_schema_for_mutant {
+	my (%args) = @_;
+
+	my $file           = $args{file}           or return;
+	my $enclosing_sub  = $args{enclosing_sub}  or return;
+	my $boundary_value = $args{boundary_value};
+	my $module         = $args{module}         or return;
+
+	# Bail out if the source file does not exist or is unreadable
+	return unless -r $file;
+
+	# Load SchemaExtractor — require here so it is only loaded
+	# when --generate_test=mutant is actually in use
+	require App::Test::Generator::SchemaExtractor;
+
+	my $extractor = eval {
+		App::Test::Generator::SchemaExtractor->new(
+			input_file => $file,
+			# no output_dir — we are using no_write => 1
+			verbose    => 0,
+		);
+	};
+
+	# If SchemaExtractor fails to instantiate, fall back gracefully
+	if($@ || !$extractor) {
+		warn "SchemaExtractor failed for $file: $@\n" if $@;
+		return;
+	}
+
+	# Extract all schemas without writing any files to disk
+	my $schemas = eval { $extractor->extract_all(no_write => 1) };
+
+	if($@ || !$schemas) {
+		warn "extract_all failed for $file: $@\n" if $@;
+		return;
+	}
+
+	# Look up the schema for the specific sub containing the mutant
+	my $schema = $schemas->{$enclosing_sub};
+	return unless $schema;
+
+	# Check confidence — skip if SchemaExtractor has very low or no
+	# confidence in the extracted schema, as the generated test
+	# would likely be meaningless or wrong
+	my $confidence = $schema->{_analysis}{overall_confidence} // 'none';
+	if($confidence eq 'very_low' || $confidence eq 'none') {
+		return;
+	}
+
+	# Determine whether to use edge_case_array or edge_cases,
+	# and which named params (if any) to annotate
+	my ($edge_key, $numeric_params) = _boundary_edge_case_key($schema);
+
+	# Augment the schema with the boundary value so the generated
+	# test will probe around the exact value the mutant survived on
+	if(defined $boundary_value) {
+		if($edge_key eq 'edge_case_array') {
+			# Positional / single-arg function
+			$schema->{edge_case_array} ||= [];
+			push @{$schema->{edge_case_array}}, $boundary_value;
+
+			# Also add the values just either side of the boundary,
+			# since the mutant flipped a comparison operator
+			push @{$schema->{edge_case_array}}, $boundary_value - 1
+				if $boundary_value > 0;
+			push @{$schema->{edge_case_array}}, $boundary_value + 1;
+		} else {
+			# Named-parameter function — annotate all numeric params
+			$schema->{edge_cases} ||= {};
+			for my $param (@{$numeric_params}) {
+				$schema->{edge_cases}{$param} ||= [];
+				push @{$schema->{edge_cases}{$param}}, $boundary_value;
+				push @{$schema->{edge_cases}{$param}}, $boundary_value - 1
+					if $boundary_value > 0;
+				push @{$schema->{edge_cases}{$param}}, $boundary_value + 1;
+			}
+		}
+	}
+
+	# Ensure the schema carries the correct module and function names,
+	# since SchemaExtractor may have recorded them differently
+	$schema->{module}   = $module;
+	$schema->{function} = $enclosing_sub;
+
+	# Strip all internal _ keys that App::Test::Generator does not
+	# understand — these are SchemaExtractor analysis metadata
+	_strip_internal_keys($schema);
+
+	return $schema;
+}
+
+# --------------------------------------------------
+# _strip_internal_keys
+#
+# Purpose:    Recursively remove keys beginning with _
+#             from a schema hashref. These are internal
+#             SchemaExtractor metadata keys that
+#             App::Test::Generator does not accept.
+#
+# Entry:      $schema is a hashref (modified in place).
+# Exit:       $schema with all _* keys removed at all
+#             levels of nesting.
+# Side effects: Modifies $schema in place.
+# Notes:      Does not descend into arrayrefs — only
+#             hashrefs are recursed into.
+# --------------------------------------------------
+sub _strip_internal_keys {
+	my ($hash) = @_;
+
+	return unless ref $hash eq 'HASH';
+
+	for my $key (keys %{$hash}) {
+		if($key =~ /^_/) {
+			# Remove SchemaExtractor internal metadata key
+			delete $hash->{$key};
+		} elsif(ref $hash->{$key} eq 'HASH') {
+			# Recurse into nested hashrefs (e.g. input params)
+			_strip_internal_keys($hash->{$key});
+		}
+	}
+}
+
+# --------------------------------------------------
+# _write_mutant_schema
+#
+# Purpose:    Serialise an augmented mutant schema to a
+#             timestamped YAML file in t/conf/ so that
+#             t/fuzz.t picks it up on the next test run.
+#
+# Entry:      $schema      - cleaned schema hashref
+#             $test_dir    - base test directory (e.g. 't')
+#             $module      - Perl module name for filename
+#             $function    - function name for filename
+#             $timestamp   - YYYYMMDD_HHMMSS string
+#
+# Exit:       Returns the path of the written file,
+#             or undef if the write failed.
+#
+# Side effects: Creates t/conf/ if it does not exist.
+#               Writes a YAML file to t/conf/.
+#
+# Notes:      Uses YAML::XS::Dump. The filename is
+#             deterministic for a given timestamp so
+#             duplicate runs in the same second are
+#             skipped (same guard as TODO stubs).
+# --------------------------------------------------
+sub _write_mutant_schema {
+	my ($schema, $test_dir, $module, $function, $timestamp) = @_;
+
+	# Build a safe filename from the module and function names
+	# by replacing :: and other non-word chars with underscores
+	(my $safe_module   = $module)   =~ s/[^A-Za-z0-9]/_/g;
+	(my $safe_function = $function) =~ s/[^A-Za-z0-9]/_/g;
+
+	# Ensure t/conf/ exists before attempting to write
+	my $conf_dir = "$test_dir/conf";
+	unless(-d $conf_dir) {
+		require File::Path;
+		File::Path::make_path($conf_dir)
+			or do { warn "Cannot create $conf_dir: $!\n"; return };
+	}
+
+	my $path = "$conf_dir/mutant_${safe_module}_${safe_function}_${timestamp}.yml";
+
+	# Skip if a file for this timestamp already exists —
+	# same guard used by the TODO stub generator
+	return $path if -f $path;
+
+	# Serialise the schema to YAML, suppressing numeric string quoting
+	# so that boundary values are written as numbers not strings
+	local $YAML::XS::QuoteNumericStrings = 0;
+
+	my $yaml = eval { YAML::XS::Dump($schema) };
+	if($@ || !defined $yaml) {
+		warn "YAML serialisation failed for $path: $@\n";
+		return;
+	}
+
+	# Write the YAML file and report success or failure
+	open(my $fh, '>:encoding(UTF-8)', $path)
+		or do { warn "Cannot write $path: $!\n"; return };
+	print $fh $yaml;
+	close $fh;
+
+	return $path;
+}
+
+# --------------------------------------------------
 # _generate_mutant_tests
 #
 # Generate a test stub file for surviving mutants,
@@ -2066,7 +2358,7 @@ sub _enclosing_sub {
 #   The filename written, or undef if nothing written
 # --------------------------------------------------
 sub _generate_mutant_tests {
-	my ($mutation_db, $cover_db, $test_dir) = @_;
+	my ($mutation_db, $cover_db, $test_dir, $generate_test) = @_;
 
 	# Default output directory is the project's t/ directory
 	$test_dir //= 't';
@@ -2361,6 +2653,55 @@ HEADER
 				my $variant_label = $count == 1
 					? '1 variant'
 					: "$count variants — one test should kill all";
+
+				# --------------------------------------------------
+				# If --generate_test=mutant is set and this is a
+				# NUM_BOUNDARY mutation, attempt to produce a
+				# runnable .yml schema via SchemaExtractor rather
+				# than a TODO stub. We already have the boundary
+				# value from $boundary_hint extraction above.
+				# Fall through to the TODO stub if extraction
+				# fails or confidence is too low.
+				# --------------------------------------------------
+				if($generate_test && $generate_test eq 'mutant') {
+					if($id =~ /NUM_BOUNDARY/) {
+
+						# Extract the numeric boundary value from the
+						# source line — default to 0 if not found
+						my $boundary_value = 0;
+						if($source =~ /(?:[><=!]=?)\s*(-?\d+)/) {
+							$boundary_value = $1 + 0;
+						} elsif($source =~ /(-?\d+)\s*(?:[><=!]=?)/) {
+							$boundary_value = $1 + 0;
+						}
+
+						# Attempt schema extraction and augmentation
+						# using the enclosing sub name already computed
+						my $schema = _extract_schema_for_mutant(
+							file           => $file,
+							enclosing_sub  => $sub_name,
+							boundary_value => $boundary_value,
+							module         => $mod,
+						);
+
+						if($schema) {
+							# Write the runnable schema to t/conf/
+							# and skip the TODO stub for this mutant
+							my $written = _write_mutant_schema(
+								$schema, $test_dir, $mod,
+								$sub_name, $timestamp
+							);
+							if($written) {
+								print $fh "# SCHEMA GENERATED: $written\n";
+								print $fh "# (runnable test via t/fuzz.t)\n\n";
+								next;	# Skip TODO stub for this mutant
+							}
+							# Fall through to stub if write failed
+						}
+						# Fall through to stub if extraction failed
+						# or confidence was too low
+					}
+				}
 
 				# Emit as commented-out stub — uncomment and complete to use
 				print $fh "# --- LOW HINT: $id $location ---\n";
