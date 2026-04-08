@@ -2936,27 +2936,63 @@ sub _generate_fuzz_schemas {
 			chomp $source;
 		}
 
-		# Extract the numeric boundary value from the source line.
-		# Try right-hand side first (operator then number),
-		# then left-hand side (number then operator)
-		my $bval;
-		if($source =~ /(?:[><=!]=?)\s*(-?\d+)/) {
-			$bval = $1 + 0;
-		} elsif($source =~ /(-?\d+)\s*(?:[><=!]=?)/) {
-			$bval = $1 + 0;
-		}
-
-		next unless defined $bval;
-
-		# Store this mutant's boundary values under mod+func key.
-		# We store bval-1, bval, and bval+1 to probe either side
-		# of the boundary, consistent with _extract_schema_for_mutant
+		# --------------------------------------------------
+		# Detect what kind of boundary this mutant is about.
+		# If the comparison involves scalar(@_), the boundary
+		# is about argument count (call arity), not argument
+		# value. We handle these two cases differently:
+		#   - arity boundaries -> generate cases entries
+		#   - value boundaries -> generate edge_case_array entries
+		# --------------------------------------------------
 		my $key = "$mod\0$func";
-		for my $v ($bval - 1, $bval, $bval + 1) {
-			# Clamp to 0 for non-negative contexts such as
-			# scalar(), length(), index() return values
-			next if $v < 0 && $source =~ /\b(?:scalar|length|index)\b/;
-			push @{ $survivors_by_mod_func{$key} }, $v;
+
+		if($source =~ /scalar\s*\(\s*\@_\s*\)/) {
+			# --------------------------------------------------
+			# Arity boundary: scalar(@_) comparison.
+			# Extract the operator and count from the source line
+			# so we can generate cases that call with too few
+			# or too many arguments to exercise the boundary.
+			# e.g. scalar(@_) <= 1 means we need cases with
+			# 0 args (dies) and 2 args (lives).
+			# --------------------------------------------------
+			my ($op, $count);
+			if($source =~ /scalar\s*\(\s*\@_\s*\)\s*([<>!=]=?)\s*(\d+)/) {
+				($op, $count) = ($1, $2 + 0);
+			} elsif($source =~ /(\d+)\s*([<>!=]=?)\s*scalar\s*\(\s*\@_\s*\)/) {
+				# Reversed form: 1 >= scalar(@_)
+				($op, $count) = ($2, $1 + 0);
+			}
+
+			next unless defined $count;
+
+			# Store as an arity boundary so _generate_fuzz_schemas
+			# can emit cases entries instead of edge_case_array
+			push @{ $survivors_by_mod_func{$key}{arity} }, {
+				op    => $op,
+				count => $count,
+			};
+		} else {
+			# --------------------------------------------------
+			# Value boundary: comparison against a literal number.
+			# Extract the boundary value and store bval-1, bval,
+			# bval+1 to probe either side of the boundary,
+			# consistent with _extract_schema_for_mutant.
+			# --------------------------------------------------
+			my $bval;
+			if($source =~ /(?:[><=!]=?)\s*(-?\d+)/) {
+				$bval = $1 + 0;
+			} elsif($source =~ /(-?\d+)\s*(?:[><=!]=?)/) {
+				$bval = $1 + 0;
+			}
+
+			next unless defined $bval;
+
+			for my $v ($bval - 1, $bval, $bval + 1) {
+				# Clamp to 0 for non-negative contexts such as
+				# scalar(), length(), index() return values
+				next if $v < 0 && $source =~ /\b(?:scalar|length|index)\b/;
+				push @{ $survivors_by_mod_func{$key}{values} }, $v;
+			}
 		}
 	}
 
@@ -3004,15 +3040,20 @@ sub _generate_fuzz_schemas {
 		}
 
 		# Look up matching survivors for this module+function pair
-		my $key    = "$mod\0$func";
-		my $bvals  = $survivors_by_mod_func{$key};
+		my $key      = "$mod\0$func";
+		my $survivor = $survivors_by_mod_func{$key};
 
-		# Skip this schema if no matching survivors exist
-		unless($bvals && @{$bvals}) {
-			print "  Skipping $schema_file: no matching NUM_BOUNDARY survivors\n"
-				if $config{verbose};
+		# Skip this schema if no matching survivors exist at all
+		unless($survivor &&
+		       (($survivor->{values} && @{$survivor->{values}}) ||
+		        ($survivor->{arity}  && @{$survivor->{arity}}))) {
+			print "  Skipping $schema_file: no matching NUM_BOUNDARY survivors\n" if $config{verbose};
 			next;
 		}
+
+		# Separate value boundaries from arity boundaries
+		my $bvals       = $survivor->{values} || [];
+		my $arity_hints = $survivor->{arity}  || [];
 
 		# --------------------------------------------------
 		# Determine which edge key to use for augmentation.
@@ -3082,6 +3123,69 @@ sub _generate_fuzz_schemas {
 					push @{ $augmented->{edge_cases}{$param} }, $v
 						unless $existing{$v}++;
 				}
+			}
+		}
+		# --------------------------------------------------
+		# Arity boundary cases: generate cases entries that
+		# call the function with too few or too many args.
+		# For each arity boundary (e.g. scalar(@_) <= 1),
+		# we add:
+		#   - a DIES case with count-1 args (too few)
+		#   - a LIVES case with count+1 args (enough)
+		# We use undef as a placeholder arg value since we
+		# don't know what valid args look like beyond what
+		# the schema already specifies.
+		# --------------------------------------------------
+		if(@{$arity_hints}) {
+			$augmented->{cases} ||= {};
+
+			for my $hint (@{$arity_hints}) {
+				my ($op, $count) = @{$hint}{qw(op count)};
+
+				# Determine which arg counts should die and
+				# which should live, based on the operator.
+				# e.g. scalar(@_) <= 1 means:
+				#   0 args -> dies (too few)
+				#   1 arg  -> dies (still too few, boundary)
+				#   2 args -> lives (enough args)
+				my ($die_count, $live_count);
+
+				if($op eq '<=' || $op eq '<') {
+					# Dies when arg count is at or below boundary
+					$die_count  = $op eq '<=' ? $count     : $count - 1;
+					$live_count = $count + 1;
+				} elsif($op eq '>=' || $op eq '>') {
+					# Dies when arg count is at or above boundary
+					$die_count  = $op eq '>=' ? $count     : $count + 1;
+					$live_count = $count - 1;
+				} elsif($op eq '==' ) {
+					# Dies when arg count equals boundary exactly
+					$die_count  = $count;
+					$live_count = $count + 1;
+				} else {
+					next;
+				}
+
+				# Add a DIES case for the too-few-args scenario.
+				# Label includes the arg count so multiple arity
+				# boundaries on the same function don't collide.
+				my $die_label  = "arity_dies_${die_count}_args";
+				my $live_label = "arity_lives_${live_count}_args";
+
+				# Build placeholder input list — undef args,
+				# since we only care about the count here
+				my @die_inputs  = (undef) x $die_count;
+				my @live_inputs = (undef) x $live_count;
+
+				$augmented->{cases}{$die_label} = {
+					input   => \@die_inputs,
+					_STATUS => 'DIES',
+				} unless exists $augmented->{cases}{$die_label};
+
+				$augmented->{cases}{$live_label} = {
+					input   => \@live_inputs,
+					_STATUS => 'OK',
+				} unless exists $augmented->{cases}{$live_label};
 			}
 		}
 
