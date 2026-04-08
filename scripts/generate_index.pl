@@ -24,7 +24,7 @@ use Time::HiRes qw(sleep);
 use URI::Escape qw(uri_escape);
 use version;
 use WWW::RT::CPAN;
-use YAML::XS;
+use YAML::XS qw(Dump LoadFile);
 
 =head1 NAME
 
@@ -2412,13 +2412,10 @@ sub _write_mutant_schema {
 	# same guard used by the TODO stub generator
 	return $path if -f $path;
 
-	# Serialise the schema to YAML, suppressing numeric string quoting
-	# so that boundary values are written as numbers not strings
-	local $YAML::XS::QuoteNumericStrings = 0;
-
-	my $yaml = eval { YAML::XS::Dump($schema) };
-	if($@ || !defined $yaml) {
-		warn "YAML serialisation failed for $path: $@\n";
+	# Serialise the schema to a normalised YAML string
+	my $yaml = _dump_schema_yaml($schema);
+	if(!defined $yaml) {
+		warn "YAML serialisation failed for $path\n";
 		return;
 	}
 
@@ -2429,6 +2426,66 @@ sub _write_mutant_schema {
 	close $fh;
 
 	return $path;
+}
+
+# --------------------------------------------------
+# _dump_schema_yaml
+#
+# Purpose:    Serialise a schema hashref to a YAML
+#             string with consistent formatting,
+#             suitable for use as input to
+#             App::Test::Generator.
+#
+# Entry:      $schema - hashref to serialise.
+#             Must be a valid schema hashref.
+#
+# Exit:       Returns the YAML string, or undef if
+#             serialisation failed.
+#
+# Side effects: None. Does not write any files.
+#
+# Notes:      Applies the following normalisation
+#             before dumping:
+#               - Removes output _STATUS: DIES if it
+#                 is the only key in output, since
+#                 SchemaExtractor incorrectly infers
+#                 this from error-path returns.
+#               - Sets indent to 2 for correct nested
+#                 structure (yamllint compliant).
+#               - Suppresses numeric string quoting so
+#                 boundary values are numbers not
+#                 quoted strings.
+#               - Converts yes/no booleans to
+#                 true/false (yamllint requires this).
+# --------------------------------------------------
+sub _dump_schema_yaml {
+	my ($schema) = @_;
+
+	# Remove spurious output _STATUS: DIES — SchemaExtractor
+	# infers this from error paths but the function does not
+	# always die; only on invalid input. If output has other
+	# keys alongside _STATUS we leave it alone.
+	if(ref $schema->{output} eq 'HASH' &&
+	   ($schema->{output}{_STATUS} // '') eq 'DIES' &&
+	   keys %{$schema->{output}} == 1) {
+		delete $schema->{output};
+	}
+
+	# Set indent and suppress numeric string quoting
+	# so boundary values are written as numbers
+	local $YAML::XS::QuoteNumericStrings = 0;
+	local $YAML::XS::Indent              = 2;
+
+	my $yaml = eval { YAML::XS::Dump($schema) };
+	return undef if $@ || !defined $yaml;
+
+	# Convert yes/no booleans to true/false —
+	# YAML::XS writes Perl's 1/0 as yes/no but
+	# yamllint requires true/false per YAML 1.2
+	$yaml =~ s/:\s+yes$/: true/mg;
+	$yaml =~ s/:\s+no$/: false/mg;
+
+	return $yaml;
 }
 
 # --------------------------------------------------
@@ -3024,7 +3081,7 @@ sub _generate_fuzz_schemas {
 		# Load the existing schema — skip if unreadable or malformed
 		my $schema = eval { YAML::XS::LoadFile($schema_path) };
 		if($@ || !$schema || ref $schema ne 'HASH') {
-			warn "Cannot load schema $schema_path: $@\n" if $@;
+			warn "Cannot load schema $schema_path: $@" if $@;
 			next;
 		}
 
@@ -3205,14 +3262,10 @@ sub _generate_fuzz_schemas {
 			next;
 		}
 
-		# Serialise the augmented schema to YAML,
-		# suppressing numeric string quoting so boundary
-		# values are written as numbers not quoted strings
-		local $YAML::XS::QuoteNumericStrings = 0;
-
-		my $yaml = eval { YAML::XS::Dump($augmented) };
-		if($@ || !defined $yaml) {
-			warn "YAML serialisation failed for $out_path: $@\n";
+		# Serialise the augmented schema to a normalised YAML string
+		my $yaml = _dump_schema_yaml($augmented);
+		if(!defined $yaml) {
+			warn "YAML serialisation failed for $out_path";
 			next;
 		}
 
