@@ -106,11 +106,13 @@ set -e
 
 # --- Step 7: Create the test dashboard ---
 # --generate_mutant_tests=t writes TODO stubs for surviving mutants.
-# --generate_test=mutant additionally attempts to generate runnable
-# YAML schemas in t/conf/ for NUM_BOUNDARY survivors via SchemaExtractor,
-# falling back to TODO stubs where confidence is too low.
+# --generate_test=mutant attempts runnable YAML schemas for NUM_BOUNDARY
+# survivors via SchemaExtractor where confidence is sufficient.
+# --generate_fuzz augments existing t/conf/ schemas with boundary values
+# from surviving mutants, writing timestamped copies for t/fuzz.t.
 scripts/generate_index.pl \
 	--generate_mutant_tests=t \
-	--generate_test=mutant
+	--generate_test=mutant \
+	--generate_fuzz
 
 echo "Done! Check cover_html/index.html locally, or https://nigelhorne.github.io/${GITHUB_REPOSITORY#*/}/coverage/ when deployed."

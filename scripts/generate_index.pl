@@ -30,6 +30,63 @@ use YAML::XS;
 
 generate_index.pl - Test coverage dashboard generator
 
+=head1 DESCRIPTION
+
+C<generate_index.pl> generates an HTML test coverage dashboard for
+publication on GitHub Pages, combining four sources of test quality
+data into a single report:
+
+=over 4
+
+=item * B<Statement and branch coverage> from L<Devel::Cover>, showing
+which lines and branches were exercised by the test suite.
+
+=item * B<LCSAJ path coverage> (TER3) from the LCSAJ runtime debugger,
+showing which control-flow paths were executed. Displayed as blue
+(covered) or red (uncovered) dots on per-file mutation pages.
+
+=item * B<Mutation testing results> from C<bin/app-test-generator-mutate>,
+showing which injected faults the test suite detected (killed) and
+which it missed (survived).
+
+=item * B<CPAN Testers failure analysis>, showing which Perl versions
+and operating systems are failing, with automatic root cause detection
+including Perl version cliffs, locale sensitivity, and dependency
+version cliffs.
+
+=back
+
+In addition to the dashboard, the script drives the mutation-guided
+test generation pipeline described in
+L<App::Test::Generator/MUTATION-GUIDED TEST GENERATION>. Surviving
+mutants are used to automatically generate new test stubs and fuzz
+schemas that target the exact boundary conditions the test suite
+missed:
+
+=over 4
+
+=item * C<--generate_mutant_tests=DIR> produces TODO stub files in
+C<DIR/> for all surviving mutants, grouped by source file and
+deduplicated by line.
+
+=item * C<--generate_test=mutant> additionally attempts to produce
+runnable YAML schemas in C<DIR/conf/> for NUM_BOUNDARY survivors
+using L<App::Test::Generator::SchemaExtractor>.
+
+=item * C<--generate_fuzz> augments existing schemas in C<DIR/conf/>
+with boundary values from surviving mutants, writing timestamped
+copies that are picked up automatically by C<t/fuzz.t>.
+
+=back
+
+The script is designed to be shared across projects. Copy it into the
+C<scripts/> directory of each project that uses it:
+
+    cp ../App-Test-Generator/scripts/generate_index.pl scripts/
+
+It is invoked automatically by C<scripts/generate_test_dashboard> on
+each CI push via C<.github/workflows/dashboard.yml>.
+
 =head1 SYNOPSIS
 
 Generates an HTML dashboard for use as a testing dashboard on GitHub Pages.
@@ -41,8 +98,7 @@ This script is automatically run by each 'git push' via the GitHub Actions
 workflow at .github/workflows/dashboard.yml, and can also be run locally
 via scripts/generate_test_dashboard.
 
-The script is shared across projects — copy it into scripts/ of each
-project that uses it:
+The script is shared across projects - copy it into scripts/ of each project that uses it:
 
   cp ../App-Test-Generator/scripts/generate_index.pl scripts/
 
@@ -71,16 +127,46 @@ project that uses it:
           the enclosing subroutine name for navigation context
         - Comment-only hints for Low difficulty survivors
       Multiple mutations on the same source line are deduplicated into
-      one stub — one good test kills all variants on that line.
+      one stub - one good test kills all variants on that line.
       File is skipped entirely if there are no survivors to report.
       If not given, no test stubs are generated.
 
-   --generate_test=CLASS
-      When set to C<mutant>, attempts to generate runnable YAML schema
-      files in t/conf/ for NUM_BOUNDARY survivors using SchemaExtractor,
-      rather than TODO stubs. Requires --generate_mutant_tests to also
-      be set. Falls back to a TODO stub if schema extraction fails or
-      confidence is too low. Future values may include other classes.
+  --generate_test=CLASS
+      When combined with --generate_mutant_tests=DIR, attempts to produce
+      runnable test artefacts for surviving mutants rather than TODO stubs.
+
+      Currently supported classes:
+
+        mutant  For NUM_BOUNDARY survivors, calls
+                App::Test::Generator::SchemaExtractor to extract the schema
+                for the enclosing subroutine and augments it with the
+                boundary value from the mutant (plus one value either side).
+                The resulting YAML schema is written to DIR/conf/ and is
+                picked up automatically by t/fuzz.t on the next test run.
+                Falls back to a TODO stub if SchemaExtractor fails, the
+                enclosing sub cannot be determined, or the extracted schema
+                confidence is too low (very_low or none).
+
+      This option is designed to accept additional classes in future, for
+      example corpus-driven or property-based test generation.
+      If not given, only TODO stubs are produced.
+
+   --generate_fuzz
+      Scans t/conf/ for existing YAML schema files and augments copies
+      of them with boundary values extracted from surviving NUM_BOUNDARY
+      mutants whose enclosing subroutine matches the schema's function
+      field. The original schema is never modified. Augmented copies are
+      written to t/conf/mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml and
+      are picked up automatically by t/fuzz.t on the next test run.
+
+      Schemas whose filename already starts with mutant_fuzz_ are skipped
+      to avoid augmenting previously augmented schemas. Schemas with no
+      matching survivors are skipped (with a note if --verbose is active).
+      New boundary values are merged into whichever edge key already
+      exists in the schema (edge_case_array or edge_cases), with
+      deduplication against existing values.
+
+      This flag is independent of --generate_test and can be used alone.
 
 =head1 DASHBOARD SECTIONS
 
@@ -148,13 +234,19 @@ Readonly my %config => (
 # Parse command-line options.
 # --generate_mutant_tests=dir enables test stub
 # generation into the named directory.
+# --generate_test=CLASS enables schema generation
+# for surviving mutants.
+# --generate_fuzz enables fuzz schema augmentation
+# from surviving mutants.
 # --------------------------------------------------
 my $mutant_test_dir;
 my $generate_test;
+my $generate_fuzz;
 GetOptions(
 	'generate_mutant_tests=s' => \$mutant_test_dir,
 	'generate_test=s'         => \$generate_test,
-) or die "Usage: $0 [--generate_mutant_tests=DIR] [--generate_test=mutant]";
+	'generate_fuzz'           => \$generate_fuzz,
+) or die "Usage: $0 [--generate_mutant_tests=DIR] [--generate_test=mutant] [--generate_fuzz]";
 
 # -------------------------------
 # Dependency correlation analysis
@@ -511,7 +603,8 @@ my $counted = 0;
 
 for my $file (keys %{$cover_db->{summary}}) {
 	next if $file eq 'Total';
-	next if $file =~ /^\//;    # skip absolute paths (installed modules)
+	next if $file =~ /^\//;	# skip absolute paths (installed modules)
+
 	my $info = $cover_db->{summary}{$file};
 	$sum_stmt   += $info->{statement}{percentage}  // 0;
 	$sum_branch += $info->{branch}{percentage}     // 0;
@@ -524,6 +617,7 @@ for my $file (keys %{$cover_db->{summary}}) {
 if($counted) {
 	my $avg_total = $sum_total / $counted;
 	my $class = $avg_total > 80 ? 'high' : $avg_total > 50 ? 'med' : 'low';
+
 	push @html, sprintf(
 		qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>},
 		$class,
@@ -1549,6 +1643,12 @@ write_file($config{output}, join("\n", @html));
 # This is opt-in to avoid surprising existing pipelines with new files.
 if($mutation_db && $mutant_test_dir) {
 	_generate_mutant_tests($mutation_db, $cover_db, $mutant_test_dir, $generate_test);
+}
+
+# Generate fuzz schema augmentations from surviving mutants
+# if --generate_fuzz was passed on the command line
+if($mutation_db && $generate_fuzz) {
+	_generate_fuzz_schemas($mutation_db);
 }
 
 # Safe git command execution
@@ -2733,12 +2833,347 @@ HEADER
 	return $filename;
 }
 
+# --------------------------------------------------
+# _generate_fuzz_schemas
+#
+# Purpose:    Scan t/conf/ for existing YAML schema
+#             files and augment copies of them with
+#             boundary values extracted from surviving
+#             NUM_BOUNDARY mutants whose enclosing sub
+#             matches the schema's function field.
+#             The original schema is never modified.
+#             Augmented copies are written with a
+#             timestamped mutant_fuzz_ prefix so they
+#             are picked up by t/fuzz.t automatically.
+#
+# Entry:      $mutation_db - decoded mutation JSON
+#                            hashref
+#             $test_dir    - base test directory
+#                            (default: 't')
+#
+# Exit:       Returns the number of augmented schema
+#             files written. Returns 0 if no matching
+#             survivors were found.
+#
+# Side effects: Writes .yml files to $test_dir/conf/.
+#               Prints progress if $config{verbose}.
+#
+# Notes:      Skips schemas whose filename starts with
+#             mutant_fuzz_ to avoid augmenting already-
+#             augmented schemas.
+#             Skips schemas where no matching NUM_BOUNDARY
+#             survivors exist, printing a verbose note.
+#             Merges new boundary values into whichever
+#             edge key already exists in the schema
+#             (edge_case_array or edge_cases), falling
+#             back to _boundary_edge_case_key detection
+#             if neither key is present yet.
+#             Deduplicates boundary values before writing.
+# --------------------------------------------------
+sub _generate_fuzz_schemas {
+	my ($mutation_db, $test_dir) = @_;
+
+	# Default test directory is the project's t/ directory
+	$test_dir //= 't';
+
+	my $conf_dir  = "$test_dir/conf";
+	my $written   = 0;
+
+	# Nothing to do if t/conf/ does not exist yet
+	unless(-d $conf_dir) {
+		print "No $conf_dir directory found, skipping fuzz schema generation\n"
+			if $config{verbose};
+		return 0;
+	}
+
+	# --------------------------------------------------
+	# Compute a single timestamp for all files written
+	# in this run, consistent with mutant_YYYYMMDD.t
+	# naming used by _generate_mutant_tests
+	# --------------------------------------------------
+	my $timestamp = strftime('%Y%m%d_%H%M%S', localtime);
+
+	# --------------------------------------------------
+	# Build a lookup of surviving NUM_BOUNDARY mutants
+	# indexed by (normalised module name, function name)
+	# so we can find matches efficiently per schema
+	# --------------------------------------------------
+	my %survivors_by_mod_func;
+
+	for my $m (@{ $mutation_db->{survived} || [] }) {
+		# Only process NUM_BOUNDARY mutations — these have
+		# the clearest boundary value inference path
+		next unless ref $m;
+		next unless ($m->{id} // '') =~ /NUM_BOUNDARY/;
+		next unless defined $m->{file} && defined $m->{line};
+
+		# Derive module name from file path for matching
+		# e.g. lib/CGI/Info.pm -> CGI::Info
+		(my $mod = $m->{file}) =~ s{^lib/}{};
+		$mod =~ s{\.pm$}{};
+		$mod =~ s{/}{::}g;
+
+		# Read source lines so we can find the enclosing sub
+		# and extract the boundary value from the source line
+		my @source_lines;
+		if(-r $m->{file}) {
+			open my $sfh, '<', $m->{file}
+				or next;
+			@source_lines = <$sfh>;
+			close $sfh;
+		}
+
+		next unless @source_lines;
+
+		# Find the enclosing subroutine name for this mutant
+		my $func = _enclosing_sub(\@source_lines, $m->{line});
+		next unless defined $func;
+
+		# Extract the source line text for boundary value parsing
+		my $source = '';
+		if($m->{line} >= 1 && $m->{line} <= scalar @source_lines) {
+			$source = $source_lines[$m->{line} - 1];
+			chomp $source;
+		}
+
+		# Extract the numeric boundary value from the source line.
+		# Try right-hand side first (operator then number),
+		# then left-hand side (number then operator)
+		my $bval;
+		if($source =~ /(?:[><=!]=?)\s*(-?\d+)/) {
+			$bval = $1 + 0;
+		} elsif($source =~ /(-?\d+)\s*(?:[><=!]=?)/) {
+			$bval = $1 + 0;
+		}
+
+		next unless defined $bval;
+
+		# Store this mutant's boundary values under mod+func key.
+		# We store bval-1, bval, and bval+1 to probe either side
+		# of the boundary, consistent with _extract_schema_for_mutant
+		my $key = "$mod\0$func";
+		for my $v ($bval - 1, $bval, $bval + 1) {
+			# Clamp to 0 for non-negative contexts such as
+			# scalar(), length(), index() return values
+			next if $v < 0 && $source =~ /\b(?:scalar|length|index)\b/;
+			push @{ $survivors_by_mod_func{$key} }, $v;
+		}
+	}
+
+	# --------------------------------------------------
+	# Scan t/conf/ for existing YAML schema files
+	# --------------------------------------------------
+	opendir(my $dh, $conf_dir)
+		or do { warn "Cannot read $conf_dir: $!\n"; return 0 };
+
+	my @schema_files = grep {
+		# Include only .yml files that are not already
+		# fuzz-augmented schemas from a previous run
+		/\.yml$/ && !/^mutant_fuzz_/
+	} readdir($dh);
+
+	closedir $dh;
+
+	if($config{verbose}) {
+		printf "Found %d candidate schema file(s) in %s\n",
+			scalar(@schema_files), $conf_dir;
+	}
+
+	# --------------------------------------------------
+	# Process each candidate schema file
+	# --------------------------------------------------
+	for my $schema_file (sort @schema_files) {
+		my $schema_path = "$conf_dir/$schema_file";
+
+		# Load the existing schema — skip if unreadable or malformed
+		my $schema = eval { YAML::XS::LoadFile($schema_path) };
+		if($@ || !$schema || ref $schema ne 'HASH') {
+			warn "Cannot load schema $schema_path: $@\n" if $@;
+			next;
+		}
+
+		# Extract module and function from the schema.
+		# Both are required to match against survivors.
+		my $mod  = $schema->{module}   // '';
+		my $func = $schema->{function} // '';
+
+		unless($mod && $func) {
+			print "  Skipping $schema_file: missing module or function\n"
+				if $config{verbose};
+			next;
+		}
+
+		# Look up matching survivors for this module+function pair
+		my $key    = "$mod\0$func";
+		my $bvals  = $survivors_by_mod_func{$key};
+
+		# Skip this schema if no matching survivors exist
+		unless($bvals && @{$bvals}) {
+			print "  Skipping $schema_file: no matching NUM_BOUNDARY survivors\n"
+				if $config{verbose};
+			next;
+		}
+
+		# --------------------------------------------------
+		# Determine which edge key to use for augmentation.
+		# Option B: respect what the schema already has,
+		# falling back to _boundary_edge_case_key detection.
+		# --------------------------------------------------
+		my ($edge_key, $numeric_params);
+
+		if(exists $schema->{edge_case_array}) {
+			# Schema already uses positional edge cases
+			$edge_key      = 'edge_case_array';
+			$numeric_params = [];
+		} elsif(exists $schema->{edge_cases}) {
+			# Schema already uses named edge cases
+			$edge_key      = 'edge_cases';
+
+			# Collect existing numeric param names from edge_cases
+			$numeric_params = [ keys %{ $schema->{edge_cases} } ];
+		} else {
+			# Neither key exists yet — detect from schema structure
+			($edge_key, $numeric_params) = _boundary_edge_case_key($schema);
+		}
+
+		# --------------------------------------------------
+		# Make a deep copy of the schema so we never modify
+		# the original data structure in memory
+		# --------------------------------------------------
+		require Storable;
+		my $augmented = Storable::dclone($schema);
+
+		# --------------------------------------------------
+		# Merge boundary values into the appropriate key,
+		# deduplicating against any values already present
+		# --------------------------------------------------
+		if($edge_key eq 'edge_case_array') {
+			# Build a dedup set from existing values
+			my %existing = map { $_ => 1 }
+				@{ $augmented->{edge_case_array} || [] };
+
+			# Add new boundary values not already present
+			for my $v (@{$bvals}) {
+				push @{ $augmented->{edge_case_array} }, $v
+					unless $existing{$v}++;
+			}
+		} else {
+			# Named parameter style — add to each numeric param.
+			# If no numeric params were found, use all params
+			# that exist in edge_cases already
+			my @targets = @{$numeric_params};
+
+			unless(@targets) {
+				# Fall back to input params of numeric type
+				for my $name (keys %{ $schema->{input} || {} }) {
+					my $p = $schema->{input}{$name};
+					next unless ref $p eq 'HASH';
+					push @targets, $name
+						if ($p->{type} // '') =~ /^(integer|number|float)$/;
+				}
+			}
+
+			for my $param (@targets) {
+				my %existing = map { $_ => 1 }
+					@{ $augmented->{edge_cases}{$param} || [] };
+
+				# Merge in new boundary values, deduplicating
+				for my $v (@{$bvals}) {
+					push @{ $augmented->{edge_cases}{$param} }, $v
+						unless $existing{$v}++;
+				}
+			}
+		}
+
+		# --------------------------------------------------
+		# Build the output filename using the timestamp and
+		# function name, safe for use as a filesystem path
+		# --------------------------------------------------
+		(my $safe_func = $func) =~ s/[^A-Za-z0-9]/_/g;
+		my $out_name = "mutant_fuzz_${timestamp}_${safe_func}.yml";
+		my $out_path = "$conf_dir/$out_name";
+
+		# Skip if this exact file already exists —
+		# same guard used by _generate_mutant_tests
+		if(-f $out_path) {
+			print "  Skipping $out_name: already exists\n"
+				if $config{verbose};
+			next;
+		}
+
+		# Serialise the augmented schema to YAML,
+		# suppressing numeric string quoting so boundary
+		# values are written as numbers not quoted strings
+		local $YAML::XS::QuoteNumericStrings = 0;
+
+		my $yaml = eval { YAML::XS::Dump($augmented) };
+		if($@ || !defined $yaml) {
+			warn "YAML serialisation failed for $out_path: $@\n";
+			next;
+		}
+
+		# Write the augmented schema file
+		open(my $fh, '>:encoding(UTF-8)', $out_path)
+			or do { warn "Cannot write $out_path: $!\n"; next };
+		print $fh $yaml;
+		close $fh;
+
+		$written++;
+
+		print "  Generated fuzz schema: $out_path\n"
+			if $config{verbose};
+	}
+
+	# Report summary of what was written
+	printf "Generated %d fuzz schema file(s) in %s\n",
+		$written, $conf_dir
+		if $config{verbose};
+
+	return $written;
+}
+
 # Mutant helpers from App::Test::Generator::Report::HTML
 
 # --------------------------------------------------
-# Write index page
+# _mutation_index
+#
+# Purpose:    Build the HTML mutation report section
+#             for the main dashboard page. Produces
+#             the mutation summary (score, totals),
+#             the per-file mutation files table with
+#             TER1/TER2/TER3 badges, and the
+#             structural coverage and executive
+#             summary blocks.
+#
+# Entry:      $data          - decoded mutation JSON
+#                              hashref (score, total,
+#                              killed, survived)
+#             $files         - hashref of file =>
+#                              { killed => [], survived => [] }
+#                              as produced by _group_by_file
+#             $coverage_data - decoded Devel::Cover JSON
+#                              hashref, or undef
+#             $lcsaj_dir     - root directory for LCSAJ
+#                              .json files, or undef
+#             $lcsaj_hits    - hashref of LCSAJ hit data
+#                              as produced by the runtime
+#                              debugger, or undef
+#
+# Exit:       Returns an arrayref of HTML strings
+#             ready to be pushed onto @html.
+#             Never returns undef.
+#
+# Notes:      TER1 and TER2 are sourced from
+#             Devel::Cover via _coverage_for_file.
+#             TER3 is sourced from LCSAJ runtime data
+#             via _lcsaj_coverage_for_file.
+#             All three are normalised to lib/ paths
+#             at display time — neither data source
+#             is modified.
+#             The table is sorted worst-score-first
+#             so the files most needing attention
+#             appear at the top.
 # --------------------------------------------------
-
 sub _mutation_index {
 	my ($data, $files, $coverage_data, $lcsaj_dir, $lcsaj_hits) = @_;
 
@@ -2940,16 +3375,27 @@ sub _file_score {
 # --------------------------------------------------
 # _ter_badge
 #
-# Format a single TER percentage value as a
-# colour-coded badge, consistent with the coverage
-# badge style used elsewhere in the dashboard.
+# Purpose:    Format a single TER percentage value as
+#             a colour-coded HTML badge, consistent
+#             with the coverage badge style used
+#             elsewhere in the dashboard.
 #
-# Arguments:
-#   $pct   - percentage value (0-100), or undef
-#   $label - text to show if undef (e.g. 'n/a')
+# Entry:      $pct   - percentage value (0-100), or
+#                      undef if data is unavailable
+#             $label - fallback text to display when
+#                      $pct is undef (e.g. 'n/a')
 #
-# Returns:
-#   HTML span string
+# Exit:       Returns an HTML span string. Never
+#             returns undef.
+#
+# Side effects: None.
+#
+# Notes:      Thresholds are taken from %config:
+#               >= med_threshold -> green (badge-good)
+#               >= low_threshold -> yellow (badge-warn)
+#               <  low_threshold -> red (badge-bad)
+#             Undef input produces a grey badge with
+#             title="No data".
 # --------------------------------------------------
 sub _ter_badge {
 	my ($pct, $label) = @_;
@@ -3941,16 +4387,16 @@ sub _lcsaj_coverage_for_file {
 	my $abs      = abs_path($file) // $file;
 	my $base     = basename($abs);
 
-    # ----------------------------------------------------------
-    # Build candidate relative paths to try, most-specific first:
-    #   1. lib-relative  e.g.  Foo/Bar.pm          (strip .../lib/)
-    #   2. basename only e.g.  Bar.pm              (last resort)
-    # We deliberately do NOT include the leading "lib/" segment in
-    # the .lcsaj.json path because the LCSAJ analyser is expected to
-    # write files mirroring only the package-namespace portion of the
-    # path (i.e. what comes *after* lib/).
-    # ----------------------------------------------------------
-    my @rel_candidates;
+	# ----------------------------------------------------------
+	# Build candidate relative paths to try, most-specific first:
+	#   1. lib-relative  e.g.  Foo/Bar.pm          (strip .../lib/)
+	#   2. basename only e.g.  Bar.pm              (last resort)
+	# We deliberately do NOT include the leading "lib/" segment in
+	# the .lcsaj.json path because the LCSAJ analyser is expected to
+	# write files mirroring only the package-namespace portion of the
+	# path (i.e. what comes *after* lib/).
+	# ----------------------------------------------------------
+	my @rel_candidates;
 
     if ($abs =~ m{(?:^|/)(?:blib/)?lib/(.+)$}) {
         push @rel_candidates, $1;               # e.g. Foo/Bar.pm
@@ -4067,7 +4513,7 @@ sub _own_file_coverage_pct {
 	my ($sum, $count) = (0, 0);
 	for my $f (keys %$summary) {
 		next if $f eq 'Total';
-		next if $f =~ /^\//;              # skip absolute paths
+		next if $f =~ /^\//;	# skip absolute paths
 		next unless $f =~ /^(?:lib|blib|bin)\//;	# only own project files
 		$sum += $summary->{$f}{total}{percentage} // 0;
 		$count++;
