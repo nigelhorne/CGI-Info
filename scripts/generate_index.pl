@@ -2459,16 +2459,17 @@ sub _write_mutant_schema {
 #                 true/false (yamllint requires this).
 # --------------------------------------------------
 sub _dump_schema_yaml {
-	my ($schema) = @_;
+	my $schema = $_[0];
 
-	# Remove spurious output _STATUS: DIES — SchemaExtractor
-	# infers this from error paths but the function does not
-	# always die; only on invalid input. If output has other
-	# keys alongside _STATUS we leave it alone.
+	# Replace spurious output _STATUS: DIES with a minimal
+	# valid output spec. SchemaExtractor infers DIES from
+	# error paths but the function does not always die.
+	# Leaving output empty causes uninitialized value warnings
+	# in App::Test::Generator, so we supply a safe default.
 	if(ref $schema->{output} eq 'HASH' &&
 	   ($schema->{output}{_STATUS} // '') eq 'DIES' &&
 	   keys %{$schema->{output}} == 1) {
-		delete $schema->{output};
+		$schema->{output} = { type => 'string' };
 	}
 
 	# Set indent and suppress numeric string quoting
@@ -2484,6 +2485,43 @@ sub _dump_schema_yaml {
 	# yamllint requires true/false per YAML 1.2
 	$yaml =~ s/:\s+yes$/: true/mg;
 	$yaml =~ s/:\s+no$/: false/mg;
+
+	# --------------------------------------------------
+	# Fix YAML::XS indentation quirks.
+	# YAML::XS does not reliably honour $Indent for:
+	#   1. List items nested inside hash values — they
+	#      should be indented 2 more than their parent
+	#      key but sometimes appear at the same level.
+	#   2. Top-level keys after a nested block — they
+	#      sometimes lose their leading spaces entirely.
+	# We correct both by scanning line by line and
+	# tracking the expected indentation depth.
+	# --------------------------------------------------
+	my @lines  = split /\n/, $yaml, -1;
+	my @fixed;
+	my $last_key_indent = 0;
+
+	for my $line (@lines) {
+		# Track indentation of the most recent hash key line
+		# so we know the expected depth for following list items
+		if($line =~ /^( *)[\w][^:]*:/) {
+			$last_key_indent = length($1);
+		}
+
+		# Fix list items that are not indented enough —
+		# they should be at least last_key_indent + 2
+		if($line =~ /^( *)- /) {
+			my $current  = length($1);
+			my $expected = $last_key_indent + 2;
+			if($current < $expected) {
+				$line = (' ' x $expected) . substr($line, $current);
+			}
+		}
+
+		push @fixed, $line;
+	}
+
+	$yaml = join("\n", @fixed);
 
 	return $yaml;
 }
@@ -3209,11 +3247,11 @@ sub _generate_fuzz_schemas {
 
 				if($op eq '<=' || $op eq '<') {
 					# Dies when arg count is at or below boundary
-					$die_count  = $op eq '<=' ? $count     : $count - 1;
+					$die_count  = $op eq '<=' ? $count : $count - 1;
 					$live_count = $count + 1;
 				} elsif($op eq '>=' || $op eq '>') {
 					# Dies when arg count is at or above boundary
-					$die_count  = $op eq '>=' ? $count     : $count + 1;
+					$die_count  = $op eq '>=' ? $count : $count + 1;
 					$live_count = $count - 1;
 				} elsif($op eq '==' ) {
 					# Dies when arg count equals boundary exactly
@@ -3234,15 +3272,22 @@ sub _generate_fuzz_schemas {
 				my @die_inputs  = (undef) x $die_count;
 				my @live_inputs = (undef) x $live_count;
 
+				# Only add the DIES case — the live case with
+				# undef placeholder args causes generated test
+				# code to fail to compile since App::Test::Generator
+				# cannot know how to call the function meaningfully
+				# with placeholder arguments
 				$augmented->{cases}{$die_label} = {
 					input   => \@die_inputs,
 					_STATUS => 'DIES',
 				} unless exists $augmented->{cases}{$die_label};
 
-				$augmented->{cases}{$live_label} = {
-					input   => \@live_inputs,
-					_STATUS => 'OK',
-				} unless exists $augmented->{cases}{$live_label};
+				# Skip the live case — undef placeholders produce
+				# uncompilable generated test code
+				# $augmented->{cases}{$live_label} = {
+					# input   => \@live_inputs,
+					# _STATUS => 'OK',
+				# } unless exists $augmented->{cases}{$live_label};
 			}
 		}
 
