@@ -244,10 +244,10 @@ pre details.mutant-details ul {
 <div class="nav"><a href="../../../index.html">Index</a>
 </div><div class='summary'>
 <strong>Structural Coverage (Approximate)</strong><p>
-TER1 (Statement): 93.24%<br>
-TER2 (Branch): 82.86%<br>
+TER1 (Statement): 93.26%<br>
+TER2 (Branch): 82.60%<br>
 TER3 (LCSAJ): 75.1% (334/445)<br>
-Approximate LCSAJ segments: 497<br>
+Approximate LCSAJ segments: 501<br>
 </div>
 
     <div class="legend">
@@ -2814,255 +2814,257 @@ is( func(VALUE_AT_BOUNDARY), EXPECTED, &#39;Test boundary behaviour&#39; );
 </span><span class=""> 2181: 
 </span><span class=""> 2182: sub cache
 </span><span class=""> 2183: {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2184 → 2187 → 2191</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2184 → 2187 → 0</span></span> 2184: 	my $self = shift;
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2184 → 2187 → 2193</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2184 → 2187 → 0</span></span> 2184: 	my $self = shift;
 </span><span class=""> 2185: 	my $cache = shift;
 </span><span class=""> 2186: 
 </span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2187: 	if($cache) {
 </span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2188: 		croak(ref($self), &#39;:cache($cache) is not an object&#39;) if(!Scalar::Util::blessed($cache));
-</span><span class=""> 2189: 		$self-&gt;{&#39;cache&#39;} = $cache;
-</span><span class=""> 2190: 	}
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2191 → 2191 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2191 → 2191 → 0</span></span> 2191: 	return $self-&gt;{&#39;cache&#39;};
-</span><span class=""> 2192: }
-</span><span class=""> 2193: 
-</span><span class=""> 2194: =head2 set_logger
+</span><span class=""> 2189: 		croak(ref($self), &#39;:cache($cache) does not support the get() method&#39;) if(!$cache-&gt;can(&#39;get&#39;));
+</span><span class=""> 2190: 		croak(ref($self), &#39;:cache($cache) does not support the set() method&#39;) if(!$cache-&gt;can(&#39;set&#39;));
+</span><span class=""> 2191: 		$self-&gt;{&#39;cache&#39;} = $cache;
+</span><span class=""> 2192: 	}
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2193 → 2193 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2193 → 2193 → 0</span></span> 2193: 	return $self-&gt;{&#39;cache&#39;};
+</span><span class=""> 2194: }
 </span><span class=""> 2195: 
-</span><span class=""> 2196: Sets the class, array, code reference, or file that will be used for logging.
+</span><span class=""> 2196: =head2 set_logger
 </span><span class=""> 2197: 
-</span><span class=""> 2198: Sometimes you don&#39;t know what the logger is until you&#39;ve instantiated the class.
-</span><span class=""> 2199: This function fixes the catch-22 situation.
-</span><span class=""> 2200: 
-</span><span class=""> 2201: =cut
+</span><span class=""> 2198: Sets the class, array, code reference, or file that will be used for logging.
+</span><span class=""> 2199: 
+</span><span class=""> 2200: Sometimes you don&#39;t know what the logger is until you&#39;ve instantiated the class.
+</span><span class=""> 2201: This function fixes the catch-22 situation.
 </span><span class=""> 2202: 
-</span><span class=""> 2203: sub set_logger
-</span><span class=""> 2204: {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2205 → 2208 → 2217</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2205 → 2208 → 0</span></span> 2205: 	my $self = shift;
-</span><span class=""> 2206: 	my $params = Params::Get::get_params(&#39;logger&#39;, @_);
-</span><span class=""> 2207: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2208: 	if(my $logger = $params-&gt;{&#39;logger&#39;}) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2209: 		if(Scalar::Util::blessed($logger)) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2210: 			$self-&gt;{&#39;logger&#39;} = $logger;
-</span><span class=""> 2211: 		} else {
-</span><span class=""> 2212: 			$self-&gt;{&#39;logger&#39;} = Log::Abstraction-&gt;new($logger);
-</span><span class=""> 2213: 		}
-</span><span class=""> 2214: 	} else {
-</span><span class=""> 2215: 		$self-&gt;{&#39;logger&#39;} = Log::Abstraction-&gt;new();
-</span><span class=""> 2216: 	}
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2217 → 2217 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2217 → 2217 → 0</span></span> 2217: 	return $self;
-</span><span class=""> 2218: }
-</span><span class=""> 2219: 
-</span><span class=""> 2220: # Log and remember a message
-</span><span class=""> 2221: sub _log
-</span><span class=""> 2222: {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2223 → 2225 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2223 → 2225 → 0</span></span> 2223: 	my ($self, $level, @messages) = @_;
-</span><span class=""> 2224: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2225: 	if(scalar(@messages)) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2226: 		# FIXME: add caller&#39;s function
-</span><span class=""> 2227: 		# if(($level eq &#39;warn&#39;) || ($level eq &#39;info&#39;)) {
-</span><span class=""> 2228: 			push @{$self-&gt;{&#39;messages&#39;}}, { level =&gt; $level, message =&gt; join(&#39; &#39;, grep defined, @messages) };
-</span><span class=""> 2229: 		# }
-</span><span class=""> 2230: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2231: 		if(scalar(@messages) &amp;&amp; (my $logger = $self-&gt;{&#39;logger&#39;})) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2232: 			$self-&gt;{&#39;logger&#39;}-&gt;$level(join(&#39;&#39;, grep defined, @messages));
-</span><span class=""> 2233: 		}
-</span><span class=""> 2234: 	}
-</span><span class=""> 2235: }
-</span><span class=""> 2236: 
-</span><span class=""> 2237: sub _debug {
-</span><span class=""> 2238: 	my $self = shift;
-</span><span class=""> 2239: 	$self-&gt;_log(&#39;debug&#39;, @_);
-</span><span class=""> 2240: }
-</span><span class=""> 2241: 
-</span><span class=""> 2242: sub _info {
-</span><span class=""> 2243: 	my $self = shift;
-</span><span class=""> 2244: 	$self-&gt;_log(&#39;info&#39;, @_);
-</span><span class=""> 2245: }
-</span><span class=""> 2246: 
-</span><span class=""> 2247: sub _notice {
-</span><span class=""> 2248: 	my $self = shift;
-</span><span class=""> 2249: 	$self-&gt;_log(&#39;notice&#39;, @_);
-</span><span class=""> 2250: }
-</span><span class=""> 2251: 
-</span><span class=""> 2252: sub _trace {
-</span><span class=""> 2253: 	my $self = shift;
-</span><span class=""> 2254: 	$self-&gt;_log(&#39;trace&#39;, @_);
-</span><span class=""> 2255: }
-</span><span class=""> 2256: 
-</span><span class=""> 2257: # Emit a warning message somewhere
-</span><span class=""> 2258: sub _warn {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2259 → 2263 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2259 → 2263 → 0</span></span> 2259: 	my $self = shift;
-</span><span class=""> 2260: 	my $params = Params::Get::get_params(&#39;warning&#39;, @_);
-</span><span class=""> 2261: 
-</span><span class=""> 2262: 	$self-&gt;_log(&#39;warn&#39;, $params-&gt;{&#39;warning&#39;});
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2263: 	if(!defined($self-&gt;{&#39;logger&#39;})) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2264: 		Carp::carp($params-&gt;{&#39;warning&#39;});
-</span><span class=""> 2265: 	}
-</span><span class=""> 2266: }
-</span><span class=""> 2267: 
-</span><span class=""> 2268: # Emit an error message somewhere
-</span><span class=""> 2269: sub _error {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2270 → 2274 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2270 → 2274 → 0</span></span> 2270: 	my $self = shift;
-</span><span class=""> 2271: 	my $params = Params::Get::get_params(&#39;warning&#39;, @_);
-</span><span class=""> 2272: 
-</span><span class=""> 2273: 	$self-&gt;_log(&#39;error&#39;, $params-&gt;{&#39;warning&#39;});
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2274: 	if(!defined($self-&gt;{&#39;logger&#39;})) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2275: 		Carp::croak($params-&gt;{&#39;warning&#39;});
-</span><span class=""> 2276: 	}
-</span><span class=""> 2277: }
-</span><span class=""> 2278: 
-</span><span class=""> 2279: # Ensure all environment variables are sanitized and validated before use.
-</span><span class=""> 2280: # Use regular expressions to enforce strict input formats.
-</span><span class=""> 2281: sub _get_env
-</span><span class=""> 2282: {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2283 → 2288 → 2291</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2283 → 2288 → 0</span></span> 2283: 	my ($self, $var) = @_;
-</span><span class=""> 2284: 
-</span><span class=""> 2285: 	return unless defined $ENV{$var};
+</span><span class=""> 2203: =cut
+</span><span class=""> 2204: 
+</span><span class=""> 2205: sub set_logger
+</span><span class=""> 2206: {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2207 → 2210 → 2219</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2207 → 2210 → 0</span></span> 2207: 	my $self = shift;
+</span><span class=""> 2208: 	my $params = Params::Get::get_params(&#39;logger&#39;, @_);
+</span><span class=""> 2209: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2210: 	if(my $logger = $params-&gt;{&#39;logger&#39;}) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2211: 		if(Scalar::Util::blessed($logger)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2212: 			$self-&gt;{&#39;logger&#39;} = $logger;
+</span><span class=""> 2213: 		} else {
+</span><span class=""> 2214: 			$self-&gt;{&#39;logger&#39;} = Log::Abstraction-&gt;new($logger);
+</span><span class=""> 2215: 		}
+</span><span class=""> 2216: 	} else {
+</span><span class=""> 2217: 		$self-&gt;{&#39;logger&#39;} = Log::Abstraction-&gt;new();
+</span><span class=""> 2218: 	}
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2219 → 2219 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2219 → 2219 → 0</span></span> 2219: 	return $self;
+</span><span class=""> 2220: }
+</span><span class=""> 2221: 
+</span><span class=""> 2222: # Log and remember a message
+</span><span class=""> 2223: sub _log
+</span><span class=""> 2224: {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2225 → 2227 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2225 → 2227 → 0</span></span> 2225: 	my ($self, $level, @messages) = @_;
+</span><span class=""> 2226: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2227: 	if(scalar(@messages)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2228: 		# FIXME: add caller&#39;s function
+</span><span class=""> 2229: 		# if(($level eq &#39;warn&#39;) || ($level eq &#39;info&#39;)) {
+</span><span class=""> 2230: 			push @{$self-&gt;{&#39;messages&#39;}}, { level =&gt; $level, message =&gt; join(&#39; &#39;, grep defined, @messages) };
+</span><span class=""> 2231: 		# }
+</span><span class=""> 2232: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2233: 		if(scalar(@messages) &amp;&amp; (my $logger = $self-&gt;{&#39;logger&#39;})) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2234: 			$self-&gt;{&#39;logger&#39;}-&gt;$level(join(&#39;&#39;, grep defined, @messages));
+</span><span class=""> 2235: 		}
+</span><span class=""> 2236: 	}
+</span><span class=""> 2237: }
+</span><span class=""> 2238: 
+</span><span class=""> 2239: sub _debug {
+</span><span class=""> 2240: 	my $self = shift;
+</span><span class=""> 2241: 	$self-&gt;_log(&#39;debug&#39;, @_);
+</span><span class=""> 2242: }
+</span><span class=""> 2243: 
+</span><span class=""> 2244: sub _info {
+</span><span class=""> 2245: 	my $self = shift;
+</span><span class=""> 2246: 	$self-&gt;_log(&#39;info&#39;, @_);
+</span><span class=""> 2247: }
+</span><span class=""> 2248: 
+</span><span class=""> 2249: sub _notice {
+</span><span class=""> 2250: 	my $self = shift;
+</span><span class=""> 2251: 	$self-&gt;_log(&#39;notice&#39;, @_);
+</span><span class=""> 2252: }
+</span><span class=""> 2253: 
+</span><span class=""> 2254: sub _trace {
+</span><span class=""> 2255: 	my $self = shift;
+</span><span class=""> 2256: 	$self-&gt;_log(&#39;trace&#39;, @_);
+</span><span class=""> 2257: }
+</span><span class=""> 2258: 
+</span><span class=""> 2259: # Emit a warning message somewhere
+</span><span class=""> 2260: sub _warn {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2261 → 2265 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2261 → 2265 → 0</span></span> 2261: 	my $self = shift;
+</span><span class=""> 2262: 	my $params = Params::Get::get_params(&#39;warning&#39;, @_);
+</span><span class=""> 2263: 
+</span><span class=""> 2264: 	$self-&gt;_log(&#39;warn&#39;, $params-&gt;{&#39;warning&#39;});
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2265: 	if(!defined($self-&gt;{&#39;logger&#39;})) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2266: 		Carp::carp($params-&gt;{&#39;warning&#39;});
+</span><span class=""> 2267: 	}
+</span><span class=""> 2268: }
+</span><span class=""> 2269: 
+</span><span class=""> 2270: # Emit an error message somewhere
+</span><span class=""> 2271: sub _error {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2272 → 2276 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2272 → 2276 → 0</span></span> 2272: 	my $self = shift;
+</span><span class=""> 2273: 	my $params = Params::Get::get_params(&#39;warning&#39;, @_);
+</span><span class=""> 2274: 
+</span><span class=""> 2275: 	$self-&gt;_log(&#39;error&#39;, $params-&gt;{&#39;warning&#39;});
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2276: 	if(!defined($self-&gt;{&#39;logger&#39;})) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2277: 		Carp::croak($params-&gt;{&#39;warning&#39;});
+</span><span class=""> 2278: 	}
+</span><span class=""> 2279: }
+</span><span class=""> 2280: 
+</span><span class=""> 2281: # Ensure all environment variables are sanitized and validated before use.
+</span><span class=""> 2282: # Use regular expressions to enforce strict input formats.
+</span><span class=""> 2283: sub _get_env
+</span><span class=""> 2284: {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2285 → 2290 → 2293</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2285 → 2290 → 0</span></span> 2285: 	my ($self, $var) = @_;
 </span><span class=""> 2286: 
-</span><span class=""> 2287: 	# Strict sanitization: allow alphanumeric and limited special characters
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2288: 	if($ENV{$var} =~ /^[\w\.\-\/:\\]+$/) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2289: 		return $ENV{$var};
-</span><span class=""> 2290: 	}
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2291 → 2293 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2291 → 2293 → 0</span></span> 2291: 	$self-&gt;_warn(&quot;Invalid value in environment variable: $var&quot;);
-</span><span class=""> 2292: 
-</span><span class=""> 2293: 	return undef;
-</span><span class=""> 2294: }
-</span><span class=""> 2295: 
-</span><span class=""> 2296: =head2 reset
+</span><span class=""> 2287: 	return unless defined $ENV{$var};
+</span><span class=""> 2288: 
+</span><span class=""> 2289: 	# Strict sanitization: allow alphanumeric and limited special characters
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2290: 	if($ENV{$var} =~ /^[\w\.\-\/:\\]+$/) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2291: 		return $ENV{$var};
+</span><span class=""> 2292: 	}
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2293 → 2295 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2293 → 2295 → 0</span></span> 2293: 	$self-&gt;_warn(&quot;Invalid value in environment variable: $var&quot;);
+</span><span class=""> 2294: 
+</span><span class=""> 2295: 	return undef;
+</span><span class=""> 2296: }
 </span><span class=""> 2297: 
-</span><span class=""> 2298: Class method to reset the class.
-</span><span class=""> 2299: You should do this in an FCGI environment before instantiating,
-</span><span class=""> 2300: but nowhere else.
-</span><span class=""> 2301: 
-</span><span class=""> 2302: =cut
+</span><span class=""> 2298: =head2 reset
+</span><span class=""> 2299: 
+</span><span class=""> 2300: Class method to reset the class.
+</span><span class=""> 2301: You should do this in an FCGI environment before instantiating,
+</span><span class=""> 2302: but nowhere else.
 </span><span class=""> 2303: 
-</span><span class=""> 2304: sub reset {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2305 → 2307 → 2312</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2305 → 2307 → 0</span></span> 2305: 	my $class = shift;
-</span><span class=""> 2306: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2307: 	unless($class eq __PACKAGE__) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2308: 		carp(&#39;Reset is a class method&#39;);
-</span><span class=""> 2309: 		return;
-</span><span class=""> 2310: 	}
-</span><span class=""> 2311: 
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2312 → 2312 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2312 → 2312 → 0</span></span> 2312: 	$stdin_data = undef;
-</span><span class=""> 2313: }
-</span><span class=""> 2314: 
-</span><span class=""> 2315: sub AUTOLOAD
-</span><span class=""> 2316: {
-</span><span class=""> 2317: 	our $AUTOLOAD;
-</span><span class=""> 2318: 
-</span><span class=""> 2319: 	my $self = shift or return;
+</span><span class=""> 2304: =cut
+</span><span class=""> 2305: 
+</span><span class=""> 2306: sub reset {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2307 → 2309 → 2314</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2307 → 2309 → 0</span></span> 2307: 	my $class = shift;
+</span><span class=""> 2308: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."> 2309: 	unless($class eq __PACKAGE__) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""> 2310: 		carp(&#39;Reset is a class method&#39;);
+</span><span class=""> 2311: 		return;
+</span><span class=""> 2312: 	}
+</span><span class=""> 2313: 
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2314 → 2314 → 0</span></span><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">2314 → 2314 → 0</span></span> 2314: 	$stdin_data = undef;
+</span><span class=""> 2315: }
+</span><span class=""> 2316: 
+</span><span class=""> 2317: sub AUTOLOAD
+</span><span class=""> 2318: {
+</span><span class=""> 2319: 	our $AUTOLOAD;
 </span><span class=""> 2320: 
-</span><span class=""> 2321: 	return if(!defined($AUTOLOAD));
+</span><span class=""> 2321: 	my $self = shift or return;
 </span><span class=""> 2322: 
-</span><span class=""> 2323: 	# Extract the method name from the AUTOLOAD variable
-</span><span class=""> 2324: 	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
-</span><span class=""> 2325: 
-</span><span class=""> 2326: 	# Skip if called on destruction
-</span><span class=""> 2327: 	return if($method eq &#39;DESTROY&#39;);
-</span><span class=""> 2328: 
-</span><span class=""> 2329: 	Carp::croak(__PACKAGE__, &quot;: Unknown method $method&quot;) if(!ref($self));
+</span><span class=""> 2323: 	return if(!defined($AUTOLOAD));
+</span><span class=""> 2324: 
+</span><span class=""> 2325: 	# Extract the method name from the AUTOLOAD variable
+</span><span class=""> 2326: 	my ($method) = $AUTOLOAD =~ /::(\w+)$/;
+</span><span class=""> 2327: 
+</span><span class=""> 2328: 	# Skip if called on destruction
+</span><span class=""> 2329: 	return if($method eq &#39;DESTROY&#39;);
 </span><span class=""> 2330: 
-</span><span class=""> 2331: 	# Allow the AUTOLOAD feature to be disabled
-</span><span class=""> 2332: 	Carp::croak(__PACKAGE__, &quot;: Unknown method $method&quot;) if(exists($self-&gt;{&#39;auto_load&#39;}) &amp;&amp; boolean($self-&gt;{&#39;auto_load&#39;})-&gt;isFalse());
-</span><span class=""> 2333: 
-</span><span class=""> 2334: 	# Ensure the method is called on the correct package object or a subclass
-</span><span class=""> 2335: 	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
-</span><span class=""> 2336: 
-</span><span class=""> 2337: 	# Validate method name - only allow safe parameter names
-</span><span class=""> 2338: 	Carp::croak(__PACKAGE__, &quot;: Invalid method name: $method&quot;) unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
-</span><span class=""> 2339: 
-</span><span class=""> 2340: 	# Delegate to the param method
-</span><span class=""> 2341: 	return $self-&gt;param($method);
-</span><span class=""> 2342: }
-</span><span class=""> 2343: 
-</span><span class=""> 2344: =head1 AUTHOR
+</span><span class=""> 2331: 	Carp::croak(__PACKAGE__, &quot;: Unknown method $method&quot;) if(!ref($self));
+</span><span class=""> 2332: 
+</span><span class=""> 2333: 	# Allow the AUTOLOAD feature to be disabled
+</span><span class=""> 2334: 	Carp::croak(__PACKAGE__, &quot;: Unknown method $method&quot;) if(exists($self-&gt;{&#39;auto_load&#39;}) &amp;&amp; boolean($self-&gt;{&#39;auto_load&#39;})-&gt;isFalse());
+</span><span class=""> 2335: 
+</span><span class=""> 2336: 	# Ensure the method is called on the correct package object or a subclass
+</span><span class=""> 2337: 	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
+</span><span class=""> 2338: 
+</span><span class=""> 2339: 	# Validate method name - only allow safe parameter names
+</span><span class=""> 2340: 	Carp::croak(__PACKAGE__, &quot;: Invalid method name: $method&quot;) unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+</span><span class=""> 2341: 
+</span><span class=""> 2342: 	# Delegate to the param method
+</span><span class=""> 2343: 	return $self-&gt;param($method);
+</span><span class=""> 2344: }
 </span><span class=""> 2345: 
-</span><span class=""> 2346: Nigel Horne, C&lt;&lt; &lt;njh at nigelhorne.com&gt; &gt;&gt;
+</span><span class=""> 2346: =head1 AUTHOR
 </span><span class=""> 2347: 
-</span><span class=""> 2348: =head1 BUGS
+</span><span class=""> 2348: Nigel Horne, C&lt;&lt; &lt;njh at nigelhorne.com&gt; &gt;&gt;
 </span><span class=""> 2349: 
-</span><span class=""> 2350: is_tablet() only currently detects the iPad and Windows PCs. Android strings
-</span><span class=""> 2351: don&#39;t differ between tablets and smartphones.
-</span><span class=""> 2352: 
-</span><span class=""> 2353: params() returns a ref which means that calling routines can change the hash
-</span><span class=""> 2354: for other routines.
-</span><span class=""> 2355: Take a local copy before making amendments to the table if you don&#39;t want unexpected
-</span><span class=""> 2356: things to happen.
-</span><span class=""> 2357: 
-</span><span class=""> 2358: =head1 SEE ALSO
+</span><span class=""> 2350: =head1 BUGS
+</span><span class=""> 2351: 
+</span><span class=""> 2352: is_tablet() only currently detects the iPad and Windows PCs. Android strings
+</span><span class=""> 2353: don&#39;t differ between tablets and smartphones.
+</span><span class=""> 2354: 
+</span><span class=""> 2355: params() returns a ref which means that calling routines can change the hash
+</span><span class=""> 2356: for other routines.
+</span><span class=""> 2357: Take a local copy before making amendments to the table if you don&#39;t want unexpected
+</span><span class=""> 2358: things to happen.
 </span><span class=""> 2359: 
-</span><span class=""> 2360: =over 4
+</span><span class=""> 2360: =head1 SEE ALSO
 </span><span class=""> 2361: 
-</span><span class=""> 2362: =item * L&lt;Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/&gt;
+</span><span class=""> 2362: =over 4
 </span><span class=""> 2363: 
-</span><span class=""> 2364: =item * L&lt;Object::Configure&gt;
+</span><span class=""> 2364: =item * L&lt;Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/&gt;
 </span><span class=""> 2365: 
-</span><span class=""> 2366: =item * L&lt;HTTP::BrowserDetect&gt;
+</span><span class=""> 2366: =item * L&lt;Object::Configure&gt;
 </span><span class=""> 2367: 
-</span><span class=""> 2368: =item * L&lt;https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker&gt;
+</span><span class=""> 2368: =item * L&lt;HTTP::BrowserDetect&gt;
 </span><span class=""> 2369: 
-</span><span class=""> 2370: =back
+</span><span class=""> 2370: =item * L&lt;https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker&gt;
 </span><span class=""> 2371: 
-</span><span class=""> 2372: =head1 REPOSITORY
+</span><span class=""> 2372: =back
 </span><span class=""> 2373: 
-</span><span class=""> 2374: L&lt;https://github.com/nigelhorne/CGI-Info&gt;
+</span><span class=""> 2374: =head1 REPOSITORY
 </span><span class=""> 2375: 
-</span><span class=""> 2376: =head1 SUPPORT
+</span><span class=""> 2376: L&lt;https://github.com/nigelhorne/CGI-Info&gt;
 </span><span class=""> 2377: 
-</span><span class=""> 2378: This module is provided as-is without any warranty.
+</span><span class=""> 2378: =head1 SUPPORT
 </span><span class=""> 2379: 
-</span><span class=""> 2380: Please report any bugs or feature requests to C&lt;bug-cgi-info at rt.cpan.org&gt;,
-</span><span class=""> 2381: or through the web interface at
-</span><span class=""> 2382: L&lt;http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info&gt;.
-</span><span class=""> 2383: I will be notified, and then you&#39;ll
-</span><span class=""> 2384: automatically be notified of progress on your bug as I make changes.
-</span><span class=""> 2385: 
-</span><span class=""> 2386: You can find documentation for this module with the perldoc command.
+</span><span class=""> 2380: This module is provided as-is without any warranty.
+</span><span class=""> 2381: 
+</span><span class=""> 2382: Please report any bugs or feature requests to C&lt;bug-cgi-info at rt.cpan.org&gt;,
+</span><span class=""> 2383: or through the web interface at
+</span><span class=""> 2384: L&lt;http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info&gt;.
+</span><span class=""> 2385: I will be notified, and then you&#39;ll
+</span><span class=""> 2386: automatically be notified of progress on your bug as I make changes.
 </span><span class=""> 2387: 
-</span><span class=""> 2388:     perldoc CGI::Info
+</span><span class=""> 2388: You can find documentation for this module with the perldoc command.
 </span><span class=""> 2389: 
-</span><span class=""> 2390: You can also look for information at:
+</span><span class=""> 2390:     perldoc CGI::Info
 </span><span class=""> 2391: 
-</span><span class=""> 2392: =over 4
+</span><span class=""> 2392: You can also look for information at:
 </span><span class=""> 2393: 
-</span><span class=""> 2394: =item * MetaCPAN
+</span><span class=""> 2394: =over 4
 </span><span class=""> 2395: 
-</span><span class=""> 2396: L&lt;https://metacpan.org/dist/CGI-Info&gt;
+</span><span class=""> 2396: =item * MetaCPAN
 </span><span class=""> 2397: 
-</span><span class=""> 2398: =item * RT: CPAN&#39;s request tracker
+</span><span class=""> 2398: L&lt;https://metacpan.org/dist/CGI-Info&gt;
 </span><span class=""> 2399: 
-</span><span class=""> 2400: L&lt;https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info&gt;
+</span><span class=""> 2400: =item * RT: CPAN&#39;s request tracker
 </span><span class=""> 2401: 
-</span><span class=""> 2402: =item * CPAN Testers&#39; Matrix
+</span><span class=""> 2402: L&lt;https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info&gt;
 </span><span class=""> 2403: 
-</span><span class=""> 2404: L&lt;http://matrix.cpantesters.org/?dist=CGI-Info&gt;
+</span><span class=""> 2404: =item * CPAN Testers&#39; Matrix
 </span><span class=""> 2405: 
-</span><span class=""> 2406: =item * CPAN Testers Dependencies
+</span><span class=""> 2406: L&lt;http://matrix.cpantesters.org/?dist=CGI-Info&gt;
 </span><span class=""> 2407: 
-</span><span class=""> 2408: L&lt;http://deps.cpantesters.org/?module=CGI::Info&gt;
+</span><span class=""> 2408: =item * CPAN Testers Dependencies
 </span><span class=""> 2409: 
-</span><span class=""> 2410: =back
+</span><span class=""> 2410: L&lt;http://deps.cpantesters.org/?module=CGI::Info&gt;
 </span><span class=""> 2411: 
-</span><span class=""> 2412: =head1 LICENCE AND COPYRIGHT
+</span><span class=""> 2412: =back
 </span><span class=""> 2413: 
-</span><span class=""> 2414: Copyright 2010-2026 Nigel Horne.
+</span><span class=""> 2414: =head1 LICENCE AND COPYRIGHT
 </span><span class=""> 2415: 
-</span><span class=""> 2416: Usage is subject to licence terms.
+</span><span class=""> 2416: Copyright 2010-2026 Nigel Horne.
 </span><span class=""> 2417: 
-</span><span class=""> 2418: The licence terms of this software are as follows:
+</span><span class=""> 2418: Usage is subject to licence terms.
 </span><span class=""> 2419: 
-</span><span class=""> 2420: =over 4
+</span><span class=""> 2420: The licence terms of this software are as follows:
 </span><span class=""> 2421: 
-</span><span class=""> 2422: =item * Personal single user, single computer use: GPL2
+</span><span class=""> 2422: =over 4
 </span><span class=""> 2423: 
-</span><span class=""> 2424: =item * All other users (including Commercial, Charity, Educational, Government)
-</span><span class=""> 2425:   must apply in writing for a licence for use from Nigel Horne at the
-</span><span class=""> 2426:   above e-mail.
-</span><span class=""> 2427: 
-</span><span class=""> 2428: =back
+</span><span class=""> 2424: =item * Personal single user, single computer use: GPL2
+</span><span class=""> 2425: 
+</span><span class=""> 2426: =item * All other users (including Commercial, Charity, Educational, Government)
+</span><span class=""> 2427:   must apply in writing for a licence for use from Nigel Horne at the
+</span><span class=""> 2428:   above e-mail.
 </span><span class=""> 2429: 
-</span><span class=""> 2430: =cut
+</span><span class=""> 2430: =back
 </span><span class=""> 2431: 
-</span><span class=""> 2432: 1;
+</span><span class=""> 2432: =cut
+</span><span class=""> 2433: 
+</span><span class=""> 2434: 1;
 </span></pre>
 
 <script>
