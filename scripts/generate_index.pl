@@ -456,11 +456,20 @@ if($prev_data) {
 	for my $file (keys %{$cover_db->{summary}}) {
 		next if $file eq 'Total';
 		next if $file =~ /^\//;    # skip absolute paths
-		next if $file =~ /^blib\//;    # skip built copies
+
+		# Normalise blib/ paths and deduplicate against lib/ entries
+		my $delta_key = $file;
+		if($file =~ /^blib\/lib\/(.+)$/) {
+			next if exists $cover_db->{summary}{"lib/$1"};
+			$delta_key = "lib/$1";
+		}
+
 		my $curr = $cover_db->{summary}{$file}{total}{percentage} // 0;
-		my $prev = $prev_data->{summary}{$file}{total}{percentage} // 0;
+		my $prev = $prev_data->{summary}{$file}{total}{percentage}
+			// $prev_data->{summary}{$delta_key}{total}{percentage}
+			// 0;
 		my $delta = sprintf('%.1f', $curr - $prev);
-		$deltas{$file} = $delta;
+		$deltas{$delta_key} = $delta;
 	}
 }
 
@@ -478,13 +487,24 @@ my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/
 # Add rows
 my ($total_files, $total_coverage, $low_coverage_count) = (0, 0, 0);
 
-for my $file (keys %{$cover_db->{summary}}) {
+for my $file (sort keys %{$cover_db->{summary}}) {
 	next if $file eq 'Total';
 	next if $file =~ /^\//;    # skip absolute paths (installed modules)
-	next if $file =~ /^blib\//;	# skip built copies
+
+	# Normalise blib/lib/ paths to lib/ for display.
+	# Devel::Cover instruments blib/ during testing but we
+	# want to show lib/ paths to match the source tree.
+	my $display_file = $file;
+	if($file =~ /^blib\/lib\/(.+)$/) {
+		my $lib_path = "lib/$1";
+		# If a native lib/ version exists, skip this blib/ entry
+		# to avoid duplicate rows
+		next if exists $cover_db->{summary}{$lib_path};
+		$display_file = $lib_path;
+	}
 
 	my $info = $cover_db->{summary}{$file};
-	my $html_file = $file;
+	my $html_file = $display_file;
 	$html_file =~ s|/|-|g;
 	$html_file =~ s|\.pm$|-pm|;
 	$html_file =~ s|\.pl$|-pl|;
@@ -527,7 +547,7 @@ for my $file (keys %{$cover_db->{summary}}) {
 		$delta_html = '<td class="neutral" title="No previous data">&#9679;</td>';
 	}
 
-	my $source_url = $github_base . $file;
+	my $source_url = $github_base . $display_file;
 	my $has_coverage = (
 		defined $info->{statement}{percentage} ||
 		defined $info->{branch}{percentage} ||
@@ -562,7 +582,7 @@ for my $file (keys %{$cover_db->{summary}}) {
 
 	push @html, sprintf(
 		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line" target="_blank">%s</a> %s<canvas class="sparkline" width="80" height="20" data-points="$points_attr"></canvas></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>},
-		$row_class, $html_file, $file, $source_link,
+		$row_class, $html_file, $display_file, $source_link,
 		$info->{statement}{percentage} // 0,
 		$info->{branch}{percentage} // 0,
 		$info->{condition}{percentage} // 0,
@@ -590,6 +610,12 @@ my $counted = 0;
 for my $file (keys %{$cover_db->{summary}}) {
 	next if $file eq 'Total';
 	next if $file =~ /^\//;	# skip absolute paths (installed modules)
+
+	# Skip blib/ entries that have a corresponding lib/ entry
+	# to avoid counting the same file twice in the totals
+	if($file =~ /^blib\/lib\/(.+)$/) {
+		next if exists $cover_db->{summary}{"lib/$1"};
+	}
 
 	my $info = $cover_db->{summary}{$file};
 	$sum_stmt   += $info->{statement}{percentage}  // 0;
