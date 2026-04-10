@@ -122,6 +122,7 @@ jobs:
             git commit -m "Add generated mutant test stubs (${SNAPSHOT_TIMESTAMP} ${SNAPSHOT_SHA})"
             git push origin HEAD:${{ github.ref_name }}
           fi
+
       # Deploy HTML report to GitHub Pages
       - name: Publish test dashboard
         uses: peaceiris/actions-gh-pages@v4

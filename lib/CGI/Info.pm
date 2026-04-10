@@ -2186,6 +2186,8 @@ sub cache
 
 	if($cache) {
 		croak(ref($self), ':cache($cache) is not an object') if(!Scalar::Util::blessed($cache));
+		croak(ref($self), ':cache($cache) does not support the get() method') if(!$cache->can('get'));
+		croak(ref($self), ':cache($cache) does not support the set() method') if(!$cache->can('set'));
 		$self->{'cache'} = $cache;
 	}
 	return $self->{'cache'};
