@@ -89,18 +89,7 @@ each CI push via C<.github/workflows/dashboard.yml>.
 
 =head1 SYNOPSIS
 
-Generates an HTML dashboard for use as a testing dashboard on GitHub Pages.
-The published URL will be:
-
   https://$github_user.github.io/$github_repo/coverage/
-
-This script is automatically run by each 'git push' via the GitHub Actions
-workflow at .github/workflows/dashboard.yml, and can also be run locally
-via scripts/generate_test_dashboard.
-
-The script is shared across projects - copy it into scripts/ of each project that uses it:
-
-  cp ../App-Test-Generator/scripts/generate_index.pl scripts/
 
 =head1 INPUTS
 
@@ -467,6 +456,7 @@ if($prev_data) {
 	for my $file (keys %{$cover_db->{summary}}) {
 		next if $file eq 'Total';
 		next if $file =~ /^\//;    # skip absolute paths
+		next if $file =~ /^blib\//;    # skip built copies
 		my $curr = $cover_db->{summary}{$file}{total}{percentage} // 0;
 		my $prev = $prev_data->{summary}{$file}{total}{percentage} // 0;
 		my $delta = sprintf('%.1f', $curr - $prev);
@@ -488,14 +478,10 @@ my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/
 # Add rows
 my ($total_files, $total_coverage, $low_coverage_count) = (0, 0, 0);
 
-for my $file (sort keys %{$cover_db->{summary}}) {
+for my $file (keys %{$cover_db->{summary}}) {
 	next if $file eq 'Total';
-
-	# Check it's in our repo e.g. bin or blib
-	if($file =~ /^\//) {
-		# delete $cover_db->{summary};
-		next;
-	}
+	next if $file =~ /^\//;    # skip absolute paths (installed modules)
+	next if $file =~ /^blib\//;	# skip built copies
 
 	my $info = $cover_db->{summary}{$file};
 	my $html_file = $file;
@@ -607,7 +593,7 @@ for my $file (keys %{$cover_db->{summary}}) {
 
 	my $info = $cover_db->{summary}{$file};
 	$sum_stmt   += $info->{statement}{percentage}  // 0;
-	$sum_branch += $info->{branch}{percentage}     // 0;
+	$sum_branch += $info->{branch}{percentage} // 0;
 	$sum_cond   += $info->{condition}{percentage}  // 0;
 	$sum_sub    += $info->{subroutine}{percentage} // 0;
 	$sum_total  += $info->{total}{percentage}      // 0;
@@ -624,7 +610,7 @@ if($counted) {
 		$sum_stmt   / $counted,
 		$sum_branch / $counted,
 		$sum_cond   / $counted,
-		$sum_sub    / $counted,
+		$sum_sub / $counted,
 		$avg_total
 	);
 }
@@ -668,7 +654,11 @@ foreach my $file (reverse sort @history_files) {
 	next unless $json->{summary};
 
 	my ($sha) = $file =~ /-(\w{7})\.json$/;
-	next unless $commit_messages{$sha};    # skip merge commits
+
+	# Skip files that don't match the expected naming pattern
+	# e.g. YYYY-MM-DD-XXXXXXX.json — $sha will be undef otherwise
+	next unless defined $sha;
+	next unless $commit_messages{$sha};	# skip merge commits
 
 	# Compute average across our own files only
 	my ($sum, $count) = (0, 0);
@@ -2976,8 +2966,7 @@ sub _generate_fuzz_schemas {
 
 	# Nothing to do if t/conf/ does not exist yet
 	unless(-d $conf_dir) {
-		print "No $conf_dir directory found, skipping fuzz schema generation\n"
-			if $config{verbose};
+		print "No $conf_dir directory found, skipping fuzz schema generation\n" if $config{verbose};
 		return 0;
 	}
 
@@ -3082,6 +3071,17 @@ sub _generate_fuzz_schemas {
 
 			next unless defined $bval;
 
+			# --------------------------------------------------
+			# Skip value boundaries that are about internal
+			# data structure sizes rather than argument values.
+			# Patterns like scalar(keys %hash) == 0 are testing
+			# the size of an internal hash, not an argument, so
+			# adding these values to edge_case_array would pass
+			# them as argument values which is meaningless.
+			# --------------------------------------------------
+			next if $source =~ /\bkeys\s+%/;
+			next if $source =~ /scalar\s*\(\s*keys\b/;
+
 			for my $v ($bval - 1, $bval, $bval + 1) {
 				# Clamp to 0 for non-negative contexts such as
 				# scalar(), length(), index() return values
@@ -3147,8 +3147,23 @@ sub _generate_fuzz_schemas {
 		}
 
 		# Separate value boundaries from arity boundaries
-		my $bvals       = $survivor->{values} || [];
+		my $bvals = $survivor->{values} || [];
 		my $arity_hints = $survivor->{arity}  || [];
+
+		# --------------------------------------------------
+		# Skip writing a fuzz schema if the only augmentation
+		# is arity boundary cases and there are no value
+		# boundary additions. Arity cases do not benefit from
+		# random string fuzzing — the cases entries alone are
+		# sufficient to exercise the boundary, and random
+		# string fuzzing will only produce meaningless
+		# file-not-found or type-error deaths that obscure
+		# the real boundary condition.
+		# --------------------------------------------------
+		unless(@{$bvals}) {
+			print "  Skipping $schema_file: only argument-count boundaries found, no value boundaries to fuzz\n" if $config{verbose};
+			next;
+		}
 
 		# --------------------------------------------------
 		# Determine which edge key to use for augmentation.
@@ -3159,11 +3174,11 @@ sub _generate_fuzz_schemas {
 
 		if(exists $schema->{edge_case_array}) {
 			# Schema already uses positional edge cases
-			$edge_key      = 'edge_case_array';
+			$edge_key = 'edge_case_array';
 			$numeric_params = [];
 		} elsif(exists $schema->{edge_cases}) {
 			# Schema already uses named edge cases
-			$edge_key      = 'edge_cases';
+			$edge_key = 'edge_cases';
 
 			# Collect existing numeric param names from edge_cases
 			$numeric_params = [ keys %{ $schema->{edge_cases} } ];
@@ -3442,11 +3457,11 @@ sub _mutation_index {
 		my $complexity = _cyclomatic_complexity($file);
 
 		my $complexity_class = $complexity >= $config{med_threshold} ? 'badge-bad'
-					: $score >= $config{low_threshold} ? 'badge-warn'
-					: 'badge-good';
-		my $complexity_tooltip = $complexity >= $config{med_threshold} ? 'Good'
-				 : $complexity >= $config{low_threshold} ? 'Medium'
-				 : 'Bad';
+			: $complexity >= $config{low_threshold} ? 'badge-warn'
+			: 'badge-good';
+		my $complexity_tooltip = $complexity >= $config{med_threshold} ? 'Needs improvement'
+			: $complexity >= $config{low_threshold} ? 'Moderate'
+			: 'Good';
 
 		my $complexity_html = sprintf(
 			'<span class="coverage-badge %s" title="%s">%d</span>',
