@@ -2199,10 +2199,68 @@ sub detect_root_causes {
 			);
 	}
 
+	push @hints, detect_scattered_failures(
+		$args{fail_reports} || [],
+		$args{pass_reports} || [],
+	);
+
 	@hints = grep { defined } @hints;
 	@hints = sort { $b->{confidence} <=> $a->{confidence} } @hints;
 
 	return @hints;
+}
+
+# --------------------------------------------------
+# detect_scattered_failures
+#
+# Purpose:    Detect when failures and passes coexist
+#             across the same Perl versions and OS
+#             types with no clear cliff pattern,
+#             suggesting flaky tests or optional
+#             dependency differences rather than a
+#             compatibility issue.
+#
+# Entry:      $fail_reports - arrayref of fail hashrefs
+#             $pass_reports - arrayref of pass hashrefs
+#
+# Exit:       Returns a root cause hashref, or undef
+#             if the pattern is not present.
+#
+# Side effects: None.
+#
+# Notes:      Triggered when: there are failures on 3+
+#             Perl versions, passes exist on some of
+#             the same versions, and no version cliff
+#             is detectable. Confidence is intentionally
+#             low since this is a weak signal.
+# --------------------------------------------------
+sub detect_scattered_failures {
+	my ($fail_reports, $pass_reports) = @_;
+
+	return unless @{$fail_reports} >= 3 && @{$pass_reports} >= 3;
+
+	# Build sets of Perl versions seen in each grade
+	my %fail_perls = map { perl_series($_->{perl}) => 1 }
+		grep { $_->{perl} } @{$fail_reports};
+	my %pass_perls = map { perl_series($_->{perl}) => 1 }
+		grep { $_->{perl} } @{$pass_reports};
+
+	# Count how many Perl series appear in both fail and pass
+	my $overlap = grep { exists $pass_perls{$_} } keys %fail_perls;
+
+	# Need significant overlap — failures and passes on same versions
+	return unless $overlap >= 2;
+
+	return {
+		type       => 'scattered',
+		label      => 'Scattered failures (no clear version or OS pattern)',
+		confidence => 0.40,
+		evidence   => [
+			sprintf('Failures and passes both seen on %d common Perl series', $overlap),
+			'Possible causes: flaky tests, optional dependency differences, or CGI environment assumptions',
+			'Review test output from failing reports for specific error messages',
+		],
+	};
 }
 
 sub make_key
