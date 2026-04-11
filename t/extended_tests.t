@@ -18,6 +18,8 @@ BEGIN { use_ok('CGI::Info') }
 
 mock 'Log::Abstraction::_high_priority' => sub { };
 
+END { CGI::Info->reset() }
+
 sub reset_env {
     delete $ENV{$_} for qw(
         GATEWAY_INTERFACE REQUEST_METHOD QUERY_STRING CONTENT_TYPE

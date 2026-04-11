@@ -19,6 +19,8 @@ BEGIN { use_ok('CGI::Info') }
 # Silence Log::Abstraction stderr noise from expected WAF/validation log calls.
 mock 'Log::Abstraction::_high_priority' => sub { };
 
+END { CGI::Info->reset() }
+
 # ---------------------------------------------------------------------------
 # Helper: wipe CGI environment and reset class state between subtests
 # ---------------------------------------------------------------------------
