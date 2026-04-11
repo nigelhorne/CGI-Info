@@ -4448,7 +4448,8 @@ document.addEventListener("mousemove", function(e) {
 # _coverage_totals
 #
 # Extract structural coverage totals from a Devel::Cover JSON
-# report. Returns four scalar values in list context:
+# report, computed only across the project's own files.
+# Returns four scalar values in list context:
 #
 #   ($statement_total, $statement_hit,
 #    $branch_total,    $branch_hit)
@@ -4456,17 +4457,13 @@ document.addEventListener("mousemove", function(e) {
 # This matches how the routine is used elsewhere in this file.
 #
 # NOTE:
-# Devel::Cover stores totals under:
-#
-#   $cov->{summary}->{Total}
-#
-# while per-file data appears under:
-#
-#   $cov->{summary}->{filename}
-#
-# This routine extracts only the aggregated totals.
+# Devel::Cover's pre-aggregated Total key includes all
+# instrumented files — CPAN dependencies, blib/ copies,
+# and absolute paths — which massively deflates the
+# reported percentage. We recompute from individual file
+# entries, applying the same own-file filter used in the
+# coverage table and badge calculation.
 # ------------------------------------------------------------
-
 sub _coverage_totals
 {
 	my $cov = $_[0];
@@ -4476,15 +4473,32 @@ sub _coverage_totals
 	return (0,0,0,0) unless ref $cov eq 'HASH';
 	return (0,0,0,0) unless $cov->{summary};
 
-	my $total = $cov->{summary}->{Total} || {};
+	my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = (0, 0, 0, 0);
 
-	# Extract statement coverage
-	my $stmt_total = $total->{statement}{total}   || 0;
-	my $stmt_hit   = $total->{statement}{covered} || 0;
+	for my $file (keys %{ $cov->{summary} }) {
+		# Skip the pre-aggregated Total — it includes CPAN modules
+		next if $file eq 'Total';
 
-	# Extract branch coverage
-	my $branch_total = $total->{branch}{total}   || 0;
-	my $branch_hit   = $total->{branch}{covered} || 0;
+		# Skip absolute paths (installed CPAN modules)
+		next if $file =~ /^\//;
+
+		# Skip blib/ entries that have a corresponding lib/ entry
+		# to avoid double-counting the same file
+		if($file =~ /^blib\/lib\/(.+)$/) {
+			next if exists $cov->{summary}{"lib/$1"};
+		}
+
+		# Only count own project files
+		next unless $file =~ /^(?:lib|blib|bin)\//;
+
+		my $info = $cov->{summary}{$file};
+
+		# Accumulate raw totals and hits across own files
+		$stmt_total   += $info->{statement}{total}   || 0;
+		$stmt_hit += $info->{statement}{covered} || 0;
+		$branch_total += $info->{branch}{total} || 0;
+		$branch_hit   += $info->{branch}{covered} || 0;
+	}
 
 	return ($stmt_total, $stmt_hit, $branch_total, $branch_hit);
 }
@@ -4497,7 +4511,7 @@ sub _coverage_totals
 # root, so we try multiple match strategies.
 # ------------------------------------------------------------
 sub _coverage_for_file {
-    my ($cov, $file) = @_;
+	my ($cov, $file) = @_;
 
     return unless $cov && $cov->{summary};
     my $summary = $cov->{summary};
