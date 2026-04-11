@@ -1394,6 +1394,10 @@ if($version) {
 				fail_perl_versions => \@fail_perl_versions,
 				pass_perl_versions => \@pass_perl_versions,
 			);
+
+			warn 'Root causes found: ', scalar(@root_causes) . "\n";
+			warn 'Pass reports: ', scalar(@pass_reports) . "\n";
+
 			if (@root_causes) {
 				push @html, <<'HTML';
 <h3>Likely Root Causes</h3>
