@@ -1273,7 +1273,7 @@ if($version) {
 					),
 					" $confidence_html</p>";
 			}
-			push @html, '<h3>Failure Summary</h3>';
+			push @html, '<h3>Failure Summary (all reports)</h3>';
 			push @html, '<ul>';
 
 			my %clusters = (
@@ -1829,8 +1829,72 @@ sub collect_dependency_versions {
 	}
 }
 
+# --------------------------------------------------
+# detect_universal_failure
+#
+# Purpose:    Detect when failures occur across all
+#             tested Perl versions and OS types,
+#             suggesting a broken release rather than
+#             a version- or platform-specific issue.
+#
+# Entry:      $fail_reports - arrayref of fail report hashrefs
+#             $pass_reports - arrayref of pass report hashrefs
+#
+# Exit:       Returns a root cause hashref, or undef
+#             if the pattern is not present.
+#
+# Side effects: None.
+#
+# Notes:      Triggered when: there are failures on 3+
+#             distinct Perl versions AND 2+ distinct OS
+#             types AND pass reports are absent or very
+#             sparse (< 10% of total reports).
+# --------------------------------------------------
+sub detect_universal_failure {
+	my ($fail_reports, $pass_reports) = @_;
+
+	return unless @{$fail_reports} >= 3;
+
+	# Count distinct Perl versions and OS types in failures
+	my %fail_perls = map { $_->{perl} => 1 }
+		grep { $_->{perl} } @{$fail_reports};
+	my %fail_os = map { $_->{osname} => 1 }
+		grep { $_->{osname} } @{$fail_reports};
+
+	# Need failures on 3+ Perl versions and 2+ OS types
+	return unless scalar(keys %fail_perls) >= 3;
+	return unless scalar(keys %fail_os)    >= 2;
+
+	# Check that passes are absent or very sparse
+	my $total = scalar(@{$fail_reports}) + scalar(@{$pass_reports});
+	my $pass_ratio = $total ? scalar(@{$pass_reports}) / $total : 0;
+
+	# If more than 10% are passing, this is not universal failure
+	return unless $pass_ratio < 0.10;
+
+	my @perl_list = sort keys %fail_perls;
+	my @os_list   = sort keys %fail_os;
+
+	return {
+		type       => 'universal',
+		label      => 'Possibly broken release (failures on all tested configurations)',
+		confidence => sprintf('%.2f', 1 - $pass_ratio),
+		evidence   => [
+			sprintf('Failures on %d Perl versions: %s',
+				scalar(@perl_list),
+				join(', ', @perl_list)
+			),
+			sprintf('Failures on %d OS types: %s',
+				scalar(@os_list),
+				join(', ', @os_list)
+			),
+			'Likely causes: missing file in tarball, broken Makefile.PL, or undeclared dependency',
+		],
+	};
+}
+
 sub detect_version_cliffs {
-	my ($deps) = @_;
+	my $deps = $_[0];
 	my @suspects;
 
 	for my $mod (sort keys %$deps) {
@@ -2112,6 +2176,13 @@ sub detect_locale_root_cause {
 sub detect_root_causes {
 	my (%args) = @_;
 	my @hints;
+
+	# Check for universal failure pattern first — if present,
+	# it is almost certainly the most important root cause
+	push @hints, detect_universal_failure(
+		$args{fail_reports} || [],
+		$args{pass_reports} || [],
+	);
 
 	push @hints, detect_os_root_cause($args{fail_reports}, \%config) if $args{fail_reports};
 	push @hints, detect_locale_root_cause($args{fail_reports}, \%config);
