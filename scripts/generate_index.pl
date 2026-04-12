@@ -1216,16 +1216,23 @@ if($version) {
 
 			my @cliffs = detect_version_cliffs(\%dep_versions);
 
+			# Cross-reference declared prereqs against installed versions
+			# in CPAN Testers reports, merging results into @cliffs so
+			# they appear in the same Dependency Version Cliffs section
+			my $prereq_cliffs = detect_prereq_version_cliffs(
+				$dist_name,
+				$version,
+				\@fail_reports,
+				\@pass_reports,
+			);
+			push @cliffs, @{$prereq_cliffs};
+
 			if (@cliffs) {
 				push @html, '<h3>Dependency Version Cliffs</h3>';
 				push @html, '<ul>';
 
 				for my $c (@cliffs) {
-					push @html, sprintf(
-						'<li><b>%s</b>: %s</li>',
-						$c->{module},
-						$c->{message},
-					);
+					push @html, sprintf('<li><b>%s</b>: %s</li>', $c->{module}, $c->{message});
 				}
 
 				push @html, '</ul>';
@@ -2099,6 +2106,209 @@ sub fetch_open_rt_ticket_count {
 	return scalar @$tickets;
 }
 
+# --------------------------------------------------
+# fetch_dist_prereqs
+#
+# Purpose:    Fetch the declared prerequisites for a
+#             distribution from MetaCPAN API, falling
+#             back to parsing raw CPAN Testers report
+#             output if the API is unavailable.
+#
+# Entry:      $dist    - distribution name e.g. CGI-Info
+#             $version - version string e.g. 1.12
+#             $reports - arrayref of fail report hashrefs
+#                        (used for fallback parsing)
+#
+# Exit:       Returns a hashref of:
+#               module_name => minimum_version_required
+#             or empty hashref if nothing could be determined.
+#
+# Side effects: Makes HTTP requests to MetaCPAN API.
+#
+# Notes:      MetaCPAN API returns prereqs for all phases.
+#             Fallback scans raw report output for version
+#             complaint patterns.
+# --------------------------------------------------
+sub fetch_dist_prereqs {
+	my ($dist, $version, $reports) = @_;
+
+	# --------------------------------------------------
+	# Stage 1: Try MetaCPAN API
+	# --------------------------------------------------
+	my $api_url = "https://fastapi.metacpan.org/v1/release/$dist/$version";
+	my $res = $http->get($api_url);
+
+	if($res->{success}) {
+		my $data = eval { decode_json($res->{content}) };
+		if($data && $data->{dependency}) {
+			my %prereqs;
+			for my $dep (@{ $data->{dependency} }) {
+				# Include all phases, requires relationship only
+				next unless ($dep->{relationship} // '') eq 'requires';
+				next unless defined $dep->{module};
+				my $min = $dep->{version} // 0;
+				# Skip perl itself and zero-version deps
+				next if $dep->{module} eq 'perl';
+				next unless $min && $min ne '0';
+				$prereqs{ $dep->{module} } = $min;
+			}
+			return \%prereqs if %prereqs;
+		}
+	}
+
+	# --------------------------------------------------
+	# Stage 2: Fall back to scanning raw report output
+	# for version complaint patterns.
+	# Patterns we look for:
+	#   "Foo::Bar 0.02 is not ... 0.03"
+	#   "requires Foo::Bar version 0.03"
+	#   "Foo::Bar version 0.03 required"
+	# --------------------------------------------------
+	my %prereqs;
+	for my $r (@{ $reports || [] }) {
+		# Fetch the full report text
+		my $guid = $r->{guid} or next;
+		my $url  = "https://api.cpantesters.org/v3/report/$guid";
+		my $rres = $http->get($url);
+		next unless $rres->{success};
+
+		my $report = eval { decode_json($rres->{content}) };
+		next unless $report;
+
+		my $text = $report->{result}{output}{uncategorized} // '';
+
+		# Pattern 1: "Module X.XX is not ... required version Y.YY"
+		while($text =~ /(\S+(?:::\S+)+)\s+([\d._]+)\s+is\s+not\s+.*?(?:required|minimum)[^\n]*?([\d._]+)/gi) {
+			my ($mod, $installed, $required) = ($1, $2, $3);
+			if(parse_version($required) > parse_version($installed)) {
+				$prereqs{$mod} = $required;
+			}
+		}
+
+		# Pattern 2: "requires Module version X.XX"
+		while($text =~ /requires\s+(\S+(?:::\S+)+)\s+(?:version\s+)?([\d._]+)/gi) {
+			$prereqs{$1} = $2;
+		}
+
+		# Pattern 3: "Module version X.XX required"
+		while($text =~ /(\S+(?:::\S+)+)\s+version\s+([\d._]+)\s+required/gi) {
+			$prereqs{$1} = $2;
+		}
+
+		# Only scan a few reports — enough to find the pattern
+		last if %prereqs;
+	}
+
+	return \%prereqs;
+}
+
+# --------------------------------------------------
+# detect_prereq_version_cliffs
+#
+# Purpose:    Cross-reference declared prerequisites
+#             against installed versions in CPAN Testers
+#             reports to find cases where installed
+#             versions are below the declared minimum.
+#             Adds findings to the existing dependency
+#             version cliffs list.
+#
+# Entry:      $dist         - distribution name
+#             $version      - version string
+#             $fail_reports - arrayref of fail report hashrefs
+#             $pass_reports - arrayref of pass report hashrefs
+#
+# Exit:       Returns an arrayref of cliff hashrefs in the
+#             same format as detect_version_cliffs(), or
+#             empty arrayref if nothing found.
+#
+# Side effects: Makes HTTP requests to MetaCPAN API and
+#               optionally to CPAN Testers report API.
+#
+# Notes:      Results are merged into the existing
+#             Dependency Version Cliffs section rather
+#             than displayed separately.
+# --------------------------------------------------
+sub detect_prereq_version_cliffs {
+	my ($dist, $version, $fail_reports, $pass_reports) = @_;
+
+	# Fetch declared prerequisites for this distribution
+	my $prereqs = fetch_dist_prereqs($dist, $version, $fail_reports);
+	return [] unless %{$prereqs};
+
+	my @cliffs;
+
+	for my $mod (sort keys %{$prereqs}) {
+		my $required = $prereqs->{$mod};
+		my $req_ver  = parse_version($required);
+
+		next unless defined $req_ver;
+
+		# Collect installed versions from fail and pass reports
+		my @fail_installed;
+		my @pass_installed;
+
+		for my $r (@{$fail_reports}) {
+			my $installed = _installed_version_from_report($r, $mod);
+			push @fail_installed, $installed if defined $installed;
+		}
+
+		for my $r (@{$pass_reports}) {
+			my $installed = _installed_version_from_report($r, $mod);
+			push @pass_installed, $installed if defined $installed;
+		}
+
+		# Check if any failing reports have installed version below required
+		my @below = grep { parse_version($_) < $req_ver } @fail_installed;
+		my @above = grep { parse_version($_) >= $req_ver } @pass_installed;
+
+		next unless @below;
+
+		push @cliffs, {
+			module  => $mod,
+			type    => 'prereq',
+			message => sprintf(
+				'Requires %s %s but %d failing report(s) had version(s): %s',
+				$mod,
+				$required,
+				scalar(@below),
+				join(', ', sort { parse_version($a) <=> parse_version($b) }
+					do { my %u; grep { !$u{$_}++ } @below }
+				),
+			),
+		};
+	}
+
+	return \@cliffs;
+}
+
+# --------------------------------------------------
+# _installed_version_from_report
+#
+# Purpose:    Extract the installed version of a specific
+#             module from a CPAN Testers report hashref,
+#             using the installed modules data previously
+#             fetched by extract_installed_modules.
+#
+# Entry:      $r   - report hashref
+#             $mod - module name to look up
+#
+# Exit:       Returns version string or undef if not found.
+#
+# Side effects: None.
+# --------------------------------------------------
+sub _installed_version_from_report {
+	my ($r, $mod) = @_;
+
+	# Use already-fetched HTML if available in report
+	return undef unless $r->{guid};
+
+	my $html = fetch_report_html($r->{guid});
+	return undef unless $html;
+
+	my $mods = extract_installed_modules($html);
+	return $mods->{$mod};
+}
+
 sub detect_os_root_cause {
 	my ($reports, $config) = @_;
 
@@ -2116,10 +2326,7 @@ sub detect_os_root_cause {
 			type => 'os',
 			label => "OS-specific behavior ($os)",
 			confidence => sprintf("%.2f", $ratio),
-			evidence => [
-				sprintf('%d/%d failures on %s', $count{$os}, $total, $os),
-					"Passes observed on other operating systems",
-				],
+			evidence => [ sprintf('%d/%d failures on %s', $count{$os}, $total, $os), 'Passes observed on other operating systems' ],
 		};
 	}
 
