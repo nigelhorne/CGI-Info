@@ -214,7 +214,7 @@ Readonly my %config => (
 	lcsaj_root => 'cover_html/mutation_html/lib',
 	lcsaj_hits_file     => 'cover_html/lcsaj_hits.json', # Runtime.pm writes here
 	output => 'cover_html/index.html',	# published to gh-pages
-	max_retry => 3,
+	max_retry => 5,
 	min_locale_samples => 3,
 	verbose => 1,
 );
@@ -1076,7 +1076,7 @@ HTML
 my $dist_name = $config{github_repo};
 my $cpan_api = "https://api.cpantesters.org/v3/summary/" . uri_escape($dist_name);
 
-my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 15);
+my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 30);
 
 my $retry = 0;
 my $success = 0;
@@ -1091,7 +1091,10 @@ while($retry < $config{max_retry}) {
 		last;
 	}
 	$retry++;
-	sleep(2 ** $retry);
+	# Cap sleep at 16 seconds — exponential backoff but don't wait forever
+	my $sleep_secs = 2 ** $retry;
+	$sleep_secs = 16 if $sleep_secs > 16;
+	sleep($sleep_secs);
 }
 
 my $version;	# current version
@@ -1607,7 +1610,11 @@ HTML
 	# push @html, "<A HREF=\"$cpan_api\">$cpan_api</A>";
 	push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
 } else {
-	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}";
+	my $reason = $res->{status} == 599
+		? 'CPAN Testers API temporarily unreachable'
+		: "$res->{status} $res->{reason}";
+	push @html, "<p><em>CPAN Testers data unavailable: $reason. "
+		. "Check <a href=\"$cpan_api\">$cpan_api</a> manually.</em></p>";
 }
 
 # Output the Mutation Overview
