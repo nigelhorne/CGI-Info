@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Mockingbird qw(mock);
+use Test::Mockingbird 0.08 qw(mock);
 use File::Temp qw(tempdir);
 use File::Spec;
 use Scalar::Util qw(blessed);

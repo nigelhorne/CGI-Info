@@ -7,7 +7,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
 use Scalar::Util qw(blessed);
-use Test::Mockingbird qw(mock mock_scoped);
+use Test::Mockingbird 0.08 qw(mock mock_scoped);
 
 # We test CGI::Info itself
 BEGIN { use_ok('CGI::Info') }

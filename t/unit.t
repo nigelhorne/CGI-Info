@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Mockingbird qw(mock mock_scoped);
+use Test::Mockingbird 0.08 qw(mock mock_scoped);
 use File::Temp qw(tempdir);
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -235,7 +235,7 @@ subtest 'domain_name() - can be called as class method' => sub {
 
 subtest 'cgi_host_url() - includes protocol prefix' => sub {
 	reset_env();
-	$ENV{HTTP_HOST}	   = 'example.com';
+	$ENV{HTTP_HOST}	= 'example.com';
 	$ENV{SERVER_PROTOCOL} = 'HTTP/1.1';
 	my $url = CGI::Info->new()->cgi_host_url();
 	like($url, qr{^https?://}, 'cgi_host_url() starts with http:// or https://');
@@ -243,7 +243,7 @@ subtest 'cgi_host_url() - includes protocol prefix' => sub {
 
 subtest 'cgi_host_url() - includes host name' => sub {
 	reset_env();
-	$ENV{HTTP_HOST}	   = 'example.com';
+	$ENV{HTTP_HOST}	= 'example.com';
 	$ENV{SERVER_PROTOCOL} = 'HTTP/1.1';
 	my $url = CGI::Info->new()->cgi_host_url();
 	like($url, qr/example\.com/, 'cgi_host_url() contains the host name');
@@ -293,7 +293,7 @@ subtest 'params() - allow: unknown keys silently excluded' => sub {
 	$ENV{REQUEST_METHOD}	= 'GET';
 	$ENV{QUERY_STRING}	  = 'allowed=1&forbidden=2';
 	my $p = CGI::Info->new()->params(allow => { allowed => undef });
-	ok(defined $p->{allowed},   'allowed key present');
+	ok(defined $p->{allowed}, 'allowed key present');
 	ok(!defined $p->{forbidden}, 'forbidden key silently excluded');
 };
 
