@@ -151,10 +151,10 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my $params = Params::Get::get_params(undef, @_) || {};
+	my $params = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
-		if((scalar keys %{$params}) > 0) {
+		if(defined($params)) {
 			# Using CGI::Info:new(), not CGI::Info->new()
 			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		}
@@ -163,6 +163,7 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
+		$params ||= {};
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
