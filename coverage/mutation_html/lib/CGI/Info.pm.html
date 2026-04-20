@@ -997,7 +997,7 @@ Approximate LCSAJ segments: 501<br>
 </span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  705: 		if(my $query = $ENV{&#39;QUERY_STRING&#39;}) {
 </span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  706: 			if((defined($content_type)) &amp;&amp; ($content_type =~ /multipart\/form-data/i)) {
 </span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  707: 				if($ENV{&#39;REMOTE_ADDR&#39;}) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  708: 					$self-&gt;_warn({ warning =&gt; &quot;$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET&quot; });
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  708: 					$self-&gt;_warn({ warning =&gt; &quot;$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET (query string = $query)&quot; });
 </span><span class="">  709: 				} else {
 </span><span class="">  710: 					$self-&gt;_warn(&#39;Multipart/form-data not supported for GET&#39;);
 </span><span class="">  711: 				}
@@ -3049,23 +3049,13 @@ is( func(VALUE_AT_BOUNDARY), EXPECTED, &#39;Test boundary behaviour&#39; );
 </span><span class=""> 2416: 
 </span><span class=""> 2417: Copyright 2010-2026 Nigel Horne.
 </span><span class=""> 2418: 
-</span><span class=""> 2419: Usage is subject to licence terms.
-</span><span class=""> 2420: 
-</span><span class=""> 2421: The licence terms of this software are as follows:
+</span><span class=""> 2419: Usage is subject to GPL2 licence terms.
+</span><span class=""> 2420: If you use it,
+</span><span class=""> 2421: please let me know.
 </span><span class=""> 2422: 
-</span><span class=""> 2423: =over 4
+</span><span class=""> 2423: =cut
 </span><span class=""> 2424: 
-</span><span class=""> 2425: =item * Personal single user, single computer use: GPL2
-</span><span class=""> 2426: 
-</span><span class=""> 2427: =item * All other users (including Commercial, Charity, Educational, Government)
-</span><span class=""> 2428:   must apply in writing for a licence for use from Nigel Horne at the
-</span><span class=""> 2429:   above e-mail.
-</span><span class=""> 2430: 
-</span><span class=""> 2431: =back
-</span><span class=""> 2432: 
-</span><span class=""> 2433: =cut
-</span><span class=""> 2434: 
-</span><span class=""> 2435: 1;
+</span><span class=""> 2425: 1;
 </span></pre>
 
 <script>
