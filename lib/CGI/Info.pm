@@ -705,7 +705,7 @@ sub params {
 		if(my $query = $ENV{'QUERY_STRING'}) {
 			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
 				if($ENV{'REMOTE_ADDR'}) {
-					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET" });
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET (query string = $query)" });
 				} else {
 					$self->_warn('Multipart/form-data not supported for GET');
 				}
@@ -2416,19 +2416,9 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 Copyright 2010-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
-
-=back
+Usage is subject to GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 
