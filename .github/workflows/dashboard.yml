@@ -51,7 +51,7 @@ jobs:
         run: |
           cpanm --skip-satisfied --notest --installdeps .
           cpanm -iqn --skip-satisfied \
-              App::Test::Generator \
+              App::Test::Generator@0.33 \
               Test::Most \
               'Devel::Cover@1.51' \
               Devel::Cover::Report::Html \
@@ -66,7 +66,8 @@ jobs:
               JSON::MaybeXS \
               PPI \
               App::Prove \
-              File::Copy::Recursive
+              File::Copy::Recursive \
+              Test::LectroTest::Compat
           cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String
         timeout-minutes: 10
 
@@ -82,7 +83,7 @@ jobs:
           NO_NETWORK_TESTING: 1
           NONINTERACTIVE_TESTING: 1
         run: |
-          scripts/generate_test_dashboard
+          generate_test_dashboard
 
       - name: Add new coverage snapshot to archive
         run: |
