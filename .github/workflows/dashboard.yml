@@ -83,7 +83,7 @@ jobs:
           NO_NETWORK_TESTING: 1
           NONINTERACTIVE_TESTING: 1
         run: |
-          generate_test_dashboard
+          generate-test-dashboard
 
       - name: Add new coverage snapshot to archive
         run: |
