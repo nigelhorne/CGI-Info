@@ -709,7 +709,7 @@ sub params {
 				} else {
 					$self->_warn('Multipart/form-data not supported for GET');
 				}
-				$self->{status} = 501;	# Not implemented
+				$self->status(501);	# Not implemented
 				return;
 			}
 			$query =~ s/\\u0026/\&/g;
@@ -751,10 +751,11 @@ sub params {
 			if(!defined($self->{upload_dir})) {
 				if($ENV{'REMOTE_ADDR'}) {
 					# This could be an attack
-					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file when upload_dir has not been set" });
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file of $content_length bytes when upload_dir has not been set" });
 				} else {
 					$self->_warn({ warning => 'Attempt to upload a file when upload_dir has not been set' });
 				}
+				$self->status(501);	# Not implemented
 				return;
 			}
 

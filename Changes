@@ -2,6 +2,7 @@ Revision history for CGI-Info
 
 1.14
 	More helpful error message on "Multipart/form-data not supported"
+	Set status to 501 when attempting to upload to a place that doesn't take uploads
 
 1.13	Sun Apr 12 08:49:24 EDT 2026
 	Fixed test failures on Windows, e.g. https://www.cpantesters.org/cpan/report/5bf7930a-7048-1014-8eeb-cabb5837fa32
