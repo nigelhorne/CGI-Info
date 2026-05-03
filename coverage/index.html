@@ -153,8 +153,8 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/41f91cbdf9f8c7cf0c4c74f787d9f49c685b3282/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
-<tr class="med"><td><a href="lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/41f91cbdf9f8c7cf0c4c74f787d9f49c685b3282/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="85.0,84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9"></canvas></td><td>93.3</td><td>82.6</td><td>68.0</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">84.9%</span></td><td class="neutral" title="No previous data">&#9679;</td></tr>
+<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/df5745ce57a251d21fc68a87271b46138ff64a5c/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/df5745ce57a251d21fc68a87271b46138ff64a5c/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9"></canvas></td><td>93.3</td><td>82.6</td><td>68.0</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">84.9%</span></td><td class="neutral" title="Previous (sparkline): 84.9%">&#9679; 0.0%</td></tr>
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 76%, Low: 1</td></tr>
 <tr class="med nosort"><td><strong>Total</strong></td><td>84.1</td><td>53.8</td><td>34.0</td><td>99.2</td><td colspan="2"><strong>76.5</strong></td></tr>
 </tbody></table>
@@ -190,7 +190,7 @@ function linearRegression(data) {
 	const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
 	const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
 
-	if (n < 2 || (n * sumX2 - sumX * sumX) === 0) {
+	if(n < 2 || (n * sumX2 - sumX * sumX) === 0) {
 		return [];
 	}
 	const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
@@ -203,23 +203,23 @@ function linearRegression(data) {
 }
 
 
-const dataPoints = [ { x: "2026-04-08T11:35:15-04:00", y: 76.5323252546104, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/a1f1196", label: "2026-04-08T11:35:15-04:00", pointBackgroundColor: "gray", comment: "Fix YAML formatting and argument-count boundary handling in fuzz schema generation" },
-{ x: "2026-04-10T15:51:57-04:00", y: 76.500328380773, delta: -0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dc62567", label: "2026-04-10T15:51:57-04:00", pointBackgroundColor: "gray", comment: "Fix bad colour flip" },
-{ x: "2026-04-10T18:55:13-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/221f040", label: "2026-04-10T18:55:13-04:00", pointBackgroundColor: "gray", comment: "Fix filename" },
-{ x: "2026-04-11T10:01:05-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/1035561", label: "2026-04-11T10:01:05-04:00", pointBackgroundColor: "gray", comment: "Added detector: \"Fails everywhere\" pattern" },
-{ x: "2026-04-11T13:12:21-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dfb2ba8", label: "2026-04-11T13:12:21-04:00", pointBackgroundColor: "gray", comment: "Added root_causes debug" },
-{ x: "2026-04-11T18:12:30-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8738fe1", label: "2026-04-11T18:12:30-04:00", pointBackgroundColor: "gray", comment: "Added detect_scattered_failures() root cause detector" },
-{ x: "2026-04-11T21:18:28-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/d4450f3", label: "2026-04-11T21:18:28-04:00", pointBackgroundColor: "gray", comment: "Try more to cpan testers database" },
-{ x: "2026-04-12T09:32:24-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/d2c8130", label: "2026-04-12T09:32:24-04:00", pointBackgroundColor: "gray", comment: "Add prereq version cliff detection via MetaCPAN API cross-reference" },
-{ x: "2026-04-16T08:57:00-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c9c6a1d", label: "2026-04-16T08:57:00-04:00", pointBackgroundColor: "gray", comment: "Only set to {} when needed" },
-{ x: "2026-04-17T20:42:11-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c30afdd", label: "2026-04-17T20:42:11-04:00", pointBackgroundColor: "gray", comment: "Fix YAML syntax for fuzz testing" } ];
+const dataPoints = [ { x: "2026-04-10T15:51:57-04:00", y: 76.500328380773, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/dc6256743cfbb2225a4fff555d2529ba8644d4d2", label: "2026-04-10T15:51:57-04:00", pointBackgroundColor: "gray", comment: "Fix bad colour flip" },
+{ x: "2026-04-10T18:55:13-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/221f04009cc326bb4eb4dab2c201354c6de3b645", label: "2026-04-10T18:55:13-04:00", pointBackgroundColor: "gray", comment: "Fix filename" },
+{ x: "2026-04-11T10:01:05-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/103556142c071692251d8600fd40c13e56acff3e", label: "2026-04-11T10:01:05-04:00", pointBackgroundColor: "gray", comment: "Added detector: \"Fails everywhere\" pattern" },
+{ x: "2026-04-11T13:12:21-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dfb2ba84cfceef87a130635495c0339d7b559345", label: "2026-04-11T13:12:21-04:00", pointBackgroundColor: "gray", comment: "Added root_causes debug" },
+{ x: "2026-04-11T18:12:30-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8738fe1a44c8531b48c2dd2e809e91dc6f16752d", label: "2026-04-11T18:12:30-04:00", pointBackgroundColor: "gray", comment: "Added detect_scattered_failures() root cause detector" },
+{ x: "2026-04-11T21:18:28-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/d4450f3b4b16b5dc01be309b26937718b8f6c3fd", label: "2026-04-11T21:18:28-04:00", pointBackgroundColor: "gray", comment: "Try more to cpan testers database" },
+{ x: "2026-04-12T09:32:24-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/d2c81308223ff909646ea5363fc7478b88d643ff", label: "2026-04-12T09:32:24-04:00", pointBackgroundColor: "gray", comment: "Add prereq version cliff detection via MetaCPAN API cross-reference" },
+{ x: "2026-04-16T08:57:00-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c9c6a1d791c1bbfe264fdc2b2120523b5f64575c", label: "2026-04-16T08:57:00-04:00", pointBackgroundColor: "gray", comment: "Only set to {} when needed" },
+{ x: "2026-04-17T20:42:11-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c30afdd1416be53602564f650b7ba3d7c85d310e", label: "2026-04-17T20:42:11-04:00", pointBackgroundColor: "gray", comment: "Fix YAML syntax for fuzz testing" },
+{ x: "2026-04-20T08:41:58-04:00", y: 76.500328380773, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/41f91cbdf9f8c7cf0c4c74f787d9f49c685b3282", label: "2026-04-20T08:41:58-04:00", pointBackgroundColor: "gray", comment: "Better error message" } ];
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
 (function registerZoomPlugin(){
 	try {
 		const candidates = ['chartjsPluginZoom','ChartZoom','zoomPlugin','chartjs_plugin_zoom','ChartjsPluginZoom','chartjsPluginZoom'];
-		for (const name of candidates) {
-			if (window[name]) {
+		for(const name of candidates) {
+			if(window[name]) {
 				try { Chart.register(window[name]); console.log('Registered zoom plugin:', name); return; } catch(e) { console.warn('zoom register failed for', name, e); }
 			}
 		}
@@ -304,7 +304,7 @@ const chart = new Chart(ctx, {
 			}
 		}, onClick: (e) => {
 			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-			if (points.length) {
+			if(points.length) {
 				const url = chart.data.datasets[0].data[points[0].index].url;
 				window.open(url, '_blank');
 			}
@@ -321,10 +321,10 @@ document.getElementById('toggleTrend').addEventListener('change', function(e) {
 
 // Reset Zoom button handler (calls plugin API if available)
 const resetBtn = document.getElementById('resetZoomBtn');
-if (resetBtn) {
+if(resetBtn) {
 	resetBtn.addEventListener('click', function() {
 		try {
-			if (chart && typeof chart.resetZoom === 'function') {
+			if(chart && typeof chart.resetZoom === 'function') {
 				chart.resetZoom();
 			} else {
 				console.warn('resetZoom not available; zoom plugin may not be registered.');
@@ -337,7 +337,7 @@ if (resetBtn) {
 
 function sortTable(th, colIndex) {
 	const table = th.closest("table");
-	if (!table || !table.tBodies.length) return;
+	if(!table || !table.tBodies.length) return;
 
 	const tbody = table.tBodies[0];
 	const rows = Array.from(tbody.rows);
@@ -355,7 +355,7 @@ function sortTable(th, colIndex) {
 		let x = a.cells[colIndex]?.innerText.trim() || "";
 		let y = b.cells[colIndex]?.innerText.trim() || "";
 
-		if (isNumeric) {
+		if(isNumeric) {
 			x = Date.parse(x) || 0;
 			y = Date.parse(y) || 0;
 		} else {
@@ -363,8 +363,8 @@ function sortTable(th, colIndex) {
 			y = y.toLowerCase();
 		}
 
-		if (x < y) return asc ? -1 : 1;
-		if (x > y) return asc ? 1 : -1;
+		if(x < y) return asc ? -1 : 1;
+		if(x > y) return asc ? 1 : -1;
 		return 0;
 	});
 
@@ -373,11 +373,11 @@ function sortTable(th, colIndex) {
 
 	// Update arrows
 	const headers = table.tHead.rows[0].cells;
-	for (let i = 0; i < headers.length; i++) {
+	for(let i = 0; i < headers.length; i++) {
 		const arrow = headers[i].querySelector(".arrow");
-		if (!arrow) continue;
+		if(!arrow) continue;
 
-		if (i === colIndex) {
+		if(i === colIndex) {
 			arrow.textContent = asc ? "▲" : "▼";
 			arrow.classList.add("active");
 		} else {
@@ -395,14 +395,14 @@ function sortTable(th, colIndex) {
 // The table has been set up sorted in ascending order on the filename; reflect that in the GUI
 document.addEventListener("DOMContentLoaded", () => {
 	const table = document.querySelector("table");
-	if (!table) return;
+	if(!table) return;
 
 	const headers = table.tHead.rows[0].cells;
-	for (let i = 0; i < headers.length; i++) {
+	for(let i = 0; i < headers.length; i++) {
 		const arrow = headers[i].querySelector(".arrow");
-		if (!arrow) continue;
+		if(!arrow) continue;
 
-		if (i === 0) {
+		if(i === 0) {
 			arrow.textContent = "▲";
 			arrow.classList.add("active");
 		} else {
@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
 	document.querySelectorAll("canvas.sparkline").forEach(canvas => {
 		const raw = canvas.getAttribute("data-points");
-		if (!raw) return;
+		if(!raw) return;
 		const points = raw.split(",").map(v => parseFloat(v));
 
 		new Chart(canvas.getContext("2d"), {
@@ -468,13 +468,13 @@ function refresh(){
 <h2>Mutation Report</h2>
 <h3>Mutation Summary</h3>
 <ul>
-<li><b>Score</b>: 85.60%</li>
-<li><b>Total</b>: 257</li>
+<li><b>Score</b>: 100%</li>
+<li><b>Total</b>: 0</li>
 <li><b>Killed</b>: 
-220
+0
 </li>
 <li><b>Survived</b>: 
-37
+0
 </li>
 </ul>
 <h3>Mutation Files</h3>
@@ -483,22 +483,21 @@ function refresh(){
 
 <tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th><th title="TER1=Statement, TER2=Branch, TER3=LCSAJ Path">TER1 / TER2 / TER3</th></tr>
 
-<tr class="med"><td><a href="mutation_html/lib/CGI/Info.pm.html" title="View mutation line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/41f91cbdf9f8c7cf0c4c74f787d9f49c685b3282/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>257</td><td>220</td><td>37</td><td><span class="coverage-badge badge-warn" title="Moderate">85.6%</span></td><td><span class="coverage-badge badge-bad" title="Needs improvement">387</span></td><td><span class="coverage-badge badge-good" title="Excellent">93.3%</span> / <span class="coverage-badge badge-warn" title="Moderate">82.6%</span> / <span class="coverage-badge badge-warn" title="Moderate">75.1%</span></td></tr>
 </table>
 
 <h2>Structural Coverage (Approximate)</h2>
 <div class='summary'>
-Statement Coverage: 92.46% (760 / 822)<br>
+Statement Coverage: 92.47% (761 / 823)<br>
 Branch Coverage: 81.69% (415 / 508)<br>
 <em>Approximate LCSAJ derived from branch and statement coverage.</em>
 </div>
 <h2>Executive Summary</h2>
 <div class='summary'>
-Tests execute 92.46% of the code, but detect only 85.60% of injected faults.
+Tests execute 92.47% of the code, but detect only 100% of injected faults.
 </div>
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-04-20 12:56:16 - <a href="https://github.com/nigelhorne/CGI-Info/commit/41f91cbdf9f8c7cf0c4c74f787d9f49c685b3282">commit <code>41f91cb</code></a></em></p>
+	<p><em>Last updated: 2026-05-03 22:50:14 - <a href="https://github.com/nigelhorne/CGI-Info/commit/df5745ce57a251d21fc68a87271b46138ff64a5c">commit <code>df5745c</code></a></em></p>
 </footer>
 
 </body>
