@@ -1,0 +1,69 @@
+---
+
+name: Mutation Testing
+permissions:
+  contents: read
+
+# on: [push, pull_request]
+on:
+  schedule:
+    - cron: '12 23 26 * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mutate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shogo82148/actions-setup-perl@v1
+
+      - run: cpanm --skip-satisfied --installdeps .
+      - run: prove -l t/
+
+      - run: echo "$(pwd)/local/bin" >> $GITHUB_PATH
+
+      - run: |
+          perl Makefile.PL
+          make install
+
+      - name: Find last code commit
+        run: |
+          BASE=$(git log --oneline | grep -v "^.\{8\} \(Add generated mutant\|Add coverage snapshot\|Update mutation results\)" | head -1 | awk '{print $1}')
+          echo "MUTATION_BASE_SHA=$BASE" >> $GITHUB_ENV
+          echo "Base commit for mutation diff: $BASE"
+          git diff --name-only "${BASE}^" HEAD
+
+      - name: Install App::Test::Generator
+        run: |
+          if [ "${{ github.repository }}" != "nigelhorne/App-Test-Generator" ]; then
+            cpanm -iqn App::Test::Generator
+          fi
+
+      - name: Generate the mutants
+        env:
+          AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+        run: |
+          if [ "${{ github.repository }}" = "nigelhorne/App-Test-Generator" ]; then
+            MUTATE_CMD="perl -Ilib -Iblib/lib bin/test-generator-mutate"
+          else
+            ATG_CMD=$(which test-generator-mutate) || { echo "test-generator-mutate not found — did App::Test::Generator install correctly?"; exit 1; }
+            MUTATE_CMD="perl -Ilib -Iblib/lib $ATG_CMD"
+          fi
+          $MUTATE_CMD \
+            --lib lib \
+            --json mutation.json \
+            --changed_only \
+            --base_sha "$MUTATION_BASE_SHA" \
+            --mutation_level fast \
+            --exclude lib/Devel \
+            --exclude lib/App/Test/Generator/Sample

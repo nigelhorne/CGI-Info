@@ -1,5 +1,5 @@
 ---
-# Create https://nigelhorne.github.io/CGI-Info/coverage/
+# Create test dashboard on GitHub Pages, e.g. https://nigelhorne.github.io/$module_name/coverage/
 name: Test Dashboard
 
 permissions:
@@ -10,6 +10,10 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_run:
+    workflows: ["Mutation Testing"]
+    types: [completed]
+    branches: [main, master]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,12 +22,13 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         perl: ["5.40"]
     steps:
       # Checkout repository
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -51,8 +56,8 @@ jobs:
         run: |
           cpanm --skip-satisfied --notest --installdeps .
           cpanm -iqn --skip-satisfied \
-              App::Test::Generator@0.33 \
               Test::Most \
+              Test::Mockingbird \
               'Devel::Cover@1.51' \
               Devel::Cover::Report::Html \
               File::Slurp \
@@ -77,13 +82,46 @@ jobs:
       #     cpanm Perl::Critic
       #     perlcritic --verbose 5 lib || true
 
+      - name: Set snapshot variables
+        run: |
+          echo "SNAPSHOT_TIMESTAMP=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+          echo "SNAPSHOT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Add local bin to PATH
+        run: echo "$(pwd)/local/bin" >> $GITHUB_PATH
+
+      - name: Install App::Test::Generator
+        run: |
+          if [ "${{ github.repository }}" = "nigelhorne/App-Test-Generator" ]; then
+            echo "Running on ATG itself — using repo version"
+            perl Makefile.PL && make install
+          else
+            cpanm -iqn App::Test::Generator
+          fi
+
       - name: Generate dashboard
         env:
           AUTOMATED_TESTING: 1
           NO_NETWORK_TESTING: 1
           NONINTERACTIVE_TESTING: 1
         run: |
-          generate-test-dashboard
+          if [ "${{ github.repository }}" = "nigelhorne/App-Test-Generator" ]; then
+            bin/generate-test-dashboard
+          else
+            generate-test-dashboard
+          fi
+
+      - name: Save updated mutation results
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          git add mutation.json
+          if git diff --cached --quiet; then
+            echo "No mutation.json changes to commit"
+          else
+            git commit -m "Update mutation results (${SNAPSHOT_TIMESTAMP} ${SNAPSHOT_SHA})"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
 
       - name: Add new coverage snapshot to archive
         run: |
@@ -112,7 +150,9 @@ jobs:
           # --generate_test=mutant and --generate_fuzz.
           # We use --intent-to-add via 'git add -N' first so that
           # new untracked files are included in 'git diff --stat'.
-          git add t/mutant_*.t t/conf/mutant_*.yml 2>/dev/null || true
+          git add xt/mutant_*.t xt/conf/mutant_*.yml 2>/dev/null || true
+          # Force add any untracked files matching the pattern
+          find xt -name 'mutant_*.t' -o -name 'mutant_*.yml' | xargs git add 2>/dev/null || true
           # Only commit if there is actually something staged —
           # the '|| true' prevents the step failing on a clean run
           # where no new stubs were generated
