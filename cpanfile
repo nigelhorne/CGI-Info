@@ -34,6 +34,7 @@ on 'test' => sub {
 	requires 'Data::Random';
 	requires 'Data::Random::String';
 	requires 'Data::Random::String::Matches';
+	requires 'Data::Random::Structure';
 	requires 'Errno';
 	requires 'File::Temp';
 	requires 'FindBin';
