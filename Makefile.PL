@@ -62,6 +62,7 @@ WriteMakefile(
 	}, TEST_REQUIRES => {
 		'Data::Random' => 0,
 		'Data::Random::String' => 0,
+		'Data::Random::String::Matches' => 0,
 		'Errno' => 0,
 		'File::Temp' => 0,
 		'FindBin' => 0,
