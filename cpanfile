@@ -32,6 +32,7 @@ on 'configure' => sub {
 
 on 'test' => sub {
 	requires 'Data::Random';
+	requires 'Data::Random::String';
 	requires 'Errno';
 	requires 'File::Temp';
 	requires 'FindBin';
