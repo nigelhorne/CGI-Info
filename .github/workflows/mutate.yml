@@ -44,7 +44,8 @@ jobs:
       - name: Install App::Test::Generator
         run: |
           if [ "${{ github.repository }}" != "nigelhorne/App-Test-Generator" ]; then
-            cpanm -iqn App::Test::Generator
+            cpanm -iqn Data::Random::Structure Data::Random::String::Matches Data::Random::String Data::Random
+            cpanm -iqn App::Test::Generator@0.37
           fi
 
       - name: Generate the mutants
