@@ -2363,9 +2363,9 @@ things to happen.
 
 =over 4
 
-=item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/>
+=item * L<Configure an Object at Runtime|Object::Configure>
 
-=item * L<Object::Configure>
+=item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/>
 
 =item * L<HTTP::BrowserDetect>
 
@@ -2417,7 +2417,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 Copyright 2010-2026 Nigel Horne.
 
-Usage is subject to GPL2 licence terms.
+Usage is subject to the GPL2 licence terms.
 If you use it,
 please let me know.
 
