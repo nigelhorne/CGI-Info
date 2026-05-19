@@ -873,7 +873,7 @@ sub params {
 		# status 501
 		$self->{status} = 501;
 		$self->_warn({
-			warning => 'Use POST, GET or HEAD'
+			warning => 'Use POST, GET or HEAD, not ' . $ENV{REQUEST_METHOD}
 		});
 	}
 
