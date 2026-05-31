@@ -96,7 +96,7 @@ jobs:
             echo "Running on ATG itself — using repo version"
             perl Makefile.PL && make install
           else
-            cpanm -iqn App::Test::Generator@0.37
+            cpanm -iqn App::Test::Generator@0.38
           fi
 
       - name: Generate dashboard
