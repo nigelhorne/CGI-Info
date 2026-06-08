@@ -306,7 +306,7 @@ sub script_name
 	return $self->{script_name};
 }
 
-# Enforce that a private method was called from within this package or a subclass.
+# Enforce that a protected method was called from within this package or a subclass.
 # Call as $self->_enforce_private() at the start of each _method().
 # Returns immediately when running under a test harness (HARNESS_ACTIVE is set
 # by prove/Test::Harness) so white-box tests can exercise internals directly.
@@ -316,16 +316,16 @@ sub script_name
 sub _enforce_private {
 	return if $ENV{HARNESS_ACTIVE};
 
-	# caller(0): the frame of the private method that called _enforce_private
-	#   [3] = name of the private method (the sub that invoked _enforce_private)
-	# caller(1): the frame from which the private method was called
+	# caller(0): the frame of the protected method that called _enforce_private
+	#   [3] = name of the protected method (the sub that invoked _enforce_private)
+	# caller(1): the frame from which the protected method was called
 	#   [0] = package of the external caller
 	my $calling_pkg = (caller(1))[0];
 	unless($calling_pkg && ($calling_pkg eq __PACKAGE__ || $calling_pkg->isa(__PACKAGE__))) {
-		# caller(0)[3] = _enforce_private itself; caller(1)[3] = the private method that called us
+		# caller(0)[3] = _enforce_private itself; caller(1)[3] = the protected method that called us
 		my $method = (caller(1))[3] // '(unknown)';
 		$method =~ s/.*:://;
-		Carp::croak("$method() is a private method and cannot be called from outside " . __PACKAGE__);
+		Carp::croak("$method() is a protected method and cannot be called from outside " . __PACKAGE__);
 	}
 }
 
@@ -1236,12 +1236,12 @@ sub param {
 sub _sanitise_input($) {
 	my $arg = shift;
 
-	# Private function: inline check because the ($) prototype means no $self,
+	# Protected function: inline check because the ($) prototype means no $self,
 	# so _enforce_private() cannot be used (wrong caller depth without that frame).
 	unless($ENV{HARNESS_ACTIVE}) {
 		my $calling_pkg = (caller)[0];
 		unless($calling_pkg && ($calling_pkg eq __PACKAGE__ || $calling_pkg->isa(__PACKAGE__))) {
-			Carp::croak('_sanitise_input() is a private function and cannot be called from outside ' . __PACKAGE__);
+			Carp::croak('_sanitise_input() is a protected function and cannot be called from outside ' . __PACKAGE__);
 		}
 	}
 

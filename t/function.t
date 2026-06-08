@@ -1679,11 +1679,11 @@ subtest 'Test::Returns - tmpdir() returns a defined string' => sub {
 # ============================================================
 # Private method access guards
 # Temporarily unset HARNESS_ACTIVE to simulate a production
-# caller; verify that each private method croaks with the
+# caller; verify that each protected method croaks with the
 # expected message when invoked from outside CGI::Info.
 # ============================================================
 
-subtest 'private method guards - _trace croaks from outside' => sub {
+subtest 'protected method guards - _trace croaks from outside' => sub {
 	plan tests => 1;
 	reset_env();
 	my $info = CGI::Info->new();
@@ -1693,11 +1693,11 @@ subtest 'private method guards - _trace croaks from outside' => sub {
 	delete $ENV{HARNESS_ACTIVE};
 
 	throws_ok { $info->_trace('test') }
-		qr/_trace\(\) is a private method and cannot be called from outside CGI::Info/,
+		qr/_trace\(\) is a protected method and cannot be called from outside CGI::Info/,
 		'_trace() croaks with correct message when called from outside';
 };
 
-subtest 'private method guards - _log croaks from outside' => sub {
+subtest 'protected method guards - _log croaks from outside' => sub {
 	plan tests => 1;
 	reset_env();
 	my $info = CGI::Info->new();
@@ -1706,11 +1706,11 @@ subtest 'private method guards - _log croaks from outside' => sub {
 	delete $ENV{HARNESS_ACTIVE};
 
 	throws_ok { $info->_log('warn', 'test') }
-		qr/_log\(\) is a private method and cannot be called from outside CGI::Info/,
+		qr/_log\(\) is a protected method and cannot be called from outside CGI::Info/,
 		'_log() croaks with correct message when called from outside';
 };
 
-subtest 'private method guards - _warn croaks from outside' => sub {
+subtest 'protected method guards - _warn croaks from outside' => sub {
 	plan tests => 1;
 	reset_env();
 	my $info = CGI::Info->new();
@@ -1719,11 +1719,11 @@ subtest 'private method guards - _warn croaks from outside' => sub {
 	delete $ENV{HARNESS_ACTIVE};
 
 	throws_ok { $info->_warn('test') }
-		qr/_warn\(\) is a private method and cannot be called from outside CGI::Info/,
+		qr/_warn\(\) is a protected method and cannot be called from outside CGI::Info/,
 		'_warn() croaks with correct message when called from outside';
 };
 
-subtest 'private method guards - _error croaks from outside' => sub {
+subtest 'protected method guards - _error croaks from outside' => sub {
 	plan tests => 1;
 	reset_env();
 	my $info = CGI::Info->new();
@@ -1732,11 +1732,11 @@ subtest 'private method guards - _error croaks from outside' => sub {
 	delete $ENV{HARNESS_ACTIVE};
 
 	throws_ok { $info->_error('test') }
-		qr/_error\(\) is a private method and cannot be called from outside CGI::Info/,
+		qr/_error\(\) is a protected method and cannot be called from outside CGI::Info/,
 		'_error() croaks with correct message when called from outside';
 };
 
-subtest 'private method guards - _get_env croaks from outside' => sub {
+subtest 'protected method guards - _get_env croaks from outside' => sub {
 	plan tests => 1;
 	reset_env();
 	my $info = CGI::Info->new();
@@ -1745,11 +1745,11 @@ subtest 'private method guards - _get_env croaks from outside' => sub {
 	delete $ENV{HARNESS_ACTIVE};
 
 	throws_ok { $info->_get_env('PATH') }
-		qr/_get_env\(\) is a private method and cannot be called from outside CGI::Info/,
+		qr/_get_env\(\) is a protected method and cannot be called from outside CGI::Info/,
 		'_get_env() croaks with correct message when called from outside';
 };
 
-subtest 'private method guards - _sanitise_input croaks from outside' => sub {
+subtest 'protected method guards - _sanitise_input croaks from outside' => sub {
 	plan tests => 1;
 	reset_env();
 
@@ -1758,11 +1758,11 @@ subtest 'private method guards - _sanitise_input croaks from outside' => sub {
 
 	# _sanitise_input is a plain function, not a method; call via full package name
 	throws_ok { CGI::Info::_sanitise_input('test') }
-		qr/_sanitise_input\(\) is a private function and cannot be called from outside CGI::Info/,
+		qr/_sanitise_input\(\) is a protected function and cannot be called from outside CGI::Info/,
 		'_sanitise_input() croaks with correct message when called from outside';
 };
 
-subtest 'private method guards - _find_paths croaks from outside' => sub {
+subtest 'protected method guards - _find_paths croaks from outside' => sub {
 	plan tests => 1;
 	reset_env();
 	my $info = CGI::Info->new();
@@ -1771,11 +1771,11 @@ subtest 'private method guards - _find_paths croaks from outside' => sub {
 	delete $ENV{HARNESS_ACTIVE};
 
 	throws_ok { $info->_find_paths() }
-		qr/_find_paths\(\) is a private method and cannot be called from outside CGI::Info/,
+		qr/_find_paths\(\) is a protected method and cannot be called from outside CGI::Info/,
 		'_find_paths() croaks with correct message when called from outside';
 };
 
-subtest 'private method guards - subclass may call private methods' => sub {
+subtest 'protected method guards - subclass may call protected methods' => sub {
 	plan tests => 2;
 
 	# Define a minimal subclass inline to test that subclasses are permitted
