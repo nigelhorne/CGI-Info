@@ -306,13 +306,33 @@ sub script_name
 	return $self->{script_name};
 }
 
+# Enforce that a private method was called from within this package or a subclass.
+# Call as $self->_enforce_private() at the start of each _method().
+# Returns immediately when running under a test harness (HARNESS_ACTIVE is set
+# by prove/Test::Harness) so white-box tests can exercise internals directly.
+# Entry: none beyond implicit $self
+# Exit:  croaks when caller is outside the package hierarchy; returns otherwise
+# Side effects: none
+sub _enforce_private {
+	return if $ENV{HARNESS_ACTIVE};
+
+	# caller(0): the frame of the private method that called _enforce_private
+	#   [3] = name of the private method (the sub that invoked _enforce_private)
+	# caller(1): the frame from which the private method was called
+	#   [0] = package of the external caller
+	my $calling_pkg = (caller(1))[0];
+	unless($calling_pkg && ($calling_pkg eq __PACKAGE__ || $calling_pkg->isa(__PACKAGE__))) {
+		# caller(0)[3] = _enforce_private itself; caller(1)[3] = the private method that called us
+		my $method = (caller(1))[3] // '(unknown)';
+		$method =~ s/.*:://;
+		Carp::croak("$method() is a private method and cannot be called from outside " . __PACKAGE__);
+	}
+}
+
 sub _find_paths {
 	my $self = shift;
 
-	# Restrict to calls from this package or a subclass
-	if(!( (caller)[0] && ( (caller)[0] eq __PACKAGE__ || (caller)[0]->isa(__PACKAGE__) ) )) {
-		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
-	}
+	$self->_enforce_private();
 
 	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
@@ -458,6 +478,8 @@ sub host_name {
 sub _find_site_details
 {
 	my $self = shift;
+
+	$self->_enforce_private();
 
 	# Log entry to the routine
 	$self->_trace('Entering _find_site_details');
@@ -1214,6 +1236,15 @@ sub param {
 sub _sanitise_input($) {
 	my $arg = shift;
 
+	# Private function: inline check because the ($) prototype means no $self,
+	# so _enforce_private() cannot be used (wrong caller depth without that frame).
+	unless($ENV{HARNESS_ACTIVE}) {
+		my $calling_pkg = (caller)[0];
+		unless($calling_pkg && ($calling_pkg eq __PACKAGE__ || $calling_pkg->isa(__PACKAGE__))) {
+			Carp::croak('_sanitise_input() is a private function and cannot be called from outside ' . __PACKAGE__);
+		}
+	}
+
 	return if(!defined($arg));
 
 	# Remove hacking attempts and spaces
@@ -1232,6 +1263,8 @@ sub _sanitise_input($) {
 
 sub _multipart_data {
 	my ($self, $args) = @_;
+
+	$self->_enforce_private();
 
 	$self->_trace('Entering _multipart_data');
 
@@ -1329,6 +1362,9 @@ sub _multipart_data {
 # Robust filename generation (preventing overwriting)
 sub _create_file_name {
 	my ($self, $args) = @_;
+
+	$self->_enforce_private();
+
 	my $filename = $$args{filename} . '_' . time;
 
 	my $counter = 0;
@@ -1345,6 +1381,8 @@ sub _create_file_name {
 # Untaint a filename. Regex from CGI::Untaint::Filenames
 sub _untaint_filename {
 	my ($self, $args) = @_;
+
+	$self->_enforce_private();
 
 	if($$args{filename} =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
 		return $1;
@@ -2291,6 +2329,8 @@ sub _log
 {
 	my ($self, $level, @messages) = @_;
 
+	$self->_enforce_private();
+
 	if(scalar(@messages)) {
 		# FIXME: add caller's function
 		# if(($level eq 'warn') || ($level eq 'info')) {
@@ -2305,27 +2345,32 @@ sub _log
 
 sub _debug {
 	my $self = shift;
+	$self->_enforce_private();
 	$self->_log('debug', @_);
 }
 
 sub _info {
 	my $self = shift;
+	$self->_enforce_private();
 	$self->_log('info', @_);
 }
 
 sub _notice {
 	my $self = shift;
+	$self->_enforce_private();
 	$self->_log('notice', @_);
 }
 
 sub _trace {
 	my $self = shift;
+	$self->_enforce_private();
 	$self->_log('trace', @_);
 }
 
 # Emit a warning message somewhere
 sub _warn {
 	my $self = shift;
+	$self->_enforce_private();
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('warn', $params->{'warning'});
@@ -2337,6 +2382,7 @@ sub _warn {
 # Emit an error message somewhere
 sub _error {
 	my $self = shift;
+	$self->_enforce_private();
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('error', $params->{'warning'});
@@ -2350,6 +2396,8 @@ sub _error {
 sub _get_env
 {
 	my ($self, $var) = @_;
+
+	$self->_enforce_private();
 
 	return unless defined $ENV{$var};
 

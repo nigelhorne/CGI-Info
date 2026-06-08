@@ -1676,6 +1676,137 @@ subtest 'Test::Returns - tmpdir() returns a defined string' => sub {
 	ok(length($dir) > 0, 'tmpdir() return value is non-empty');
 };
 
+# ============================================================
+# Private method access guards
+# Temporarily unset HARNESS_ACTIVE to simulate a production
+# caller; verify that each private method croaks with the
+# expected message when invoked from outside CGI::Info.
+# ============================================================
+
+subtest 'private method guards - _trace croaks from outside' => sub {
+	plan tests => 1;
+	reset_env();
+	my $info = CGI::Info->new();
+
+	# Remove HARNESS_ACTIVE for the scope of this subtest only
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	throws_ok { $info->_trace('test') }
+		qr/_trace\(\) is a private method and cannot be called from outside CGI::Info/,
+		'_trace() croaks with correct message when called from outside';
+};
+
+subtest 'private method guards - _log croaks from outside' => sub {
+	plan tests => 1;
+	reset_env();
+	my $info = CGI::Info->new();
+
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	throws_ok { $info->_log('warn', 'test') }
+		qr/_log\(\) is a private method and cannot be called from outside CGI::Info/,
+		'_log() croaks with correct message when called from outside';
+};
+
+subtest 'private method guards - _warn croaks from outside' => sub {
+	plan tests => 1;
+	reset_env();
+	my $info = CGI::Info->new();
+
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	throws_ok { $info->_warn('test') }
+		qr/_warn\(\) is a private method and cannot be called from outside CGI::Info/,
+		'_warn() croaks with correct message when called from outside';
+};
+
+subtest 'private method guards - _error croaks from outside' => sub {
+	plan tests => 1;
+	reset_env();
+	my $info = CGI::Info->new();
+
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	throws_ok { $info->_error('test') }
+		qr/_error\(\) is a private method and cannot be called from outside CGI::Info/,
+		'_error() croaks with correct message when called from outside';
+};
+
+subtest 'private method guards - _get_env croaks from outside' => sub {
+	plan tests => 1;
+	reset_env();
+	my $info = CGI::Info->new();
+
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	throws_ok { $info->_get_env('PATH') }
+		qr/_get_env\(\) is a private method and cannot be called from outside CGI::Info/,
+		'_get_env() croaks with correct message when called from outside';
+};
+
+subtest 'private method guards - _sanitise_input croaks from outside' => sub {
+	plan tests => 1;
+	reset_env();
+
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	# _sanitise_input is a plain function, not a method; call via full package name
+	throws_ok { CGI::Info::_sanitise_input('test') }
+		qr/_sanitise_input\(\) is a private function and cannot be called from outside CGI::Info/,
+		'_sanitise_input() croaks with correct message when called from outside';
+};
+
+subtest 'private method guards - _find_paths croaks from outside' => sub {
+	plan tests => 1;
+	reset_env();
+	my $info = CGI::Info->new();
+
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	throws_ok { $info->_find_paths() }
+		qr/_find_paths\(\) is a private method and cannot be called from outside CGI::Info/,
+		'_find_paths() croaks with correct message when called from outside';
+};
+
+subtest 'private method guards - subclass may call private methods' => sub {
+	plan tests => 2;
+
+	# Define a minimal subclass inline to test that subclasses are permitted
+	{
+		package CGI::InfoSub;
+		our @ISA = ('CGI::Info');
+		sub call_trace {
+			my $self = shift;
+			# This must not croak even without HARNESS_ACTIVE
+			eval { $self->_trace('subclass call') };
+			return $@;
+		}
+	}
+
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = '';
+
+	my $sub = CGI::InfoSub->new();
+
+	local %ENV = %ENV;
+	delete $ENV{HARNESS_ACTIVE};
+
+	my $err = $sub->call_trace();
+	ok(!$err, 'subclass can call _trace() without croaking');
+
+	# Confirm the subclass is actually a subclass
+	ok($sub->isa('CGI::Info'), 'CGI::InfoSub isa CGI::Info');
+};
+
 diag("function.t completed") if $ENV{TEST_VERBOSE};
 
 done_testing();
