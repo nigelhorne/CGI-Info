@@ -69,6 +69,7 @@ t/is_tablet.t
 t/json.t
 t/kwalitee.t
 t/lib/MyLogger.pm
+t/locales.t
 t/logdir.t
 t/logger.t
 t/manifest.t

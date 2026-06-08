@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-# use diagnostics;
+use autodie qw(:all);
 
 use CGI::Info;
 
@@ -34,8 +34,8 @@ print "Domain_name: $domain\n",
 
 if($info->params()) {
 	my %FORM = %{$info->params()};
-	foreach (keys(%FORM)) {
-		print "$_ => $FORM{$_}\n";
+	for my $key (sort keys %FORM) {
+		print "$key => $FORM{$key}\n";
 	}
 }
 

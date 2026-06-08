@@ -1,30 +1,37 @@
 package CGI::Info;
 
-# TODO: remove the expect argument
-# TODO:	look into params::check or params::validate
-
 use warnings;
 use strict;
+use autodie qw(:all);
 
+use 5.010;	# Minimum version for features used here
+
+# Core modules
 use boolean;
 use Carp;
+use List::Util ();	# any() used in is_robot() referrer check
+use Readonly;
+use Scalar::Util;
+use Socket;	# AF_INET constant
+
+# CPAN modules
 use Object::Configure 0.19;
 use File::Spec;
 use Log::Abstraction 0.10;
+use Net::CIDR;
 use Params::Get 0.13;
 use Params::Validate::Strict 0.21;
-use Net::CIDR;
 use Return::Set;
-use Scalar::Util;
-use Socket;	# For AF_INET
-use 5.008;
-# use Cwd;
-# use JSON::Parse;
-use List::Util ();	# Can go when expect goes
-# use Sub::Private;
 use Sys::Path;
 
 use namespace::clean;
+
+# ---------------------------------------------------------------------------
+# Module-level constants -- avoids magic numbers scattered through the code
+# ---------------------------------------------------------------------------
+Readonly my $MAX_UPLOAD_SIZE_DEFAULT => 512 * 1024;	# 512 KB default upload cap
+Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
+Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
 
 sub _sanitise_input($);
 
@@ -131,15 +138,90 @@ such as a L<CHI> object.
 
 =item * C<max_upload_size>
 
-The maximum file size you can upload (-1 for no limit), the default is 512MB.
+The maximum file size in bytes you can upload.
+Use C<-1> for no limit.
+The default is 512 KB (524288 bytes).
 
 =back
 
-The class can be configured at runtime using environments and configuration files,
-for example,
-setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to use L<Carp>.
-For more information about configuring object constructors at runtime,
-see L<Object::Configure>.
+The class can be configured at runtime using environment variables and configuration
+files; for example, setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to
+use L<Carp>.  For more information see L<Object::Configure>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    allow          => { type => 'hashref',  optional => 1 },
+    auto_load      => { type => 'boolean',  optional => 1 },
+    cache          => { type => 'object',   optional => 1 },
+    carp_on_warn   => { type => 'boolean',  optional => 1 },
+    config_dirs    => { type => 'arrayref', optional => 1 },
+    config_file    => { type => 'string',   optional => 1 },
+    logger         => { type => 'object',   optional => 1 },
+    max_upload_size=> { type => 'integer',  optional => 1, min => -1 },
+    upload_dir     => { type => 'string',   optional => 1 },
+  }
+
+=head4 OUTPUT
+
+  { type => 'object', isa => 'CGI::Info' }
+
+=head3 MESSAGES
+
+=over 4
+
+=item C<< use ->new() not ::new() to instantiate >>
+
+B<Level>: fatal (croak).
+B<Cause>: called as C<CGI::Info::new()> (double-colon) instead of C<< CGI::Info->new() >>.
+B<Action>: change the call-site to use the arrow notation.
+
+=item C<< Logger must be an object with info() and error() methods >>
+
+B<Level>: fatal (croak).
+B<Cause>: the C<logger> argument is not a blessed object, or does not
+implement C<info()>, C<warn()>, and C<error()> methods.
+B<Action>: pass a compliant logger such as a L<Log::Abstraction>-based object.
+
+=item C<< expect has been deprecated, use allow instead >>
+
+B<Level>: fatal (croak).
+B<Cause>: the removed C<expect> parameter was passed to C<new()>.
+B<Action>: replace C<expect =E<gt> [...]> with C<allow =E<gt> { key =E<gt> qr/.../ }>.
+
+=back
+
+=head3 FORMAL SPECIFICATION
+
+  -- CGI::Info construction
+  new : ClassName x Params --> CGIInfo
+
+  -- Normal (non-clone) path
+  new(class, params) ^=
+    let configured == Object::Configure::configure(class, params)
+    in  CGIInfo {
+          max_upload_size |-> configured.max_upload_size ?? MAX_UPLOAD_SIZE_DEFAULT,
+          allow           |-> configured.allow ?? null,
+          upload_dir      |-> configured.upload_dir ?? null,
+          ...configured
+        }
+
+  -- Pre-conditions
+  pre new(class, params) ^=
+    params.logger = null
+    v (blessed(params.logger)
+       ^ params.logger.can('warn')
+       ^ params.logger.can('info')
+       ^ params.logger.can('error'))
+    ^ params.expect = null
+
+  -- Clone path (invocant is an existing object)
+  clone : CGIInfo x Params --> CGIInfo
+  clone(self, params) ^=
+    let merged == (self (+) params) \ {paramref}
+    in  CGIInfo { ...merged }
 
 =cut
 
@@ -206,12 +288,12 @@ sub new
 		Carp::croak("$class: expect has been deprecated, use allow instead");
 	}
 
-	# Return the blessed object
+	# Return the blessed object with sensible defaults
 	return bless {
-		max_upload_size => 512 * 1024,
-		allow => undef,
-		upload_dir => undef,
-		%{$params}	# Overwrite defaults with given arguments
+		max_upload_size => $MAX_UPLOAD_SIZE_DEFAULT,
+		allow           => undef,
+		upload_dir      => undef,
+		%{$params}	# Caller-supplied args override the defaults above
 	}, $class;
 }
 
@@ -257,7 +339,8 @@ sub script_name
 sub _find_paths {
 	my $self = shift;
 
-	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
+	# Restrict to calls from this package or a subclass
+	if(!( (caller)[0] && ( (caller)[0] eq __PACKAGE__ || (caller)[0]->isa(__PACKAGE__) ) )) {
 		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
 	}
 
@@ -656,14 +739,6 @@ sub params {
 	if(defined($params->{allow})) {
 		$self->{allow} = $params->{allow};
 	}
-	# if(defined($params->{expect})) {
-		# if(ref($params->{expect}) eq 'ARRAY') {
-			# $self->{expect} = $params->{expect};
-			# $self->_warn('expect is deprecated, use allow instead');
-		# } else {
-			# $self->_warn('expect must be a reference to an array');
-		# }
-	# }
 	if(defined($params->{upload_dir})) {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
@@ -698,26 +773,8 @@ sub params {
 				}
 			}
 		} elsif($stdin_data) {
+			# Re-use previously read STDIN (class variable shared across instances)
 			@pairs = split(/\n/, $stdin_data);
-		# } elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
-		} elsif(0) {
-			# TODO:  Do I really need this anymore?
-			my $oldfh = select(STDOUT);
-			print "Entering debug mode\n",
-				"Enter key=value pairs - end with quit\n";
-			select($oldfh);
-
-			# Avoid prompting for the arguments more than once
-			# if just 'quit' is entered
-			$self->{args_read} = 1;
-
-			while(<STDIN>) {
-				chop(my $line = $_);
-				$line =~ s/[\r\n]//g;
-				last if $line eq 'quit';
-				push(@pairs, $line);
-				$stdin_data .= "$line\n";
-			}
 		}
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		if(my $query = $ENV{'QUERY_STRING'}) {
@@ -1105,35 +1162,68 @@ sub params {
 
 =head2 param($field)
 
-Get a single parameter from the query string.
-Takes an optional single string parameter which is the argument to return. If
-that parameter is not given param() is a wrapper to params() with no arguments.
+Get a single CGI parameter value by name.
+When called without arguments it delegates to C<params()> and returns all parameters.
+When called with a field name it returns that parameter's (sanitised) value,
+or C<undef> if the parameter was not supplied or is not in the allow list.
 
 	use CGI::Info;
-	# ...
 	my $info = CGI::Info->new();
-	my $bar = $info->param('foo');
+	my $bar  = $info->param('foo');
 
-If the requested parameter isn't in the allowed list, an error message will
-be thrown:
-
-	use CGI::Info;
-	my $allowed = {
-		foo => qr/\d+/
-	};
-	my $xyzzy = $info->params(allow => $allowed);
-	my $bar = $info->param('bar');  # Gives an error message
-
-Returns undef if the requested parameter was not given
+	# With an allow list:
+	my $info2 = CGI::Info->new();
+	my $allowed = { foo => qr/\d+/ };
+	$info2->params(allow => $allowed);
+	my $bar2 = $info2->param('bar');   # logs a warning; returns undef
 
 =over 4
 
 =item $field
 
-Optional field to be retrieved.
-If omitted, all the parameters are returned.
+Optional. The name of the CGI parameter to retrieve.
+If omitted, all parameters (as a hash-ref) are returned via C<params()>.
 
 =back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+	{
+		field => { type => 'scalar', optional => 1 },
+	}
+
+=head4 Output
+
+	# When $field is supplied
+	{ type => 'scalar', optional => 1 }
+	# When $field is omitted (delegates to params())
+	{ type => 'hashref', optional => 1 }
+
+=head3 MESSAGES
+
+	| Level | Message                                  | Meaning                              | Action                                  |
+	|-------|------------------------------------------|--------------------------------------|-----------------------------------------|
+	| warn  | param: <field> isn't in the allow list   | Caller requested a parameter outside | Review the allow list passed to new()   |
+	|       |                                          | the schema set by params(allow=>\%h) | or params(); add the key if legitimate  |
+
+=head3 FORMAL SPECIFICATION
+
+Let F be the set of all possible CGI field names, V be the set of all
+possible (sanitised) scalar values, and allow : F -> Regex | undef be the
+current allow-list schema (undef means all fields are permitted).
+
+  param : F? -> V | HashRef | undef
+
+  param() =  params()
+
+  param(f) =
+    f not in dom(allow) /\ allow /= undef =>  warn; undef
+    f in params()                          =>  params()(f)
+    otherwise                              =>  undef
+
+Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = undef.
 
 =cut
 
@@ -1377,7 +1467,7 @@ sub is_mobile {
 			# Without the ?1:0 it will set to the empty string not 0
 			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i)) ? 1 : 0;
 			if($is_mobile && $self->{cache} && defined($remote)) {
-				$self->{cache}->set("$remote/$agent", 'mobile', '1 day');
+				$self->{cache}->set("$remote/$agent", 'mobile', $CACHE_TTL_SEARCH);
 			}
 			return $self->{is_mobile} = $is_mobile;
 		}
@@ -1794,12 +1884,16 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
+		# Normalise stray backslashes in the referrer before matching
 		$referrer =~ s/\\/_/g;
-		if(($referrer =~ /\)/) || (List::Util::any { $_ =~ /^$referrer/ } @crawler_lists)) {
+		# Block if the referrer starts with a known crawler domain (or contains a closing
+		# parenthesis, which is a common hallmark of spam referrers).
+		# quotemeta() prevents accidental regex metacharacters in the referrer.
+		if(($referrer =~ /\)/) || (List::Util::any { $referrer =~ /^\Q$_\E/i } @crawler_lists)) {
 			$self->_debug("is_robot: blocked trawler $referrer");
 
 			if($self->{cache}) {
-				$self->{cache}->set($key, 'robot', '1 day');
+				$self->{cache}->set($key, 'robot', $CACHE_TTL_ROBOT);
 			}
 			$self->{is_robot} = 1;
 			return 1;
@@ -1817,7 +1911,7 @@ sub is_robot {
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
 		# Mark Facebook as a search engine, not a robot
 		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		return 0;
 	}
@@ -1838,7 +1932,7 @@ sub is_robot {
 
 		if($is_robot) {
 			if($self->{cache}) {
-				$self->{cache}->set($key, 'robot', '1 day');
+				$self->{cache}->set($key, 'robot', $CACHE_TTL_ROBOT);
 			}
 			$self->{is_robot} = $is_robot;
 			return $is_robot;
@@ -1846,7 +1940,7 @@ sub is_robot {
 	}
 
 	if($self->{cache}) {
-		$self->{cache}->set($key, 'unknown', '1 day');
+		$self->{cache}->set($key, 'unknown', $CACHE_TTL_ROBOT);
 	}
 	$self->{is_robot} = 0;
 	return 0;
@@ -1902,7 +1996,7 @@ sub is_search_engine
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
 		# Mark Facebook as a search engine, not a robot
 		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		return 1;
 	}
@@ -1923,7 +2017,7 @@ sub is_search_engine
 			}
 		}
 		if($is_search && $self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		return $self->{is_search_engine} = $is_search;
 	}
@@ -1936,7 +2030,7 @@ sub is_search_engine
 	if((defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) ||
 	   (Net::CIDR::cidrlookup($remote, @cidr_blocks))) {
 		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		$self->{is_search_engine} = 1;
 		return 1;

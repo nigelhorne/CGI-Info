@@ -8,6 +8,13 @@ Revision history for CGI-Info
 	Clone path deletes cached paramref so a new allow schema is applied on the first params() call
 	Fix t/00-load.t bail-out: capture load error before use_ok clobbers $@, then BAIL_OUT with the actual reason on failure
 	Upgrade t/40-more.t from Test::MockModule to Test::Mockingbird; fix three pre-existing test bugs now exposed
+	Add use autodie qw(:all) and Readonly constants ($MAX_UPLOAD_SIZE_DEFAULT, $CACHE_TTL_ROBOT, $CACHE_TTL_SEARCH) to eliminate magic numbers
+	Fix UNIVERSAL::isa() deprecation warning in _find_paths(): replaced with proper ->isa() call
+	Remove dead commented-out expect and interactive debug blocks from params()
+	Fix reversed referrer logic in is_robot(): now correctly checks if the HTTP_REFERER starts with a known crawler URL
+	Add API SPECIFICATION, MESSAGES and FORMAL SPECIFICATION sections to param() POD
+	Add t/locales.t: tests system-locale (POSIX LC_ALL) error-path invariance under en_US.UTF-8, de_DE.UTF-8, and zh_CN.UTF-8; geographic GeoIP subtests skipped unless IP::Country::Fast is installed
+	Fix bin/info.pl: add use autodie qw(:all); replace bare foreach(keys(%FORM)) with for my $key (sort keys %FORM)
 
 1.13	Sun Apr 12 08:49:24 EDT 2026
 	Fixed test failures on Windows, e.g. https://www.cpantesters.org/cpan/report/5bf7930a-7048-1014-8eeb-cabb5837fa32
