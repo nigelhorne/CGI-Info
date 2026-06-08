@@ -33,8 +33,8 @@ jobs:
           fetch-depth: 0
 
       # Install Perl via perlbrew
-      - name: Setup Perl
-        uses: shogo82148/actions-setup-perl@v1
+      - name: Setup Perl environment
+        uses: shogo82148/actions-setup-perl@v1.41.1
         with:
           perl-version: ${{ matrix.perl }}
           # install cpanminus

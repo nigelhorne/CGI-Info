@@ -4,6 +4,9 @@ Revision history for CGI-Info
 	More helpful error message on "Multipart/form-data not supported"
 	Set status to 501 when attempting to upload to a place that doesn't take uploads
 	Log the invalid method type
+	Clone path now validates logger and croaks on deprecated expect argument, matching the normal construction path
+	Clone path deletes cached paramref so a new allow schema is applied on the first params() call
+	Fix t/00-load.t bail-out: replace bail_on_fail (deferred) with BAIL_OUT (immediate) on use_ok failure
 
 1.13	Sun Apr 12 08:49:24 EDT 2026
 	Fixed test failures on Windows, e.g. https://www.cpantesters.org/cpan/report/5bf7930a-7048-1014-8eeb-cabb5837fa32

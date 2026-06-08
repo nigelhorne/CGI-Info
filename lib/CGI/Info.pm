@@ -164,7 +164,25 @@ sub new
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		$params ||= {};
-		return bless { %{$class}, %{$params} }, ref($class);
+
+		# Validate any new logger passed to the clone
+		if(defined $params->{'logger'}) {
+			unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('warn') && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
+				Carp::croak('Logger must be an object with info() and error() methods');
+			}
+		}
+
+		# expect is deprecated even when cloning
+		if(defined($params->{'expect'})) {
+			my $logger = $params->{'logger'} // $class->{'logger'};
+			$logger->error(ref($class) . ': expect has been deprecated, use allow instead') if $logger;
+			Carp::croak(ref($class) . ': expect has been deprecated, use allow instead');
+		}
+
+		# Drop cached params so a new allow schema is applied on next call
+		my %merged = (%{$class}, %{$params});
+		delete $merged{'paramref'};
+		return bless \%merged, ref($class);
 	}
 
 	# Load the configuration from a config file, if provided
