@@ -193,36 +193,6 @@ B<Action>: replace C<expect =E<gt> [...]> with C<allow =E<gt> { key =E<gt> qr/..
 
 =back
 
-=head3 FORMAL SPECIFICATION
-
-  -- CGI::Info construction
-  new : ClassName x Params --> CGIInfo
-
-  -- Normal (non-clone) path
-  new(class, params) ^=
-    let configured == Object::Configure::configure(class, params)
-    in  CGIInfo {
-          max_upload_size |-> configured.max_upload_size ?? MAX_UPLOAD_SIZE_DEFAULT,
-          allow           |-> configured.allow ?? null,
-          upload_dir      |-> configured.upload_dir ?? null,
-          ...configured
-        }
-
-  -- Pre-conditions
-  pre new(class, params) ^=
-    params.logger = null
-    v (blessed(params.logger)
-       ^ params.logger.can('warn')
-       ^ params.logger.can('info')
-       ^ params.logger.can('error'))
-    ^ params.expect = null
-
-  -- Clone path (invocant is an existing object)
-  clone : CGIInfo x Params --> CGIInfo
-  clone(self, params) ^=
-    let merged == (self (+) params) \ {paramref}
-    in  CGIInfo { ...merged }
-
 =cut
 
 our $stdin_data;	# Class variable storing STDIN in case the class
@@ -1208,23 +1178,6 @@ If omitted, all parameters (as a hash-ref) are returned via C<params()>.
 	| warn  | param: <field> isn't in the allow list   | Caller requested a parameter outside | Review the allow list passed to new()   |
 	|       |                                          | the schema set by params(allow=>\%h) | or params(); add the key if legitimate  |
 
-=head3 FORMAL SPECIFICATION
-
-Let F be the set of all possible CGI field names, V be the set of all
-possible (sanitised) scalar values, and allow : F -> Regex | undef be the
-current allow-list schema (undef means all fields are permitted).
-
-  param : F? -> V | HashRef | undef
-
-  param() =  params()
-
-  param(f) =
-    f not in dom(allow) /\ allow /= undef =>  warn; undef
-    f in params()                          =>  params()(f)
-    otherwise                              =>  undef
-
-Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = undef.
-
 =cut
 
 sub param {
@@ -1266,7 +1219,7 @@ sub _sanitise_input($) {
 	# Remove hacking attempts and spaces
 	$arg =~ s/[\r\n]//g;
 	$arg =~ s/\s+$//;
-	$arg =~ s/^\s//;
+	$arg =~ s/^\s+//;
 
 	$arg =~ s/<!--.*-->//g;
 	# Allow :
@@ -1396,7 +1349,7 @@ sub _untaint_filename {
 	if($$args{filename} =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
 		return $1;
 	}
-	# return undef;
+	return;
 }
 
 =head2 is_mobile
@@ -2524,6 +2477,55 @@ L<http://matrix.cpantesters.org/?dist=CGI-Info>
 L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
+
+=head2 FORMAL SPECIFICATION
+
+=head3 new
+
+  -- CGI::Info construction
+  new : ClassName x Params --> CGIInfo
+
+  -- Normal (non-clone) path
+  new(class, params) ^=
+    let configured == Object::Configure::configure(class, params)
+    in  CGIInfo {
+          max_upload_size |-> configured.max_upload_size ?? MAX_UPLOAD_SIZE_DEFAULT,
+          allow           |-> configured.allow ?? null,
+          upload_dir      |-> configured.upload_dir ?? null,
+          ...configured
+        }
+
+  -- Pre-conditions
+  pre new(class, params) ^=
+    params.logger = null
+    v (blessed(params.logger)
+       ^ params.logger.can('warn')
+       ^ params.logger.can('info')
+       ^ params.logger.can('error'))
+    ^ params.expect = null
+
+  -- Clone path (invocant is an existing object)
+  clone : CGIInfo x Params --> CGIInfo
+  clone(self, params) ^=
+    let merged == (self (+) params) \ {paramref}
+    in  CGIInfo { ...merged }
+
+=head3 param
+
+Let F be the set of all possible CGI field names, V be the set of all
+possible (sanitised) scalar values, and allow : F -> Regex | undef be the
+current allow-list schema (undef means all fields are permitted).
+
+  param : F? -> V | HashRef | undef
+
+  param() =  params()
+
+  param(f) =
+    f not in dom(allow) /\ allow /= undef =>  warn; undef
+    f in params()                          =>  params()(f)
+    otherwise                              =>  undef
+
+Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = undef.
 
 =head1 LICENCE AND COPYRIGHT
 
