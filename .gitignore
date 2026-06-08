@@ -10,6 +10,7 @@
 # Devel::Cover
 cover_db/
 cover_html/
+coverage_history/
 
 # Devel::NYTProf
 nytprof.out
@@ -43,3 +44,6 @@ mutation.json
 /.carmel/
 # cpanfile.snapshot should generally be ignored for library code, otherwise included
 # cpanfile.snapshot 
+
+\.claude
+CLAUDE.md

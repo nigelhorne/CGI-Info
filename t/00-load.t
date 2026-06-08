@@ -6,7 +6,9 @@ use strict;
 use Test::Most tests => 2;
 
 BEGIN {
-	use_ok('CGI::Info') || BAIL_OUT('CGI::Info failed to load');
+	my $load_error;
+	eval { require CGI::Info; CGI::Info->import() } or $load_error = $@;
+	use_ok('CGI::Info') || BAIL_OUT("CGI::Info failed to load: $load_error");
 }
 
 require_ok('CGI::Info') || do {

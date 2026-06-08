@@ -6,7 +6,8 @@ Revision history for CGI-Info
 	Log the invalid method type
 	Clone path now validates logger and croaks on deprecated expect argument, matching the normal construction path
 	Clone path deletes cached paramref so a new allow schema is applied on the first params() call
-	Fix t/00-load.t bail-out: replace bail_on_fail (deferred) with BAIL_OUT (immediate) on use_ok failure
+	Fix t/00-load.t bail-out: capture load error before use_ok clobbers $@, then BAIL_OUT with the actual reason on failure
+	Upgrade t/40-more.t from Test::MockModule to Test::Mockingbird; fix three pre-existing test bugs now exposed
 
 1.13	Sun Apr 12 08:49:24 EDT 2026
 	Fixed test failures on Windows, e.g. https://www.cpantesters.org/cpan/report/5bf7930a-7048-1014-8eeb-cabb5837fa32
