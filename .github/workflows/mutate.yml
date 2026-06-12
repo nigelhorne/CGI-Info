@@ -1,5 +1,5 @@
 ---
-
+# Run a mutation test.  They can take a long time so only run then on demand or every month, not on each commit
 name: Mutation Testing
 permissions:
   contents: write

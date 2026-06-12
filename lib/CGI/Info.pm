@@ -1,5 +1,7 @@
 package CGI::Info;
 
+# Next - unit.t
+
 use warnings;
 use strict;
 use autodie qw(:all);
