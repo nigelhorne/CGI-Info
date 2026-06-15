@@ -134,7 +134,7 @@
 	<a href="https://github.com/nigelhorne/CGI-Info">
 		<img src="https://img.shields.io/github/stars/nigelhorne/CGI-Info?style=social" alt="GitHub stars">
 	</a>
-	<img src="https://img.shields.io/badge/coverage-76%25-yellow" alt="Coverage badge">
+	<img src="https://img.shields.io/badge/coverage-77%25-yellow" alt="Coverage badge">
 </div>
 <h1>CGI::Info</h1><h2>Coverage Report</h2>
 <table data-sort-col="0" data-sort-order="asc">
@@ -153,316 +153,12 @@
 
 <tbody>
 
-<tr class="low"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/2eaf7c5498cbc73e245d3ff2a5d02f0f5be8ab3b/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1,68.1"></canvas></td><td>75.0</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-bad" title="Needs improvement">68.1%</span></td><td class="neutral" title="Previous: 68.1%">&#9679; 0.0%</td></tr>
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/2eaf7c5498cbc73e245d3ff2a5d02f0f5be8ab3b/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9,84.9"></canvas></td><td>93.3</td><td>82.6</td><td>68.0</td><td>98.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">84.9%</span></td><td class="neutral" title="Previous (sparkline): 84.9%">&#9679; 0.0%</td></tr>
-<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 76%, Low: 1</td></tr>
-<tr class="med nosort"><td><strong>Total</strong></td><td>84.1</td><td>53.8</td><td>34.0</td><td>99.2</td><td colspan="2"><strong>76.5</strong></td></tr>
+<tr class="med"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/89bc613ea522430b418075fbb98dc312f108aeb8/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points=""></canvas></td><td>76.9</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">70.6%</span></td><td class="neutral" title="No previous data">&#9679;</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/89bc613ea522430b418075fbb98dc312f108aeb8/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points=""></canvas></td><td>93.8</td><td>84.2</td><td>66.6</td><td>100.0</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">85.3%</span></td><td class="neutral" title="No previous data">&#9679;</td></tr>
+<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 77%, Low: 0</td></tr>
+<tr class="med nosort"><td><strong>Total</strong></td><td>85.4</td><td>54.6</td><td>33.3</td><td>100.0</td><td colspan="2"><strong>77.9</strong></td></tr>
 </tbody></table>
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-	<div>
-		<h2>Coverage Trend</h2>
-		<label>
-			<input type="checkbox" id="toggleTrend" checked>
-			Show regression trend
-		</label>
-		<div>
-		</div>
-	</div>
-	<div id="zoomControls" style="margin-top:8px;">
-		<input type="button" value="Refresh" onClick="refresh(this)">
-		<button id="resetZoomBtn" type="button">Reset Zoom</button>
-	</div>
-</div>
-<canvas id="coverageTrend" width="600" height="300"></canvas>
-<!-- Zoom controls for the trend chart -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Add chartjs-plugin-zoom (required for wheel/pinch/drag zoom & pan) -->
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom\@2.1.1/dist/chartjs-plugin-zoom.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-<script>
-function linearRegression(data) {
-	const xs = data.map(p => new Date(p.x).getTime());
-	const ys = data.map(p => p.y);
-	const n = xs.length;
-
-	const sumX = xs.reduce((a, b) => a + b, 0);
-	const sumY = ys.reduce((a, b) => a + b, 0);
-	const sumXY = xs.reduce((acc, val, i) => acc + val * ys[i], 0);
-	const sumX2 = xs.reduce((acc, val) => acc + val * val, 0);
-
-	if(n < 2 || (n * sumX2 - sumX * sumX) === 0) {
-		return [];
-	}
-	const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-	const intercept = (sumY - slope * sumX) / n;
-
-	return xs.map(x => ({
-		x: new Date(x).toISOString(),
-		y: slope * x + intercept
-	}));
-}
-
-
-const dataPoints = [ { x: "2026-05-03T23:13:25+00:00", y: 76.5047184999876, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/463bc0ffb45dd20f2b81aae1c555542739a92351", label: "2026-05-03T23:13:25+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-03 df5745c)" },
-{ x: "2026-05-04T00:04:51+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/b5df790ecd165a190f4dd8f987d969ba7de5bae0", label: "2026-05-04T00:04:51+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-03 12ed39b)" },
-{ x: "2026-05-04T00:45:57+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/4645768aabfe2230c4946849c33f8c899920ed2f", label: "2026-05-04T00:45:57+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-04 8e0a4fd)" },
-{ x: "2026-05-04T01:37:51+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/5ed1d0fcd9fb6685cc69afb8b7e06e5f8a0409dc", label: "2026-05-04T01:37:51+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-04 ab6d848)" },
-{ x: "2026-05-04T21:31:18+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/0dbb075868f4a7d13873d27d55b41c33de74a61d", label: "2026-05-04T21:31:18+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-04 fd5411c)" },
-{ x: "2026-05-04T23:02:47+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/9579b7a5c836ff8d1557aff397c053b318643f0f", label: "2026-05-04T23:02:47+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-04 6f004e8)" },
-{ x: "2026-05-05T01:33:25+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/a09fec4753336dc05b872b0a3ae9f7562bbc9bdb", label: "2026-05-05T01:33:25+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-05 5d0b872)" },
-{ x: "2026-05-11T00:00:42+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/4a7cdb099ab3e8070f6076aa9900c50b7aa14cd9", label: "2026-05-11T00:00:42+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-10 a839515)" },
-{ x: "2026-05-18T16:45:02+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c3834ae1509e447ea87c84f0218de59f5379207d", label: "2026-05-18T16:45:02+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-18 d5f188c)" },
-{ x: "2026-05-18T20:36:50+00:00", y: 76.5047184999876, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/edacd9b68fd5265aabf3d25647131c2dc1fc705d", label: "2026-05-18T20:36:50+00:00", pointBackgroundColor: "gray", comment: "Update mutation results (2026-05-18 559bedf)" } ];
-const regressionPoints = linearRegression(dataPoints);
-// Try to register the zoom plugin (handles different UMD builds)
-(function registerZoomPlugin(){
-	try {
-		const candidates = ['chartjsPluginZoom','ChartZoom','zoomPlugin','chartjs_plugin_zoom','ChartjsPluginZoom','chartjsPluginZoom'];
-		for(const name of candidates) {
-			if(window[name]) {
-				try { Chart.register(window[name]); console.log('Registered zoom plugin:', name); return; } catch(e) { console.warn('zoom register failed for', name, e); }
-			}
-		}
-		// Some CDN builds auto-register the plugin; if nothing found that's OK (feature disabled).
-	} catch(e) {
-		console.warn('registerZoomPlugin error', e);
-	}
-})();
-const ctx = document.getElementById('coverageTrend').getContext('2d');
-const chart = new Chart(ctx, {
-	type: 'line',
-	data: {
-		datasets: [{
-			label: 'Total Coverage (%)',
-			data: dataPoints,
-			borderColor: 'green',
-			backgroundColor: 'rgba(0,128,0,0.1)',
-			pointRadius: 5,
-			pointHoverRadius: 7,
-			pointStyle: 'circle',
-			fill: false,
-			tension: 0.3,
-			pointBackgroundColor: function(context) {
-				return context.raw.pointBackgroundColor || 'gray';
-			}
-		}, {
-			label: 'Regression Line',
-			data: regressionPoints,
-			borderColor: 'blue',
-			borderDash: [5, 5],
-			pointRadius: 0,
-			fill: false,
-			tension: 0.0
-		}]
-	}, options: {
-		scales: {
-			x: {
-				type: 'time',
-				time: {
-					tooltipFormat: 'MMM d, yyyy HH:mm:ss',
-					unit: 'day'
-				},
-				title: { display: true, text: 'Commit Date' }
-			},
-			y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
-		}, plugins: {
-			legend: {
-				display: true,
-				position: 'top', // You can also use 'bottom', 'left', or 'right'
-				labels: {
-					boxWidth: 12,
-					padding: 10,
-					font: {
-						size: 12,
-						weight: 'bold'
-					}
-				}
-			}, tooltip: {
-				callbacks: {
-					label: function(context) {
-						const raw = context.raw;
-						const coverage = raw.y.toFixed(1);
-						const delta = raw.delta?.toFixed(1) ?? '0.0';
-						const sign = delta > 0 ? '+' : delta < 0 ? '-' : '±';
-						// const baseLine = `${raw.label}: ${coverage}% (${sign}${Math.abs(delta)}%)`;
-						const baseLine = `${coverage}% (${sign}${Math.abs(delta)}%)`;
-						const commentLine = raw.comment ? raw.comment : null;
-						return commentLine ? [baseLine, commentLine] : [baseLine];
-					}
-				}
-			} , zoom: {	// Enable zoom & pan on the x-axis for the trend chart
-				pan: {
-					enabled: true,
-					mode: 'x'
-				}, zoom: {
-					wheel: {
-						enabled: true
-					}, pinch: {
-						enabled: true
-					}, mode: 'x'
-				}
-			}
-		}, onClick: (e) => {
-			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-			if(points.length) {
-				const url = chart.data.datasets[0].data[points[0].index].url;
-				window.open(url, '_blank');
-			}
-		}
-	}
-});
-
-document.getElementById('toggleTrend').addEventListener('change', function(e) {
-	const show = e.target.checked;
-	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
-	trendDataset.hidden = !show;
-	chart.update();
-});
-
-// Reset Zoom button handler (calls plugin API if available)
-const resetBtn = document.getElementById('resetZoomBtn');
-if(resetBtn) {
-	resetBtn.addEventListener('click', function() {
-		try {
-			if(chart && typeof chart.resetZoom === 'function') {
-				chart.resetZoom();
-			} else {
-				console.warn('resetZoom not available; zoom plugin may not be registered.');
-			}
-		} catch (e) {
-			console.warn('resetZoom call failed', e);
-		}
-	});
-}
-
-function sortTable(th, colIndex) {
-	const table = th.closest("table");
-	if(!table || !table.tBodies.length) return;
-
-	const tbody = table.tBodies[0];
-	const rows = Array.from(tbody.rows);
-
-	const prevCol = table.getAttribute("data-sort-col");
-	const prevOrder = table.getAttribute("data-sort-order") || "desc";
-	const asc = (prevCol != colIndex) ? true : (prevOrder === "desc");
-
-	const isNumeric = colIndex === 0; // Date column
-
-	const normalRows = rows.filter(r => !r.classList.contains("nosort"));
-	const fixedRows = rows.filter(r => r.classList.contains("nosort"));
-
-	normalRows.sort((a, b) => {
-		let x = a.cells[colIndex]?.innerText.trim() || "";
-		let y = b.cells[colIndex]?.innerText.trim() || "";
-
-		if(isNumeric) {
-			x = Date.parse(x) || 0;
-			y = Date.parse(y) || 0;
-		} else {
-			x = x.toLowerCase();
-			y = y.toLowerCase();
-		}
-
-		if(x < y) return asc ? -1 : 1;
-		if(x > y) return asc ? 1 : -1;
-		return 0;
-	});
-
-	normalRows.forEach(r => tbody.appendChild(r));
-	fixedRows.forEach(r => tbody.appendChild(r));
-
-	// Update arrows
-	const headers = table.tHead.rows[0].cells;
-	for(let i = 0; i < headers.length; i++) {
-		const arrow = headers[i].querySelector(".arrow");
-		if(!arrow) continue;
-
-		if(i === colIndex) {
-			arrow.textContent = asc ? "▲" : "▼";
-			arrow.classList.add("active");
-		} else {
-			arrow.textContent = "▲";
-			arrow.classList.remove("active");
-		}
-	}
-
-	table.setAttribute("data-sort-col", colIndex);
-	table.setAttribute("data-sort-order", asc ? "asc" : "desc");
-}
-
-
-// Initial display.
-// The table has been set up sorted in ascending order on the filename; reflect that in the GUI
-document.addEventListener("DOMContentLoaded", () => {
-	const table = document.querySelector("table");
-	if(!table) return;
-
-	const headers = table.tHead.rows[0].cells;
-	for(let i = 0; i < headers.length; i++) {
-		const arrow = headers[i].querySelector(".arrow");
-		if(!arrow) continue;
-
-		if(i === 0) {
-			arrow.textContent = "▲";
-			arrow.classList.add("active");
-		} else {
-			arrow.textContent = "▲";
-			arrow.classList.remove("active");
-		}
-	}
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-	document.querySelectorAll("canvas.sparkline").forEach(canvas => {
-		const raw = canvas.getAttribute("data-points");
-		if(!raw) return;
-		const points = raw.split(",").map(v => parseFloat(v));
-
-		new Chart(canvas.getContext("2d"), {
-			type: 'line',
-			data: {
-				labels: points.map((_, i) => i+1),
-				datasets: [{
-					data: points,
-					borderColor: points.length > 1 && points[points.length-1] >= points[0] ? "green" : "red",
-					borderWidth: 1,
-					fill: false,
-					tension: 0.3,
-					pointRadius: 0
-				}]
-			}, options: {
-				responsive: false,
-				maintainAspectRatio: false,
-				elements: { line: { borderJoinStyle: 'round' } },
-				plugins: {
-					legend: { display: false },
-					tooltip: { enabled: false },
-					zoom: {	// Enable zoom and pan
-						pan: {
-							enabled: true,
-							mode: 'x',
-						}, zoom: {
-							wheel: {
-								enabled: true,
-							},
-							pinch: {
-								enabled: true
-							},
-							mode: 'x',
-						}
-					}
-				}, scales: { x: { display: false }, y: { display: false } }
-			}
-		});
-	});
-});
-
-function refresh(){
-	window.location.reload("Refresh")
-}
-</script>
-
-<p><center>Use mouse wheel or pinch to zoom; drag to pan</center></p>
+<p><i>No history to show coverage trend</i></p>
 <p>No issues active on <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info">RT</a></p>
 <h2>CPAN Testers Failures for CGI-Info 1.13</h2>
 <h3>Failure Summary (all reports)</h3>
@@ -578,12 +274,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <tr class="cpan-fail"><td>2026-05-26T01:41:00Z</td><td>linux</td><td>5.32.1</td><td>David Solimano</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/f67a4fbe-58a3-11f1-b637-ec25f57ebdfd" target="_blank">View</a></td></tr>
-<tr class="cpan-fail"><td>2026-05-06T00:10:00Z</td><td>linux</td><td>5.43.11</td><td>Carlos Guevara</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/f1cd10e2-48df-11f1-9b25-85d46e924bb9" target="_blank">View</a></td></tr>
 <tr class="cpan-fail"><td>2026-05-13T02:35:00Z</td><td>linux</td><td>5.43.11</td><td>Carlos Guevara</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/6636faee-4e74-11f1-bf0e-98e581a72d59" target="_blank">View</a></td></tr>
 <tr class="cpan-fail"><td>2026-05-09T03:39:00Z</td><td>freebsd</td><td>5.43.11</td><td>Carlos Guevara</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/b1f53578-4b58-11f1-b58e-c3b1dd4ff9a0" target="_blank">View</a></td></tr>
+<tr class="cpan-fail"><td>2026-05-06T00:10:00Z</td><td>linux</td><td>5.43.11</td><td>Carlos Guevara</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/f1cd10e2-48df-11f1-9b25-85d46e924bb9" target="_blank">View</a></td></tr>
 <tr class="cpan-fail"><td>2026-05-15T15:52:00Z</td><td>linux</td><td>5.40.0</td><td>Nigel Horne</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/0fe29f78-5076-11f1-b056-c49f78c52a0d" target="_blank">View</a></td></tr>
 </tbody></table>
@@ -609,17 +305,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <h2>Structural Coverage (Approximate)</h2>
 <div class='summary'>
-Statement Coverage: 92.47% (761 / 823)<br>
-Branch Coverage: 81.69% (415 / 508)<br>
+Statement Coverage: 93.04% (802 / 862)<br>
+Branch Coverage: 83.33% (435 / 522)<br>
 <em>Approximate LCSAJ derived from branch and statement coverage.</em>
 </div>
 <h2>Executive Summary</h2>
 <div class='summary'>
-Tests execute 92.47% of the code. No mutation data available yet — trigger the mutation workflow for fault detection analysis.
+Tests execute 93.04% of the code. No mutation data available yet — trigger the mutation workflow for fault detection analysis.
 </div>
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-05-31 21:58:08 - <a href="https://github.com/nigelhorne/CGI-Info/commit/2eaf7c5498cbc73e245d3ff2a5d02f0f5be8ab3b">commit <code>2eaf7c5</code></a></em></p>
+	<p><em>Last updated: 2026-06-15 13:10:35 - <a href="https://github.com/nigelhorne/CGI-Info/commit/89bc613ea522430b418075fbb98dc312f108aeb8">commit <code>89bc613</code></a></em></p>
 	<p style="float: right; font-size: 0.85em; color: #999;">Powered by <a href="https://metacpan.org/dist/App-Test-Generator">App::Test::Generator 0.38</a></p>
 </footer>
 </body>
