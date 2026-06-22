@@ -25,7 +25,7 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-        perl: '5.42'
+        perl: ["5.42"]
 
     runs-on: ${{ matrix.os }}
     name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
@@ -51,7 +51,7 @@ jobs:
       - name: Install App::Test::Generator this module's dependencies
         run: |
           cpanm App::Test::Generator
-          cpanm --installdeps .
+          cpanm -notest --installdeps .
 
       - name: Make Module
         run: |
@@ -81,4 +81,4 @@ jobs:
         if: runner.os != 'Windows' && failure()
         run: |
           echo "Fuzz Testing workflow failed" | mailx -s "GitHub Action Failed" alerts@nigelhorne.com
-          tail -100 "$HOME/.cpanm/work/*/build.log"
+          for f in $HOME/.cpanm/work/*/build.log; do [ -f "$f" ] && { echo "=== $f ==="; tail -200 "$f"; } done
