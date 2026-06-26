@@ -15,7 +15,7 @@ Revision history for CGI-Info
 	- Add API SPECIFICATION, MESSAGES and FORMAL SPECIFICATION sections to param() POD
 	- Add t/locales.t: tests system-locale (POSIX LC_ALL) error-path invariance under en_US.UTF-8, de_DE.UTF-8, and zh_CN.UTF-8; geographic GeoIP subtests skipped unless IP::Country::Fast is installed
 	- Rewrite t/function.t: Test::Most, Test::Returns, Test::Memory::Cycle, Readonly constants, white-box tests for _log/_warn/_error/_get_env/_create_file_name/_untaint_filename, $_ clobbering tests
-	- Add _enforce_private() guard: all protected methods now croak with "<method>() is a protected method and cannot be called from outside CGI::Info" when invoked by external callers; test harness (HARNESS_ACTIVE) and subclasses are exempt
+	- Use Sub::Protected
 	- Remove subroutine prototype from _sanitise_input forward declaration and definition
 	- Replace explicit return undef with return in _get_env
 	- Rename FIXME in _log to a Note

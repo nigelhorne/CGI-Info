@@ -45,6 +45,7 @@ WriteMakefile(
 		'Readonly' => 0,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
+		'Sub::Protected' => 0,
 		'Sys::Hostname' => 0,
 		'URI::Heuristic' => 0,
 		# 'Sub::Private' => 0,

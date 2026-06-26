@@ -1,7 +1,5 @@
 package CGI::Info;
 
-# Next - unit.t
-
 use warnings;
 use strict;
 use autodie qw(:all);
@@ -25,6 +23,7 @@ use Params::Get 0.13;
 use Params::Validate::Strict 0.21;
 use Return::Set;
 use Sys::Path;
+use Sub::Protected;
 
 use namespace::clean;
 
@@ -315,33 +314,8 @@ sub script_name
 	return $self->{script_name};
 }
 
-# Enforce that a protected method was called from within this package or a subclass.
-# Call as $self->_enforce_private() at the start of each _method().
-# Returns immediately when running under a test harness (HARNESS_ACTIVE is set
-# by prove/Test::Harness) so white-box tests can exercise internals directly.
-# Entry: none beyond implicit $self
-# Exit:  croaks when caller is outside the package hierarchy; returns otherwise
-# Side effects: none
-sub _enforce_private {
-	return if $ENV{HARNESS_ACTIVE};
-
-	# caller(0): the frame of the protected method that called _enforce_private
-	#   [3] = name of the protected method (the sub that invoked _enforce_private)
-	# caller(1): the frame from which the protected method was called
-	#   [0] = package of the external caller
-	my $calling_pkg = (caller(1))[0];
-	unless($calling_pkg && ($calling_pkg eq __PACKAGE__ || $calling_pkg->isa(__PACKAGE__))) {
-		# caller(0)[3] = _enforce_private itself; caller(1)[3] = the protected method that called us
-		my $method = (caller(1))[3] // '(unknown)';
-		$method =~ s/.*:://;
-		Carp::croak("$method() is a protected method and cannot be called from outside " . __PACKAGE__);
-	}
-}
-
-sub _find_paths {
+sub _find_paths :Protected {
 	my $self = shift;
-
-	$self->_enforce_private();
 
 	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
@@ -484,11 +458,8 @@ sub host_name {
 	return $self->{site};
 }
 
-sub _find_site_details
-{
+sub _find_site_details :Protected {
 	my $self = shift;
-
-	$self->_enforce_private();
 
 	# Log entry to the routine
 	$self->_trace('Entering _find_site_details');
@@ -1242,11 +1213,10 @@ sub param {
 	}
 }
 
-sub _sanitise_input {
+sub _sanitise_input :Protected {
 	my $arg = shift;
 
 	# Protected function: inline check because the ($) prototype means no $self,
-	# so _enforce_private() cannot be used (wrong caller depth without that frame).
 	unless($ENV{HARNESS_ACTIVE}) {
 		my $calling_pkg = (caller)[0];
 		unless($calling_pkg && ($calling_pkg eq __PACKAGE__ || $calling_pkg->isa(__PACKAGE__))) {
@@ -1270,10 +1240,8 @@ sub _sanitise_input {
 	return convert_XSS($arg);
 }
 
-sub _multipart_data {
+sub _multipart_data :Protected {
 	my ($self, $args) = @_;
-
-	$self->_enforce_private();
 
 	$self->_trace('Entering _multipart_data');
 
@@ -1369,10 +1337,8 @@ sub _multipart_data {
 }
 
 # Robust filename generation (preventing overwriting)
-sub _create_file_name {
+sub _create_file_name :Protected {
 	my ($self, $args) = @_;
-
-	$self->_enforce_private();
 
 	my $filename = $$args{filename} . '_' . time;
 
@@ -1388,10 +1354,8 @@ sub _create_file_name {
 }
 
 # Untaint a filename. Regex from CGI::Untaint::Filenames
-sub _untaint_filename {
+sub _untaint_filename :Protected {
 	my ($self, $args) = @_;
-
-	$self->_enforce_private();
 
 	if($$args{filename} =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
 		return $1;
@@ -2334,11 +2298,8 @@ sub set_logger
 }
 
 # Log and remember a message
-sub _log
-{
+sub _log :Protected {
 	my ($self, $level, @messages) = @_;
-
-	$self->_enforce_private();
 
 	if(scalar(@messages)) {
 		# Note: consider adding caller's function name to log messages in a future release
@@ -2352,34 +2313,29 @@ sub _log
 	}
 }
 
-sub _debug {
+sub _debug :Protected {
 	my $self = shift;
-	$self->_enforce_private();
 	$self->_log('debug', @_);
 }
 
-sub _info {
+sub _info :Protected {
 	my $self = shift;
-	$self->_enforce_private();
 	$self->_log('info', @_);
 }
 
-sub _notice {
+sub _notice :Protected {
 	my $self = shift;
-	$self->_enforce_private();
 	$self->_log('notice', @_);
 }
 
-sub _trace {
+sub _trace :Protected {
 	my $self = shift;
-	$self->_enforce_private();
 	$self->_log('trace', @_);
 }
 
 # Emit a warning message somewhere
-sub _warn {
+sub _warn :Protected {
 	my $self = shift;
-	$self->_enforce_private();
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('warn', $params->{'warning'});
@@ -2389,9 +2345,8 @@ sub _warn {
 }
 
 # Emit an error message somewhere
-sub _error {
+sub _error :Protected {
 	my $self = shift;
-	$self->_enforce_private();
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('error', $params->{'warning'});
@@ -2402,11 +2357,8 @@ sub _error {
 
 # Ensure all environment variables are sanitized and validated before use.
 # Use regular expressions to enforce strict input formats.
-sub _get_env
-{
+sub _get_env :Protected {
 	my ($self, $var) = @_;
-
-	$self->_enforce_private();
 
 	return unless defined $ENV{$var};
 

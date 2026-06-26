@@ -1,5 +1,6 @@
 ---
 # Create test dashboard on GitHub Pages, e.g. https://nigelhorne.github.io/$module_name/coverage/
+#   for any CPAN module.  Just copy to .github/workflows/dashboard.yml to your repo
 name: Test Dashboard
 
 permissions:
@@ -96,7 +97,7 @@ jobs:
             echo "Running on ATG itself — using repo version"
             perl Makefile.PL && make install
           else
-            cpanm -iqn App::Test::Generator@0.39
+            cpanm -iqn App::Test::Generator@0.40
           fi
 
       - name: Generate dashboard
