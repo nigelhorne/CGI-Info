@@ -43,11 +43,11 @@ if($ENV{'HTTP_COOKIE'}) {
 	print 'HTTP_COOKIE: ', $ENV{'HTTP_COOKIE'}, "\n",
 		"Cookies:\n";
 
-	foreach my $cookie(split (/; /, $ENV{'HTTP_COOKIE'})) {
+	foreach my $cookie(split (/\s*;\s*/, $ENV{'HTTP_COOKIE'})) {
 		my ($key, $value) = split(/=/, $cookie);
 
 		print "Cookie $key:\n";
-		my $c = $info->get_cookie(cookie_name => $key);
+		my $c = $info->cookie(cookie_name => $key);
 		if(!defined($c)) {
 			print "ERROR: Expected $value, got undef\n";
 		} elsif($c eq $value) {

@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 350
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: shogo82148/actions-setup-perl@v1
@@ -50,7 +50,7 @@ jobs:
         run: |
           if [ "${{ github.repository }}" != "nigelhorne/App-Test-Generator" ]; then
             cpanm -iqn Data::Random::Structure Data::Random::String::Matches Data::Random::String Data::Random
-            cpanm -iqn App::Test::Generator@0.38
+            cpanm -iqn App::Test::Generator@0.39
           fi
 
       - name: Generate the mutants
@@ -69,6 +69,8 @@ jobs:
             --lib lib \
             --tests t \
             --json mutation.json \
+            --changed_only \
+            --base_sha "$MUTATION_BASE_SHA" \
             --mutation_level fast
 
       - name: Commit mutation results

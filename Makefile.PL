@@ -42,6 +42,7 @@ WriteMakefile(
 		'Object::Configure' => 0.19,
 		'Params::Get' => 0.13,
 		'Params::Validate::Strict' => 0.28,
+		'Readonly' => 0,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
 		'Sys::Hostname' => 0,

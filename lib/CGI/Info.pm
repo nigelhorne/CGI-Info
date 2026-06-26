@@ -35,7 +35,7 @@ Readonly my $MAX_UPLOAD_SIZE_DEFAULT => 512 * 1024;	# 512 KB default upload cap
 Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
 Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
 
-sub _sanitise_input($);
+sub _sanitise_input;
 
 =head1 NAME
 
@@ -207,15 +207,22 @@ sub new
 	# Handle hash or hashref arguments
 	my $params = Params::Get::get_params(undef, @_);
 
-	if(!defined($class)) {
-		if(defined($params)) {
-			# Using CGI::Info:new(), not CGI::Info->new()
+	if (defined($class)) {
+		my $is_valid = Scalar::Util::blessed($class) || (eval { $class->isa(__PACKAGE__) });
+		unless ($is_valid) {
+			# Called as CGI::Info::new(...) or similar wrong function call
 			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		}
-
-		# FIXME: this only works when no arguments are given
+	} else {
+		# If class is undef, but there are arguments/params passed
+		if (defined($params) && keys %{$params}) {
+			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		}
+		# Called as CGI::Info::new() with 0 arguments (undef $class)
 		$class = __PACKAGE__;
-	} elsif(Scalar::Util::blessed($class)) {
+	}
+
+	if(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		$params ||= {};
 
@@ -1235,7 +1242,7 @@ sub param {
 	}
 }
 
-sub _sanitise_input($) {
+sub _sanitise_input {
 	my $arg = shift;
 
 	# Protected function: inline check because the ($) prototype means no $self,
@@ -1398,7 +1405,7 @@ Returns a boolean if the website is being viewed on a mobile
 device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
-Can be overriden by the IS_MOBILE environment setting
+Can be overridden by the IS_MOBILE environment setting
 
 =cut
 
@@ -1949,7 +1956,7 @@ Is the visitor a search engine?
 	# allow the user to pick and choose something to display
     }
 
-Can be overriden by the IS_SEARCH_ENGINE environment setting
+Can be overridden by the IS_SEARCH_ENGINE environment setting
 
 =cut
 
@@ -2334,7 +2341,7 @@ sub _log
 	$self->_enforce_private();
 
 	if(scalar(@messages)) {
-		# FIXME: add caller's function
+		# Note: consider adding caller's function name to log messages in a future release
 		# if(($level eq 'warn') || ($level eq 'info')) {
 			push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
 		# }
@@ -2409,7 +2416,7 @@ sub _get_env
 	}
 	$self->_warn("Invalid value in environment variable: $var");
 
-	return undef;
+	return;
 }
 
 =head2 reset
