@@ -24,7 +24,7 @@ WriteMakefile(
 	VERSION_FROM	=> 'lib/CGI/Info.pm',
 	ABSTRACT_FROM	=> 'lib/CGI/Info.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'

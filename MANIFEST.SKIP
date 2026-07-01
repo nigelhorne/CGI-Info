@@ -69,6 +69,7 @@ schemas\.yml$
 CGI-.*
 .test-script-*
 typescript
-mutation.json
+mutation*
+^xt/mutant_\d
 CLAUDE.md
 \.claude

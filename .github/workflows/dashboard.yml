@@ -35,7 +35,7 @@ jobs:
 
       # Install Perl via perlbrew
       - name: Setup Perl environment
-        uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
+        uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
           # install cpanminus
@@ -97,7 +97,8 @@ jobs:
             echo "Running on ATG itself — using repo version"
             perl Makefile.PL && make install
           else
-            cpanm -iqn App::Test::Generator@0.40
+            echo "Install ATG"
+            cpanm -iqn App::Test::Generator@0.41
           fi
 
       - name: Generate dashboard
@@ -107,7 +108,9 @@ jobs:
           NONINTERACTIVE_TESTING: 1
         run: |
           if [ "${{ github.repository }}" = "nigelhorne/App-Test-Generator" ]; then
-            bin/generate-test-dashboard
+            bin/generate-test-dashboard \
+              --exclude lib/Devel \
+              --exclude lib/App/Test/Generator/Sample
           else
             generate-test-dashboard
           fi
@@ -127,7 +130,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Update mutation results (${SNAPSHOT_TIMESTAMP} ${SNAPSHOT_SHA})"
-            git pull --rebase --quiet origin "${GITHUB_REF_NAME}" || true
+            git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin HEAD:"${GITHUB_REF_NAME}"
           fi
 
@@ -135,19 +138,13 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p coverage_history
-          TIMESTAMP=$(date +%Y-%m-%d)
-          SHA=$(git rev-parse --short HEAD)
           if [ -f cover_html/cover.json ]; then
-            cp cover_html/cover.json "coverage_history/${TIMESTAMP}-${SHA}.json"
+            cp cover_html/cover.json "coverage_history/${SNAPSHOT_TIMESTAMP}-${SNAPSHOT_SHA}.json"
           else
-            echo "::error::cover_html/cover.json not found — Generate dashboard step did not produce coverage output"
+            echo "::error::cover_html/cover.json not found"
             find cover_db cover_html coverage -print 2>/dev/null || true
             exit 1
           fi
-          # Recomputed (not reused from "Set snapshot variables") because the
-          # mutation-results commit above may have already moved HEAD.
-          echo "SNAPSHOT_TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          echo "SNAPSHOT_SHA=${SHA}" >> $GITHUB_ENV
 
       - name: Save coverage snapshot archive
         if: github.event_name != 'pull_request'
@@ -159,7 +156,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Add coverage snapshot for ${SNAPSHOT_TIMESTAMP} (${SNAPSHOT_SHA})"
-            git pull --rebase --quiet origin "${GITHUB_REF_NAME}" || true
+            git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin HEAD:"${GITHUB_REF_NAME}"
           fi
 
@@ -179,7 +176,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Add generated mutant test stubs (${SNAPSHOT_TIMESTAMP} ${SNAPSHOT_SHA})"
-            git pull --rebase --quiet origin "${GITHUB_REF_NAME}" || true
+            git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin HEAD:"${GITHUB_REF_NAME}"
           fi
 
