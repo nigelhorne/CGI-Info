@@ -1,4 +1,3 @@
-.circleci/config.yml
 .codeclimate.yml
 .codecov.yml
 .tachikoma.yml
@@ -62,6 +61,7 @@ t/function.t
 t/fuzz.t
 t/gv.t
 t/integration.t
+t/is_ai.t
 t/is_mobile.t
 t/is_robot.t
 t/is_search.t
