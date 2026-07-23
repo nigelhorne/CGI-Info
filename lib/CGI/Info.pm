@@ -1038,13 +1038,15 @@ sub params {
 			# convert_XSS encodes ', =, < etc. as HTML entities, which would hide
 			# injection patterns from the WAF if we checked $value instead.
 			if($has_quote || $has_hash || ($has_equals && $has_dash)) {
-				if(($orig_value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
+				if(($orig_value =~ /(?:%27|'|%23|#)/i) ||
 				   (($has_equals && ($has_quote || $has_semi || $has_dash)) &&
-				   $orig_value =~ /((\%3D)|(=))[^-]*+((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
+				   $orig_value =~ /(?:%3D|=)[^-]*+(?:%27|'|--|%3B|;)/i) ||
 				   ($has_quote &&
-				    $orig_value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
+				   # Detect 'or'-style injection: word + quote + url-encoded or literal 'or' + SQL keyword.
+				   # (?:%6F|o|%4F) = 'o', (?:%72|r|%52) = 'r', both case-folded via /i.
+				    $orig_value =~ /\w*(?:%27|')(?:%6F|o|%4F)(?:%72|r|%52)\s*(?:OR|AND|UNION|SELECT|--)/ix) ||
 				    ($has_quote &&
-				    $orig_value =~ /((\%27)|(\'))union/ix)) {
+				    $orig_value =~ /(?:%27|')union/ix)) {
 					$self->status(403);
 					if($ENV{'REMOTE_ADDR'}) {
 						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
@@ -1074,7 +1076,7 @@ sub params {
 			   ($has_slash  && $orig_value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($has_dump   && $orig_value =~ /var_dump[^m]*+md5/) ||
 			   ($has_slash  && $has_select && $orig_value =~ /\/AND\/[^(]*+\(SELECT\//) ||
-			   ($has_exec   && $orig_value =~ /exec(\s|\+)++(s|x)p\w+/ix)) {
+			   ($has_exec   && $orig_value =~ /exec[\s+]++[sx]p\w+/ix)) {
 				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
 					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
@@ -1104,10 +1106,10 @@ sub params {
 			#     "<img\nsrc=x\nonerror=alert(1)>" are caught without /s.
 			#   - Replaces both the old [^\n]+ (stopped at newline — bypass)
 			#     and the broken .++ (possessive consumed '>' — never matched).
-			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($value =~ /((\%3C)|<)[^>]+((\%3E)|>)/i) ||
-			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($orig_value =~ /((\%3C)|<)[^>]+((\%3E)|>)/i)) {
+			if(($value =~ /(?:%3C|<)(?:%2F|\/)*[a-z0-9%]+(?:%3E|>)/ix) ||
+			   ($value =~ /(?:%3C|<)[^>]+(?:%3E|>)/i) ||
+			   ($orig_value =~ /(?:%3C|<)(?:%2F|\/)*[a-z0-9%]+(?:%3E|>)/ix) ||
+			   ($orig_value =~ /(?:%3C|<)[^>]+(?:%3E|>)/i)) {
 				$self->status(403);
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
@@ -1322,7 +1324,9 @@ sub _multipart_data :Protected {
 				if($field =~ /name="(.+?)"/) {
 					$key = $1;
 				}
-				if($field =~ /filename="(.+)?"/) {
+				# [^"]+ instead of .+ : stops at first '"' without backtracking,
+				# and cannot accidentally capture across the closing delimiter.
+				if($field =~ /filename="([^"]+)?"/) {
 					my $filename = $1;
 					unless(defined($filename)) {
 						$self->_warn('No upload filename given');
@@ -1587,7 +1591,9 @@ it can't be determined.
 sub protocol {
 	my $self = shift;
 
-	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^(.+):\/\/.+/)) {
+	# RFC 3986 §3.1: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+	# Character-class [^:]+ avoids the O(n) backtracking of the former (.+)://
+	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^([a-zA-Z][a-zA-Z0-9+\-.]*):\/\//)) {
 		return $1;
 	}
 	if($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
@@ -1596,7 +1602,7 @@ sub protocol {
 
 	if(my $port = $ENV{'SERVER_PORT'}) {
 		if(defined(my $name = getservbyport($port, 'tcp'))) {
-			if($name =~ /https?/) {
+			if($name =~ /^https?$/) {
 				return $name;
 			} elsif($name eq 'www') {
 				# e.g. NetBSD and OpenBSD
@@ -1835,8 +1841,17 @@ sub is_robot {
 
 	# SQL injection check MUST run before is_ai(): a WAF block must never be
 	# bypassed just because the UA also identifies itself as an AI crawler.
-	# See also params()
-	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
+	# See also params() — patterns here MUST stay in sync with those in params().
+	# Bounded-lazy .{1,N}? replaces unbounded .+ to prevent O(n²/n³) backtracking
+	# on long UAs that contain SQL keywords but not the complete injection sequence.
+	# \b word boundaries prevent false positives on tokens like "SELECTFOO".
+	if(($agent =~ /\bSELECT\b.{1,500}?\bAND\b/i)         ||
+	   ($agent =~ /\bORDER\s+BY\b/i)                      ||
+	   ($agent =~ /\bOR\s+NOT\b/i)                        ||
+	   ($agent =~ /\bAND\b\s+\d+=\d+/)                    ||
+	   ($agent =~ /\bTHEN\b.{1,300}?\bELSE\b.{1,300}?\bEND\b/i) ||
+	   ($agent =~ /\bAND\b.{1,500}?\bSELECT\b/i)         ||
+	   ($agent =~ /\sAND\s.{1,500}?\sAND\s/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;
 		if($ENV{'REMOTE_ADDR'}) {
@@ -2058,7 +2073,9 @@ sub is_search_engine
 
 	my @cidr_blocks = ('47.235.0.0/12');	# Alibaba
 
-	if((defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) ||
+	# \b word boundaries prevent false positives like "notgoogle.example.com".
+	# /i because DNS hostnames are case-insensitive.
+	if((defined($hostname) && ($hostname =~ /\b(?:google|msnbot|bingbot|amazonbot|GPTBot)\b/i) && ($hostname !~ /^google-proxy/i)) ||
 	   (Net::CIDR::cidrlookup($remote, @cidr_blocks))) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
