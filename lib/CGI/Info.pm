@@ -1062,13 +1062,15 @@ sub params {
 			my $has_and = index($orig_value, ' AND ') >= 0;
 			my $has_slash  = index($orig_value, '/**/') >= 0 || index($orig_value, '/AND/') >= 0;
 
-			if(# Fixed: was /select[[a-z]\s\*]from/ix — malformed char class never matched.
-			   # \b…\b anchors prevent matching inside longer words.
-			   ($has_select && $orig_value =~ /\bselect\b.+\bfrom\b/is) ||
+			if(# \b anchors prevent matching inside longer words.
+			   # {1,500}? is lazy+bounded: avoids catastrophic backtracking on
+			   # "SELECT aaaa...aaaa" (no FROM) while still catching real queries.
+			   ($has_select && $orig_value =~ /\bselect\b.{1,500}?\bfrom\b/is) ||
 			   ($has_and    && $orig_value =~ /\sAND\s1=1/ix) ||
 			   # Numeric tautology without quotes: OR 1=1, OR 2=2, etc.
 			   ($has_or     && $orig_value =~ /\bOR\s+\d+\s*=\s*\d+/i) ||
-			   ($has_or && $has_and && $orig_value =~ /\sOR\s.*\sAND\s/) ||
+			   # Bounded lazy .{1,500}? avoids backtracking on "OR aaaa..." with no AND.
+			   ($has_or && $has_and && $orig_value =~ /\sOR\s.{1,500}?\sAND\s/) ||
 			   ($has_slash  && $orig_value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($has_dump   && $orig_value =~ /var_dump[^m]*+md5/) ||
 			   ($has_slash  && $has_select && $orig_value =~ /\/AND\/[^(]*+\(SELECT\//) ||
@@ -1083,7 +1085,9 @@ sub params {
 			}
 
 			if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
-				if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
+			# Bounded lazy .{1,500}? separates SQL keyword pairs without catastrophic backtracking.
+			# Possessive .++ would consume the trailing anchor — never match. Unbounded .+ risks ReDoS.
+			if(($agent =~ /\bSELECT\b.{1,500}?\bAND\b/i) || ($agent =~ /\bORDER\s+BY\b/i) || ($agent =~ /\bOR\s+NOT\b/i) || ($agent =~ /\bAND\b\s+\d+=\d+/) || ($agent =~ /\bTHEN\b.{1,300}?\bELSE\b.{1,300}?\bEND\b/i) || ($agent =~ /\bAND\b.{1,500}?\bSELECT\b/i) || ($agent =~ /\sAND\s.{1,500}?\sAND\s/)) {
 					$self->status(403);
 					if($ENV{'REMOTE_ADDR'}) {
 						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$agent'");
@@ -1094,13 +1098,16 @@ sub params {
 				}
 			}
 
-			# XSS: use /s so that . matches newlines — multi-line tag payloads
-			# like "<img\nsrc=x\nonerror=alert(1)>" were previously bypassing
-			# the [^\n]+ pattern which stops at the first newline.
+			# XSS detection using [^>]+ instead of .+ or .++ :
+			#   - [^>]+ stops naturally at '>' — no backtracking, no ReDoS.
+			#   - [^>] also matches '\n', so multi-line payloads like
+			#     "<img\nsrc=x\nonerror=alert(1)>" are caught without /s.
+			#   - Replaces both the old [^\n]+ (stopped at newline — bypass)
+			#     and the broken .++ (possessive consumed '>' — never matched).
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($value =~ /((\%3C)|<).+((\%3E)|>)/is) ||
+			   ($value =~ /((\%3C)|<)[^>]+((\%3E)|>)/i) ||
 			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($orig_value =~ /((\%3C)|<).+((\%3E)|>)/is)) {
+			   ($orig_value =~ /((\%3C)|<)[^>]+((\%3E)|>)/i)) {
 				$self->status(403);
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
@@ -1250,7 +1257,9 @@ sub _sanitise_input :Protected {
 	$arg =~ s/\s+$//;
 	$arg =~ s/^\s+//;
 
-	$arg =~ s/<!--.*-->//g;
+	# Possessive quantifier prevents catastrophic backtracking when input
+	# contains '<!--' with no matching closing '-->'.
+	$arg =~ s/<!--[^-]*+(?:-(?!->)[^-]*+)*+-->//g;
 	# Allow :
 	# $arg =~ s/[;<>\*|`&\$!?#\(\)\[\]\{\}'"\\\r]//g;
 
@@ -1355,19 +1364,32 @@ sub _multipart_data :Protected {
 	return @pairs;
 }
 
-# Robust filename generation (preventing overwriting)
+# Robust filename generation (preventing overwriting).
+# Previously used "! -e $rc" which checked existence in the CURRENT WORKING
+# DIRECTORY, not the upload directory — a logic bug and a TOCTOU race.
+# Now checks in the actual upload directory and caps iterations to avoid
+# an infinite loop if the directory fills up.
 sub _create_file_name :Protected {
 	my ($self, $args) = @_;
 
-	my $filename = $$args{filename} . '_' . time;
+	my $upload_dir = $self->{upload_dir};
+	my $filename   = $$args{filename} . '_' . time;
 
 	my $counter = 0;
 	my $rc;
-
 	do {
 		$rc = $filename . ($counter ? "_$counter" : '');
 		$counter++;
-	} until(! -e $rc);	# Check if file exists
+		# Check in upload_dir when set; otherwise check relative to CWD.
+		# File::Spec->catfile('', ...) produces an absolute path, so we
+		# must not pass an empty string as the directory component.
+	} until(
+		! -e ($upload_dir ? File::Spec->catfile($upload_dir, $rc) : $rc)
+		|| $counter > 1000
+	);
+	if($counter > 1000) {
+		Carp::croak('_create_file_name: unable to find a unique filename after 1000 attempts');
+	}
 
 	return $rc;
 }
@@ -1419,7 +1441,9 @@ sub is_mobile {
 	}
 
 	if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
-		if($agent =~ /.+(Android|iPhone).+/) {
+		# Was '.+(Android|iPhone).+' — .+ before and after adds no useful
+		# constraint but causes ReDoS on long UAs without those tokens.
+		if($agent =~ /\b(?:Android|iPhone)\b/) {
 			$self->{is_mobile} = 1;
 			return 1;
 		}
@@ -1472,7 +1496,8 @@ sub is_tablet {
 		return $self->{is_tablet};
 	}
 
-	if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
+	# Was '.+(iPad|TabletPC).+' — same ReDoS risk as the mobile pattern above.
+	if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /\b(?:iPad|TabletPC)\b/)) {
 		# TODO: add others when I see some nice user_agents
 		$self->{is_tablet} = 1;
 	} else {
@@ -1676,13 +1701,17 @@ sub rootdir {
 	} elsif($ENV{'DOCUMENT_ROOT'} && (-d $ENV{'DOCUMENT_ROOT'})) {
 		return $ENV{'DOCUMENT_ROOT'};
 	}
-	my $script_name = $0;
+	# $0 is tainted under -T; untaint with a permissive but defined capture.
+	# The leading . before cgi-bin was also a regex bug (matched any char);
+	# corrected to match a path separator so the kludge fires only on real paths.
+	my ($script_name) = $0 =~ /^(.+)$/;
+	return '' unless defined $script_name;
 
 	unless(File::Spec->file_name_is_absolute($script_name)) {
 		$script_name = File::Spec->rel2abs($script_name);
 	}
-	if($script_name =~ /.cgi\-bin.*/) {	# kludge for outside CGI environment
-		$script_name =~ s/.cgi\-bin.*//;
+	if($script_name =~ /[\/\\]cgi-bin/) {
+		$script_name =~ s/[\/\\]cgi-bin.*//;
 	}
 	if(-f $script_name) {	# More kludge
 		if($^O eq 'MSWin32') {
@@ -1824,7 +1853,9 @@ sub is_robot {
 	if($self->is_ai()) {
 		return $self->{is_robot} = 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
+	# '.+bot' was replaced with '\bbot\b' — the leading .+ caused catastrophic
+	# backtracking on long UAs that contain no 'bot' substring.
+	if($agent =~ /\bbot\b|axios\/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy\.Intelligence\.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith\.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -2014,8 +2045,16 @@ sub is_search_engine
 		return $self->{is_search_engine} = $is_search;
 	}
 
+	# Untaint $remote before passing to inet_aton: under -T, tainted data
+	# causes a fatal "Insecure dependency" in inet_aton.  The strict IPv4
+	# regex also rejects any non-address garbage that could reach this path.
+	my ($safe_remote) = $remote =~ /^(\d{1,3}(?:\.\d{1,3}){3})$/;
+	unless(defined $safe_remote) {
+		$self->{is_search_engine} = 0;
+		return 0;
+	}
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
+	my $hostname = gethostbyaddr(inet_aton($safe_remote), AF_INET) || $safe_remote;
 
 	my @cidr_blocks = ('47.235.0.0/12');	# Alibaba
 
