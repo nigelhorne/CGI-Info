@@ -20,19 +20,19 @@ https://pjcj.net
 <h1>Branch Coverage</h1>
 <table>
 <tr><td class="h" align="right">File:</td><td align="left">blib/lib/CGI/Info.pm</td></tr>
-<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">80.7%</td></tr>
+<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">82.0%</td></tr>
 </table>
 <div><br/></div>
 <table>
 <tr><th>line</th><th>%</th><th colspan="2">coverage</th><th>branch</th></tr>
 <tr><td class="h"><a id="L209">209</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $class) { }</td></tr>
-<tr><td class="h"><a id="L211">211</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ($is_valid)</td></tr>
+<tr><td class="h"><a id="L211">211</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($is_valid)</td></tr>
 <tr><td class="h"><a id="L217">217</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $params and keys %{$params;})</td></tr>
 <tr><td class="h"><a id="L224">224</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($class))</td></tr>
-<tr><td class="h"><a id="L229">229</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (defined $params-&gt;{&#39;logger&#39;})</td></tr>
+<tr><td class="h"><a id="L229">229</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $params-&gt;{&#39;logger&#39;})</td></tr>
 <tr><td class="h"><a id="L230">230</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">unless (&amp;Scalar::Util::blessed($params-&gt;{&#39;logger&#39;}) and $params-&gt;{&#39;logger&#39;}-&gt;can(&quot;warn&quot;) and $params-&gt;{&#39;logger&#39;}-&gt;can(&quot;info&quot;) and $params-&gt;{&#39;logger&#39;}-&gt;can(&quot;error&quot;))</td></tr>
-<tr><td class="h"><a id="L236">236</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (defined $params-&gt;{&#39;expect&#39;})</td></tr>
-<tr><td class="h"><a id="L238">238</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if $logger</td></tr>
+<tr><td class="h"><a id="L236">236</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $params-&gt;{&#39;expect&#39;})</td></tr>
+<tr><td class="h"><a id="L238">238</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if $logger</td></tr>
 <tr><td class="h"><a id="L252">252</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (defined $params-&gt;{&#39;logger&#39;})</td></tr>
 <tr><td class="h"><a id="L253">253</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (&amp;Scalar::Util::blessed($params-&gt;{&#39;logger&#39;}) and $params-&gt;{&#39;logger&#39;}-&gt;can(&quot;warn&quot;) and $params-&gt;{&#39;logger&#39;}-&gt;can(&quot;info&quot;) and $params-&gt;{&#39;logger&#39;}-&gt;can(&quot;error&quot;))</td></tr>
 <tr><td class="h"><a id="L258">258</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $params-&gt;{&#39;expect&#39;})</td></tr>
@@ -257,8 +257,8 @@ https://pjcj.net
 <tr><td class="h"><a id="L2421">2421</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
 <tr><td class="h"><a id="L2422">2422</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless &amp;Scalar::Util::blessed($cache)</td></tr>
 <tr><td class="h"><a id="L2423">2423</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $cache-&gt;can(&quot;get&quot;)</td></tr>
-<tr><td class="h"><a id="L2424">2424</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $cache-&gt;can(&quot;set&quot;)</td></tr>
-<tr><td class="h"><a id="L2444">2444</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $params-&gt;{&#39;logger&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L2424">2424</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $cache-&gt;can(&quot;set&quot;)</td></tr>
+<tr><td class="h"><a id="L2444">2444</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $logger = $params-&gt;{&#39;logger&#39;}) { }</td></tr>
 <tr><td class="h"><a id="L2445">2445</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
 <tr><td class="h"><a id="L2541">2541</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
 <tr><td class="h"><a id="L2553">2553</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
