@@ -83,7 +83,7 @@ sub reset_env {
 		C_DOCUMENT_ROOT HTTP_HOST SERVER_NAME SSL_TLS_SNI SERVER_PROTOCOL
 		SERVER_PORT SCRIPT_URI REMOTE_ADDR HTTP_USER_AGENT HTTP_COOKIE
 		HTTP_X_WAP_PROFILE HTTP_SEC_CH_UA_MOBILE HTTP_REFERER IS_MOBILE
-		IS_SEARCH_ENGINE LOGDIR
+		IS_SEARCH_ENGINE IS_AI LOGDIR
 	);
 	CGI::Info->reset();
 }
@@ -857,7 +857,71 @@ subtest 'is_search_engine() - no CGI env returns 0' => sub {
 };
 
 # ============================================================
-# 14. browser_type()
+# 14. is_ai()
+# ============================================================
+
+# Known AI training crawler => is_ai true and browser_type 'ai'
+subtest 'is_ai() - ClaudeBot detected as AI crawler' => sub {
+	plan tests => 3;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_cbot};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info = CGI::Info->new();
+	ok($info->is_ai(),                     'ClaudeBot => is_ai true');
+	ok($info->is_robot(),                  'ClaudeBot => is_robot true (invariant)');
+	is($info->browser_type(), 'ai',        'ClaudeBot => browser_type is ai');
+};
+
+# UA with no "bot"/"spider" token must still satisfy is_ai AND is_robot
+subtest 'is_ai() - ChatGPT-User (no bot token) satisfies invariant' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); ChatGPT-User/1.0; +https://openai.com/bot)';
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info = CGI::Info->new();
+	ok($info->is_ai(),    'ChatGPT-User => is_ai true');
+	ok($info->is_robot(), 'ChatGPT-User => is_robot true (is_robot calls is_ai internally)');
+};
+
+# IS_AI env override (use local so the override cannot bleed into later tests)
+subtest 'is_ai() - IS_AI env override' => sub {
+	plan tests => 1;
+	reset_env();
+	local $ENV{IS_AI}     = 1;
+	$ENV{HTTP_USER_AGENT} = $config{ua_desktop};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	ok(CGI::Info->new()->is_ai(), 'IS_AI=1 env override forces is_ai true');
+};
+
+# Non-AI UA must not trigger is_ai
+subtest 'is_ai() - desktop UA is not AI' => sub {
+	plan tests => 1;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_desktop};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	ok(!CGI::Info->new()->is_ai(), 'desktop UA is not detected as AI crawler');
+};
+
+# No CGI environment => 0
+subtest 'is_ai() - no CGI env returns 0' => sub {
+	plan tests => 1;
+	reset_env();
+	is(CGI::Info->new()->is_ai(), 0, 'no CGI env returns 0');
+};
+
+# Call-order invariant: is_robot() first, then is_ai()
+subtest 'is_ai() - call order: is_robot first still gives is_ai true' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Claude-Web/1.0';
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info = CGI::Info->new();
+	ok($info->is_robot(), 'Claude-Web: is_robot() true when called first');
+	ok($info->is_ai(),    'Claude-Web: is_ai() true after is_robot()');
+};
+
+# ============================================================
+# 15. browser_type()
 # ============================================================
 
 subtest 'browser_type() - mobile' => sub {

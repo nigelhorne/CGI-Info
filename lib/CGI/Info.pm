@@ -1785,6 +1785,13 @@ sub is_robot {
 		return 0;
 	}
 
+	# is_ai implies is_robot: check AI crawlers before the generic bot regex so
+	# that UAs like ChatGPT-User or Google-Extended (no "bot"/"spider" token)
+	# are still caught here.
+	if($self->is_ai()) {
+		return $self->{is_robot} = 1;
+	}
+
 	# See also params()
 	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 		$self->status(403);
@@ -2004,9 +2011,83 @@ sub is_search_engine
 	return 0;
 }
 
+=head2 is_ai
+
+Returns a boolean indicating whether the visitor is a known AI training or
+inference crawler (e.g. GPTBot, ClaudeBot, PerplexityBot).
+
+Use this to withhold training data, serve an opt-out notice, or log AI traffic
+separately from regular robot traffic.
+
+    use CGI::Info;
+
+    my $info = CGI::Info->new();
+    if($info->is_ai()) {
+        # Decline to serve content to AI scrapers
+        print "Status: 403 Forbidden\r\n\r\n";
+        exit;
+    }
+
+Can be overridden by the IS_AI environment variable.
+
+Note: AI crawlers are also robots, so C<is_robot()> returns true for them too.
+
+=cut
+
+sub is_ai {
+	my $self = shift;
+
+	# Return cached result if already determined
+	if(defined($self->{is_ai})) {
+		return $self->{is_ai};
+	}
+
+	# Allow environment variable override for testing or manual classification
+	if(defined(my $override = $ENV{'IS_AI'})) {
+		return $self->{is_ai} = $override ? 1 : 0;
+	}
+
+	my $agent = $ENV{'HTTP_USER_AGENT'};
+	my $remote = $ENV{'REMOTE_ADDR'};
+
+	unless($remote && $agent) {
+		# Probably not running in CGI - assume not an AI crawler
+		return 0;
+	}
+
+	# Known AI training and inference crawlers, matched against the User-Agent.
+	# We intentionally do not consult the shared IP/agent cache here: is_robot()
+	# stores 'robot' for many of the same UAs, and reading 'robot' != 'ai' would
+	# produce a false negative.  Instance-level caching ($self->{is_ai}) above is
+	# sufficient to avoid redundant regex evaluation within a single request.
+	# Sources: vendor documentation and public bot lists.
+	# Anthropic: ClaudeBot, Claude-Web, anthropic-ai
+	# OpenAI: GPTBot, ChatGPT-User, OAI-SearchBot
+	# Google: Google-Extended (AI training opt-out token)
+	# Meta: meta-externalagent, FacebookBot (AI training)
+	# Apple: Applebot-Extended (AI training subset)
+	# Perplexity: PerplexityBot
+	# Amazon: Amazonbot (Amazon AI / Alexa AI)
+	# You.com: YouBot
+	# Diffbot: Diffbot
+	# Cohere: cohere-ai
+	# Common Crawl: CCBot (primary data source for many LLM trainers)
+	# ByteDance: Bytespider (TikTok / AI training)
+	# Allen AI: AI2Bot
+	# Timpi: TimpiBot
+	if($agent =~ /ClaudeBot|Claude-Web|anthropic-ai|GPTBot|ChatGPT-User|OAI-SearchBot|Google-Extended|meta-externalagent|FacebookBot|Applebot-Extended|PerplexityBot|Amazonbot|YouBot|Diffbot|cohere-ai|CCBot|Bytespider|AI2Bot|TimpiBot/i) {
+		# Enforce is_ai => is_robot so callers need not check both
+		$self->{is_robot} = 1;
+		return $self->{is_ai} = 1;
+	}
+
+	$self->{is_ai} = 0;
+	return 0;
+}
+
 =head2 browser_type
 
-Returns one of 'web', 'search', 'robot' and 'mobile'.
+Returns one of 'web', 'search', 'robot', 'ai' and 'mobile'.
 
     # Code to display a different web page for a browser, search engine and
     # smartphone
@@ -2033,6 +2114,9 @@ sub browser_type {
 
 	if($self->is_mobile()) {
 		return 'mobile';
+	}
+	if($self->is_ai()) {
+		return 'ai';
 	}
 	if($self->is_search_engine()) {
 		return 'search';

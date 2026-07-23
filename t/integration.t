@@ -308,10 +308,11 @@ subtest 'robot browser: is_robot, browser_type, params blocked on SQL UA' => sub
 
     my $info = CGI::Info->new();
 
-    ok($info->is_robot(),              'is_robot() true for ClaudeBot');
-    is($info->browser_type(), 'robot', 'browser_type() is robot');
-    ok(!$info->is_mobile(),            'is_mobile() false for robot');
-    ok(!$info->is_tablet(),            'is_tablet() false for robot');
+    ok($info->is_robot(),           'is_robot() true for ClaudeBot');
+    ok($info->is_ai(),              'is_ai() true for ClaudeBot');
+    is($info->browser_type(), 'ai', 'browser_type() is ai for AI crawler');
+    ok(!$info->is_mobile(),         'is_mobile() false for robot');
+    ok(!$info->is_tablet(),         'is_tablet() false for robot');
 
     # params() should still work for a robot (it only blocks on bad content)
     my $params = $info->params();

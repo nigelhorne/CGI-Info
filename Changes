@@ -2,6 +2,8 @@ Revision history for CGI-Info
 
 1.14
 	[ Enhancements ]
+	- Add is_ai() method: returns true for known AI training/inference crawlers (ClaudeBot, GPTBot, PerplexityBot, CCBot, etc.)
+	  browser_type() now returns 'ai' for these visitors
 	- More helpful error message on "Multipart/form-data not supported"
 	- Set status to 501 when attempting to upload to a place that doesn't take uploads
 	- Log the invalid method type

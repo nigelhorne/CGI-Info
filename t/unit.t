@@ -792,20 +792,27 @@ subtest 'browser_type() - returns web for desktop browser' => sub {
 	is(CGI::Info->new()->browser_type(), 'web', 'desktop => web');
 };
 
-subtest 'browser_type() - returns robot for known bot' => sub {
+subtest 'browser_type() - returns ai for known AI crawler' => sub {
 	reset_env();
 	$ENV{HTTP_USER_AGENT} = 'ClaudeBot/1.0';
 	$ENV{REMOTE_ADDR}	 = '1.2.3.4';
-	is(CGI::Info->new()->browser_type(), 'robot', 'bot => robot');
+	is(CGI::Info->new()->browser_type(), 'ai', 'bot => ai');
 };
 
-subtest 'browser_type() - return value is one of the four valid strings' => sub {
+subtest 'browser_type() - returns robot for non-AI bot' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'SomeGenericSpider/1.0';
+	$ENV{REMOTE_ADDR}	 = '1.2.3.4';
+	is(CGI::Info->new()->browser_type(), 'robot', 'generic spider => robot');
+};
+
+subtest 'browser_type() - return value is one of the five valid strings' => sub {
 	reset_env();
 	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (Windows NT 10.0)';
 	$ENV{REMOTE_ADDR}	 = '1.2.3.4';
 	my $type = CGI::Info->new()->browser_type();
-	ok((grep { $type eq $_ } qw(web search robot mobile)),
-		"browser_type() returns one of the four valid values (got '$type')");
+	ok((grep { $type eq $_ } qw(web search robot mobile ai)),
+		"browser_type() returns one of the five valid values (got '$type')");
 };
 
 # ============================================================
