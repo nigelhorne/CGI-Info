@@ -46,8 +46,14 @@ Readonly my $UA_IPHONE  => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS 
 Readonly my $UA_ANDROID => 'Mozilla/5.0 (Linux; Android 10; Pixel 3)';
 Readonly my $UA_IPAD    => 'Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X)';
 Readonly my $UA_DESKTOP => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120';
-Readonly my $UA_GBOT    => 'Googlebot/2.1 (+http://www.google.com/bot.html)';
-Readonly my $UA_CBOT    => 'ClaudeBot/1.0';
+Readonly my $UA_GBOT         => 'Googlebot/2.1 (+http://www.google.com/bot.html)';
+Readonly my $UA_CBOT         => 'ClaudeBot/1.0';
+Readonly my $UA_CLAUDE_WEB   => 'Claude-Web/1.0';
+Readonly my $UA_GPTBOT       => 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)';
+Readonly my $UA_CHATGPT_USER => 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); ChatGPT-User/1.0; +https://openai.com/bot)';
+Readonly my $UA_COHERE_AI    => 'cohere-ai/1.0';
+# GPTBot UA that also embeds a SQL injection payload: used to verify WAF ordering
+Readonly my $UA_GPTBOT_SQL   => 'GPTBot/1.0 SELECT foo AND bar FROM baz';
 
 # %config gathers all constants for Object::Configure-style flexibility
 my %config = (
@@ -71,6 +77,11 @@ my %config = (
 	ua_desktop        => $UA_DESKTOP,
 	ua_gbot           => $UA_GBOT,
 	ua_cbot           => $UA_CBOT,
+	ua_claude_web     => $UA_CLAUDE_WEB,
+	ua_gptbot         => $UA_GPTBOT,
+	ua_chatgpt_user   => $UA_CHATGPT_USER,
+	ua_cohere_ai      => $UA_COHERE_AI,
+	ua_gptbot_sql     => $UA_GPTBOT_SQL,
 );
 
 # ---------------------------------------------------------------------------
@@ -837,6 +848,20 @@ subtest 'is_robot() - no CGI env returns 0' => sub {
 	is(CGI::Info->new()->is_robot(), 0, 'no CGI env returns 0 (assumes real person)');
 };
 
+# Critical security invariant: the SQL injection WAF check runs BEFORE is_ai(),
+# so an AI crawler UA that also contains an injection payload still receives 403.
+# If this order were reversed, the AI check would short-circuit and skip the WAF.
+subtest 'is_robot() - SQL injection in AI crawler UA triggers 403 (ordering invariant)' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_gptbot_sql};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info = CGI::Info->new();
+	ok($info->is_robot(), 'injection in AI UA => is_robot still true');
+	is($info->status(), $config{status_forbidden},
+		'injection in AI UA => HTTP 403 set (WAF not bypassed by AI classification)');
+};
+
 # ============================================================
 # 13. is_search_engine()
 # ============================================================
@@ -913,11 +938,95 @@ subtest 'is_ai() - no CGI env returns 0' => sub {
 subtest 'is_ai() - call order: is_robot first still gives is_ai true' => sub {
 	plan tests => 2;
 	reset_env();
-	$ENV{HTTP_USER_AGENT} = 'Claude-Web/1.0';
+	$ENV{HTTP_USER_AGENT} = $config{ua_claude_web};
 	$ENV{REMOTE_ADDR}     = $config{good_ip};
 	my $info = CGI::Info->new();
 	ok($info->is_robot(), 'Claude-Web: is_robot() true when called first');
 	ok($info->is_ai(),    'Claude-Web: is_ai() true after is_robot()');
+};
+
+# IS_AI=0 must force false even when the UA matches the AI pattern.
+# The env override is authoritative in both directions.
+subtest 'is_ai() - IS_AI=0 override forces false for known AI UA' => sub {
+	plan tests => 1;
+	reset_env();
+	local $ENV{IS_AI}     = 0;
+	$ENV{HTTP_USER_AGENT} = $config{ua_cbot};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	ok(!CGI::Info->new()->is_ai(), 'IS_AI=0 env override suppresses AI detection');
+};
+
+# Without REMOTE_ADDR the CGI environment is incomplete; method returns 0
+# without caching, consistent with is_robot() and is_search_engine() behaviour.
+subtest 'is_ai() - no REMOTE_ADDR returns 0' => sub {
+	plan tests => 1;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_cbot};
+	# REMOTE_ADDR deliberately absent
+	ok(!CGI::Info->new()->is_ai(), 'absent REMOTE_ADDR => is_ai returns 0');
+};
+
+# GPTBot (OpenAI training crawler): representative OpenAI-family UA.
+# Confirms that is_ai does not depend on "ClaudeBot" alone.
+subtest 'is_ai() - GPTBot detected as AI crawler' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_gptbot};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info = CGI::Info->new();
+	ok($info->is_ai(),    'GPTBot => is_ai true');
+	ok($info->is_robot(), 'GPTBot => is_robot true (invariant holds)');
+};
+
+# cohere-ai contains no "bot" or "spider" token; this exercises the regex
+# branches that cover unusual AI crawler UA string formats.
+subtest 'is_ai() - cohere-ai UA (no bot/spider token) satisfies invariant' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_cohere_ai};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info = CGI::Info->new();
+	ok($info->is_ai(),    'cohere-ai => is_ai true');
+	ok($info->is_robot(), 'cohere-ai => is_robot true (no "bot" token -- tests invariant path)');
+};
+
+# Googlebot is a search engine robot but NOT an AI training crawler;
+# is_ai() must return false for it even though is_robot() returns true.
+subtest 'is_ai() - Googlebot is robot but not AI' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_gbot};
+	$ENV{REMOTE_ADDR}     = $config{googlebot_ip};
+	my $info = CGI::Info->new();
+	ok(!$info->is_ai(), 'Googlebot => is_ai false');
+	ok($info->is_robot() || $info->is_search_engine(),
+		'Googlebot => still classified as robot or search engine');
+};
+
+# The first call computes and caches $self->{is_ai}; the second call must
+# return the same result from the cache without re-evaluating the UA regex.
+subtest 'is_ai() - result is cached within the same instance' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_cbot};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info   = CGI::Info->new();
+	my $first  = $info->is_ai();
+	my $second = $info->is_ai();	# must hit $self->{is_ai} cache
+	ok($first,             'first call => is_ai true');
+	is($second, $first,    'second call => identical cached result');
+};
+
+# Call-order: is_ai() first sets $self->{is_robot}=1; is_robot() then hits
+# the instance cache and returns 1 without re-running its own detection logic.
+subtest 'is_ai() - call order: is_ai first populates is_robot cache' => sub {
+	plan tests => 2;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_claude_web};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	my $info = CGI::Info->new();
+	ok($info->is_ai(),    'Claude-Web: is_ai() true when called first');
+	ok($info->is_robot(), 'Claude-Web: is_robot() true after is_ai() (cache set by is_ai)');
 };
 
 # ============================================================
@@ -938,6 +1047,26 @@ subtest 'browser_type() - desktop is web' => sub {
 	$ENV{HTTP_USER_AGENT} = $config{ua_desktop};
 	$ENV{REMOTE_ADDR}     = $config{good_ip};
 	is(CGI::Info->new()->browser_type(), 'web', 'desktop browser_type is web');
+};
+
+# AI crawlers must be classified as 'ai', which is checked before 'robot'.
+# Verifies the priority order: mobile > ai > search > robot > web.
+subtest 'browser_type() - returns ai for known AI crawler' => sub {
+	plan tests => 1;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $config{ua_cbot};
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	is(CGI::Info->new()->browser_type(), 'ai', 'ClaudeBot => browser_type is ai');
+};
+
+# A generic spider that is NOT in the AI list must still return 'robot',
+# not 'ai', confirming the AI check does not over-reach.
+subtest 'browser_type() - generic spider returns robot not ai' => sub {
+	plan tests => 1;
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'SomeGenericSpider/1.0';
+	$ENV{REMOTE_ADDR}     = $config{good_ip};
+	is(CGI::Info->new()->browser_type(), 'robot', 'generic spider => browser_type is robot');
 };
 
 # ============================================================

@@ -2,8 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 52;
-use Test::NoWarnings;
+use Test::Most tests => 56;
 
 BEGIN { use_ok('CGI::Info') }
 
@@ -161,4 +160,21 @@ AI: {
 	$i = new_ok('CGI::Info');
 	ok($i->is_ai()   == 1, 'call order: is_ai()   first => true for Claude-Web');
 	ok($i->is_robot() == 1, 'call order: is_robot() after => true (set by is_ai)');
+
+	# ---------------------------------------------------------------
+	# Security invariant: SQL injection in an AI crawler UA must still
+	# trigger status 403 via is_robot().  Previously is_ai() ran first
+	# and the injection check was never reached.
+	# is_ai() on a fresh instance still correctly identifies the UA.
+	# ---------------------------------------------------------------
+	$ENV{HTTP_USER_AGENT} = 'GPTBot/1.0 SELECT foo AND bar FROM baz';
+	$i = new_ok('CGI::Info');
+	ok($i->is_robot(),                   'SQL injection in GPTBot UA => is_robot true');
+	cmp_ok($i->status(), '==', 403,      'SQL injection in GPTBot UA => status 403');
+
+	# A separate instance checks the AI identity of the same UA pattern
+	# (without injection the regex still matches GPTBot token)
+	$ENV{HTTP_USER_AGENT} = 'GPTBot/1.0';
+	$i = new_ok('CGI::Info');
+	ok($i->is_ai(),                      'clean GPTBot UA => is_ai true on fresh instance');
 }

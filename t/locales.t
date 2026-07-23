@@ -62,6 +62,8 @@ for my $loc (@LOCALES) {
 }
 
 subtest 'System locale - invalid logdir croak' => sub {
+	plan skip_all => 'no POSIX locales available on this system'
+		unless @available_locales;
 	plan tests => scalar(@available_locales) * 2;
 
 	for my $locale (@available_locales) {
@@ -84,6 +86,8 @@ subtest 'System locale - invalid logdir croak' => sub {
 };
 
 subtest 'System locale - cookie croak with no name' => sub {
+	plan skip_all => 'no POSIX locales available on this system'
+		unless @available_locales;
 	plan tests => scalar(@available_locales) * 2;
 
 	for my $locale (@available_locales) {
@@ -106,6 +110,8 @@ subtest 'System locale - cookie croak with no name' => sub {
 };
 
 subtest 'System locale - param() allow-list warning is locale-independent' => sub {
+	plan skip_all => 'no POSIX locales available on this system'
+		unless @available_locales;
 	plan tests => scalar(@available_locales) * 2;
 
 	for my $locale (@available_locales) {
@@ -127,6 +133,8 @@ subtest 'System locale - param() allow-list warning is locale-independent' => su
 };
 
 subtest 'System locale - expect deprecation croak is locale-independent' => sub {
+	plan skip_all => 'no POSIX locales available on this system'
+		unless @available_locales;
 	plan tests => scalar(@available_locales) * 2;
 
 	for my $locale (@available_locales) {

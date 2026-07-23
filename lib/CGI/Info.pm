@@ -204,7 +204,7 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my $params = Params::Get::get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, \@_);
 
 	if (defined($class)) {
 		my $is_valid = Scalar::Util::blessed($class) || (eval { $class->isa(__PACKAGE__) });
@@ -1785,13 +1785,8 @@ sub is_robot {
 		return 0;
 	}
 
-	# is_ai implies is_robot: check AI crawlers before the generic bot regex so
-	# that UAs like ChatGPT-User or Google-Extended (no "bot"/"spider" token)
-	# are still caught here.
-	if($self->is_ai()) {
-		return $self->{is_robot} = 1;
-	}
-
+	# SQL injection check MUST run before is_ai(): a WAF block must never be
+	# bypassed just because the UA also identifies itself as an AI crawler.
 	# See also params()
 	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 		$self->status(403);
@@ -1802,6 +1797,13 @@ sub is_robot {
 			$self->_warn("SQL injection attempt blocked for '$agent'");
 		}
 		return 1;
+	}
+
+	# is_ai implies is_robot: check AI crawlers before the generic bot regex so
+	# that UAs like ChatGPT-User or Google-Extended (no "bot"/"spider" token)
+	# are still caught here.
+	if($self->is_ai()) {
+		return $self->{is_robot} = 1;
 	}
 	if($agent =~ /.+bot|axios\/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
@@ -2019,18 +2021,75 @@ inference crawler (e.g. GPTBot, ClaudeBot, PerplexityBot).
 Use this to withhold training data, serve an opt-out notice, or log AI traffic
 separately from regular robot traffic.
 
+B<Invariant>: when C<is_ai()> returns true, C<is_robot()> also returns true,
+regardless of the order in which the two methods are called.
+
+Can be overridden by the C<IS_AI> environment variable.
+
+=head3 EXAMPLE
+
     use CGI::Info;
 
     my $info = CGI::Info->new();
-    if($info->is_ai()) {
-        # Decline to serve content to AI scrapers
+    if ($info->is_ai()) {
+        # Decline to serve training data to AI scrapers
         print "Status: 403 Forbidden\r\n\r\n";
         exit;
     }
 
-Can be overridden by the IS_AI environment variable.
+    # Route AI crawlers to a lightweight page instead of blocking them
+    if ($info->is_ai()) {
+        serve_ai_summary();
+    } else {
+        serve_full_page();
+    }
 
-Note: AI crawlers are also robots, so C<is_robot()> returns true for them too.
+=head3 API SPECIFICATION
+
+=head4 Input
+
+No arguments beyond the implicit object reference (C<$self>).
+
+    # Params::Validate::Strict schema -- no parameters
+    {}
+
+=head4 Output
+
+    # Return::Set schema
+    {
+        type    => SCALAR,
+        values  => [ 0, 1 ],
+    }
+
+Returns C<1> if the visiting client is identified as an AI training or
+inference crawler; C<0> otherwise.
+
+=head3 MESSAGES
+
+This method produces no log messages of its own.  Upstream callers such as
+C<is_robot()> may emit WAF warnings; see L</is_robot> for that table.
+
+=head3 PSEUDOCODE
+
+    function is_ai(self):
+        if self.{is_ai} is defined:
+            return self.{is_ai}                    # instance-level cache
+
+        if IS_AI environment variable is set:
+            return self.{is_ai} = IS_AI ? 1 : 0   # override; no robot sync needed
+                                                   # because is_robot() calls is_ai()
+
+        ua     = HTTP_USER_AGENT
+        remote = REMOTE_ADDR
+
+        if not (remote and ua):
+            return 0                               # not a CGI request; assume human
+
+        if ua matches any AI_PAT token (case-insensitive):
+            self.{is_robot} = 1                    # enforce is_ai => is_robot
+            return self.{is_ai} = 1
+
+        return self.{is_ai} = 0
 
 =cut
 
@@ -2087,25 +2146,38 @@ sub is_ai {
 
 =head2 browser_type
 
-Returns one of 'web', 'search', 'robot', 'ai' and 'mobile'.
+Returns a string classifying the visitor's client.  The possible values are:
 
-    # Code to display a different web page for a browser, search engine and
-    # smartphone
+=over 4
+
+=item * C<'mobile'> -- smartphone or tablet (checked first)
+
+=item * C<'ai'> -- known AI training or inference crawler (see L</is_ai>)
+
+=item * C<'search'> -- search-engine crawler
+
+=item * C<'robot'> -- other automated client
+
+=item * C<'web'> -- ordinary desktop or laptop browser
+
+=back
+
+    use Carp;
     use Template;
     use CGI::Info;
 
     my $info = CGI::Info->new();
-    my $dir = $info->rootdir() . '/templates/' . $info->browser_type();
+    my $dir  = $info->rootdir() . '/templates/' . $info->browser_type();
 
-    my $filename = ref($self);
+    my $filename = ref($info);
     $filename =~ s/::/\//g;
     $filename = "$dir/$filename.tmpl";
 
-    if((!-f $filename) || (!-r $filename)) {
-	die "Can't open $filename";
-    }
+    (-f $filename && -r $filename)
+        or croak "Cannot open template '$filename'";
+
     my $template = Template->new();
-    $template->process($filename, {}) || die $template->error();
+    $template->process($filename, {}) or croak $template->error();
 
 =cut
 
@@ -2571,6 +2643,8 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
 
+=encoding utf-8
+
 =head2 FORMAL SPECIFICATION
 
 =head3 new
@@ -2619,6 +2693,41 @@ current allow-list schema (undef means all fields are permitted).
     otherwise                              =>  undef
 
 Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = undef.
+
+=head2 is_ai
+
+    -- is_ai ---------------------------------------------------------
+    -- Given CGIInfo state i, returns a boolean result.
+    --
+    -- AI_PAT is the set of known AI crawler token strings.
+    --
+    -- ENV denotes the process environment (a partial function from
+    -- name to value).
+    --
+    AI_PAT == {ClaudeBot, Claude-Web, anthropic-ai, GPTBot,
+               ChatGPT-User, OAI-SearchBot, Google-Extended,
+               meta-externalagent, FacebookBot, Applebot-Extended,
+               PerplexityBot, Amazonbot, YouBot, Diffbot,
+               cohere-ai, CCBot, Bytespider, AI2Bot, TimpiBot}
+
+    is_ai ≜ λ i : CGIInfo •
+      -- Environment override takes absolute priority
+      IS_AI ∈ dom ENV ⟹
+          (ENV IS_AI ≠ '0' ∧ ENV IS_AI ≠ '')
+
+      -- Without both IP and UA we cannot classify
+    ∧ IS_AI ∉ dom ENV ∧
+      (REMOTE_ADDR ∉ dom ENV ∨ HTTP_USER_AGENT ∉ dom ENV)
+          ⟹ false
+
+      -- UA-pattern match (case-insensitive substring)
+    ∧ IS_AI ∉ dom ENV ∧
+      REMOTE_ADDR ∈ dom ENV ∧ HTTP_USER_AGENT ∈ dom ENV
+          ⟹ (∃ p : AI_PAT • p ⊑ᵢ ENV HTTP_USER_AGENT)
+
+      -- Invariant: is_ai ⟹ is_robot
+    ∧ is_ai i = true ⟹ is_robot i = true
+    -- ---------------------------------------------------------------
 
 =head1 LICENCE AND COPYRIGHT
 
