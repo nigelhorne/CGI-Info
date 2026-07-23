@@ -33,7 +33,7 @@ sub enoent_string {
 sub with_locale (&$) {
 	my ($code, $locale) = @_;
 	local $ENV{LC_ALL}   = $locale;
-	local $ENV{LANG}     = $locale;
+	local $ENV{LANG} = $locale;
 	# setlocale so that $! is also translated
 	my $old = POSIX::setlocale(LC_ALL);
 	POSIX::setlocale(LC_ALL, $locale);
@@ -161,15 +161,16 @@ subtest 'Geographic locale - GeoIP country detection' => sub {
 
 	# Known IP -> country mappings.  BAIL_OUT on any mismatch to expose GeoIP
 	# database drift fast and obviously.
+	# This can happen because of sites using vPOP e.g. cloudflare
 	my %ip_to_country = (
 		'212.58.244.22'  => 'GB',   # BBC (UK)
 		'8.8.8.8'        => 'US',   # Google DNS (US)
-		'195.148.127.10' => 'FR',   # RENATER (France)
-		'195.243.1.1'    => 'DE',   # Deutsche Telekom (Germany)
+		'212.27.60.19' => 'FR',   # free.fr (France)
+		'195.243.1.1' => 'DE',	# Deutsche Telekom (Germany)
 		'101.4.55.4'     => 'CN',   # CERNET (China)
 	);
 
-	my $reg = IP::Country::Fast->new();
+	my $reg = new_ok('IP::Country::Fast');
 
 	subtest 'Sanity check - IP to country mapping' => sub {
 		plan tests => scalar(keys %ip_to_country);
