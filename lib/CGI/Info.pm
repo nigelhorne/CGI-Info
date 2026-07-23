@@ -34,6 +34,52 @@ Readonly my $MAX_UPLOAD_SIZE_DEFAULT => 512 * 1024;	# 512 KB default upload cap
 Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
 Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
 
+# Compiled once at module-load time: replaces the 29-element @crawler_lists array
+# that was re-allocated on every is_robot() call.  Building the alternation with
+# quotemeta() is equivalent to the former List::Util::any { /^\Q$_\E/i } loop
+# but avoids both per-call array construction and per-element regex compilation.
+Readonly my $CRAWLER_REFERER_RE => do {
+	my @domains = (
+		'http://fix-website-errors.com',
+		'http://keywords-monitoring-your-success.com',
+		'http://free-video-tool.com',
+		'http://magnet-to-torrent.com',
+		'http://torrent-to-magnet.com',
+		'http://dogsrun.net',
+		'http://###.responsive-test.net',
+		'http://uptime.com',
+		'http://uptimechecker.com',
+		'http://top1-seo-service.com',
+		'http://fast-wordpress-start.com',
+		'http://wordpress-crew.net',
+		'http://dbutton.net',
+		'http://justprofit.xyz',
+		'http://video--production.com',
+		'http://buttons-for-website.com',
+		'http://buttons-for-your-website.com',
+		'http://success-seo.com',
+		'http://videos-for-your-business.com',
+		'http://semaltmedia.com',
+		'http://dailyrank.net',
+		'http://uptimebot.net',
+		'http://sitevaluation.org',
+		'http://100dollars-seo.com',
+		'http://forum69.info',
+		'http://partner.semalt.com',
+		'http://best-seo-offer.com',
+		'http://best-seo-solution.com',
+		'http://semalt.semalt.com',
+		'http://semalt.com',
+		'http://7makemoneyonline.com',
+		'http://anticrawler.org',
+		'http://baixar-musicas-gratis.com',
+		'http://descargar-musica-gratis.net',
+		'http://www.seokicks.de/robot.html',
+	);
+	my $alt = join '|', map { quotemeta $_ } @domains;
+	qr/^(?:$alt)/i;
+};
+
 sub _sanitise_input;
 
 =head1 NAME
@@ -1591,36 +1637,40 @@ it can't be determined.
 sub protocol {
 	my $self = shift;
 
+	# Cached: ENV is read-only during a CGI request, so the result never changes.
+	# Use exists (not defined) so we cache undef for the "unknown" case too.
+	# Guard with ref() because protocol() may be called as a class method.
+	return $self->{'protocol'} if ref($self) && exists $self->{'protocol'};
+
 	# RFC 3986 §3.1: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 	# Character-class [^:]+ avoids the O(n) backtracking of the former (.+)://
+	my $result;
 	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^([a-zA-Z][a-zA-Z0-9+\-.]*):\/\//)) {
-		return $1;
-	}
-	if($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
-		return 'http';
-	}
-
-	if(my $port = $ENV{'SERVER_PORT'}) {
+		$result = $1;
+	} elsif($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
+		$result = 'http';
+	} elsif(my $port = $ENV{'SERVER_PORT'}) {
 		if(defined(my $name = getservbyport($port, 'tcp'))) {
 			if($name =~ /^https?$/) {
-				return $name;
+				$result = $name;
 			} elsif($name eq 'www') {
 				# e.g. NetBSD and OpenBSD
-				return 'http';
+				$result = 'http';
 			}
-			# Return an error, maybe missing something
+			# else: unrecognised service name — $result stays undef
 		} elsif($port == 80) {
 			# e.g. Solaris
-			return 'http';
+			$result = 'http';
 		} elsif($port == 443) {
-			return 'https';
+			$result = 'https';
 		}
 	}
 
-	if($ENV{'REMOTE_ADDR'}) {
+	if(!defined($result) && $ENV{'REMOTE_ADDR'}) {
 		$self->_warn("Can't determine the calling protocol");
 	}
-	return;
+	$self->{'protocol'} = $result if ref($self);
+	return $result;
 }
 
 =head2 tmpdir
@@ -1881,66 +1931,28 @@ sub is_robot {
 
 	my $key = "$remote/$agent";
 
+	# Check the shared cache BEFORE the referrer scan: the 29-domain referrer
+	# check is the most expensive path in is_robot() and is unnecessary when a
+	# prior request already classified this remote/agent pair.
+	# The SQL injection check above MUST remain before this (security gate).
+	if($self->{cache}) {
+		if(my $type = $self->{cache}->get($key)) {
+			return $self->{is_robot} = ($type eq 'robot');
+		}
+	}
+
 	if(my $referrer = $ENV{'HTTP_REFERER'}) {
-		# https://agency.ohow.co/google-analytics-implementation-audit/google-analytics-historical-spam-list/
-		my @crawler_lists = (
-			'http://fix-website-errors.com',
-			'http://keywords-monitoring-your-success.com',
-			'http://free-video-tool.com',
-			'http://magnet-to-torrent.com',
-			'http://torrent-to-magnet.com',
-			'http://dogsrun.net',
-			'http://###.responsive-test.net',
-			'http://uptime.com',
-			'http://uptimechecker.com',
-			'http://top1-seo-service.com',
-			'http://fast-wordpress-start.com',
-			'http://wordpress-crew.net',
-			'http://dbutton.net',
-			'http://justprofit.xyz',
-			'http://video--production.com',
-			'http://buttons-for-website.com',
-			'http://buttons-for-your-website.com',
-			'http://success-seo.com',
-			'http://videos-for-your-business.com',
-			'http://semaltmedia.com',
-			'http://dailyrank.net',
-			'http://uptimebot.net',
-			'http://sitevaluation.org',
-			'http://100dollars-seo.com',
-			'http://forum69.info',
-			'http://partner.semalt.com',
-			'http://best-seo-offer.com',
-			'http://best-seo-solution.com',
-			'http://semalt.semalt.com',
-			'http://semalt.com',
-			'http://7makemoneyonline.com',
-			'http://anticrawler.org',
-			'http://baixar-musicas-gratis.com',
-			'http://descargar-musica-gratis.net',
-
-			# Mine
-			'http://www.seokicks.de/robot.html',
-		);
-		# Normalise stray backslashes in the referrer before matching
+		# $CRAWLER_REFERER_RE is compiled once at module load (see top of file):
+		# replaces List::Util::any { /^\Q$_\E/i } @crawler_lists (29 per-call
+		# regex compilations + array allocation eliminated).
 		$referrer =~ s/\\/_/g;
-		# Block if the referrer starts with a known crawler domain (or contains a closing
-		# parenthesis, which is a common hallmark of spam referrers).
-		# quotemeta() prevents accidental regex metacharacters in the referrer.
-		if(($referrer =~ /\)/) || (List::Util::any { $referrer =~ /^\Q$_\E/i } @crawler_lists)) {
+		if(($referrer =~ /\)/) || ($referrer =~ $CRAWLER_REFERER_RE)) {
 			$self->_debug("is_robot: blocked trawler $referrer");
-
 			if($self->{cache}) {
 				$self->{cache}->set($key, 'robot', $CACHE_TTL_ROBOT);
 			}
 			$self->{is_robot} = 1;
 			return 1;
-		}
-	}
-
-	if(defined($remote) && $self->{cache}) {
-		if(my $type = $self->{cache}->get("$remote/$agent")) {
-			return $self->{is_robot} = ($type eq 'robot');
 		}
 	}
 
@@ -2018,14 +2030,15 @@ sub is_search_engine
 		return 0;
 	}
 
-	my $key;
+	# Build the cache key once; reuse $key for every subsequent set() call.
+	my $key = "$remote/$agent";
 
 	if($self->{cache}) {
-		$key = "$remote/$agent";
-		if(defined($remote) && $self->{cache}) {
-			if(my $type = $self->{cache}->get("$remote/$agent")) {
-				return $self->{is_search} = ($type eq 'search');
-			}
+		if(my $type = $self->{cache}->get($key)) {
+			# Write to is_search_engine (not the old is_search typo) so the
+			# instance-level guard at the top of this method actually fires on
+			# the next call, avoiding a redundant shared-cache round-trip.
+			return $self->{is_search_engine} = ($type eq 'search');
 		}
 	}
 
@@ -2539,15 +2552,16 @@ sub set_logger
 sub _log :Protected {
 	my ($self, $level, @messages) = @_;
 
-	if(scalar(@messages)) {
-		# Note: consider adding caller's function name to log messages in a future release
-		# if(($level eq 'warn') || ($level eq 'info')) {
-			push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
-		# }
+	# Filter once; reuse for both the in-memory store and the logger call.
+	# The former inner scalar(@messages) guard was always true inside this block.
+	my @defined_msgs = grep { defined } @messages;
+	return unless @defined_msgs;
 
-		if(scalar(@messages) && (my $logger = $self->{'logger'})) {
-			$self->{'logger'}->$level(join('', grep defined, @messages));
-		}
+	# Note: consider adding caller's function name to log messages in a future release
+	push @{$self->{'messages'}}, { level => $level, message => join(' ', @defined_msgs) };
+
+	if(my $logger = $self->{'logger'}) {
+		$logger->$level(join('', @defined_msgs));
 	}
 }
 
