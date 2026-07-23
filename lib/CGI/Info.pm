@@ -944,10 +944,11 @@ sub params {
 		$key =~ tr/+/ /;
 		if(defined($value)) {
 			$value =~ s/%00//g;   # Strip encoded NUL byte poison
-			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode
+			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode (1st pass)
+			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode (2nd pass: catches %252F -> %2F -> /)
 			$value =~ tr/+/ /;
-			$value =~ s/\0//g;    # Strip NUL again: %2500 -> %00 -> \0 after second pass
-			$value =~ s/%00//g;   # Strip literal %00 again: catches %2500 -> %00
+			$value =~ s/\0//g;    # Strip NUL: %2500 -> %00 -> NUL
+			$value =~ s/%00//g;   # Strip literal %00
 		} else {
 			$value = '';
 		}
@@ -1014,7 +1015,10 @@ sub params {
 		# }
 		my $orig_value = $value;
 		$value = _sanitise_input($value);
-		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
+
+		# WAF: inspect all methods (GET and POST) for injection patterns.
+		# Previously gated on GET only, which allowed POST to bypass all checks.
+		{
 			   # ($value =~ /\/AND\/.++\(SELECT\//) || # United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
 			# Facebook FBCLID can have "--"
@@ -1058,8 +1062,12 @@ sub params {
 			my $has_and = index($orig_value, ' AND ') >= 0;
 			my $has_slash  = index($orig_value, '/**/') >= 0 || index($orig_value, '/AND/') >= 0;
 
-			if(($has_select && $orig_value =~ /select[[a-z]\s\*]from/ix) ||
+			if(# Fixed: was /select[[a-z]\s\*]from/ix — malformed char class never matched.
+			   # \b…\b anchors prevent matching inside longer words.
+			   ($has_select && $orig_value =~ /\bselect\b.+\bfrom\b/is) ||
 			   ($has_and    && $orig_value =~ /\sAND\s1=1/ix) ||
+			   # Numeric tautology without quotes: OR 1=1, OR 2=2, etc.
+			   ($has_or     && $orig_value =~ /\bOR\s+\d+\s*=\s*\d+/i) ||
 			   ($has_or && $has_and && $orig_value =~ /\sOR\s.*\sAND\s/) ||
 			   ($has_slash  && $orig_value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($has_dump   && $orig_value =~ /var_dump[^m]*+md5/) ||
@@ -1086,10 +1094,21 @@ sub params {
 				}
 			}
 
+			# XSS: use /s so that . matches newlines — multi-line tag payloads
+			# like "<img\nsrc=x\nonerror=alert(1)>" were previously bypassing
+			# the [^\n]+ pattern which stops at the first newline.
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i) ||
+			   ($value =~ /((\%3C)|<).+((\%3E)|>)/is) ||
 			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($orig_value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
+			   ($orig_value =~ /((\%3C)|<).+((\%3E)|>)/is)) {
+				$self->status(403);
+				$self->_warn("XSS injection attempt blocked for '$value'");
+				return;
+			}
+
+			# Block javascript: URI scheme — no angle brackets, but still executes
+			# script when used in href or src attributes.
+			if($orig_value =~ /\bjavascript\s*:/i) {
 				$self->status(403);
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
@@ -2299,6 +2318,13 @@ sub cookie
 	# Load cookies if not already loaded
 	unless($self->{jar}) {
 		if(defined $ENV{'HTTP_COOKIE'}) {
+			# Truncate at the first CR or LF before parsing.
+			# HTTP header values cannot span lines; anything after a newline is
+			# injected content (e.g. "session=abc\r\nSet-Cookie: admin=1").
+			# Stripping rather than truncating would leave the injected text
+			# concatenated onto a legitimate value, so we discard from \r/\n onward.
+			(my $raw_cookie = $ENV{'HTTP_COOKIE'}) =~ s/[\r\n].*$//s;
+
 			# grep { /=/ } filters out malformed tokens (empty strings, bare
 			# semicolons, entries with no name=value separator) that would
 			# otherwise cause split(/=/, $_, 2) to return a single-element list
@@ -2306,7 +2332,7 @@ sub cookie
 			$self->{jar} = {
 				map  { split(/=/, $_, 2) }
 				grep { /=/ }
-				split(/; /, $ENV{'HTTP_COOKIE'})
+				split(/; /, $raw_cookie)
 			};
 		}
 	}

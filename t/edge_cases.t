@@ -1210,16 +1210,14 @@ subtest 'WAF: AND 1=1 tautology injection blocked (403)' => sub {
     is($info->status(), 403, 'AND 1=1 tautology injection blocked with 403');
 };
 
-# The WAF SQL and XSS filters run ONLY for GET (or no REQUEST_METHOD).
-# POST bodies deliberately bypass them (by design - the module delegates
-# sanitisation to the application layer for non-GET).  This test documents
-# that known-hostile payloads in POST bodies produce status 200, not 403.
-subtest 'WAF: SQL injection in POST body is NOT blocked (by design)' => sub {
+# The WAF now inspects both GET and POST.  The previous GET-only gate
+# was a security gap; it has been removed.  This test verifies that
+# known-hostile payloads in POST bodies are also blocked with 403.
+subtest 'WAF: SQL injection in POST body IS blocked (WAF now covers POST)' => sub {
     reset_env();
     $ENV{GATEWAY_INTERFACE}  = 'CGI/1.1';
     $ENV{REQUEST_METHOD}     = 'POST';
     $ENV{CONTENT_TYPE}       = 'application/x-www-form-urlencoded';
-    # "1' OR 1=1--" - classic injection, but POST skips the WAF
     my $body                 = "id=1'+OR+1%3D1--";
     $ENV{CONTENT_LENGTH}     = length($body);
     $CGI::Info::stdin_data   = $body;
@@ -1227,8 +1225,8 @@ subtest 'WAF: SQL injection in POST body is NOT blocked (by design)' => sub {
     my $info = CGI::Info->new();
     my $p    = eval { $info->params() };
     ok(!$@, 'does not die on SQL injection in POST body');
-    isnt($info->status(), 403,
-        'POST body SQL injection NOT blocked (WAF intentionally skips POST - application must sanitise)');
+    is($info->status(), 403,
+        'POST body SQL injection is now blocked with 403');
 };
 
 # ============================================================
