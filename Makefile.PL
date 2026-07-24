@@ -35,13 +35,12 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'boolean' => 0,
 		'Carp' => 0,
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'File::Spec' => 3.4,
 		'Log::Abstraction' => 0.10,
 		'Net::CIDR' => 0,
 		'Object::Configure' => 0.19,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.28,
+		'Params::Validate::Strict' => 0.35,
 		'Readonly' => 0,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
@@ -51,10 +50,8 @@ WriteMakefile(
 		# 'Sub::Private' => 0,
 		'Cwd' => 0,
 		'Socket' => 0,
-		'List::Util' => 1.33,
 		'HTTP::BrowserDetect' => 3.10,	# Include bingbot
 		'File::Basename' => 0,
-		'IO::Interactive' => 0,
 		'String::Clean::XSS' => 0,
 		'JSON::MaybeXS' => 0,
 		# 'String::EscapeCage' => 0.02,
@@ -91,7 +88,6 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 		'Taint::Runtime' => 0,
 		'Test::Returns' => 0,
-		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'CGI-Info-*' },
@@ -116,5 +112,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION	=> '5.010'
 );

@@ -9,7 +9,6 @@ use 5.010;	# Minimum version for features used here
 # Core modules
 use boolean;
 use Carp;
-use List::Util ();	# any() used in is_robot() referrer check
 use Readonly;
 use Scalar::Util;
 use Socket;	# AF_INET constant
@@ -20,7 +19,7 @@ use File::Spec;
 use Log::Abstraction 0.10;
 use Net::CIDR;
 use Params::Get 0.13;
-use Params::Validate::Strict 0.21;
+use Params::Validate::Strict 0.35;
 use Return::Set;
 use Sys::Path;
 use Sub::Protected;
