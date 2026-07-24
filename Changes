@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-1.14
+1.14	Thu Jul 23 21:29:19 EDT 2026
 	[ Enhancements ]
 	- Add is_ai() method: returns true for known AI training/inference crawlers (ClaudeBot, GPTBot, PerplexityBot, CCBot, etc.)
 	  browser_type() now returns 'ai' for these visitors
