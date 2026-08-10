@@ -37,6 +37,7 @@ on 'test' => sub {
 	requires 'Errno';
 	requires 'File::Temp';
 	requires 'FindBin';
+	requires 'IO::Interactive';
 	requires 'IPC::Run3';
 	requires 'IPC::System::Simple';
 	requires 'JSON::PP', '4.02';   # Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857

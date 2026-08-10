@@ -2371,16 +2371,18 @@ sub cookie
 
 	my $field = $params->{'cookie_name'};
 
-	# Validate field argument
+	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+	# validate_strict() above enforces type=>string, min=>1 and croaks for undef/ref
+	# inputs before control ever reaches these two guards.
 	if(!defined($field)) {
 		$self->_error('what cookie do you want?');
 		Carp::croak('what cookie do you want?');
-		return;
+		return;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
 	}
 	if(ref($field)) {
 		$self->_error('Cookie name should be a string');
 		Carp::croak('Cookie name should be a string');
-		return;
+		return;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
 	}
 
 	# Load cookies if not already loaded
@@ -2663,7 +2665,9 @@ sub AUTOLOAD
 	# Ensure the method is called on the correct package object or a subclass
 	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
 
-	# Validate method name - only allow safe parameter names
+	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+	# $method is captured via /::(\w+)$/ which only yields \w+ chars; a digit-leading
+	# name is possible in theory but Perl's method dispatch never generates one.
 	Carp::croak(__PACKAGE__, ": Invalid method name: $method") unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 	# Delegate to the param method

@@ -66,8 +66,9 @@ WriteMakefile(
 		'Errno' => 0,
 		'File::Temp' => 0,
 		'FindBin' => 0,
-		'LWP::UserAgent' => 0,
+		'IO::Interactive' => 0,
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
+		'LWP::UserAgent' => 0,
 		'POSIX' => 0,
 		'Test::Carp' => 0,
 		'Test::CleanNamespaces' => 0,
