@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+# Automatically generate and run tests for each function in the package.
+
 # End-to-end self-test: for every .pm under lib/, run the CLI pipeline
 #   extract-schemas --output-dir $tmp $pm
 #   fuzz-harness-generator -r $tmp/$func.yml
