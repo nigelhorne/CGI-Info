@@ -35,7 +35,7 @@ jobs:
 
       # Install Perl via perlbrew
       - name: Setup Perl environment
-        uses: shogo82148/actions-setup-perl@v1.42.0
+        uses: shogo82148/actions-setup-perl@v1.43.1
         with:
           perl-version: ${{ matrix.perl }}
           # install cpanminus
@@ -53,14 +53,19 @@ jobs:
           sudo apt install libdb-dev
         if: runner.os == 'Linux'
 
-      # - name: Upgrade Toolchain
-      #   run: |
-      #   run: cpanm -iqn --skip-satisfied ExtUtils::MakeMaker Module::Build
+      - name: Upgrade Toolchain
+        run: |
+          cpanm -iqn --skip-satisfied ExtUtils::MakeMaker Module::Build
 
       # Install module dependencies (from cpanfile or manually)
       - name: Install dependencies
+        env:
+          AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+          PERL_MM_USE_DEFAULT: 1
         run: |
-          cpanm --skip-satisfied --notest --installdeps .
+          cpanm --skip-satisfied --notest --installdeps --verbose .
           cpanm -iqn --skip-satisfied \
               Test::Most \
               Test::Mockingbird \
@@ -78,7 +83,8 @@ jobs:
               PPI \
               App::Prove \
               File::Copy::Recursive \
-              Test::LectroTest::Compat
+              Test::LectroTest::Compat \
+              Code::CutNPaste
           cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String
         timeout-minutes: 10
 
@@ -90,7 +96,7 @@ jobs:
 
       - name: Set snapshot variables
         run: |
-          echo "SNAPSHOT_TIMESTAMP=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+          echo "SNAPSHOT_TIMESTAMP=$(date -u +%Y-%m-%dT%H%M%SZ)" >> $GITHUB_ENV
           echo "SNAPSHOT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Add local bin to PATH
@@ -103,7 +109,7 @@ jobs:
             perl Makefile.PL && make install
           else
             echo "Install ATG"
-            cpanm -iqn App::Test::Generator@0.45
+            cpanm -iqn App::Test::Generator@0.46
           fi
 
       - name: Generate dashboard
