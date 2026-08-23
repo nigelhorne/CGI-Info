@@ -42,7 +42,7 @@
 		/* Show cursor points on the headers to show that they are clickable */
 		th { background-color: #f2f2f2; cursor: pointer; }
 		th.sortable {
-			cursor: pointer;
+			cursor: grab;
 			user-select: none;
 			white-space: nowrap;
 		}
@@ -54,6 +54,11 @@
 			color: #000;	/* dark for active */
 			font-weight: bold;
 		}
+		/* Prevent child spans intercepting drag events so enter/leave fire only on the th */
+		th.sortable .label,
+		th.sortable .arrow { pointer-events: none; }
+		th.col-dragging { opacity: 0.4; cursor: grabbing; }
+		th.col-drag-over { outline: 2px dashed #555; background-color: #d8eaff !important; }
 		.sparkline {
 			display: inline-block;
 			vertical-align: middle;
@@ -137,7 +142,7 @@
 	<img src="https://img.shields.io/badge/coverage-77%25-yellow" alt="Coverage badge">
 </div>
 <h1>CGI::Info</h1><h2>Coverage Report</h2>
-<table data-sort-col="0" data-sort-order="asc">
+<table data-sort-col="0" data-sort-order="asc" data-table-id="coverage">
 <!-- Make the column headers clickable -->
 <thead>
 <tr>
@@ -153,8 +158,8 @@
 
 <tbody>
 
-<tr class="med"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/8e82a6252df88114dd8bbbbd9970138b65dcafb8/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6"></canvas></td><td>76.9</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">70.6%</span></td><td class="neutral" title="Previous: 70.6%">&#9679; 0.0%</td></tr>
-<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/8e82a6252df88114dd8bbbbd9970138b65dcafb8/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="82.5,83.9,82.7,83.9,83.9,83.9,83.9,83.9,83.9,83.9"></canvas></td><td>91.9</td><td>82.5</td><td>67.8</td><td>91.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">83.9%</span></td><td class="neutral" title="Previous: 83.9%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="bin-info-pl.html" title="View coverage line by line" target="_blank">bin/info.pl</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/f44c74a0768cba980f8a1ed3ff848c8d6bf52b7d/bin/info.pl" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6"></canvas></td><td>76.9</td><td>25.0</td><td>0.0</td><td>100.0</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">70.6%</span></td><td class="neutral" title="Previous: 70.6%">&#9679; 0.0%</td></tr>
+<tr class="med"><td><a href="blib-lib-CGI-Info-pm.html" title="View coverage line by line" target="_blank">lib/CGI/Info.pm</a> <a href="https://github.com/nigelhorne/CGI-Info/blob/f44c74a0768cba980f8a1ed3ff848c8d6bf52b7d/lib/CGI/Info.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="83.9,82.7,83.9,83.9,83.9,83.9,83.9,83.9,83.9,83.9"></canvas></td><td>91.9</td><td>82.5</td><td>67.8</td><td>91.4</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">83.9%</span></td><td class="neutral" title="Previous: 83.9%">&#9679; 0.0%</td></tr>
 <tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">2 files</td><td colspan="3">Avg: 77%, Low: 0</td></tr>
 <tr class="med nosort"><td><strong>Total</strong></td><td>84.4</td><td>53.7</td><td>33.9</td><td>95.7</td><td colspan="2"><strong>77.3</strong></td></tr>
 </tbody></table>
@@ -205,15 +210,15 @@ function linearRegression(data) {
 
 const dataPoints = [ { x: "2026-07-23T08:27:21-04:00", y: 76.5494497616232, delta: 0, url: "https://github.com/nigelhorne/CGI-Info/commit/6e85d948f65594995975da6d7de813fcdc7f5d79", label: "2026-07-23T08:27:21-04:00", pointBackgroundColor: "gray", comment: "Added t/is_ai.t" },
 { x: "2026-07-23T11:04:07-04:00", y: 76.6408574398681, delta: 0.1, url: "https://github.com/nigelhorne/CGI-Info/commit/98521b0f80dbf16575940a1bbe8a442e03db5add", label: "2026-07-23T11:04:07-04:00", pointBackgroundColor: "green", comment: "More edge_cases" },
-{ x: "2026-07-23T13:19:28-07:00", y: 77.2422479245016, delta: 0.6, url: "https://github.com/nigelhorne/CGI-Info/commit/490dc542f8ac3fcf79442104547ed63b70834336", label: "2026-07-23T13:19:28-07:00", pointBackgroundColor: "green", comment: "Fix site hostsed in France" },
-{ x: "2026-07-23T15:40:56-04:00", y: 77.2422479245016, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/7687a75f253dd6c6560e973ec755c8cdd4cab41f", label: "2026-07-23T15:40:56-04:00", pointBackgroundColor: "gray", comment: "Added new fuzz tests" },
+{ x: "2026-07-23T15:40:56-04:00", y: 77.2422479245016, delta: 0.6, url: "https://github.com/nigelhorne/CGI-Info/commit/7687a75f253dd6c6560e973ec755c8cdd4cab41f", label: "2026-07-23T15:40:56-04:00", pointBackgroundColor: "green", comment: "Added new fuzz tests" },
 { x: "2026-07-27T20:53:21-04:00", y: 77.2227754463333, delta: -0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/29b5c7b3af675d9e6039ac381472632788200d97", label: "2026-07-27T20:53:21-04:00", pointBackgroundColor: "gray", comment: "POC all-fuzz.t" },
 { x: "2026-07-28T08:09:36-04:00", y: 77.2227754463333, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/c05f66880ae278efe16453e424109b9d612bd755", label: "2026-07-28T08:09:36-04:00", pointBackgroundColor: "gray", comment: "Use Strawberry Perl" },
 { x: "2026-08-06T10:52:43-04:00", y: 77.2227754463333, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/e5e6d5938aa27cd1f3f2a07c57760cc024eb8868", label: "2026-08-06T10:52:43-04:00", pointBackgroundColor: "gray", comment: "Latest actions-setup-perl" },
 { x: "2026-08-10T07:29:28-04:00", y: 77.2530051924034, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/414e59dd90a3cb28dc8587fa9da7996377be17b7", label: "2026-08-10T07:29:28-04:00", pointBackgroundColor: "gray", comment: "Added path testing" },
-{ x: "2026-08-10T08:15:45-04:00", y: 51.5020034616023, delta: -25.8, url: "https://github.com/nigelhorne/CGI-Info/commit/dba4610889f6340f918e46c53bd6b8e339897ec0", label: "2026-08-10T08:15:45-04:00", pointBackgroundColor: "red", comment: "Update Changes" },
-{ x: "2026-08-10T11:29:05-04:00", y: 77.2530051924034, delta: 25.8, url: "https://github.com/nigelhorne/CGI-Info/commit/5114c7d6b84b14ee01e03d0558b8bd9e4fc90be4", label: "2026-08-10T11:29:05-04:00", pointBackgroundColor: "green", comment: "Merge pull request #36 from nigelhorne/dependabot/github_actions/nigelhorne/App-GHGen-8" },
-{ x: "2026-08-17T01:41:56+00:00", y: 77.2530051924034, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/8e82a6252df88114dd8bbbbd9970138b65dcafb8", label: "2026-08-17T01:41:56+00:00", pointBackgroundColor: "gray", comment: "latest dashboard" } ];
+{ x: "2026-08-10T08:15:45-04:00", y: 77.2530051924034, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/dba4610889f6340f918e46c53bd6b8e339897ec0", label: "2026-08-10T08:15:45-04:00", pointBackgroundColor: "gray", comment: "Update Changes" },
+{ x: "2026-08-10T11:29:05-04:00", y: 77.2530051924034, delta: 0.0, url: "https://github.com/nigelhorne/CGI-Info/commit/5114c7d6b84b14ee01e03d0558b8bd9e4fc90be4", label: "2026-08-10T11:29:05-04:00", pointBackgroundColor: "gray", comment: "Merge pull request #36 from nigelhorne/dependabot/github_actions/nigelhorne/App-GHGen-8" },
+{ x: "2026-08-16T21:17:38-04:00", y: 51.5020034616023, delta: -25.8, url: "https://github.com/nigelhorne/CGI-Info/commit/8e82a6252df88114dd8bbbbd9970138b65dcafb8", label: "2026-08-16T21:17:38-04:00", pointBackgroundColor: "red", comment: "latest dashboard" },
+{ x: "2026-08-23T01:19:00+00:00", y: 77.2530051924034, delta: 25.8, url: "https://github.com/nigelhorne/CGI-Info/commit/f44c74a0768cba980f8a1ed3ff848c8d6bf52b7d", label: "2026-08-23T01:19:00+00:00", pointBackgroundColor: "green", comment: "Latest dashboards" } ];
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
 (function registerZoomPlugin(){
@@ -336,7 +341,10 @@ if(resetBtn) {
 	});
 }
 
-function sortTable(th, colIndex) {
+function sortTable(th) {
+	// Always recompute colIndex from DOM so it stays correct after drag-reordering.
+	// The historic onclick="sortTable(this, N)" calls still work; the N is ignored.
+	const colIndex = Array.from(th.parentElement.cells).indexOf(th);
 	const table = th.closest("table");
 	if(!table || !table.tBodies.length) return;
 
@@ -347,21 +355,30 @@ function sortTable(th, colIndex) {
 	const prevOrder = table.getAttribute("data-sort-order") || "desc";
 	const asc = (prevCol != colIndex) ? true : (prevOrder === "desc");
 
-	const isNumeric = colIndex === 0; // Date column
+	const isDate = th.dataset.sortType === 'date';
 
 	const normalRows = rows.filter(r => !r.classList.contains("nosort"));
 	const fixedRows = rows.filter(r => r.classList.contains("nosort"));
 
 	normalRows.sort((a, b) => {
-		let x = a.cells[colIndex]?.innerText.trim() || "";
-		let y = b.cells[colIndex]?.innerText.trim() || "";
+		const cellA = a.cells[colIndex];
+		const cellB = b.cells[colIndex];
+		let x = (cellA?.dataset.value ?? cellA?.innerText ?? "").trim();
+		let y = (cellB?.dataset.value ?? cellB?.innerText ?? "").trim();
 
-		if(isNumeric) {
+		if(isDate) {
 			x = Date.parse(x) || 0;
 			y = Date.parse(y) || 0;
 		} else {
-			x = x.toLowerCase();
-			y = y.toLowerCase();
+			const nx = parseFloat(x);
+			const ny = parseFloat(y);
+			if(!isNaN(nx) && !isNaN(ny)) {
+				x = nx;
+				y = ny;
+			} else {
+				x = x.toLowerCase();
+				y = y.toLowerCase();
+			}
 		}
 
 		if(x < y) return asc ? -1 : 1;
@@ -389,28 +406,235 @@ function sortTable(th, colIndex) {
 
 	table.setAttribute("data-sort-col", colIndex);
 	table.setAttribute("data-sort-order", asc ? "asc" : "desc");
+	saveSortState(table);
 }
 
+// ---------------------------------------------------------
+// Column drag-to-reorder
+// ---------------------------------------------------------
+let _dragSrcTh = null;
+let _initializingTables = false;
+
+// ---------------------------------------------------------
+// localStorage persistence for sort state and column order
+// ---------------------------------------------------------
+function _tableId(table) {
+	return table ? table.dataset.tableId : null;
+}
+
+function saveColOrder(table) {
+	const id = _tableId(table);
+	if(!id) return;
+	const headerRow = table.tHead && table.tHead.rows[0];
+	if(!headerRow) return;
+	const order = Array.from(headerRow.cells).map(th => parseInt(th.dataset.colId, 10));
+	try { localStorage.setItem('atg_col_order_' + id, JSON.stringify(order)); } catch(e) {}
+}
+
+function saveSortState(table) {
+	if(_initializingTables) return;
+	const id = _tableId(table);
+	if(!id) return;
+	const colIdx = parseInt(table.getAttribute('data-sort-col'), 10);
+	const order  = table.getAttribute('data-sort-order') || 'asc';
+	const headerRow = table.tHead && table.tHead.rows[0];
+	if(!headerRow) return;
+	const th = headerRow.cells[colIdx];
+	const colId = th ? parseInt(th.dataset.colId, 10) : colIdx;
+	try { localStorage.setItem('atg_sort_' + id, JSON.stringify({colId, order})); } catch(e) {}
+}
+
+function _restoreColOrder(table, savedOrder) {
+	const headerRow = table.tHead && table.tHead.rows[0];
+	if(!headerRow) return;
+	const placed = new Set();
+	savedOrder.forEach((wantedId, dstPos) => {
+		const srcTh = Array.from(headerRow.cells).find(
+			th => parseInt(th.dataset.colId, 10) === wantedId && !placed.has(th)
+		);
+		if(!srcTh) return;
+		const srcIdx = Array.from(headerRow.cells).indexOf(srcTh);
+		const dstIdx = dstPos < headerRow.cells.length ? dstPos : headerRow.cells.length - 1;
+		if(srcIdx === dstIdx) { placed.add(srcTh); return; }
+		Array.from(table.rows).forEach(row => {
+			if(row.cells.length <= Math.max(srcIdx, dstIdx)) return;
+			const moved = row.cells[srcIdx];
+			const ref = row.cells[dstIdx];
+			if(srcIdx < dstIdx) row.insertBefore(moved, ref ? ref.nextSibling : null);
+			else row.insertBefore(moved, ref);
+		});
+		placed.add(srcTh);
+	});
+}
+
+function _applySort(table, th, order) {
+	// Force the desired direction then call sortTable
+	const colIndex = Array.from(th.parentElement.cells).indexOf(th);
+	// Preset state so sortTable's toggle logic lands on `order`
+	table.setAttribute('data-sort-col', colIndex === 0 ? -1 : 0); // make it differ
+	table.setAttribute('data-sort-order', order === 'asc' ? 'desc' : 'asc');
+	sortTable(th);
+}
+
+function _colDragStart(e) {
+	_dragSrcTh = this;
+	e.dataTransfer.effectAllowed = 'move';
+	e.dataTransfer.setData('text/plain', ''); // required by Firefox
+	this.classList.add('col-dragging');
+}
+
+function _colDragOver(e) {
+	if(!_dragSrcTh || _dragSrcTh === this) return;
+	e.preventDefault();
+	e.dataTransfer.dropEffect = 'move';
+}
+
+function _colDragEnter(e) {
+	if(!_dragSrcTh || _dragSrcTh === this) return;
+	// Clear previous drag-over highlight before setting the new one
+	document.querySelectorAll('th.col-drag-over').forEach(t => t.classList.remove('col-drag-over'));
+	this.classList.add('col-drag-over');
+}
+
+function _colDragLeave(e) {
+	// Only clear when leaving to something truly outside this th
+	if(!this.contains(e.relatedTarget)) {
+		this.classList.remove('col-drag-over');
+	}
+}
+
+function _colDrop(e) {
+	e.preventDefault();
+	e.stopPropagation();
+	if(!_dragSrcTh || _dragSrcTh === this) return false;
+
+	const table = this.closest('table');
+	const srcIdx = Array.from(_dragSrcTh.parentElement.cells).indexOf(_dragSrcTh);
+	const dstIdx = Array.from(this.parentElement.cells).indexOf(this);
+
+	// Move the cell at srcIdx to dstIdx in every row (thead + tbody)
+	Array.from(table.rows).forEach(row => {
+		const cells = row.cells;
+		if(cells.length <= Math.max(srcIdx, dstIdx)) return;
+		const moved = cells[srcIdx];
+		if(srcIdx < dstIdx) {
+			row.insertBefore(moved, cells[dstIdx].nextSibling);
+		} else {
+			row.insertBefore(moved, cells[dstIdx]);
+		}
+	});
+
+	// Update data-sort-col so the next sort-click knows the active column's new position
+	const activeArrow = table.querySelector('thead .arrow.active');
+	if(activeArrow) {
+		const activeTh = activeArrow.closest('th');
+		const newIdx = Array.from(activeTh.parentElement.cells).indexOf(activeTh);
+		table.setAttribute('data-sort-col', newIdx);
+	}
+
+	saveColOrder(table);
+	return false;
+}
+
+function _colDragEnd(e) {
+	this.classList.remove('col-dragging');
+	document.querySelectorAll('th.col-drag-over').forEach(t => t.classList.remove('col-drag-over'));
+	_dragSrcTh = null;
+}
 
 // Initial display.
-// The table has been set up sorted in ascending order on the filename; reflect that in the GUI
+// The coverage table is pre-sorted ascending by filename from Perl; reflect that in the GUI.
+// The mutation and duplication tables are sorted by JS on load so the arrows always match data.
+// Saved column order and sort state are restored from localStorage when present.
 document.addEventListener("DOMContentLoaded", () => {
-	const table = document.querySelector("table");
-	if(!table) return;
+	_initializingTables = true;
 
-	const headers = table.tHead.rows[0].cells;
-	for(let i = 0; i < headers.length; i++) {
-		const arrow = headers[i].querySelector(".arrow");
-		if(!arrow) continue;
+	// Assign original column indices as data-col-id (must be done before any reordering)
+	document.querySelectorAll('table[data-table-id]').forEach(table => {
+		const headerRow = table.tHead && table.tHead.rows[0];
+		if(!headerRow) return;
+		Array.from(headerRow.cells).forEach((th, i) => { th.dataset.colId = i; });
+	});
 
-		if(i === 0) {
-			arrow.textContent = "▲";
-			arrow.classList.add("active");
-		} else {
-			arrow.textContent = "▲";
-			arrow.classList.remove("active");
+	// Restore saved column order, then sort state, for every identified table
+	document.querySelectorAll('table[data-table-id]').forEach(table => {
+		const id = _tableId(table);
+		// --- column order ---
+		let savedOrder = null;
+		try { savedOrder = JSON.parse(localStorage.getItem('atg_col_order_' + id)); } catch(e) {}
+		if(Array.isArray(savedOrder) && savedOrder.length) {
+			_restoreColOrder(table, savedOrder);
+		}
+
+		// --- sort state ---
+		let savedSort = null;
+		try { savedSort = JSON.parse(localStorage.getItem('atg_sort_' + id)); } catch(e) {}
+		if(savedSort && typeof savedSort.colId === 'number') {
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === savedSort.colId
+			);
+			if(th) {
+				_applySort(table, th, savedSort.order || 'asc');
+				return; // done with this table
+			}
+		}
+
+		// No saved sort — apply defaults
+		if(table.classList.contains('mut-table')) {
+			// Score% column (original col 5)
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === 5
+			);
+			if(th) _applySort(table, th, 'asc');
+		} else if(table.classList.contains('dup-table')) {
+			// File column (original col 0)
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === 0
+			);
+			if(th) _applySort(table, th, 'asc');
+		} else if(table.classList.contains('sortable-table') && !table.classList.contains('mut-table') && !table.classList.contains('dup-table')) {
+			// CPAN Testers: sort by Date (original col 0) ascending
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === 0
+			);
+			if(th) _applySort(table, th, 'asc');
+		}
+	});
+
+	// Coverage table: pre-sorted ascending by File (col 0) from Perl — just update arrows
+	const covTable = document.querySelector("table[data-table-id='coverage']");
+	if(covTable && covTable.tHead) {
+		const id = _tableId(covTable);
+		let savedSort = null;
+		try { savedSort = JSON.parse(localStorage.getItem('atg_sort_' + id)); } catch(e) {}
+		if(!savedSort) {
+			const headers = covTable.tHead.rows[0].cells;
+			for(let i = 0; i < headers.length; i++) {
+				const arrow = headers[i].querySelector(".arrow");
+				if(!arrow) continue;
+				arrow.textContent = "▲";
+				arrow.classList.toggle("active", i === 0);
+			}
 		}
 	}
+
+	_initializingTables = false;
+
+	// Wire up drag-to-reorder on every sortable column header
+	document.querySelectorAll('th.sortable').forEach(th => {
+		th.setAttribute('draggable', 'true');
+		th.title = (th.title ? th.title + ' · ' : '') + 'Drag to reorder columns';
+		th.addEventListener('dragstart',  _colDragStart);
+		th.addEventListener('dragover',   _colDragOver);
+		th.addEventListener('dragenter',  _colDragEnter);
+		th.addEventListener('dragleave',  _colDragLeave);
+		th.addEventListener('drop',       _colDrop);
+		th.addEventListener('dragend',    _colDragEnd);
+	});
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -502,10 +726,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	update();
 });
-document.addEventListener("DOMContentLoaded", () => {
-	const th = document.querySelector("table.sortable-table th");
-	if(th) sortTable(th, 0);
-});
 </script>
 
 
@@ -529,10 +749,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	</label>
 </div>
 
-<table class="sortable-table" data-sort-col="0" data-sort-order="asc">
+<table class="sortable-table" data-sort-col="0" data-sort-order="asc" data-table-id="cpan">
 <thead>
 <tr>
-	<th class="sortable" onclick="sortTable(this, 0)">
+	<th class="sortable" onclick="sortTable(this, 0)" data-sort-type="date">
 		<span class="label">Date</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th class="sortable" onclick="sortTable(this, 1)">
@@ -553,10 +773,10 @@ document.addEventListener("DOMContentLoaded", () => {
 </thead>
 <tbody>
 
-<tr class="cpan-fail"><td>2026-07-29T10:07:00Z</td><td>linux</td><td>5.32.1</td><td>David Solimano</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/56e70d6a-8b35-11f1-a051-99173a8c2e03" target="_blank">View</a></td><td></td></tr>
 <tr class="cpan-fail"><td>2026-07-25T18:58:00Z</td><td>openbsd</td><td>5.36.1</td><td>Brian Blackmore</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/ceeebeda-885a-11f1-bb64-c02520a3b583" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-29T10:07:00Z</td><td>linux</td><td>5.32.1</td><td>David Solimano</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/56e70d6a-8b35-11f1-a051-99173a8c2e03" target="_blank">View</a></td><td></td></tr>
 </tbody></table>
 <h2>Mutation Report</h2>
 <h3>Mutation Summary</h3>
@@ -569,14 +789,28 @@ document.addEventListener("DOMContentLoaded", () => {
 <li><b>Survived</b>: 
 0
 </li>
+<li><b>Duplication</b>: no duplicate code blocks detected</li>
 </ul>
 <h3>Mutation Files</h3>
 
-<table border='1' cellpadding='5'>
+<table border='1' cellpadding='5' class="sortable-table mut-table" data-sort-col="5" data-sort-order="asc" data-table-id="mut">
 
-<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Skipped</th><th>Score%</th><th>Complexity</th><th title="TER1=Statement, TER2=Branch, TER3=LCSAJ Path">TER1 / TER2 / TER3</th></tr>
+<thead>
+<tr>
+<th class="sortable" onclick="sortTable(this, 0)"><span class="label">File</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 1)"><span class="label">Total</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 2)"><span class="label">Killed</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 3)"><span class="label">Survivors</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 4)"><span class="label">Skipped</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 5)"><span class="label">Score%</span> <span class="arrow active">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 6)"><span class="label">Complexity</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 7)" title="TER1=Statement, TER2=Branch, TER3=LCSAJ Path"><span class="label">TER1 / TER2 / TER3</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 8)"><span class="label">Dup%</span> <span class="arrow">&#x25B2;</span></th>
+</tr>
+</thead>
+<tbody>
 
-</table>
+</tbody></table>
 
 <h2>Structural Coverage (Approximate)</h2>
 <div class='summary'>
@@ -590,8 +824,8 @@ Tests execute 91.18% of the code. No mutation data available yet — trigger the
 </div>
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/CGI-Info">CGI-Info</a></p>
-	<p><em>Last updated: 2026-08-17 01:40:47 - <a href="https://github.com/nigelhorne/CGI-Info/commit/8e82a6252df88114dd8bbbbd9970138b65dcafb8">commit <code>8e82a62</code></a></em></p>
-	<p style="float: right; font-size: 0.85em; color: #999;">Powered by <a href="https://metacpan.org/dist/App-Test-Generator">App::Test::Generator 0.45</a></p>
+	<p><em>Last updated: 2026-08-23 01:17:52 - <a href="https://github.com/nigelhorne/CGI-Info/commit/f44c74a0768cba980f8a1ed3ff848c8d6bf52b7d">commit <code>f44c74a</code></a></em></p>
+	<p style="float: right; font-size: 0.85em; color: #999;">Powered by <a href="https://metacpan.org/dist/App-Test-Generator">App::Test::Generator 0.46</a></p>
 </footer>
 </body>
 </html>
