@@ -225,12 +225,12 @@ if (@fuzz_report) {
 	diag(sprintf '  %-*s  %-*s  %s', $mw, '-' x $mw, $fw, '-' x $fw, '-----');
 	for my $r (sort { $a->{module} cmp $b->{module} || $a->{func} cmp $b->{func} } @fuzz_report) {
 		my $tests_col =
-			$r->{status} eq 'ok'      ? $r->{tests}     :
-			$r->{status} eq 'failed'  ? 'FAILED'         :
-			$r->{status} eq 'private' ? 'skipped:private' :
-			$r->{status} eq 'no_fuzz' ? 'skipped:no_fuzz' :
-			$r->{status} eq 'oop'     ? 'skipped:oop'     :
-			$r->{status} eq 'no_can'  ? 'skipped:no_can'  : '?';
+			$r->{status} eq 'ok'      ? $r->{tests}                          :
+			$r->{status} eq 'failed'  ? 'FAILED'                              :
+			$r->{status} eq 'private' ? 'skipped (internal helper)'           :
+			$r->{status} eq 'no_fuzz' ? 'skipped (excluded from fuzz list)'   :
+			$r->{status} eq 'oop'     ? 'skipped (instance method, needs $self)' :
+			$r->{status} eq 'no_can'  ? 'skipped (object param without can:)' : '?';
 		diag(sprintf '  %-*s  %-*s  %s', $mw, $r->{module}, $fw, $r->{func}, $tests_col);
 		$total += $r->{tests} // 0;
 	}
