@@ -17,7 +17,7 @@ use warnings;
 # schema from the code.
 
 use Test::Needs {
-	'App::Test::Generator' => '0.43',
+	'App::Test::Generator' => '0.46',
 	'perl' => 5.036,	# Later A::T::G need this version
 };
 
