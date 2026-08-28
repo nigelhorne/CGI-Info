@@ -1,0 +1,2426 @@
+{
+   "runs" : [
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942812.07694,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "-e",
+         "start" : 1787942723.7723,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942723.92906,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "-e",
+         "start" : 1787942723.92886,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942724.34661,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/00-load.t",
+         "start" : 1787942724.34509,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942725.14319,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/10-compile.t",
+         "start" : 1787942724.83004,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942725.59079,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/20-new.t",
+         "start" : 1787942725.55843,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942726.34788,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/30-basics.t",
+         "start" : 1787942726.23484,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942727.4226,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/40-more.t",
+         "start" : 1787942727.02231,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942728.07356,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/all-fuzz.t",
+         "start" : 1787942728.07318,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942728.61607,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/allow.t",
+         "start" : 1787942728.51421,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942729.10054,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/apoc.t",
+         "start" : 1787942729.10048,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942729.54463,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/as_string.t",
+         "start" : 1787942729.50255,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942731.06394,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/bin.t",
+         "start" : 1787942730.08639,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942730.78902,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "bin/info.pl",
+         "start" : 1787942730.75835,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942731.37514,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/boiler.t",
+         "start" : 1787942731.35154,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942731.84398,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/carp.t",
+         "start" : 1787942731.79201,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942732.71199,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/cgi_security.t",
+         "start" : 1787942732.50743,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942733.27309,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/changes.t",
+         "start" : 1787942733.27274,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942733.52553,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/comment-spelling.t",
+         "start" : 1787942733.52518,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942733.95595,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/config_file.t",
+         "start" : 1787942733.80749,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942734.71864,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/cookies.t",
+         "start" : 1787942734.6515,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942735.21934,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/cover.t",
+         "start" : 1787942735.21899,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942735.46551,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/critic.t",
+         "start" : 1787942735.46518,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942735.71189,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/cv.t",
+         "start" : 1787942735.71152,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942735.95881,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/dependent-modules.t",
+         "start" : 1787942735.95846,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942736.20901,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/dist.t",
+         "start" : 1787942736.20866,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942737.14701,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/edge_cases.t",
+         "start" : 1787942736.61114,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942737.87906,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/eof.t",
+         "start" : 1787942737.87871,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942738.13323,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/eol.t",
+         "start" : 1787942738.13287,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942738.40783,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/expect.t",
+         "start" : 1787942738.40687,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942739.16194,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/extended_tests.t",
+         "start" : 1787942738.8165,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942739.81359,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/fixme.t",
+         "start" : 1787942739.81322,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942740.80945,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/function.t",
+         "start" : 1787942740.23505,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942785.93912,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/fuzz.t",
+         "start" : 1787942741.74349,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942743.38712,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942742.02626,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942743.33544,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942742.25634,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942742.70232,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/7wfJku72Xv",
+         "start" : 1787942742.67557,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942745.12103,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942743.76362,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942745.06759,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942743.98879,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942744.43318,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/q9OGYEfoch",
+         "start" : 1787942744.4063,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942746.85931,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942745.4956,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942746.8032,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942745.71926,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942746.16223,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/QJUjYKgBfb",
+         "start" : 1787942746.13561,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942750.78492,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942747.23475,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942750.72795,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942747.45977,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942750.04466,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/H_WrAVGCre",
+         "start" : 1787942747.87557,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942752.57108,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942751.17588,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942752.51105,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942751.4049,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942751.85541,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/pzft6625kJ",
+         "start" : 1787942751.82829,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942754.33848,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942752.95414,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942754.27871,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942753.17966,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942753.62952,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/7VSqbo1U8T",
+         "start" : 1787942753.60256,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942756.11125,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942754.72479,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942756.04994,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942754.94944,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942755.39913,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/TjeypYcZMl",
+         "start" : 1787942755.36684,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942757.89274,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942756.49457,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942757.82718,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942756.72316,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942757.16715,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/JRYdCtsVyX",
+         "start" : 1787942757.13995,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942759.69487,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942758.28749,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942759.62967,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942758.51557,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942758.96279,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/SFO6pJiIsR",
+         "start" : 1787942758.93523,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942761.48996,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942760.08833,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942761.42389,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942760.31547,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942760.7668,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/FlN8uLU1m_",
+         "start" : 1787942760.73913,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942763.31317,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942761.88015,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942763.24486,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942762.10852,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942762.56672,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/PBXevtiKxb",
+         "start" : 1787942762.5342,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942765.17553,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942763.71105,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942765.10504,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942763.93696,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942764.38783,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/n5L3Dc_vcw",
+         "start" : 1787942764.36078,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942767.00375,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942765.56931,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942766.93082,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942765.79698,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942766.24616,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/w09onwNHYp",
+         "start" : 1787942766.2141,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942768.83772,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942767.40181,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942768.76378,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942767.62774,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942768.07725,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/Y12yQDgenp",
+         "start" : 1787942768.05156,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942770.67038,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942769.24026,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942770.59635,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942769.46944,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942769.92367,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/f3usOmHOui",
+         "start" : 1787942769.89087,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942772.50766,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942771.0735,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942772.4311,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942771.30068,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942771.75372,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/Cz56_BA80f",
+         "start" : 1787942771.72575,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942774.33572,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942772.91407,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942774.25677,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942773.1412,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942773.58649,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/5ZBmIg14Ag",
+         "start" : 1787942773.55912,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942776.17302,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942774.74325,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942776.09275,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942774.96834,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942775.42224,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/5LcDslhplS",
+         "start" : 1787942775.39434,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942783.96783,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942776.58099,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942783.88671,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942776.8113,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942783.14521,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/rJgnrJXmsB",
+         "start" : 1787942777.23385,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942785.80904,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator",
+         "start" : 1787942784.37438,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942785.72822,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove",
+         "start" : 1787942784.60326,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942785.05341,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "/tmp/1ywrcKNC_p",
+         "start" : 1787942785.02615,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942786.24885,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/gv.t",
+         "start" : 1787942786.24852,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942787.00165,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/integration.t",
+         "start" : 1787942786.68972,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942787.951,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/is_ai.t",
+         "start" : 1787942787.87597,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942788.70438,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/is_mobile.t",
+         "start" : 1787942788.64827,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942789.45555,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/is_robot.t",
+         "start" : 1787942789.40076,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942790.20256,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/is_search.t",
+         "start" : 1787942790.146,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942790.92824,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/is_tablet.t",
+         "start" : 1787942790.88359,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942791.6216,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/json.t",
+         "start" : 1787942791.60703,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942792.13556,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/kwalitee.t",
+         "start" : 1787942792.13523,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942792.62306,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/locales.t",
+         "start" : 1787942792.57457,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942793.34363,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/logdir.t",
+         "start" : 1787942793.31593,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942794.04507,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/logger.t",
+         "start" : 1787942794.01105,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942794.55198,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/manifest.t",
+         "start" : 1787942794.55164,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942794.83918,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/metrics.t",
+         "start" : 1787942794.83885,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942795.11604,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/minimum.t",
+         "start" : 1787942795.11571,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942795.3896,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/modules-used.t",
+         "start" : 1787942795.38925,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942795.66478,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/namespaces.t",
+         "start" : 1787942795.66443,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942795.9425,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/no404s.t",
+         "start" : 1787942795.94215,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942796.22222,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/noopentickets.t",
+         "start" : 1787942796.22188,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942796.50446,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/noplan.t",
+         "start" : 1787942796.50413,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942796.92464,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/object_configure.t",
+         "start" : 1787942796.81196,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942797.72248,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/param.t",
+         "start" : 1787942797.65095,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942798.6122,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/params.t",
+         "start" : 1787942798.41611,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942799.64155,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/path.t",
+         "start" : 1787942799.35532,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942800.36016,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/pod-cm.t",
+         "start" : 1787942800.35981,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942800.63944,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/pod-coverage.t",
+         "start" : 1787942800.63909,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942800.91727,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/pod-links.t",
+         "start" : 1787942800.91694,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942801.19581,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/pod-snippets.t",
+         "start" : 1787942801.19545,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942801.47247,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/pod-spelling.t",
+         "start" : 1787942801.4721,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942801.7539,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/pod-synopsis.t",
+         "start" : 1787942801.75354,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942802.03452,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/pod.t",
+         "start" : 1787942802.03418,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942802.34409,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/port.t",
+         "start" : 1787942802.3437,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942802.6293,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/prereq.t",
+         "start" : 1787942802.62896,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942803.11251,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/protocol.t",
+         "start" : 1787942803.07181,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942803.83613,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/rootdir.t",
+         "start" : 1787942803.80268,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942804.58671,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/script.t",
+         "start" : 1787942804.52855,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942805.3378,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/site.t",
+         "start" : 1787942805.30128,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942806.06923,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/status.t",
+         "start" : 1787942806.0261,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942806.59733,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/strict.t",
+         "start" : 1787942806.59698,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942806.88135,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/tabs.t",
+         "start" : 1787942806.88099,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942807.16292,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/taint.t",
+         "start" : 1787942807.16256,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942807.65516,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/tmpdir.t",
+         "start" : 1787942807.60948,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942808.78336,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/unit.t",
+         "start" : 1787942808.33673,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942809.52991,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/untaint.t",
+         "start" : 1787942809.52933,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942809.81755,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/unused.t",
+         "start" : 1787942809.81722,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942810.09696,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/vars.t",
+         "start" : 1787942810.09661,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942810.37669,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/version.t",
+         "start" : 1787942810.37634,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942810.98069,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/waf.t",
+         "start" : 1787942810.82104,
+         "version" : "1.14"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Information about the CGI environment",
+         "dir" : "/home/runner/work/CGI-Info/CGI-Info",
+         "finish" : 1787942811.75072,
+         "name" : "CGI-Info",
+         "perl" : "5.40.5",
+         "run" : "t/xml.t",
+         "start" : 1787942811.72244,
+         "version" : "1.14"
+      }
+   ],
+   "summary" : {
+      "/opt/hostedtoolcache/perl/5.40.5/x64/bin/fuzz-harness-generator" : {
+         "branch" : {
+            "covered" : 11,
+            "error" : 69,
+            "percentage" : 13.75,
+            "total" : 80,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 5,
+            "error" : 25,
+            "percentage" : 16.6666666666667,
+            "total" : 30,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 52,
+            "error" : 120,
+            "percentage" : 30.2325581395349,
+            "total" : 172
+         },
+         "subroutine" : {
+            "covered" : 9,
+            "error" : 4,
+            "percentage" : 69.2307692307692,
+            "total" : 13
+         },
+         "total" : {
+            "covered" : 77,
+            "error" : 218,
+            "percentage" : 26.1016949152542,
+            "total" : 295,
+            "uncoverable" : 0
+         }
+      },
+      "/opt/hostedtoolcache/perl/5.40.5/x64/bin/prove" : {
+         "branch" : {
+            "covered" : 2,
+            "error" : 2,
+            "percentage" : 50,
+            "total" : 4,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 14,
+            "percentage" : 100,
+            "total" : 14
+         },
+         "subroutine" : {
+            "covered" : 4,
+            "percentage" : 100,
+            "total" : 4
+         },
+         "total" : {
+            "covered" : 20,
+            "error" : 2,
+            "percentage" : 90.9090909090909,
+            "total" : 22,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/1ywrcKNC_p" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 197,
+            "error" : 1010,
+            "percentage" : 16.3214581607291,
+            "total" : 1207
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 281,
+            "error" : 2049,
+            "percentage" : 12.0600858369099,
+            "total" : 2330,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/5LcDslhplS" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 198,
+            "error" : 1010,
+            "percentage" : 16.3907284768212,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 282,
+            "error" : 2049,
+            "percentage" : 12.0978120978121,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/5ZBmIg14Ag" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 197,
+            "error" : 1011,
+            "percentage" : 16.3079470198676,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 281,
+            "error" : 2050,
+            "percentage" : 12.0549120549121,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/7VSqbo1U8T" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 196,
+            "error" : 1012,
+            "percentage" : 16.2251655629139,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 280,
+            "error" : 2051,
+            "percentage" : 12.012012012012,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/7wfJku72Xv" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 196,
+            "error" : 1012,
+            "percentage" : 16.2251655629139,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 280,
+            "error" : 2051,
+            "percentage" : 12.012012012012,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/Cz56_BA80f" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 197,
+            "error" : 1011,
+            "percentage" : 16.3079470198676,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 281,
+            "error" : 2050,
+            "percentage" : 12.0549120549121,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/FlN8uLU1m_" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 198,
+            "error" : 1010,
+            "percentage" : 16.3907284768212,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 282,
+            "error" : 2049,
+            "percentage" : 12.0978120978121,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/H_WrAVGCre" : {
+         "branch" : {
+            "covered" : 95,
+            "error" : 651,
+            "percentage" : 12.7345844504021,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 54,
+            "error" : 263,
+            "percentage" : 17.0347003154574,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 284,
+            "error" : 924,
+            "percentage" : 23.5099337748344,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 29,
+            "error" : 31,
+            "percentage" : 48.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 462,
+            "error" : 1869,
+            "percentage" : 19.8198198198198,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/JRYdCtsVyX" : {
+         "branch" : {
+            "covered" : 41,
+            "error" : 727,
+            "percentage" : 5.33854166666667,
+            "total" : 768,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 199,
+            "error" : 1020,
+            "percentage" : 16.3248564397047,
+            "total" : 1219
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 284,
+            "error" : 2080,
+            "percentage" : 12.0135363790186,
+            "total" : 2364,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/PBXevtiKxb" : {
+         "branch" : {
+            "covered" : 47,
+            "error" : 699,
+            "percentage" : 6.30026809651474,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 23,
+            "error" : 294,
+            "percentage" : 7.25552050473186,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 205,
+            "error" : 1004,
+            "percentage" : 16.9561621174524,
+            "total" : 1209
+         },
+         "subroutine" : {
+            "covered" : 27,
+            "error" : 33,
+            "percentage" : 45,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 302,
+            "error" : 2030,
+            "percentage" : 12.9502572898799,
+            "total" : 2332,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/QJUjYKgBfb" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 196,
+            "error" : 1012,
+            "percentage" : 16.2251655629139,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 280,
+            "error" : 2051,
+            "percentage" : 12.012012012012,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/SFO6pJiIsR" : {
+         "branch" : {
+            "covered" : 41,
+            "error" : 727,
+            "percentage" : 5.33854166666667,
+            "total" : 768,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 199,
+            "error" : 1020,
+            "percentage" : 16.3248564397047,
+            "total" : 1219
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 284,
+            "error" : 2080,
+            "percentage" : 12.0135363790186,
+            "total" : 2364,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/TjeypYcZMl" : {
+         "branch" : {
+            "covered" : 49,
+            "error" : 719,
+            "percentage" : 6.38020833333333,
+            "total" : 768,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 23,
+            "error" : 294,
+            "percentage" : 7.25552050473186,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 206,
+            "error" : 1013,
+            "percentage" : 16.8990976210008,
+            "total" : 1219
+         },
+         "subroutine" : {
+            "covered" : 27,
+            "error" : 33,
+            "percentage" : 45,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 305,
+            "error" : 2059,
+            "percentage" : 12.9018612521151,
+            "total" : 2364,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/Y12yQDgenp" : {
+         "branch" : {
+            "covered" : 63,
+            "error" : 767,
+            "percentage" : 7.59036144578313,
+            "total" : 830,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 30,
+            "error" : 287,
+            "percentage" : 9.46372239747635,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 174,
+            "error" : 1088,
+            "percentage" : 13.7876386687797,
+            "total" : 1262
+         },
+         "subroutine" : {
+            "covered" : 23,
+            "error" : 41,
+            "percentage" : 35.9375,
+            "total" : 64
+         },
+         "total" : {
+            "covered" : 290,
+            "error" : 2183,
+            "percentage" : 11.7266477961989,
+            "total" : 2473,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/f3usOmHOui" : {
+         "branch" : {
+            "covered" : 49,
+            "error" : 719,
+            "percentage" : 6.38020833333333,
+            "total" : 768,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 23,
+            "error" : 294,
+            "percentage" : 7.25552050473186,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 207,
+            "error" : 1013,
+            "percentage" : 16.9672131147541,
+            "total" : 1220
+         },
+         "subroutine" : {
+            "covered" : 27,
+            "error" : 33,
+            "percentage" : 45,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 306,
+            "error" : 2059,
+            "percentage" : 12.938689217759,
+            "total" : 2365,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/n5L3Dc_vcw" : {
+         "branch" : {
+            "covered" : 41,
+            "error" : 727,
+            "percentage" : 5.33854166666667,
+            "total" : 768,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 197,
+            "error" : 1022,
+            "percentage" : 16.1607875307629,
+            "total" : 1219
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 282,
+            "error" : 2082,
+            "percentage" : 11.9289340101523,
+            "total" : 2364,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/pzft6625kJ" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 196,
+            "error" : 1012,
+            "percentage" : 16.2251655629139,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 280,
+            "error" : 2051,
+            "percentage" : 12.012012012012,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/q9OGYEfoch" : {
+         "branch" : {
+            "covered" : 40,
+            "error" : 706,
+            "percentage" : 5.36193029490616,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 18,
+            "error" : 299,
+            "percentage" : 5.6782334384858,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 196,
+            "error" : 1012,
+            "percentage" : 16.2251655629139,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 26,
+            "error" : 34,
+            "percentage" : 43.3333333333333,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 280,
+            "error" : 2051,
+            "percentage" : 12.012012012012,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/rJgnrJXmsB" : {
+         "branch" : {
+            "covered" : 171,
+            "error" : 575,
+            "percentage" : 22.9222520107239,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 53,
+            "error" : 264,
+            "percentage" : 16.7192429022082,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 419,
+            "error" : 789,
+            "percentage" : 34.6854304635762,
+            "total" : 1208
+         },
+         "subroutine" : {
+            "covered" : 37,
+            "error" : 23,
+            "percentage" : 61.6666666666667,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 680,
+            "error" : 1651,
+            "percentage" : 29.1720291720292,
+            "total" : 2331,
+            "uncoverable" : 0
+         }
+      },
+      "/tmp/w09onwNHYp" : {
+         "branch" : {
+            "covered" : 47,
+            "error" : 699,
+            "percentage" : 6.30026809651474,
+            "total" : 746,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 23,
+            "error" : 294,
+            "percentage" : 7.25552050473186,
+            "total" : 317,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 205,
+            "error" : 1004,
+            "percentage" : 16.9561621174524,
+            "total" : 1209
+         },
+         "subroutine" : {
+            "covered" : 27,
+            "error" : 33,
+            "percentage" : 45,
+            "total" : 60
+         },
+         "total" : {
+            "covered" : 302,
+            "error" : 2030,
+            "percentage" : 12.9502572898799,
+            "total" : 2332,
+            "uncoverable" : 0
+         }
+      },
+      "Total" : {
+         "branch" : {
+            "covered" : 1440,
+            "error" : 14228,
+            "percentage" : 9.19070717385755,
+            "total" : 15668,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 717,
+            "error" : 6020,
+            "percentage" : 10.6427193112661,
+            "total" : 6737,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 5052,
+            "error" : 20199,
+            "percentage" : 20.0071284305572,
+            "total" : 25251
+         },
+         "subroutine" : {
+            "covered" : 616,
+            "error" : 679,
+            "percentage" : 47.5675675675676,
+            "total" : 1295
+         },
+         "total" : {
+            "covered" : 7825,
+            "error" : 41126,
+            "percentage" : 15.9853731282303,
+            "total" : 48951,
+            "uncoverable" : 0
+         }
+      },
+      "bin/info.pl" : {
+         "branch" : {
+            "covered" : 2,
+            "error" : 6,
+            "percentage" : 25,
+            "total" : 8,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 30,
+            "error" : 9,
+            "percentage" : 76.9230769230769,
+            "total" : 39
+         },
+         "subroutine" : {
+            "covered" : 4,
+            "percentage" : 100,
+            "total" : 4
+         },
+         "total" : {
+            "covered" : 36,
+            "error" : 15,
+            "percentage" : 70.5882352941177,
+            "total" : 51,
+            "uncoverable" : 0
+         }
+      },
+      "blib/lib/CGI/Info.pm" : {
+         "branch" : {
+            "covered" : 381,
+            "error" : 81,
+            "percentage" : 82.4675324675325,
+            "total" : 462,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 249,
+            "error" : 118,
+            "percentage" : 67.8474114441417,
+            "total" : 367,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 694,
+            "error" : 61,
+            "percentage" : 91.9205298013245,
+            "total" : 755
+         },
+         "subroutine" : {
+            "covered" : 64,
+            "error" : 6,
+            "percentage" : 91.4285714285714,
+            "total" : 70
+         },
+         "total" : {
+            "covered" : 1388,
+            "error" : 266,
+            "percentage" : 83.9177750906892,
+            "total" : 1654,
+            "uncoverable" : 0
+         }
+      }
+   }
+}
