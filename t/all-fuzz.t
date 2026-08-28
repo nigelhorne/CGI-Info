@@ -39,6 +39,9 @@ my $VERBOSE = $ENV{TEST_VERBOSE} // 0;
 my $extract_bin = 'extract-schemas';
 my $fuzz_bin = 'fuzz-harness-generator';
 
+# Populated during the run: func_name => test_count
+my %fuzz_stats;
+
 # Functions that cannot be fuzz-tested via this CLI pipeline.
 # When adding an entry here, first check whether extract-schemas produces a
 # wrong schema (fix SchemaExtractor) before resorting to a skip.
@@ -184,7 +187,9 @@ for my $pm_file (@pm_files) {
 				$failed++;
 				last;
 			} else {
-				pass("$func: fuzz harness passed");
+				my $n = ($fuzz_out =~ /Tests=(\d+)/) ? $1 : 0;
+				$fuzz_stats{$func} = $n;
+				pass("$func: fuzz harness passed ($n tests)");
 			}
 		}
 
@@ -192,6 +197,21 @@ for my $pm_file (@pm_files) {
 
 		done_testing();
 	};
+}
+
+if (%fuzz_stats) {
+	my $total = 0;
+	$total += $_ for values %fuzz_stats;
+	my $width = (sort { $b <=> $a } map { length($_) } keys %fuzz_stats)[0];
+	$width = 40 if $width < 40;
+	diag('');
+	diag('Fuzz test summary:');
+	diag(sprintf '  %-*s  %s', $width, 'Routine', 'Tests');
+	diag(sprintf '  %-*s  %s', $width, '-' x $width, '-----');
+	for my $func (sort keys %fuzz_stats) {
+		diag(sprintf '  %-*s  %d', $width, $func, $fuzz_stats{$func});
+	}
+	diag(sprintf '  %-*s  %d', $width, 'TOTAL', $total);
 }
 
 done_testing();
