@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup Perl
         id: setup-perl
-        uses: shogo82148/actions-setup-perl@v1.43.1
+        uses: shogo82148/actions-setup-perl@v1.44.0
         with:
           perl-version: ${{ matrix.perl }}
 
@@ -89,7 +89,9 @@ jobs:
 
       - name: Install DB_File, needed for a lot of CPAN modules
         if: runner.os == 'Linux'
-        run: sudo apt install libdb-dev libperl-dev
+        run: |
+           sudo apt update
+           sudo apt install libdb-dev libperl-dev
       - name: Install dependencies
         if: runner.os != 'Windows'
         shell: bash
