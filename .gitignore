@@ -49,3 +49,6 @@ t/tmp_*.t
 schemas/
 \.claude
 CLAUDE.md
+
+# make dist / disttest
+/CGI-Info-*

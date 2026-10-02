@@ -2674,10 +2674,6 @@ sub AUTOLOAD
 	return $self->param($method);
 }
 
-=head1 AUTHOR
-
-Nigel Horne, C<< <njh at nigelhorne.com> >>
-
 =head1 BUGS
 
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
@@ -2827,6 +2823,10 @@ Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = und
       -- Invariant: is_ai ⟹ is_robot
     ∧ is_ai i = true ⟹ is_robot i = true
     -- ---------------------------------------------------------------
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
