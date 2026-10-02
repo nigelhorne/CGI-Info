@@ -12,7 +12,7 @@ requires 'Log::Abstraction', '0.10';
 requires 'Net::CIDR';
 requires 'Object::Configure', '0.19';
 requires 'Params::Get', '0.13';
-requires 'Params::Validate::Strict', '0.35';
+requires 'Params::Validate::Strict', '0.40';
 requires 'Readonly';
 requires 'Return::Set';
 requires 'Scalar::Util';

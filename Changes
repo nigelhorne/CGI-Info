@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+1.15
+	[ Bug fixes ]
+	- Bumped to latest version of Params::Validate::Strict
+	- Look into GH#38
+
 1.14	Thu Jul 23 21:29:19 EDT 2026
 	[ Enhancements ]
 	- Add is_ai() method: returns true for known AI training/inference crawlers (ClaudeBot, GPTBot, PerplexityBot, CCBot, etc.)

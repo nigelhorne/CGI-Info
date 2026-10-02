@@ -40,7 +40,7 @@ WriteMakefile(
 		'Net::CIDR' => 0,
 		'Object::Configure' => 0.19,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.35,
+		'Params::Validate::Strict' => 0.40,
 		'Readonly' => 0,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
