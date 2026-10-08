@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+1.16
+	[ Tests ]
+	- Use Test::Log::Adapter
+	- Update to latest all_fuzz.t from App::Test::Generator
+
 1.15	Fri Oct  2 11:36:07 AM EDT 2026
 	[ Bug fixes ]
 	- Bumped to latest version of Params::Validate::Strict

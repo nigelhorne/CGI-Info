@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use Test::Most tests => 202;
 use File::Spec;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -473,7 +472,7 @@ EOF
 	delete $ENV{'QUERY_STRING'};
 	@ARGV = ('foo=bar', 'fred=wilma' );
 	$i = new_ok('CGI::Info');
-	%p = %{$i->params(logger => MyLogger->new())};
+	%p = %{$i->params(logger => Test::Log::Abstraction->new())};
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());

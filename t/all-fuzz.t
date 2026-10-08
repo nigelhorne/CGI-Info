@@ -60,6 +60,26 @@ my @fuzz_report;
 #   mutate         - requires a live PPI::Document object; schema has new: ~
 #                    so auto-detected as OOP, but kept here for clarity
 #   applies_to     - requires a live PPI::Document object; same as mutate
+#   absorb_legacy_output - silently returns for non-hashref input rather than
+#                    croaking; harness generates DIES tests that always fail
+#   calculate_age  - integer min constraint causes rand() to generate sub-minimum
+#                    values (e.g. 0..1899) that die with "Birth year out of range";
+#                    harness expects survival but the function dies
+#   add_evidence   - category and signal accept only specific enum values; schema
+#                    says 'string' so harness sends random strings which croak with
+#                    "Invalid evidence category '...'" — enum constraints not yet
+#                    supported in the schema format
+#   classification - getter that returns undef until resolve_classification() is
+#                    called; output spec says 'string' but freshly-constructed
+#                    objects have classification=undef; Return::Set validation fails
+#   evidence       - returns a list (not a reference), so scalar context gives 0;
+#                    output spec says 'arrayref' but harness captures in scalar context
+#   validate_email - requires valid email format (regex with @); harness generates random
+#                    strings that don't satisfy the format check; enum-like semantic
+#   validate_score - requires numeric value 0-100; schema says type:string (from SCALAR)
+#                    so harness generates random strings that fail the numeric regex check
+#   return_type    - getter returning undef until resolve_return_type() called; output
+#                    spec says string but freshly-constructed objects have return_type=undef
 my %no_fuzz = map { $_ => 1 } qw(
 	generate
 	DB::DB
@@ -68,6 +88,14 @@ my %no_fuzz = map { $_ => 1 } qw(
 	merge
 	mutate
 	applies_to
+	absorb_legacy_output
+	calculate_age
+	add_evidence
+	classification
+	evidence
+	validate_email
+	validate_score
+	return_type
 );
 
 # Collect every .pm under lib/
@@ -158,9 +186,12 @@ for my $pm_file (@pm_files) {
 				next;
 			}
 
-			if (exists $schema->{new}) {
+			if (exists $schema->{new} && !defined($schema->{new})) {
+				# new: null means SchemaExtractor could not generate representative
+				# constructor args (e.g. constructor needs a coderef or object param).
+				# Skip — the harness can't build $self automatically in this case.
 				push @fuzz_report, { module => $module, func => $func, status => 'oop' };
-				pass("$func: skipped (OOP instance method)");
+				pass("$func: skipped (OOP instance method - constructor not auto-buildable)");
 				next;
 			}
 
@@ -229,7 +260,7 @@ if (@fuzz_report) {
 			$r->{status} eq 'failed'  ? 'FAILED'                              :
 			$r->{status} eq 'private' ? 'skipped (internal helper)'           :
 			$r->{status} eq 'no_fuzz' ? 'skipped (excluded from fuzz list)'   :
-			$r->{status} eq 'oop'     ? 'skipped (instance method, needs $self)' :
+			$r->{status} eq 'oop'     ? 'skipped (constructor not auto-buildable)' :
 			$r->{status} eq 'no_can'  ? 'skipped (object param without can:)' : '?';
 		diag(sprintf '  %-*s  %-*s  %s', $mw, $r->{module}, $fw, $r->{func}, $tests_col);
 		$total += $r->{tests} // 0;
