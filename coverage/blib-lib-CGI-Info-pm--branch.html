@@ -20,7 +20,7 @@ https://pjcj.net
 <h1>Branch Coverage</h1>
 <table>
 <tr><td class="h" align="right">File:</td><td align="left">blib/lib/CGI/Info.pm</td></tr>
-<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">82.3%</td></tr>
+<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">85.2%</td></tr>
 </table>
 <div><br/></div>
 <table>
@@ -38,14 +38,6 @@ https://pjcj.net
 <tr><td class="h"><a id="L303">303</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $params-&gt;{&#39;expect&#39;})</td></tr>
 <tr><td class="h"><a id="L308">308</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $logger = $params-&gt;{&#39;logger&#39;})</td></tr>
 <tr><td class="h"><a id="L356">356</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;script_name&#39;})</td></tr>
-<tr><td class="h"><a id="L367">367</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">unless &quot;File::Basename&quot;-&gt;can(&quot;basename&quot;)</td></tr>
-<tr><td class="h"><a id="L376">376</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $script_path = $self-&gt;_get_env(&#39;SCRIPT_FILENAME&#39;)) { }</td></tr>
-<tr><td class="h"></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">elsif ($script_name = $self-&gt;_get_env(&#39;SCRIPT_NAME&#39;)) { }</td></tr>
-<tr><td class="h"></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">elsif (&#39;File::Spec&#39;-&gt;file_name_is_absolute($0)) { }</td></tr>
-<tr><td class="h"><a id="L379">379</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (my $document_root = $self-&gt;_get_env(&#39;DOCUMENT_ROOT&#39;)) { }</td></tr>
-<tr><td class="h"><a id="L387">387</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (&#39;File::Spec&#39;-&gt;file_name_is_absolute($script_name) and -r $script_name) { }</td></tr>
-<tr><td class="h"><a id="L391">391</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">unless &quot;Cwd&quot;-&gt;can(&quot;abs_path&quot;)</td></tr>
-<tr><td class="h"><a id="L393">393</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($script_name =~ m[^/(.+)])</td></tr>
 <tr><td class="h"><a id="L436">436</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;script_path&#39;})</td></tr>
 <tr><td class="h"><a id="L463">463</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
 <tr><td class="h"><a id="L466">466</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $self-&gt;{&#39;script_path&#39;}</td></tr>
