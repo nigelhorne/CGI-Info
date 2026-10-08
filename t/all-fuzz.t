@@ -47,55 +47,7 @@ my @fuzz_report;
 # When adding an entry here, first check whether extract-schemas produces a
 # wrong schema (fix SchemaExtractor) before resorting to a skip.
 #
-#   generate       - requires schemas/generate.yml on disk (memberof path) and
-#                    takes 40+ s; tested separately via fuzz-harness-generator
-#   DB::DB         - Perl debugger hook; auto-filtered by SchemaExtractor since
-#                    0.45 (cross-package subs skipped); kept here as a belt-and-
-#                    suspenders guard in case the schema somehow surfaces it
-#   get_data_section - returns a ref type that Test::Returns cannot validate
-#   new            - constructors need properly typed args (hashref/object);
-#                    SchemaExtractor infers 'string' and the harness sends
-#                    random strings, crashing every call
-#   merge          - requires valid file paths that exist on disk
-#   mutate         - requires a live PPI::Document object; schema has new: ~
-#                    so auto-detected as OOP, but kept here for clarity
-#   applies_to     - requires a live PPI::Document object; same as mutate
-#   absorb_legacy_output - silently returns for non-hashref input rather than
-#                    croaking; harness generates DIES tests that always fail
-#   calculate_age  - integer min constraint causes rand() to generate sub-minimum
-#                    values (e.g. 0..1899) that die with "Birth year out of range";
-#                    harness expects survival but the function dies
-#   add_evidence   - category and signal accept only specific enum values; schema
-#                    says 'string' so harness sends random strings which croak with
-#                    "Invalid evidence category '...'" — enum constraints not yet
-#                    supported in the schema format
-#   classification - getter that returns undef until resolve_classification() is
-#                    called; output spec says 'string' but freshly-constructed
-#                    objects have classification=undef; Return::Set validation fails
-#   evidence       - returns a list (not a reference), so scalar context gives 0;
-#                    output spec says 'arrayref' but harness captures in scalar context
-#   validate_email - requires valid email format (regex with @); harness generates random
-#                    strings that don't satisfy the format check; enum-like semantic
-#   validate_score - requires numeric value 0-100; schema says type:string (from SCALAR)
-#                    so harness generates random strings that fail the numeric regex check
-#   return_type    - getter returning undef until resolve_return_type() called; output
-#                    spec says string but freshly-constructed objects have return_type=undef
 my %no_fuzz = map { $_ => 1 } qw(
-	generate
-	DB::DB
-	get_data_section
-	new
-	merge
-	mutate
-	applies_to
-	absorb_legacy_output
-	calculate_age
-	add_evidence
-	classification
-	evidence
-	validate_email
-	validate_score
-	return_type
 );
 
 # Collect every .pm under lib/
