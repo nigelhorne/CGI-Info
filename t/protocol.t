@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::Most tests => 23;
-use lib 't/lib';
 use Test::Log::Abstraction;
 
 BEGIN {
