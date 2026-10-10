@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [main, master]
   schedule:
-    - cron: '15 5 15 * *'
+    - cron: "15 5 15 * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -69,6 +69,7 @@ jobs:
             test_name=$(basename "$config" .conf)
             fuzz-harness-generator "$config" > "t/fuzz/${test_name}_fuzz.t"
           done
+        shell: bash
 
       - name: Run generated fuzz tests
         run: |

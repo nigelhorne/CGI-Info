@@ -1,5 +1,4 @@
 ---
-
 # https://github.com/AtomLinter/atom-linter-perlcritic/blob/master/.circleci/config.yml
 
 # Couldn't automatically generate a config from your source code.
@@ -77,10 +76,10 @@ jobs:
       # Replace this with steps to deploy to users
       - run:
           name: deploy
-          command: '#e.g. ./deploy.sh'
+          command: "#e.g. ./deploy.sh"
       - run:
           name: found github actions config
-          command: ':'
+          command: ":"
 workflows:
   test:
     jobs:

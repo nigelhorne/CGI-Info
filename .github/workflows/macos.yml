@@ -7,9 +7,9 @@ permissions:
 on:
   push:
     branches:
-      - '*'
+      - "*"
     tags-ignore:
-      - '*'
+      - "*"
   pull_request:
 jobs:
   build:
@@ -20,8 +20,8 @@ jobs:
         os:
           - macos-14
           - macos-13
-          - macos-12
-        perl: ['5.38', '5.36', '5.34', '5.32', '5.30', '5.28', '5.22']
+          - macos-latest
+        perl: ["5.38", "5.36", "5.34", "5.32", "5.30", "5.28", "5.22"]
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -36,17 +36,17 @@ jobs:
           cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Devel::Cover::Report::Codecov Test::Harness
           cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
-      # - name: Run Tests
         # run: |
-          # cover -test
-          # cover -report codecov
-          # curl -Os https://uploader.codecov.io/latest/macos/codecov
-          # chmod +x codecov
-          # ./codecov -t ${{ secrets.CODECOV_TOKEN }}
+        # cover -test
+        # cover -report codecov
+        # curl -Os https://uploader.codecov.io/latest/macos/codecov
+        # chmod +x codecov
+        # ./codecov -t ${{ secrets.CODECOV_TOKEN }}
         # shell: bash
         # env:
-          # AUTHOR_TESTING: 1
-          # CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        # AUTHOR_TESTING: 1
+        # CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      # - name: Run Tests
       - name: Run Tests
         run: prove -l -b t
         shell: bash

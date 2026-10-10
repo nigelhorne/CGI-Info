@@ -2,7 +2,7 @@
 # Created by App::GHGen::PerlCustomizer
 name: Perl CI
 
-'on':
+"on":
   push:
     branches:
       - main
@@ -31,13 +31,13 @@ jobs:
           - macos-latest
           - windows-latest
         perl:
-          - '5.36'
-          - '5.38'
-          - '5.40'
-          - '5.42'
+          - "5.36"
+          - "5.38"
+          - "5.40"
+          - "5.42"
         exclude:
           - os: windows-latest
-            perl: '5.40'
+            perl: "5.40"
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     env:
       AUTOMATED_TESTING: 1
@@ -90,8 +90,8 @@ jobs:
       - name: Install DB_File, needed for a lot of CPAN modules
         if: runner.os == 'Linux'
         run: |
-           sudo apt update
-           sudo apt install libdb-dev libperl-dev
+          sudo apt update
+          sudo apt install libdb-dev libperl-dev
       - name: Install dependencies
         if: runner.os != 'Windows'
         shell: bash
