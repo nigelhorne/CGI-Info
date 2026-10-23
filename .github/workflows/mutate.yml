@@ -65,6 +65,7 @@ jobs:
           AUTOMATED_TESTING: 1
           NO_NETWORK_TESTING: 1
           NONINTERACTIVE_TESTING: 1
+          INPUTS_FULL: ${{ inputs.full }}
         run: |
           if [ -n "$MUTATION_BASE_SHA" ]; then
             BASE_SHA_FLAG="--base_sha $MUTATION_BASE_SHA"
@@ -93,7 +94,7 @@ jobs:
             # The monthly run, and a run requested with "full", mutate
             # everything: --changed_only on a commit that did not touch
             # lib/ generates no mutants and reports a vacuous 100%.
-            if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.full }}" = "true" ]; then
+            if [ "${{ github.event_name }}" = "schedule" ] || [ "$INPUTS_FULL" = "true" ]; then
               CHANGED_FLAG=""
               BASE_SHA_FLAG=""
             else
