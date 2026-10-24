@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 ## Version
 
-Version 1.15
+Version 1.16
 
 ## Synopsis
 
