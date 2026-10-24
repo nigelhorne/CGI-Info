@@ -30,6 +30,10 @@ use namespace::clean;
 # Module-level constants -- avoids magic numbers scattered through the code
 # ---------------------------------------------------------------------------
 Readonly my $MAX_UPLOAD_SIZE_DEFAULT => 512 * 1024;	# 512 KB default upload cap
+Readonly my $MAX_PARAMS_DEFAULT       => 1000;		# Maximum number of input parameters
+Readonly my $MAX_PARTS_DEFAULT        => 100;		# Maximum number of multipart parts
+Readonly my $MAX_PART_HEADERS_DEFAULT => 20;		# Maximum header lines per multipart part
+Readonly my $MAX_NESTING_DEPTH_DEFAULT => 8;		# Maximum [] nesting in parameter names
 Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
 Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
 
@@ -132,8 +136,9 @@ it is another layer and every little helps.
 
 Creates a CGI::Info object.
 
-It takes four optional arguments: allow, logger, expect and upload_dir,
-which are documented in the params() method.
+It takes optional arguments allow, logger and upload_dir,
+which are documented in the params() method, plus the request-complexity
+limits documented below.
 
 It takes other optional parameters:
 
@@ -188,6 +193,46 @@ The maximum file size in bytes you can upload.
 Use C<-1> for no limit.
 The default is 512 KB (524288 bytes).
 
+=item * C<max_body_size>
+
+The maximum number of bytes read from a POST body.
+This is checked against C<CONTENT_LENGTH> before anything is read and
+against any pre-populated body, so it caps the raw request rather than
+the parsed parameter values.
+Use C<-1> for no limit.
+When omitted it falls back to C<max_upload_size>, preserving the historical
+512 KB default.
+
+=item * C<max_params>
+
+The maximum number of parameters accepted from one request.
+The check is made on the raw key=value pairs before decoding, so it also
+bounds the amount of work done by the parser.
+Use C<0> to reject every parameter and C<-1> for no limit.
+The default is 1000.
+
+=item * C<max_parts>
+
+The maximum number of parts in a C<multipart/form-data> body.
+Use C<0> to reject every part and C<-1> for no limit.
+The default is 100.
+
+=item * C<max_part_headers>
+
+The maximum number of header lines allowed in one C<multipart/form-data>
+part, including C<Content-Disposition> and C<Content-Type>.
+Use C<0> to reject any part with headers and C<-1> for no limit.
+The default is 20.
+
+=item * C<max_nesting_depth>
+
+The maximum depth of square-bracket nesting in a parameter name, for
+example C<a[b][c]> has a depth of 2.
+This applies to URL-encoded, JSON and multipart parameter names, not to
+values.
+Use C<0> to reject any bracketed name and C<-1> for no limit.
+The default is 8.
+
 =back
 
 The class can be configured at runtime using environment variables and configuration
@@ -206,6 +251,11 @@ use L<Carp>.  For more information see L<Object::Configure>.
     config_dirs    => { type => 'arrayref', optional => 1 },
     config_file    => { type => 'string',   optional => 1 },
     logger         => { type => 'object',   optional => 1 },
+    max_body_size  => { type => 'integer',  optional => 1, min => -1 },
+    max_nesting_depth => { type => 'integer', optional => 1, min => -1 },
+    max_params     => { type => 'integer',  optional => 1, min => -1 },
+    max_part_headers => { type => 'integer', optional => 1, min => -1 },
+    max_parts      => { type => 'integer',  optional => 1, min => -1 },
     max_upload_size=> { type => 'integer',  optional => 1, min => -1 },
     upload_dir     => { type => 'string',   optional => 1 },
   }
@@ -313,9 +363,14 @@ sub new
 
 	# Return the blessed object with sensible defaults
 	return bless {
-		max_upload_size => $MAX_UPLOAD_SIZE_DEFAULT,
-		allow           => undef,
-		upload_dir      => undef,
+		max_upload_size    => $MAX_UPLOAD_SIZE_DEFAULT,
+		max_body_size      => undef,	# Falls back to max_upload_size
+		max_params         => $MAX_PARAMS_DEFAULT,
+		max_parts          => $MAX_PARTS_DEFAULT,
+		max_part_headers   => $MAX_PART_HEADERS_DEFAULT,
+		max_nesting_depth  => $MAX_NESTING_DEPTH_DEFAULT,
+		allow              => undef,
+		upload_dir         => undef,
 		%{$params}	# Caller-supplied args override the defaults above
 	}, $class;
 }
@@ -609,7 +664,10 @@ separated string.
 
 The returned hash value can be passed into L<CGI::Untaint>.
 
-Takes four optional parameters: allow, logger and upload_dir.
+Takes the optional parameters allow, logger and upload_dir.
+The request-complexity limits (C<max_body_size>, C<max_params>, C<max_parts>,
+C<max_part_headers> and C<max_nesting_depth>) are set on the constructor or
+in the configuration file, not per call.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
@@ -698,6 +756,12 @@ mustleak and directory traversals,
 thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layers.
 
+The request-complexity limits (C<max_body_size>, C<max_params>, C<max_parts>,
+C<max_part_headers> and C<max_nesting_depth>) are applied before parameter
+decoding and, for multipart bodies, while the body is parsed.
+A request that exceeds one of them causes C<params()> to return undef
+and sets the HTTP status to 413 (Payload Too Large).
+
 =head3 Validation Subroutine Support
 
 The C<allow> parameter accepts subroutine references for dynamic validation,
@@ -744,6 +808,47 @@ Advanced features:
     }
 =cut
 
+# The effective raw-body limit.  max_body_size is optional so that existing
+# callers keep the historical max_upload_size behaviour when they do not set it.
+sub _body_limit :Protected {
+	my $self = shift;
+
+	return $self->{max_body_size} if defined($self->{max_body_size});
+	return $self->{max_upload_size};
+}
+
+# A negative limit means "unlimited"; the comparison is deliberately inclusive
+# so that a body or parameter count exactly at the limit is accepted.
+sub _over_limit :Protected {
+	my ($self, $value, $limit) = @_;
+
+	return 0 unless defined($limit);
+	return 0 if($limit < 0);
+	return $value > $limit;
+}
+
+# Maximum depth of square-bracket nesting in a parameter name:
+# a[b][c] is 2, as is a[b[c]].  Counting opening brackets treats sibling
+# groups as successive levels, which is how form-to-array names are used.
+sub _param_nesting_depth :Protected {
+	my ($self, $key) = @_;
+
+	my $depth = () = $key =~ /\[/g;
+	return $depth;
+}
+
+# Record a complexity rejection once, set the status and log it.  The private
+# flag lets callers such as _multipart_data() abort a nested parse and have
+# params() stop without confusing an empty result with a successful parse.
+sub _reject_complexity :Protected {
+	my ($self, $what) = @_;
+
+	$self->{_limit_exceeded} = 1;
+	$self->status(413);
+	$self->_warn("Request complexity limit exceeded: $what");
+	return;
+}
+
 sub params {
 	my $self = shift;
 
@@ -763,6 +868,8 @@ sub params {
 		$self->set_logger($params->{'logger'});
 	}
 	$self->_trace('Entering params');
+
+	delete $self->{_limit_exceeded};
 
 	my @pairs;
 	my $content_type = $ENV{'CONTENT_TYPE'};
@@ -815,9 +922,20 @@ sub params {
 			$self->{status} = 411;
 			return;
 		}
-		if(($self->{max_upload_size} >= 0) && ($content_length > $self->{max_upload_size})) {	# Set maximum posts
+		my $body_limit = $self->_body_limit();
+		if($self->_over_limit($content_length, $body_limit)) {
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
+			$self->{status} = 413;
+			$self->_warn('Large upload prohibited');
+			return;
+		}
+		if(($self->{max_upload_size} >= 0) && ($content_length > $self->{max_upload_size})) {	# Set maximum posts
+			$self->{status} = 413;
+			$self->_warn('Large upload prohibited');
+			return;
+		}
+		if(defined($stdin_data) && $self->_over_limit(length($stdin_data), $body_limit)) {
 			$self->{status} = 413;
 			$self->_warn('Large upload prohibited');
 			return;
@@ -895,6 +1013,7 @@ sub params {
 					length => $content_length,
 					boundary => $1
 				});
+				return if($self->{_limit_exceeded});
 			}
 		} elsif($content_type =~ /text\/xml/i) {
 			my $buffer;
@@ -969,6 +1088,11 @@ sub params {
 		});
 	}
 
+	if($self->_over_limit(scalar(@pairs), $self->{max_params})) {
+		$self->_reject_complexity("more than $self->{max_params} parameters");
+		return;
+	}
+
 	unless(scalar @pairs) {
 		return;
 	}
@@ -996,6 +1120,11 @@ sub params {
 			$value =~ s/%00//g;   # Strip literal %00
 		} else {
 			$value = '';
+		}
+
+		if($self->_over_limit($self->_param_nesting_depth($key), $self->{max_nesting_depth})) {
+			$self->_reject_complexity("parameter name nesting deeper than $self->{max_nesting_depth}");
+			return;
 		}
 
 		$key = _sanitise_input($key);
@@ -1329,11 +1458,20 @@ sub _multipart_data :Protected {
 	}
 
 	unless($stdin_data) {
-		while(<STDIN>) {
-			chop(my $line = $_);
-			$line =~ s/[\r\n]//g;
-			$stdin_data .= "$line\n";
+		# Read no more than the declared body length.  The old line loop read
+		# until EOF, which ignored CONTENT_LENGTH and could grow without bound
+		# if the server passed more bytes than the declared request body.
+		my $buffer = '';
+		my $remaining = $total_bytes;
+		while($remaining > 0) {
+			my $chunk;
+			my $got = read(STDIN, $chunk, $remaining);
+			last unless(defined($got) && ($got > 0));
+			$buffer .= $chunk;
+			$remaining -= $got;
 		}
+		$buffer =~ s/\r//g;
+		$stdin_data = $buffer;
 		if(!$stdin_data) {
 			return;
 		}
@@ -1347,12 +1485,20 @@ sub _multipart_data :Protected {
 	my $value;
 	my $in_header = 0;
 	my $fout;
+	my $part_count = 0;
+	my $header_count = 0;
 
 	foreach my $line(split(/\n/, $stdin_data)) {
 		if($line =~ /^--\Q$boundary\E--$/) {
 			last;
 		}
 		if($line =~ /^--\Q$boundary\E$/) {
+			$part_count++;
+			if($self->_over_limit($part_count, $self->{max_parts})) {
+				close $fout if($writing_file);
+				$self->_reject_complexity("more than $self->{max_parts} multipart parts");
+				return;
+			}
 			if($writing_file) {
 				close $fout;
 				$writing_file = 0;
@@ -1361,36 +1507,50 @@ sub _multipart_data :Protected {
 				$value = undef;
 			}
 			$in_header = 1;
+			$header_count = 0;
 		} elsif($in_header) {
 			if(length($line) == 0) {
 				$in_header = 0;
-			} elsif($line =~ /^Content-Disposition: (.+)/i) {
-				my $field = $1;
-				if($field =~ /name="(.+?)"/) {
-					$key = $1;
+			} else {
+				$header_count++;
+				if($self->_over_limit($header_count, $self->{max_part_headers})) {
+					close $fout if($writing_file);
+					$self->_reject_complexity("more than $self->{max_part_headers} headers in a multipart part");
+					return;
 				}
-				# [^"]+ instead of .+ : stops at first '"' without backtracking,
-				# and cannot accidentally capture across the closing delimiter.
-				if($field =~ /filename="([^"]+)?"/) {
-					my $filename = $1;
-					unless(defined($filename)) {
-						$self->_warn('No upload filename given');
-					} elsif($filename =~ /[\\\/\|]/) {
-						$self->_warn("Disallowing invalid filename: $filename");
-					} else {
-						$filename = $self->_create_file_name({
-							filename => $filename
-						});
-
-						# Don't do this since it taints the string and I can't work out how to untaint it
-						# my $full_path = Cwd::realpath(File::Spec->catfile($self->{upload_dir}, $filename));
-						# $full_path =~ m/^(\/[\w\.]+)$/;
-						my $full_path = File::Spec->catfile($self->{upload_dir}, $filename);
-						unless(open($fout, '>', $full_path)) {
-							$self->_warn("Can't open $full_path");
+				if($line =~ /^Content-Disposition: (.+)/i) {
+					my $field = $1;
+					if($field =~ /name="(.+?)"/) {
+						$key = $1;
+						if($self->_over_limit($self->_param_nesting_depth($key), $self->{max_nesting_depth})) {
+							close $fout if($writing_file);
+							$self->_reject_complexity("parameter name nesting deeper than $self->{max_nesting_depth}");
+							return;
 						}
-						$writing_file = 1;
-						push(@pairs, "$key=$filename");
+					}
+					# [^"]+ instead of .+ : stops at first '"' without backtracking,
+					# and cannot accidentally capture across the closing delimiter.
+					if($field =~ /filename="([^"]+)?"/) {
+						my $filename = $1;
+						unless(defined($filename)) {
+							$self->_warn('No upload filename given');
+						} elsif($filename =~ /[\\\/\|]/) {
+							$self->_warn("Disallowing invalid filename: $filename");
+						} else {
+							$filename = $self->_create_file_name({
+								filename => $filename
+							});
+
+							# Don't do this since it taints the string and I can't work out how to untaint it
+							# my $full_path = Cwd::realpath(File::Spec->catfile($self->{upload_dir}, $filename));
+							# $full_path = m/^(\/[\w\.]+)$/;
+							my $full_path = File::Spec->catfile($self->{upload_dir}, $filename);
+							unless(open($fout, '>', $full_path)) {
+								$self->_warn("Can't open $full_path");
+							}
+							$writing_file = 1;
+							push(@pairs, "$key=$filename");
+						}
 					}
 				}
 			}

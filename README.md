@@ -60,8 +60,9 @@ my $id = $info->param('id');        # Validated against allow schema
 
 Creates a CGI::Info object.
 
-It takes four optional arguments: allow, logger, expect and upload\_dir,
-which are documented in the params() method.
+It takes optional arguments allow, logger and upload\_dir,
+which are documented in the params() method, plus the request-complexity
+limits documented below.
 
 It takes other optional parameters:
 
@@ -116,6 +117,46 @@ It takes other optional parameters:
     Use `-1` for no limit.
     The default is 512 KB (524288 bytes).
 
+- `max_body_size`
+
+    The maximum number of bytes read from a POST body.
+    This is checked against `CONTENT_LENGTH` before anything is read and
+    against any pre-populated body, so it caps the raw request rather than
+    the parsed parameter values.
+    Use `-1` for no limit.
+    When omitted it falls back to `max_upload_size`, preserving the historical
+    512 KB default.
+
+- `max_params`
+
+    The maximum number of parameters accepted from one request.
+    The check is made on the raw key=value pairs before decoding, so it also
+    bounds the amount of work done by the parser.
+    Use `0` to reject every parameter and `-1` for no limit.
+    The default is 1000.
+
+- `max_parts`
+
+    The maximum number of parts in a `multipart/form-data` body.
+    Use `0` to reject every part and `-1` for no limit.
+    The default is 100.
+
+- `max_part_headers`
+
+    The maximum number of header lines allowed in one `multipart/form-data`
+    part, including `Content-Disposition` and `Content-Type`.
+    Use `0` to reject any part with headers and `-1` for no limit.
+    The default is 20.
+
+- `max_nesting_depth`
+
+    The maximum depth of square-bracket nesting in a parameter name, for
+    example `a[b][c]` has a depth of 2.
+    This applies to URL-encoded, JSON and multipart parameter names, not to
+    values.
+    Use `0` to reject any bracketed name and `-1` for no limit.
+    The default is 8.
+
 The class can be configured at runtime using environment variables and configuration
 files; for example, setting `$ENV{'CGI__INFO__carp_on_warn'}` causes warnings to
 use [Carp](https://metacpan.org/pod/Carp).  For more information see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
@@ -133,6 +174,11 @@ use [Carp](https://metacpan.org/pod/Carp).  For more information see [Object::Co
   config_dirs    => { type => 'arrayref', optional => 1 },
   config_file    => { type => 'string',   optional => 1 },
   logger         => { type => 'object',   optional => 1 },
+  max_body_size  => { type => 'integer',  optional => 1, min => -1 },
+  max_nesting_depth => { type => 'integer', optional => 1, min => -1 },
+  max_params     => { type => 'integer',  optional => 1, min => -1 },
+  max_part_headers => { type => 'integer', optional => 1, min => -1 },
+  max_parts      => { type => 'integer',  optional => 1, min => -1 },
   max_upload_size=> { type => 'integer',  optional => 1, min => -1 },
   upload_dir     => { type => 'string',   optional => 1 },
 }
@@ -288,7 +334,10 @@ separated string.
 
 The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/pod/CGI%3A%3AUntaint).
 
-Takes four optional parameters: allow, logger and upload\_dir.
+Takes the optional parameters allow, logger and upload\_dir.
+The request-complexity limits (`max_body_size`, `max_params`, `max_parts`,
+`max_part_headers` and `max_nesting_depth`) are set on the constructor or
+in the configuration file, not per call.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
@@ -380,6 +429,12 @@ such as SQL and XSS injections,
 mustleak and directory traversals,
 thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layers.
+
+The request-complexity limits (`max_body_size`, `max_params`, `max_parts`,
+`max_part_headers` and `max_nesting_depth`) are applied before parameter
+decoding and, for multipart bodies, while the body is parsed.
+A request that exceeds one of them causes `params()` to return undef
+and sets the HTTP status to 413 (Payload Too Large).
 
 #### Validation Subroutine Support
 

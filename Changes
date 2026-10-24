@@ -1,6 +1,11 @@
 Revision history for CGI-Info
 
 1.16
+	[ Enhancements ]
+	- Add configurable request-complexity limits: max_body_size, max_params,
+	  max_parts, max_part_headers and max_nesting_depth. Exceeding one sets
+	  status 413 and makes params() return undef.
+
 	[ Tests ]
 	- Use Test::Log::Adapter
 	- Update to latest all_fuzz.t from App::Test::Generator
