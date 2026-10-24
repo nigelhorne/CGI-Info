@@ -209,8 +209,9 @@ When omitted it falls back to C<max_upload_size>, preserving the historical
 The maximum number of parameters accepted from one request.
 The check is made on the raw key=value pairs before decoding, so it also
 bounds the amount of work done by the parser.
-For XML bodies (C<text/xml> and C<application/xml>), this is the number of
-XML elements, including the root element.
+For XML bodies (C<text/xml>, C<application/xml> and structured
+C<application/*+xml> types such as C<application/soap+xml>), this is the
+number of XML elements, including the root element.
 Use C<0> to reject every parameter and C<-1> for no limit.
 The default is 1000.
 
@@ -233,8 +234,9 @@ The maximum depth of square-bracket nesting in a parameter name, for
 example C<a[b][c]> has a depth of 2.
 This applies to URL-encoded, JSON and multipart parameter names, not to
 values.
-For XML bodies (C<text/xml> and C<application/xml>), this is the XML element
-nesting depth, where the root element is depth 1.
+For XML bodies (C<text/xml>, C<application/xml> and structured
+C<application/*+xml> types such as C<application/soap+xml>), this is the XML
+element nesting depth, where the root element is depth 1.
 Use C<0> to reject any bracketed name (or any XML element) and C<-1> for no
 limit.
 The default is 8.
@@ -767,7 +769,8 @@ constructor.
 	}
 
 If the request is an XML request (i.e. the content type of the POST is
-text/xml or application/xml), CGI::Info will put the request into the params
+text/xml, application/xml or a structured application/*+xml type such as
+application/soap+xml), CGI::Info will put the request into the params
 element 'XML', thus:
 
 	use CGI::Info;
@@ -780,8 +783,11 @@ element 'XML', thus:
 Before returning the body, XML is checked against C<max_params> (the number
 of elements, including the root) and C<max_nesting_depth> (element depth,
 with the root at depth 1). Comments, CDATA sections and processing
-instructions are ignored. These are structural limits, not an XML parser;
-use a proper parser with entity expansion disabled for untrusted XML.
+instructions are ignored. A body containing a C<!DOCTYPE> or C<!ENTITY>
+declaration is rejected with status C<403> and C<params()> returns undef,
+because such declarations enable entity expansion and external entity
+attacks. These are structural checks, not an XML parser; use a proper parser
+with entity expansion disabled for untrusted XML.
 
 Carp if logger is not set and we detect something serious.
 
@@ -944,12 +950,15 @@ sub _xml_tag_end :Protected {
 # document.  Comments, CDATA sections and processing instructions are skipped.
 # The root element is at depth 1.  A self-closing element counts as one
 # element at depth + 1 but does not open a level for its siblings.
+# A DOCTYPE or ENTITY declaration is reported as forbidden: it enables entity
+# expansion and external entity attacks, so such a body is never returned.
 sub _xml_complexity :Protected {
 	my ($self, $xml) = @_;
 
 	my $elements = 0;
 	my $depth = 0;
 	my $max_depth = 0;
+	my $forbidden;
 	my $pos = 0;
 	my $length = length($xml);
 
@@ -975,6 +984,10 @@ sub _xml_complexity :Protected {
 		my $tag = substr($xml, $start + 1, $end - $start - 1);
 		$pos = $end + 1;
 
+		if($tag =~ /^\s*!\s*(DOCTYPE|ENTITY)\b/i) {
+			$forbidden = uc($1);
+		}
+
 		# Declarations, DOCTYPE declarations and processing instructions.
 		next if($tag =~ /^\s*[!?]/);
 
@@ -991,7 +1004,7 @@ sub _xml_complexity :Protected {
 		$depth = $element_depth unless($tag =~ m{/\s*$});
 	}
 
-	return { elements => $elements, depth => $max_depth };
+	return { elements => $elements, depth => $max_depth, forbidden => $forbidden };
 }
 
 # Identify the effective limits so a cached parameter set is only reused when
@@ -1208,7 +1221,7 @@ sub params {
 				});
 				return if($self->{_limit_exceeded});
 			}
-		} elsif($content_type =~ m{(?:text|application)/xml}i) {
+		} elsif($content_type =~ m{^\s*(?:(?:text|application)/xml|application/[^/;\s]+\+xml)\s*(?:;.*)?$}i) {
 			my $buffer;
 			if($stdin_data) {
 				$buffer = $stdin_data;
@@ -1222,6 +1235,11 @@ sub params {
 			}
 
 			my $complexity = $self->_xml_complexity($buffer);
+			if(defined($complexity->{forbidden})) {
+				$self->status(403);
+				$self->_warn("XML $complexity->{forbidden} declaration blocked");
+				return;
+			}
 			if($self->_over_limit($complexity->{elements}, $self->{max_params})) {
 				$self->_reject_complexity("more than $self->{max_params} XML elements");
 				return;

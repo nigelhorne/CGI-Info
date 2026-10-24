@@ -8,9 +8,12 @@ Revision history for CGI-Info
 	- Allow those limits to be overridden per params() call, individually or
 	  through a single limits hash-ref; the override applies only to that call
 	  and cannot be bypassed by a cached result.
-	- Apply max_params and max_nesting_depth to text/xml and application/xml
-	  bodies, counting XML elements and element nesting depth before returning
-	  the body.
+	- Apply max_params and max_nesting_depth to text/xml, application/xml and
+	  structured application/*+xml bodies (for example application/soap+xml),
+	  counting XML elements and element nesting depth before returning the
+	  body.
+	- Reject XML request bodies containing a DOCTYPE or ENTITY declaration,
+	  setting status 403 and making params() return undef.
 
 	[ Tests ]
 	- Use Test::Log::Adapter

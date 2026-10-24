@@ -132,6 +132,9 @@ It takes other optional parameters:
     The maximum number of parameters accepted from one request.
     The check is made on the raw key=value pairs before decoding, so it also
     bounds the amount of work done by the parser.
+    For XML bodies (`text/xml`, `application/xml` and structured
+    `application/*+xml` types such as `application/soap+xml`), this is the
+    number of XML elements, including the root element.
     Use `0` to reject every parameter and `-1` for no limit.
     The default is 1000.
 
@@ -154,7 +157,11 @@ It takes other optional parameters:
     example `a[b][c]` has a depth of 2.
     This applies to URL-encoded, JSON and multipart parameter names, not to
     values.
-    Use `0` to reject any bracketed name and `-1` for no limit.
+    For XML bodies (`text/xml`, `application/xml` and structured
+    `application/*+xml` types such as `application/soap+xml`), this is the XML
+    element nesting depth, where the root element is depth 1.
+    Use `0` to reject any bracketed name (or any XML element) and `-1` for no
+    limit.
     The default is 8.
 
 The class can be configured at runtime using environment variables and configuration
@@ -411,7 +418,8 @@ constructor.
 ```
 
 If the request is an XML request (i.e. the content type of the POST is
-text/xml or application/xml), CGI::Info will put the request into the params
+text/xml, application/xml or a structured application/*+xml type such as
+application/soap+xml), CGI::Info will put the request into the params
 element 'XML', thus:
 
 ```perl
@@ -422,6 +430,10 @@ element 'XML', thus:
     my $xml = $$paramsref{'XML'};
     # ... parse and process the XML request in $xml
 ```
+
+A request body containing a `<!DOCTYPE>` or `<!ENTITY>` declaration is
+rejected: `params()` returns undef and the status is set to 403.  Declarations
+inside comments and CDATA sections are ignored.
 
 Carp if logger is not set and we detect something serious.
 

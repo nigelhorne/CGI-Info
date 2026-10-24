@@ -484,6 +484,85 @@ subtest 'application/xml bodies use the XML path and limits' => sub {
 	is($info->status(), 413, 'too deeply nested application/xml returns 413');
 };
 
+subtest 'structured application/*+xml bodies use the XML path and limits' => sub {
+	my $xml = '<root><a><b/></a></root>';
+
+	foreach my $content_type ('application/soap+xml; charset=utf-8', 'application/atom+xml') {
+		my $parse = sub {
+			my %limits = @_;
+
+			local %ENV = (
+				GATEWAY_INTERFACE => 'CGI/1.1',
+				REQUEST_METHOD    => 'POST',
+				CONTENT_TYPE      => $content_type,
+				CONTENT_LENGTH    => length($xml),
+			);
+			CGI::Info->reset();
+			local *STDIN;
+			open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+			my $info = CGI::Info->new(%limits);
+			return ($info, eval { $info->params() });
+		};
+
+		my ($info, $params) = $parse->(max_params => 3, max_nesting_depth => 3);
+		ok(defined($params) && ($params->{XML} eq $xml), "$content_type body is stored under XML");
+		is($info->status(), 200, "valid $content_type leaves the status at 200");
+
+		($info, $params) = $parse->(max_params => 2);
+		ok(!defined($params), "$content_type over the element limit is rejected");
+		is($info->status(), 413, "too many $content_type elements returns 413");
+
+		($info, $params) = $parse->(max_nesting_depth => 2);
+		ok(!defined($params), "$content_type deeper than the limit is rejected");
+		is($info->status(), 413, "too deeply nested $content_type returns 413");
+	}
+};	subtest 'XML bodies with DOCTYPE or ENTITY declarations are rejected' => sub {
+	my $parse = sub {
+		my ($xml, $content_type) = @_;
+
+		local %ENV = (
+			GATEWAY_INTERFACE => 'CGI/1.1',
+			REQUEST_METHOD    => 'POST',
+			CONTENT_TYPE      => $content_type,
+			CONTENT_LENGTH    => length($xml),
+		);
+		CGI::Info->reset();
+		local *STDIN;
+		open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+		my $info = CGI::Info->new();
+		return ($info, eval { $info->params() });
+	};
+
+	my $plain = '<root><item>ok</item></root>';
+	my ($info, $params) = $parse->($plain, 'text/xml');
+	ok(defined($params) && ($params->{XML} eq $plain), 'XML without a declaration is accepted');
+	is($info->status(), 200, 'plain XML leaves the status at 200');
+
+	foreach my $content_type ('text/xml', 'application/xml', 'application/soap+xml') {
+		my $doctype = q{<?xml version="1.0"?><!DOCTYPE root SYSTEM "http://example.com/root.dtd"><root/>};
+		($info, $params) = $parse->($doctype, $content_type);
+		ok(!defined($params), "$content_type body with a DOCTYPE is rejected");
+		is($info->status(), 403, "$content_type DOCTYPE rejection returns 403");
+	}
+
+	my $entities = q{<!DOCTYPE root [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><root>&xxe;</root>};
+	($info, $params) = $parse->($entities, 'text/xml');
+	ok(!defined($params), 'an internal subset declaring an ENTITY is rejected');
+	is($info->status(), 403, 'ENTITY inside a DOCTYPE returns 403');
+
+	my $bare_entity = q{<!ENTITY xxe SYSTEM "file:///etc/passwd"><root/>};
+	($info, $params) = $parse->($bare_entity, 'application/xml');
+	ok(!defined($params), 'a bare ENTITY declaration is rejected');
+	is($info->status(), 403, 'bare ENTITY rejection returns 403');
+
+	my $commented = q{<root><!-- <!DOCTYPE x> --><![CDATA[<!ENTITY y>]]></root>};
+	($info, $params) = $parse->($commented, 'text/xml');
+	ok(defined($params) && ($params->{XML} eq $commented), 'declarations inside comments and CDATA are not treated as declarations');
+	is($info->status(), 200, 'comments and CDATA leave the status at 200');
+};
+
 subtest 'per-call limits must be integers' => sub {
 	local %ENV = (
 		GATEWAY_INTERFACE => 'CGI/1.1',
