@@ -9,6 +9,17 @@ use CGI::Info;
 
 END { CGI::Info->reset() }
 
+# local %ENV replaces the whole environment.  TMPDIR has to survive that, or
+# tmpdir() falls back to /tmp while upload_dir still points at the directory
+# tempdir() created, and params() rejects it as outside the temporary area.
+sub env_with_tmpdir {
+	my (%env) = @_;
+
+	$env{TMPDIR} = $ENV{TMPDIR} if defined($ENV{TMPDIR});
+
+	return %env;
+}
+
 sub multipart_body {
 	my ($boundary, @parts) = @_;
 
@@ -139,7 +150,7 @@ subtest 'multipart part count is capped' => sub {
 		"Content-Disposition: form-data; name=\"b\"\n\n2",
 	);
 
-	local %ENV = (
+	local %ENV = env_with_tmpdir(
 		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD    => 'POST',
 		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
@@ -161,7 +172,7 @@ subtest 'multipart header count per part is capped' => sub {
 		"Content-Disposition: form-data; name=\"a\"\nX-One: 1\nX-Two: 2\n\nvalue",
 	);
 
-	local %ENV = (
+	local %ENV = env_with_tmpdir(
 		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD    => 'POST',
 		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
@@ -183,7 +194,7 @@ subtest 'multipart nesting depth is capped' => sub {
 		"Content-Disposition: form-data; name=\"a[b][c]\"\n\nvalue",
 	);
 
-	local %ENV = (
+	local %ENV = env_with_tmpdir(
 		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD    => 'POST',
 		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
@@ -273,7 +284,7 @@ subtest 'limits hash applies to multipart parsing' => sub {
 		"Content-Disposition: form-data; name=\"b\"\n\n2",
 	);
 
-	local %ENV = (
+	local %ENV = env_with_tmpdir(
 		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD    => 'POST',
 		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
@@ -338,7 +349,7 @@ subtest 'per-call max_parts overrides the constructor' => sub {
 		"Content-Disposition: form-data; name=\"b\"\n\n2",
 	);
 
-	local %ENV = (
+	local %ENV = env_with_tmpdir(
 		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD    => 'POST',
 		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
@@ -361,7 +372,7 @@ subtest 'per-call max_part_headers overrides the constructor' => sub {
 		"Content-Disposition: form-data; name=\"a\"\nX-One: 1\nX-Two: 2\n\nvalue",
 	);
 
-	local %ENV = (
+	local %ENV = env_with_tmpdir(
 		GATEWAY_INTERFACE => 'CGI/1.1',
 		REQUEST_METHOD    => 'POST',
 		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
