@@ -209,6 +209,8 @@ When omitted it falls back to C<max_upload_size>, preserving the historical
 The maximum number of parameters accepted from one request.
 The check is made on the raw key=value pairs before decoding, so it also
 bounds the amount of work done by the parser.
+For C<text/xml> bodies, this is the number of XML elements, including the
+root element.
 Use C<0> to reject every parameter and C<-1> for no limit.
 The default is 1000.
 
@@ -231,7 +233,10 @@ The maximum depth of square-bracket nesting in a parameter name, for
 example C<a[b][c]> has a depth of 2.
 This applies to URL-encoded, JSON and multipart parameter names, not to
 values.
-Use C<0> to reject any bracketed name and C<-1> for no limit.
+For C<text/xml> bodies, this is the XML element nesting depth, where the
+root element is depth 1.
+Use C<0> to reject any bracketed name (or any XML element) and C<-1> for no
+limit.
 The default is 8.
 
 =back
@@ -771,6 +776,12 @@ CGI::Info will put the request into the params element 'XML', thus:
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
 
+Before returning the body, XML is checked against C<max_params> (the number
+of elements, including the root) and C<max_nesting_depth> (element depth,
+with the root at depth 1). Comments, CDATA sections and processing
+instructions are ignored. These are structural limits, not an XML parser;
+use a proper parser with entity expansion disabled for untrusted XML.
+
 Carp if logger is not set and we detect something serious.
 
 Blocks some attacks,
@@ -905,6 +916,81 @@ sub _param_nesting_depth :Protected {
 
 	my $depth = () = $key =~ /\[/g;
 	return $depth;
+}
+
+# Find the '>' that closes a tag, ignoring '>' inside quoted attribute values.
+sub _xml_tag_end :Protected {
+	my ($self, $xml, $pos) = @_;
+
+	my $length = length($xml);
+	my $quote;
+	while($pos < $length) {
+		my $char = substr($xml, $pos, 1);
+		if(defined($quote)) {
+			$quote = undef if($char eq $quote);
+		} elsif(($char eq '"') || ($char eq "'")) {
+			$quote = $char;
+		} elsif($char eq '>') {
+			return $pos;
+		}
+		$pos++;
+	}
+
+	return -1;
+}
+
+# Count XML elements and their maximum nesting depth without parsing the
+# document.  Comments, CDATA sections and processing instructions are skipped.
+# The root element is at depth 1.  A self-closing element counts as one
+# element at depth + 1 but does not open a level for its siblings.
+sub _xml_complexity :Protected {
+	my ($self, $xml) = @_;
+
+	my $elements = 0;
+	my $depth = 0;
+	my $max_depth = 0;
+	my $pos = 0;
+	my $length = length($xml);
+
+	while($pos < $length) {
+		my $start = index($xml, '<', $pos);
+		last if($start < 0);
+
+		if(substr($xml, $start, 4) eq '<!--') {
+			my $end = index($xml, '-->', $start + 4);
+			last if($end < 0);
+			$pos = $end + 3;
+			next;
+		}
+		if(substr($xml, $start, 9) eq '<![CDATA[') {
+			my $end = index($xml, ']]>', $start + 9);
+			last if($end < 0);
+			$pos = $end + 3;
+			next;
+		}
+
+		my $end = $self->_xml_tag_end($xml, $start + 1);
+		last if($end < 0);
+		my $tag = substr($xml, $start + 1, $end - $start - 1);
+		$pos = $end + 1;
+
+		# Declarations, DOCTYPE declarations and processing instructions.
+		next if($tag =~ /^\s*[!?]/);
+
+		if($tag =~ m{^/\s*[A-Za-z_][\w.:-]*\s*$}) {
+			$depth-- if($depth > 0);
+			next;
+		}
+
+		next unless($tag =~ m{^\s*[A-Za-z_][\w.:-]*});
+		$elements++;
+
+		my $element_depth = $depth + 1;
+		$max_depth = $element_depth if($element_depth > $max_depth);
+		$depth = $element_depth unless($tag =~ m{/\s*$});
+	}
+
+	return { elements => $elements, depth => $max_depth };
 }
 
 # Identify the effective limits so a cached parameter set is only reused when
@@ -1132,6 +1218,16 @@ sub params {
 					});
 				}
 				$stdin_data = $buffer;
+			}
+
+			my $complexity = $self->_xml_complexity($buffer);
+			if($self->_over_limit($complexity->{elements}, $self->{max_params})) {
+				$self->_reject_complexity("more than $self->{max_params} XML elements");
+				return;
+			}
+			if($self->_over_limit($complexity->{depth}, $self->{max_nesting_depth})) {
+				$self->_reject_complexity("XML nesting deeper than $self->{max_nesting_depth}");
+				return;
 			}
 
 			$FORM{XML} = $buffer;

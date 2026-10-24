@@ -378,6 +378,79 @@ subtest 'per-call max_part_headers overrides the constructor' => sub {
 	is($info->{max_part_headers}, 10, 'per-call max_part_headers does not change the instance');
 };
 
+subtest 'XML element count is capped' => sub {
+	my $xml = '<root><a>1</a><b>2</b></root>';
+
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'text/xml; charset=utf-8',
+		CONTENT_LENGTH    => length($xml),
+	);
+	CGI::Info->reset();
+	local *STDIN;
+	open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+	my $info = CGI::Info->new(max_params => 3);
+	my $params = eval { $info->params() };
+	ok(defined($params) && ($params->{XML} eq $xml), 'XML at the element limit is accepted');
+
+	my $strict = CGI::Info->new(max_params => 2);
+	$params = eval { $strict->params() };
+	ok(!defined($params), 'XML over the element limit is rejected');
+	is($strict->status(), 413, 'too many XML elements returns 413');
+};
+
+subtest 'XML nesting depth is capped' => sub {
+	my $xml = '<root><a><b/></a></root>';
+
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'text/xml; charset=utf-8',
+		CONTENT_LENGTH    => length($xml),
+	);
+	CGI::Info->reset();
+	local *STDIN;
+	open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+	my $info = CGI::Info->new(max_nesting_depth => 3);
+	my $params = eval { $info->params() };
+	ok(defined($params) && ($params->{XML} eq $xml), 'XML at the nesting limit is accepted');
+
+	my $strict = CGI::Info->new(max_nesting_depth => 2);
+	$params = eval { $strict->params() };
+	ok(!defined($params), 'XML deeper than the limit is rejected');
+	is($strict->status(), 413, 'too deeply nested XML returns 413');
+};
+
+subtest 'XML complexity ignores declarations, comments, CDATA and quoted >' => sub {
+	my $xml = q{<?xml version="1.0"?>}
+		. q{<root note="1 > 0">}
+		. q{<!-- <fake><deep> -->}
+		. q{<![CDATA[<fake>]]>}
+		. q{<item/>}
+		. q{</root>};
+
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'text/xml',
+		CONTENT_LENGTH    => length($xml),
+	);
+	CGI::Info->reset();
+	local *STDIN;
+	open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+	my $info = CGI::Info->new(max_params => 2, max_nesting_depth => 2);
+	my $params = eval { $info->params() };
+	ok(defined($params) && ($params->{XML} eq $xml), 'non-element markup does not count towards the limits');
+
+	$params = eval { $info->params(limits => { max_params => 1 }) };
+	ok(!defined($params), 'per-call limits apply to XML bodies');
+	is($info->status(), 413, 'XML limits hash rejection returns 413');
+};
+
 subtest 'per-call limits must be integers' => sub {
 	local %ENV = (
 		GATEWAY_INTERFACE => 'CGI/1.1',
