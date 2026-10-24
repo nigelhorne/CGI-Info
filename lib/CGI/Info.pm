@@ -789,6 +789,14 @@ C<..> is judged by where it really is, and a sibling that merely shares a name
 prefix with a temporary area is not accepted.
 C<%XX> escapes are decoded first, so an encoded spelling of a path is judged
 like its decoded form.
+On Windows both C</> and C<\> separate directories, and that is applied after
+decoding, so an encoded C<%5C> cannot hide a C<..> traversal either.
+Two Windows spellings are refused because they cannot be checked against a
+temporary area by comparing strings: a drive-relative path such as C<C:uploads>
+(and a bare C<C:>), which starts at the current directory on that drive rather
+than at its root, and an 8.3 short name such as C<PROGRA~1>, which is an alias
+for a long name that only the filesystem can expand.
+Pass a long, absolute path instead.
 The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
@@ -1334,6 +1342,14 @@ sub params {
 				delete $self->{_limits_key};
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't writeable"
+				});
+				$self->status(500);
+				delete $self->{upload_dir};
+				return;
+			}
+			if(my $problem = $self->_win32_path_problem($self->{'upload_dir'})) {
+				$self->_warn({
+					warning => 'upload_dir ' . $self->{'upload_dir'} . " $problem, so it can't be checked against the temporary areas"
 				});
 				$self->status(500);
 				delete $self->{upload_dir};
@@ -2264,14 +2280,18 @@ sub tmpdir {
 # Lexical tidy-up shared by the audit key and the upload directory check:
 # decode %XX, collapse repeated slashes and resolve '.' and '..' segments
 # without touching the filesystem.  A leading slash is preserved for absolute
-# paths; an empty result means the path had no usable segments.
+# paths; an empty result means the path had no usable segments.  With
+# $windows set, backslashes are separators too, and are translated after
+# decoding so that an encoded '%5C' cannot hide a traversal from the segment
+# resolution.
 sub _tidy_path :Protected {
-	my ($self, $path) = @_;
+	my ($self, $path, $windows) = @_;
 
 	return unless defined($path);
 
 	# Decoding first means '%2e%2e' is treated like '..' and '%2F' like '/'.
 	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	$path =~ tr{\\}{/} if($windows);
 	$path =~ s{/+}{/}g;
 
 	my $absolute = ($path =~ m{\A/}) ? 1 : 0;
@@ -2292,7 +2312,8 @@ sub _tidy_path :Protected {
 # Canonicalise a path for comparison: resolve '.' and '..' and symlinks when
 # the path exists (so '/tmp/../etc' cannot masquerade as '/tmp/...'), then
 # apply the lexical tidy-up above.  Decoding there means an encoded spelling of
-# a temporary path is judged like its decoded form.
+# a temporary path is judged like its decoded form, and on Windows both
+# separator kinds are resolved, including an encoded '%5C'.
 sub _temp_path :Protected {
 	my $self = shift;
 	my $path = shift;
@@ -2302,10 +2323,41 @@ sub _temp_path :Protected {
 		my $real = Cwd::abs_path($path);
 		$path = $real if(defined($real) && length($real));
 	}
-	$path =~ tr{\\}{/};
-	$path = lc($path) if($^O eq 'MSWin32');
+	my $windows = ($^O eq 'MSWin32');
+	$path = lc($path) if($windows);
 
-	return $self->_tidy_path($path);
+	return $self->_tidy_path($path, $windows);
+}
+
+# Windows spellings that cannot be checked by comparing strings.  A
+# drive-relative path (C:foo) starts from the per-drive current directory
+# rather than from the drive root, so it can point anywhere; and an 8.3 short
+# name (PROGRA~1) is an alias for a long name that cannot be expanded without
+# asking the filesystem.  Both are refused rather than guessed at, so
+# upload_dir is always judged by an unambiguous path.  A tilde that is not
+# followed by digits is an ordinary character, not an alias.
+sub _win32_path_problem :Protected {
+	my ($self, $dir) = @_;
+
+	return unless(defined($dir) && ($^O eq 'MSWin32'));
+
+	my $path = $dir;
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	$path =~ tr{\\}{/};
+
+	# 'C:foo', and a bare 'C:', are relative to the working directory on that
+	# drive, unlike 'C:/foo'.
+	if($path =~ m{\A[A-Za-z]:(?!/)}) {
+		return "is relative to the current directory on its drive";
+	}
+
+	foreach my $segment (split(m{/}, $path, -1)) {
+		if($segment =~ m{\A[^~]*~\d{1,6}(?:\.[^.]*)?\z}) {
+			return "uses the 8.3 short name '$segment'";
+		}
+	}
+
+	return;
 }
 
 # The directories that count as temporary work areas for upload_dir.
@@ -2345,6 +2397,8 @@ sub _temp_areas :Protected {
 sub _in_temp_area :Protected {
 	my ($self, $dir) = @_;
 
+	return if($self->_win32_path_problem($dir));
+
 	my $path = $self->_temp_path($dir);
 	return unless defined($path);
 
@@ -2365,6 +2419,8 @@ sub _in_temp_area :Protected {
 # directory was rejected rather than calling it "not in a temporary area".
 sub _temp_area_root :Protected {
 	my ($self, $dir) = @_;
+
+	return if($self->_win32_path_problem($dir));
 
 	my $path = $self->_temp_path($dir);
 	return unless defined($path);

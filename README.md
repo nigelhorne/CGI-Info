@@ -137,17 +137,21 @@ It takes other optional parameters:
     warning reports how many were suppressed, so a frequently polled feed does
     not hide its traffic while still not writing a line per request.
     Set this to `0` to log every accepted declaration.
-    The limit is per process and per request path, so separate feeds keep
-    separate budgets; the path comes from `PATH_INFO`, then `SCRIPT_NAME`, then
-    the path part of `REQUEST_URI`, and is normalised lexically: query strings
-    are dropped, `%XX` escapes decoded, repeated slashes collapsed and
-    `.`/`..` segments removed, so `/feed/a`, `/feed/a/`, `/feed//a` and
-    `/feed/%61` share one budget.
-    It is not per object, so it also applies when a persistent handler (such as
-    mod\_perl, FastCGI or PSGI) creates a new object for every request, and
-    `reset()` does not clear it.
-    At most 100 paths are tracked, after which the table is cleared (which can
-    produce one extra warning per feed).
+
+    The limit is per process and per request path, so the warnings for
+    `/feed/a` and `/feed/b` are counted separately and one busy feed does not
+    silence another.
+    The path is taken from `PATH_INFO`, falling back to `SCRIPT_NAME` and then
+    to the path part of `REQUEST_URI`, and normalised lexically: the query string
+    is dropped, `%XX` escapes are decoded, repeated slashes are collapsed and
+    `.` and `..` segments are resolved, so the usual spellings of one feed
+    (`/feed/a`, `/feed/a/`, `/feed//a`, `/feed/%61`) share a single budget
+    instead of splitting it.
+    The limiter is not per object, so it also applies when a persistent handler
+    (such as mod\_perl, FastCGI or PSGI) creates a new object for every request,
+    and `reset()` does not clear it.
+    At most 100 paths are tracked at once; when that many are in use the table is
+    cleared, which can produce one extra warning per feed.
     It is a constructor, configuration file or environment
     (`CGI__Info__dtd_warning_interval`) setting.
 
@@ -436,7 +440,7 @@ on macOS any directory below `/var/folders`.
 This matters because a web server usually does not export `TMPDIR`, so
 ["tmpdir"](#tmpdir) can point somewhere different from the platform's temporary tree.
 
-It has to be a directory *inside* an area, not the area root itself: `/tmp`
+It has to be a directory _inside_ an area, not the area root itself: `/tmp`
 and the like are shared and world-writable, so pass a subdirectory created for
 the application instead.
 The test is made against the resolved path, so a directory reached through
@@ -444,6 +448,14 @@ The test is made against the resolved path, so a directory reached through
 prefix with a temporary area is not accepted.
 `%XX` escapes are decoded first, so an encoded spelling of a path is judged
 like its decoded form.
+On Windows both `/` and `\` separate directories, and that is applied after
+decoding, so an encoded `%5C` cannot hide a `..` traversal either.
+Two Windows spellings are refused because they cannot be checked against a
+temporary area by comparing strings: a drive-relative path such as `C:uploads`
+(and a bare `C:`), which starts at the current directory on that drive rather
+than at its root, and an 8.3 short name such as `PROGRA~1`, which is an alias
+for a long name that only the filesystem can expand.
+Pass a long, absolute path instead.
 The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
@@ -521,11 +533,8 @@ declaration is rejected with status `403` and `params()` returns undef,
 because such declarations enable entity expansion and external entity
 attacks. Pass `allow_dtd => 1` to the constructor to accept them for a
 trusted feed; each accepted declaration is still logged as a warning, so the
-exception is recorded. Those warnings are rate limited to at most one per
-`dtd_warning_interval` seconds per request path (default 60, `0` logs every
-occurrence), and the next warning reports how many declarations were accepted
-without being logged for that path. These are structural checks, not an XML
-parser; use a proper parser with entity expansion disabled for untrusted XML.
+exception is recorded. These are structural checks, not an XML parser; use a
+proper parser with entity expansion disabled for untrusted XML.
 
 Carp if logger is not set and we detect something serious.
 

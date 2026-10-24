@@ -31,9 +31,13 @@ Revision history for CGI-Info
 	  rejected with a 500.  The check now compares resolved paths, so '..'
 	  cannot escape the temporary area and a sibling that only shares a name
 	  prefix no longer matches; %XX escapes are decoded first, so an encoded
-	  spelling is judged like its decoded form.  The root of a temporary area,
-	  such as /tmp itself, is now rejected: upload_dir has to be a directory
-	  inside the area.
+	  spelling is judged like its decoded form.  On Windows backslashes are
+	  translated after that decoding, so an encoded %5C cannot hide a '..'
+	  traversal from the area check.  A drive-relative path (C:uploads) or an
+	  8.3 short name (PROGRA~1) is refused with a 500, because neither can be
+	  checked against the temporary areas by comparing strings.  The root of a
+	  temporary area, such as /tmp itself, is now rejected: upload_dir has to
+	  be a directory inside the area.
 
 	[ Tests ]
 	- Use Test::Log::Adapter
