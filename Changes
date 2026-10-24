@@ -13,7 +13,8 @@ Revision history for CGI-Info
 	  counting XML elements and element nesting depth before returning the
 	  body.
 	- Reject XML request bodies containing a DOCTYPE or ENTITY declaration,
-	  setting status 403 and making params() return undef.
+	  setting status 403 and making params() return undef.  The new allow_dtd
+	  constructor option accepts such bodies for trusted feeds.
 
 	[ Tests ]
 	- Use Test::Log::Adapter

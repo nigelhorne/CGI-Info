@@ -117,6 +117,20 @@ It takes other optional parameters:
     Use `-1` for no limit.
     The default is 512 KB (524288 bytes).
 
+- `allow_dtd`
+
+    When false (the default), an XML request body containing a `<!DOCTYPE>` or
+    `<!ENTITY>` declaration is rejected before it is returned: `params()`
+    returns undef and the status is set to `403`.
+    Set this to a true value to accept such bodies, for example when parsing a
+    trusted feed that ships its own DTD.
+    Entity expansion and external entity resolution are then the caller's
+    responsibility: parse the body with a proper XML parser that has entity
+    expansion disabled.
+    This is a constructor, configuration file or environment
+    (`CGI__Info__allow_dtd`) setting; it cannot be overridden per `params()`
+    call.
+
 - `max_body_size`
 
     The maximum number of bytes read from a POST body.
@@ -175,6 +189,7 @@ use [Carp](https://metacpan.org/pod/Carp).  For more information see [Object::Co
 ```perl
 {
   allow          => { type => 'hashref',  optional => 1 },
+  allow_dtd      => { type => 'boolean',  optional => 1 },
   auto_load      => { type => 'boolean',  optional => 1 },
   cache          => { type => 'object',   optional => 1 },
   carp_on_warn   => { type => 'boolean',  optional => 1 },
@@ -344,7 +359,11 @@ The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/p
 Takes the optional parameters allow, logger and upload\_dir.
 The request-complexity limits (`max_body_size`, `max_params`, `max_parts`,
 `max_part_headers` and `max_nesting_depth`) are set on the constructor or
-in the configuration file, not per call.
+in the configuration file, and can also be tightened or relaxed for a single
+call (see the `params()` documentation for the `limits` hash and the
+individual arguments).
+`allow_dtd` is a constructor or configuration setting only; it is not a
+complexity limit.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
@@ -433,7 +452,8 @@ element 'XML', thus:
 
 A request body containing a `<!DOCTYPE>` or `<!ENTITY>` declaration is
 rejected: `params()` returns undef and the status is set to 403.  Declarations
-inside comments and CDATA sections are ignored.
+inside comments and CDATA sections are ignored.  Pass `allow_dtd => 1` to the
+constructor to accept them for a trusted feed.
 
 Carp if logger is not set and we detect something serious.
 

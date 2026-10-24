@@ -528,7 +528,9 @@ subtest 'structured application/*+xml bodies use the XML path and limits' => sub
 		ok(!defined($params), "$content_type deeper than the limit is rejected");
 		is($info->status(), 413, "too deeply nested $content_type returns 413");
 	}
-};	subtest 'XML bodies with DOCTYPE or ENTITY declarations are rejected' => sub {
+};
+
+subtest 'XML bodies with DOCTYPE or ENTITY declarations are rejected' => sub {
 	my $parse = sub {
 		my ($xml, $content_type) = @_;
 
@@ -572,6 +574,50 @@ subtest 'structured application/*+xml bodies use the XML path and limits' => sub
 	($info, $params) = $parse->($commented, 'text/xml');
 	ok(defined($params) && ($params->{XML} eq $commented), 'declarations inside comments and CDATA are not treated as declarations');
 	is($info->status(), 200, 'comments and CDATA leave the status at 200');
+};
+
+subtest 'allow_dtd accepts DOCTYPE and ENTITY declarations' => sub {
+	my $parse = sub {
+		my ($xml, %args) = @_;
+
+		local %ENV = (
+			GATEWAY_INTERFACE => 'CGI/1.1',
+			REQUEST_METHOD    => 'POST',
+			CONTENT_TYPE      => 'text/xml',
+			CONTENT_LENGTH    => length($xml),
+			$args{'env'} ? %{$args{'env'}} : (),
+		);
+		delete $args{'env'};
+		CGI::Info->reset();
+		local *STDIN;
+		open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+		my $info = CGI::Info->new(%args);
+		return ($info, eval { $info->params() });
+	};
+
+	my $doctype = q{<?xml version="1.0"?><!DOCTYPE root SYSTEM "http://example.com/root.dtd"><root><item>ok</item></root>};
+	my ($info, $params) = $parse->($doctype, allow_dtd => 1);
+	ok(defined($params) && ($params->{XML} eq $doctype), 'allow_dtd keeps a body with a DOCTYPE');
+	is($info->status(), 200, 'allow_dtd leaves the status at 200');
+
+	my $entities = q{<!DOCTYPE root [<!ENTITY greet "hi">]><root>&greet;</root>};
+	($info, $params) = $parse->($entities, allow_dtd => 1);
+	ok(defined($params) && ($params->{XML} eq $entities), 'allow_dtd keeps an internal ENTITY subset');
+	is($info->status(), 200, 'an internal subset with allow_dtd leaves the status at 200');
+
+	($info, $params) = $parse->($doctype);
+	ok(!defined($params), 'allow_dtd defaults to off');
+	is($info->status(), 403, 'a DOCTYPE without allow_dtd is still rejected');
+
+	($info, $params) = $parse->($doctype, env => { CGI__Info__allow_dtd => 1 });
+	ok(defined($params) && ($params->{XML} eq $doctype), 'allow_dtd can be set from the environment');
+	is($info->status(), 200, 'environment-configured allow_dtd leaves the status at 200');
+
+	my $many = q{<!DOCTYPE root SYSTEM "root.dtd"><root><a/><b/></root>};
+	($info, $params) = $parse->($many, allow_dtd => 1, max_params => 2);
+	ok(!defined($params), 'allow_dtd does not relax the element count');
+	is($info->status(), 413, 'complexity limits still apply with allow_dtd');
 };
 
 subtest 'per-call limits must be integers' => sub {

@@ -188,6 +188,20 @@ An object that is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
+=item * C<allow_dtd>
+
+When false (the default), an XML request body containing a C<!DOCTYPE> or
+C<!ENTITY> declaration is rejected before it is returned: C<params()>
+returns undef and the status is set to C<403>.
+Set this to a true value to accept such bodies, for example when parsing a
+trusted feed that ships its own DTD.
+Entity expansion and external entity resolution are then the caller's
+responsibility: parse the body with a proper XML parser that has entity
+expansion disabled.
+This is a constructor, configuration file or environment
+(C<CGI__Info__allow_dtd>) setting; it cannot be overridden per C<params()>
+call.
+
 =item * C<max_upload_size>
 
 The maximum file size in bytes you can upload.
@@ -256,6 +270,7 @@ use L<Carp>.  For more information see L<Object::Configure>.
 
   {
     allow          => { type => 'hashref',  optional => 1 },
+    allow_dtd      => { type => 'boolean',  optional => 1 },
     auto_load      => { type => 'boolean',  optional => 1 },
     cache          => { type => 'object',   optional => 1 },
     carp_on_warn   => { type => 'boolean',  optional => 1 },
@@ -376,6 +391,7 @@ sub new
 	# Return the blessed object with sensible defaults
 	return bless {
 		max_upload_size    => $MAX_UPLOAD_SIZE_DEFAULT,
+		allow_dtd          => 0,		# Reject DOCTYPE/ENTITY declarations unless asked
 		max_body_size      => undef,	# Falls back to max_upload_size
 		max_params         => $MAX_PARAMS_DEFAULT,
 		max_parts          => $MAX_PARTS_DEFAULT,
@@ -786,8 +802,9 @@ with the root at depth 1). Comments, CDATA sections and processing
 instructions are ignored. A body containing a C<!DOCTYPE> or C<!ENTITY>
 declaration is rejected with status C<403> and C<params()> returns undef,
 because such declarations enable entity expansion and external entity
-attacks. These are structural checks, not an XML parser; use a proper parser
-with entity expansion disabled for untrusted XML.
+attacks. Pass C<< allow_dtd => 1 >> to the constructor to accept them for a
+trusted feed. These are structural checks, not an XML parser; use a proper
+parser with entity expansion disabled for untrusted XML.
 
 Carp if logger is not set and we detect something serious.
 
@@ -951,7 +968,8 @@ sub _xml_tag_end :Protected {
 # The root element is at depth 1.  A self-closing element counts as one
 # element at depth + 1 but does not open a level for its siblings.
 # A DOCTYPE or ENTITY declaration is reported as forbidden: it enables entity
-# expansion and external entity attacks, so such a body is never returned.
+# expansion and external entity attacks, so such a body is rejected unless the
+# caller opted in with allow_dtd.
 sub _xml_complexity :Protected {
 	my ($self, $xml) = @_;
 
@@ -1235,7 +1253,7 @@ sub params {
 			}
 
 			my $complexity = $self->_xml_complexity($buffer);
-			if(defined($complexity->{forbidden})) {
+			if(defined($complexity->{forbidden}) && (!$self->{allow_dtd})) {
 				$self->status(403);
 				$self->_warn("XML $complexity->{forbidden} declaration blocked");
 				return;
