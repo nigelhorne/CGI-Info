@@ -139,7 +139,10 @@ It takes other optional parameters:
     Set this to `0` to log every accepted declaration.
     The limit is per process and per request path, so separate feeds keep
     separate budgets; the path comes from `PATH_INFO`, then `SCRIPT_NAME`, then
-    the path part of `REQUEST_URI`, with the query string ignored.
+    the path part of `REQUEST_URI`, and is normalised lexically: query strings
+    are dropped, `%XX` escapes decoded, repeated slashes collapsed and
+    `.`/`..` segments removed, so `/feed/a`, `/feed/a/`, `/feed//a` and
+    `/feed/%61` share one budget.
     It is not per object, so it also applies when a persistent handler (such as
     mod\_perl, FastCGI or PSGI) creates a new object for every request, and
     `reset()` does not clear it.
@@ -433,9 +436,14 @@ on macOS any directory below `/var/folders`.
 This matters because a web server usually does not export `TMPDIR`, so
 ["tmpdir"](#tmpdir) can point somewhere different from the platform's temporary tree.
 
+It has to be a directory *inside* an area, not the area root itself: `/tmp`
+and the like are shared and world-writable, so pass a subdirectory created for
+the application instead.
 The test is made against the resolved path, so a directory reached through
 `..` is judged by where it really is, and a sibling that merely shares a name
 prefix with a temporary area is not accepted.
+`%XX` escapes are decoded first, so an encoded spelling of a path is judged
+like its decoded form.
 The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
@@ -513,8 +521,11 @@ declaration is rejected with status `403` and `params()` returns undef,
 because such declarations enable entity expansion and external entity
 attacks. Pass `allow_dtd => 1` to the constructor to accept them for a
 trusted feed; each accepted declaration is still logged as a warning, so the
-exception is recorded. These are structural checks, not an XML parser; use a
-proper parser with entity expansion disabled for untrusted XML.
+exception is recorded. Those warnings are rate limited to at most one per
+`dtd_warning_interval` seconds per request path (default 60, `0` logs every
+occurrence), and the next warning reports how many declarations were accepted
+without being logged for that path. These are structural checks, not an XML
+parser; use a proper parser with entity expansion disabled for untrusted XML.
 
 Carp if logger is not set and we detect something serious.
 

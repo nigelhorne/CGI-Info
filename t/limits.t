@@ -667,11 +667,29 @@ subtest 'allow_dtd audit warning is rate limited per request path' => sub {
 		qr/DOCTYPE declaration allowed by allow_dtd \(1 earlier declaration not logged\)/,
 		'the next warning reports how many declarations were suppressed for that path');
 
+	# Spellings of the same feed must share its budget, not split it.
+	foreach my $variant ('/feed/a/', '/feed//a', '/feed/./a', '/feed/b/../a', '/feed/a?t=1',
+		'/feed/%61', '/feed/a%2F', '/feed/b/%2e%2e/a') {
+		($info, $params) = parse_xml_request($doctype, allow_dtd => 1, env => { PATH_INFO => $variant });
+		unlike($info->messages_as_string(), qr/allowed by allow_dtd/,
+			"PATH_INFO of $variant shares the /feed/a budget");
+	}
+	is_deeply([sort keys %CGI::Info::DTD_WARNING_STATE], ['/feed/a', '/feed/b'],
+		'path variants are stored under one key');
+
 	parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0, %feed_a);
 	my ($second, $second_params) = parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0, %feed_a);
 	ok(defined($second_params), 'the declaration is accepted with the limit disabled');
 	like($second->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
 		'an interval of 0 logs every accepted declaration');
+
+	# The key comes from the request, so the table of paths must stay bounded.
+	for my $n (1 .. 101) {
+		parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0,
+			env => { PATH_INFO => "/feed/$n" });
+	}
+	cmp_ok(scalar(keys %CGI::Info::DTD_WARNING_STATE), '<=', 100,
+		'the number of tracked request paths is capped');
 };
 
 subtest 'per-call limits must be integers' => sub {

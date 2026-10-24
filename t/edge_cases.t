@@ -1491,6 +1491,68 @@ subtest 'upload_dir: system temp area accepted when tmpdir() points elsewhere' =
     is_deeply($p, { a => '1' }, 'multipart body parsed');
 };
 
+# The temporary area root itself is too shared and world-writable to be an
+# upload directory, so it must be rejected like any other non-temp path.
+subtest 'upload_dir: temporary area root rejected with 500' => sub {
+    plan skip_all => 'POSIX temporary directories only' if $^O eq 'MSWin32';
+
+    reset_env();
+    my $info = CGI::Info->new();
+    my $root = File::Spec->tmpdir();
+
+    SKIP: {
+        skip "$root is not a writable temporary area root", 4
+            unless (-d $root) && (-w $root) && $info->_temp_area_root($root);
+
+        $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+        $ENV{REQUEST_METHOD}    = 'POST';
+        $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+        $ENV{CONTENT_LENGTH}    = 100;
+        $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+        my $p = eval { $info->params(upload_dir => $root) };
+        ok(!$@, 'does not die on the temporary area root');
+        is($info->status(), 500, 'the temporary area root is rejected with 500');
+        ok(!defined($p), 'no parameters are returned for the area root');
+        like($info->messages_as_string(), qr/is the temporary area root/,
+            'the warning explains that the area root is not allowed');
+    }
+};
+
+# An upload_dir whose name looks like an escaped traversal is judged by its
+# decoded path, even though the literal directory exists and is writable.
+subtest 'upload_dir: encoded traversal rejected when the literal directory exists' => sub {
+    plan skip_all => 'POSIX path semantics only' if $^O eq 'MSWin32';
+
+    reset_env();
+    my $base = tempdir(CLEANUP => 1);
+
+    # A single directory whose name decodes to enough '..' segments to reach
+    # /etc from anywhere under the temporary tree.
+    my $escaped = File::Spec->catdir($base, ('%2e%2e%2f' x 15) . 'etc');
+    mkdir $escaped or die "Can't create $escaped: $!";
+
+    my $probe = CGI::Info->new();
+    ok(-d $escaped, 'the literal directory exists');
+    is($probe->_temp_path($escaped), '/etc', 'the name decodes to /etc');
+
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+    $ENV{CONTENT_LENGTH}    = 100;
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new(upload_dir => $escaped);
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on an encoded traversal');
+    is($info->status(), 500, 'the encoded traversal is rejected with 500');
+    ok(!defined($p), 'no parameters are returned');
+    like($info->messages_as_string(), qr/isn't in a temporary area/,
+        'the warning says the decoded path is outside the temporary areas');
+
+    rmdir $escaped;
+};
+
 # The area test must not be fooled by the root, by '..', or by a name that
 # merely shares a prefix with a temporary directory.
 subtest 'temp-area check rejects the root and cannot be escaped with ..' => sub {
@@ -1500,11 +1562,23 @@ subtest 'temp-area check rejects the root and cannot be escaped with ..' => sub 
     ok(!$info->_in_temp_area('/'), 'filesystem root is not a temporary area');
 
     SKIP: {
-        skip 'POSIX path semantics only', 2 if $^O eq 'MSWin32';
+        skip 'POSIX path semantics only', 4 if $^O eq 'MSWin32';
 
         my $tmp     = $info->tmpdir();
         my $escaped = File::Spec->catdir($tmp, ('..') x 20, 'etc');
         ok(!$info->_in_temp_area($escaped), "'..' cannot escape the temporary area");
+        ok(!$info->_in_temp_area($tmp), 'a temporary area root is not inside itself');
+
+        # An encoded spelling of the same directory is judged like the literal
+        # one, the same way the DOCTYPE audit key is normalised.
+        my $last = substr($tmp, -1);
+        if(ord($last) > 127) {
+            pass('percent-encoded paths skipped for a non-ASCII temp path');
+        } else {
+            my $encoded = substr($tmp, 0, -1) . sprintf('%%%02X', ord($last));
+            is($info->_temp_path($encoded), $info->_temp_path($tmp),
+                'a percent-encoded path is resolved like its decoded form');
+        }
 
         # '/tmpfoo' shares the name prefix of '/tmp' but is not inside it.
         my $sibling = File::Spec->catdir(File::Spec->rootdir(), 'tmp') . 'foo';

@@ -16,9 +16,13 @@ Revision history for CGI-Info
 	  setting status 403 and making params() return undef.  The new allow_dtd
 	  constructor option accepts such bodies for trusted feeds, and logs a
 	  warning naming the declaration.  The new dtd_warning_interval option
-	  (default 60 seconds, 0 for every occurrence) rate limits that warning per
-	  process and reports how many declarations were suppressed, so a polled
-	  feed does not flood the log.
+	  (default 60 seconds, 0 for every occurrence) rate limits that warning,
+	  separately for each request path, and reports how many declarations were
+	  suppressed for it, so a polled feed does not flood the log or silence a
+	  different XML endpoint served by the same process.  Paths are normalised
+	  (query string dropped, %XX decoded, repeated slashes collapsed, '.' and
+	  '..' segments resolved), so the usual spellings of one feed share a
+	  single budget.
 
 	[ Bug fixes ]
 	- upload_dir is accepted anywhere in a temporary area, not just below
@@ -26,7 +30,10 @@ Revision history for CGI-Info
 	  the platform's own temporary tree (e.g. /var/folders/... on macOS) was
 	  rejected with a 500.  The check now compares resolved paths, so '..'
 	  cannot escape the temporary area and a sibling that only shares a name
-	  prefix no longer matches.
+	  prefix no longer matches; %XX escapes are decoded first, so an encoded
+	  spelling is judged like its decoded form.  The root of a temporary area,
+	  such as /tmp itself, is now rejected: upload_dir has to be a directory
+	  inside the area.
 
 	[ Tests ]
 	- Use Test::Log::Adapter

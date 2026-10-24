@@ -222,8 +222,11 @@ The limit is per process and per request path, so the warnings for
 F</feed/a> and F</feed/b> are counted separately and one busy feed does not
 silence another.
 The path is taken from C<PATH_INFO>, falling back to C<SCRIPT_NAME> and then
-to the path part of C<REQUEST_URI>; the query string is ignored, so it cannot
-be used to split one feed's budget.
+to the path part of C<REQUEST_URI>, and normalised lexically: the query string
+is dropped, C<%XX> escapes are decoded, repeated slashes are collapsed and
+C<.> and C<..> segments are resolved, so the usual spellings of one feed
+(F</feed/a>, F</feed/a/>, F</feed//a>, F</feed/%61>) share a single budget
+instead of splitting it.
 The limiter is not per object, so it also applies when a persistent handler
 (such as mod_perl, FastCGI or PSGI) creates a new object for every request,
 and C<reset()> does not clear it.
@@ -778,9 +781,14 @@ on macOS any directory below F</var/folders>.
 This matters because a web server usually does not export C<TMPDIR>, so
 L</tmpdir> can point somewhere different from the platform's temporary tree.
 
+It has to be a directory I<inside> an area, not the area root itself: C</tmp>
+and the like are shared and world-writable, so pass a subdirectory created for
+the application instead.
 The test is made against the resolved path, so a directory reached through
 C<..> is judged by where it really is, and a sibling that merely shares a name
 prefix with a temporary area is not accepted.
+C<%XX> escapes are decoded first, so an encoded spelling of a path is judged
+like its decoded form.
 The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
@@ -1104,16 +1112,23 @@ sub _reject_complexity :Protected {
 }
 
 # The feed an audit warning belongs to.  This is the request path, so two XML
-# endpoints served by one process each get their own warning budget; the query
-# string is deliberately ignored so a client cannot fragment the budget.
+# endpoints served by one process each get their own warning budget.  The path
+# is normalised lexically -- query string dropped, %XX decoded, repeated
+# slashes collapsed and '.' or '..' segments resolved -- so the usual spellings
+# of one feed share its budget instead of letting a client fragment it.
+# Nothing is looked up on disk: these are URL paths, not files.
 sub _dtd_audit_key :Protected {
 	my $self = shift;
 
 	foreach my $var (qw(PATH_INFO SCRIPT_NAME REQUEST_URI)) {
 		my $path = $ENV{$var};
 		next unless(defined($path) && length($path));
-		$path =~ s/\?.*//s if($var eq 'REQUEST_URI');
-		return $path;
+
+		$path =~ s/\?.*//s;
+
+		my $key = $self->_tidy_path($path);
+		next unless(defined($key) && length($key));
+		return $key;
 	}
 
 	return '';
@@ -1325,9 +1340,12 @@ sub params {
 				return;
 			}
 			if(!$self->_in_temp_area($self->{'upload_dir'})) {
+				my $root = $self->_temp_area_root($self->{'upload_dir'});
 				$self->_warn({
-					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't in a temporary area ("
-						. join(', ', $self->_temp_areas()) . ')'
+					warning => defined($root)
+						? 'upload_dir ' . $self->{'upload_dir'} . " is the temporary area root $root, not a directory inside it"
+						: 'upload_dir ' . $self->{'upload_dir'} . " isn't in a temporary area ("
+							. join(', ', $self->_temp_areas()) . ')'
 				});
 				$self->status(500);
 				delete $self->{upload_dir};
@@ -2243,9 +2261,38 @@ sub tmpdir {
 	return $params->{default} ? $params->{default} : File::Spec->tmpdir();
 }
 
+# Lexical tidy-up shared by the audit key and the upload directory check:
+# decode %XX, collapse repeated slashes and resolve '.' and '..' segments
+# without touching the filesystem.  A leading slash is preserved for absolute
+# paths; an empty result means the path had no usable segments.
+sub _tidy_path :Protected {
+	my ($self, $path) = @_;
+
+	return unless defined($path);
+
+	# Decoding first means '%2e%2e' is treated like '..' and '%2F' like '/'.
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	$path =~ s{/+}{/}g;
+
+	my $absolute = ($path =~ m{\A/}) ? 1 : 0;
+	my @segments;
+	foreach my $segment (split(m{/}, $path, -1)) {
+		next if(($segment eq '') || ($segment eq '.'));
+		if($segment eq '..') {
+			pop(@segments);
+			next;
+		}
+		push(@segments, $segment);
+	}
+
+	my $normalised = join('/', @segments);
+	return $absolute ? "/$normalised" : $normalised;
+}
+
 # Canonicalise a path for comparison: resolve '.' and '..' and symlinks when
-# the path exists (so '/tmp/../etc' cannot masquerade as '/tmp/...'), strip a
-# trailing slash, and fold case and separators on Windows.
+# the path exists (so '/tmp/../etc' cannot masquerade as '/tmp/...'), then
+# apply the lexical tidy-up above.  Decoding there means an encoded spelling of
+# a temporary path is judged like its decoded form.
 sub _temp_path :Protected {
 	my $self = shift;
 	my $path = shift;
@@ -2257,9 +2304,8 @@ sub _temp_path :Protected {
 	}
 	$path =~ tr{\\}{/};
 	$path = lc($path) if($^O eq 'MSWin32');
-	$path =~ s{(?<=.)/+\z}{};
 
-	return $path;
+	return $self->_tidy_path($path);
 }
 
 # The directories that count as temporary work areas for upload_dir.
@@ -2290,16 +2336,40 @@ sub _temp_areas :Protected {
 		map { $self->_temp_path($_) } @areas;
 }
 
-# Is $dir inside one of the temporary areas?  Compared on canonical paths and
-# on directory boundaries, so '/tmpfoo' is not accepted for '/tmp'.
+# Is $dir a directory inside one of the temporary areas?  Compared on
+# canonical paths and on directory boundaries, so '/tmpfoo' is not accepted
+# for '/tmp'.  The root of an area is not accepted either: those directories
+# are shared and world-writable, while an upload directory should be one the
+# operator created for this application.  That applies even when the area is
+# itself nested in another one, such as a TMPDIR of /tmp/1234.
 sub _in_temp_area :Protected {
 	my ($self, $dir) = @_;
 
 	my $path = $self->_temp_path($dir);
 	return unless defined($path);
-	foreach my $area ($self->_temp_areas()) {
-		return 1 if($path eq $area);
+
+	my @areas = $self->_temp_areas();
+	# An area root is never an upload directory, even when it sits inside
+	# another area (a TMPDIR of /tmp/1234, for example).
+	foreach my $area (@areas) {
+		return if($path eq $area);
+	}
+	foreach my $area (@areas) {
 		return 1 if(index($path, "$area/") == 0);
+	}
+
+	return;
+}
+
+# The temporary area whose root $dir is, if any.  Used to explain why such a
+# directory was rejected rather than calling it "not in a temporary area".
+sub _temp_area_root :Protected {
+	my ($self, $dir) = @_;
+
+	my $path = $self->_temp_path($dir);
+	return unless defined($path);
+	foreach my $area ($self->_temp_areas()) {
+		return $area if($path eq $area);
 	}
 
 	return;
