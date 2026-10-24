@@ -9,6 +9,7 @@ use 5.010;	# Minimum version for features used here
 # Core modules
 use boolean;
 use Carp;
+use Cwd ();
 use Readonly;
 use Scalar::Util;
 use Socket;	# AF_INET constant
@@ -34,6 +35,8 @@ Readonly my $MAX_PARAMS_DEFAULT       => 1000;		# Maximum number of input parame
 Readonly my $MAX_PARTS_DEFAULT        => 100;		# Maximum number of multipart parts
 Readonly my $MAX_PART_HEADERS_DEFAULT => 20;		# Maximum header lines per multipart part
 Readonly my $MAX_NESTING_DEPTH_DEFAULT => 8;		# Maximum [] nesting in parameter names
+Readonly my $DTD_WARNING_INTERVAL_DEFAULT => 60;	# Seconds between allow_dtd audit warnings
+Readonly my $DTD_WARNING_MAX_KEYS => 100;		# Request paths tracked by that limiter
 Readonly my @COMPLEXITY_LIMITS      => qw(max_body_size max_params max_parts max_part_headers max_nesting_depth);
 Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
 Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
@@ -198,9 +201,27 @@ trusted feed that ships its own DTD.
 Entity expansion and external entity resolution are then the caller's
 responsibility: parse the body with a proper XML parser that has entity
 expansion disabled.
+Every body accepted under this option is logged as a warning naming the
+declaration, so use of the exception is visible in the audit trail; see
+C<dtd_warning_interval> for how those warnings are rate limited.
 This is a constructor, configuration file or environment
 (C<CGI__Info__allow_dtd>) setting; it cannot be overridden per C<params()>
 call.
+
+=item * C<dtd_warning_interval>
+
+The minimum number of seconds between audit warnings for XML bodies accepted
+because of C<allow_dtd>.
+The default is 60.
+Declarations that are accepted but not logged are counted, and the next
+warning reports how many were suppressed, so a frequently polled feed does
+not hide its traffic while still not writing a line per request.
+Set this to C<0> to log every accepted declaration.
+The limit is per process, not per object, so it also applies when a
+persistent handler (such as mod_perl, FastCGI or PSGI) creates a new object
+for every request.
+It is a constructor, configuration file or environment
+(C<CGI__Info__dtd_warning_interval>) setting.
 
 =item * C<max_upload_size>
 
@@ -276,6 +297,7 @@ use L<Carp>.  For more information see L<Object::Configure>.
     carp_on_warn   => { type => 'boolean',  optional => 1 },
     config_dirs    => { type => 'arrayref', optional => 1 },
     config_file    => { type => 'string',   optional => 1 },
+    dtd_warning_interval => { type => 'integer', optional => 1, min => 0 },
     logger         => { type => 'object',   optional => 1 },
     max_body_size  => { type => 'integer',  optional => 1, min => -1 },
     max_nesting_depth => { type => 'integer', optional => 1, min => -1 },
@@ -319,6 +341,14 @@ B<Action>: replace C<expect =E<gt> [...]> with C<allow =E<gt> { key =E<gt> qr/..
 
 our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
+
+# Rate limiter for the allow_dtd audit warning, keyed by request path so that
+# different XML endpoints do not share one warning budget.  Process-wide rather
+# than per object: a persistent handler (mod_perl, FastCGI, PSGI) creates a new
+# object for each request while sharing one log, and reset() must not defeat
+# the limit.
+#   $DTD_WARNING_STATE{$path} = { last => <time>, suppressed => <count> }
+our %DTD_WARNING_STATE = ();
 
 sub new
 {
@@ -392,6 +422,7 @@ sub new
 	return bless {
 		max_upload_size    => $MAX_UPLOAD_SIZE_DEFAULT,
 		allow_dtd          => 0,		# Reject DOCTYPE/ENTITY declarations unless asked
+		dtd_warning_interval => $DTD_WARNING_INTERVAL_DEFAULT,	# Rate-limit its audit warning
 		max_body_size      => undef,	# Falls back to max_upload_size
 		max_params         => $MAX_PARAMS_DEFAULT,
 		max_parts          => $MAX_PARTS_DEFAULT,
@@ -731,7 +762,17 @@ This is useful to help to block attacks on your site.
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
-It must be a writeable directory in the temporary area.
+It must be a writeable directory inside a temporary area: the directory
+returned by L</tmpdir>, a classic system temporary directory such as F</tmp>,
+F</var/tmp> or F</usr/tmp>, the area named by C<TMPDIR>, C<TEMP> or C<TMP>, or
+on macOS any directory below F</var/folders>.
+This matters because a web server usually does not export C<TMPDIR>, so
+L</tmpdir> can point somewhere different from the platform's temporary tree.
+
+The test is made against the resolved path, so a directory reached through
+C<..> is judged by where it really is, and a sibling that merely shares a name
+prefix with a temporary area is not accepted.
+The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
@@ -803,8 +844,9 @@ instructions are ignored. A body containing a C<!DOCTYPE> or C<!ENTITY>
 declaration is rejected with status C<403> and C<params()> returns undef,
 because such declarations enable entity expansion and external entity
 attacks. Pass C<< allow_dtd => 1 >> to the constructor to accept them for a
-trusted feed. These are structural checks, not an XML parser; use a proper
-parser with entity expansion disabled for untrusted XML.
+trusted feed; each accepted declaration is still logged as a warning, so the
+exception is recorded. These are structural checks, not an XML parser; use a
+proper parser with entity expansion disabled for untrusted XML.
 
 Carp if logger is not set and we detect something serious.
 
@@ -1052,6 +1094,56 @@ sub _reject_complexity :Protected {
 	return;
 }
 
+# The feed an audit warning belongs to.  This is the request path, so two XML
+# endpoints served by one process each get their own warning budget; the query
+# string is deliberately ignored so a client cannot fragment the budget.
+sub _dtd_audit_key :Protected {
+	my $self = shift;
+
+	foreach my $var (qw(PATH_INFO SCRIPT_NAME REQUEST_URI)) {
+		my $path = $ENV{$var};
+		next unless(defined($path) && length($path));
+		$path =~ s/\?.*//s if($var eq 'REQUEST_URI');
+		return $path;
+	}
+
+	return '';
+}
+
+# Log that allow_dtd let a DOCTYPE/ENTITY declaration through, at most once per
+# dtd_warning_interval seconds per request path.  A trusted feed that is polled
+# continuously would otherwise write one warning per request; the number of
+# declarations accepted for that feed but not logged is reported by its next
+# warning.  An interval of 0 (or less) logs every occurrence.
+sub _audit_allowed_dtd :Protected {
+	my ($self, $declaration) = @_;
+
+	my $interval = $self->{dtd_warning_interval};
+	$interval = $DTD_WARNING_INTERVAL_DEFAULT unless defined($interval);
+
+	my $key = $self->_dtd_audit_key();
+	# The key comes from the request path, so cap the table: a server that sees
+	# an unbounded number of paths must not accumulate entries forever.
+	%DTD_WARNING_STATE = () if(scalar(keys %DTD_WARNING_STATE) >= $DTD_WARNING_MAX_KEYS);
+
+	my $now = time();
+	my $state = $DTD_WARNING_STATE{$key};
+	if(($interval > 0) && defined($state) && $state->{last} && (($now - $state->{last}) < $interval)) {
+		$state->{suppressed}++;
+		return;
+	}
+
+	my $suppressed = defined($state) ? $state->{suppressed} : 0;
+	$DTD_WARNING_STATE{$key} = { last => $now, suppressed => 0 };
+
+	my $earlier = $suppressed
+		? " ($suppressed earlier declaration" . (($suppressed == 1) ? '' : 's') . ' not logged)'
+		: '';
+	$self->_warn("XML $declaration declaration allowed by allow_dtd$earlier");
+
+	return;
+}
+
 sub params {
 	my $self = shift;
 
@@ -1223,10 +1315,10 @@ sub params {
 				delete $self->{upload_dir};
 				return;
 			}
-			my $tmpdir = $self->tmpdir();
-			if($self->{'upload_dir'} !~ /^\Q$tmpdir\E/) {
+			if(!$self->_in_temp_area($self->{'upload_dir'})) {
 				$self->_warn({
-					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't somewhere in the temporary area $tmpdir"
+					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't in a temporary area ("
+						. join(', ', $self->_temp_areas()) . ')'
 				});
 				$self->status(500);
 				delete $self->{upload_dir};
@@ -1253,10 +1345,15 @@ sub params {
 			}
 
 			my $complexity = $self->_xml_complexity($buffer);
-			if(defined($complexity->{forbidden}) && (!$self->{allow_dtd})) {
-				$self->status(403);
-				$self->_warn("XML $complexity->{forbidden} declaration blocked");
-				return;
+			if(defined($complexity->{forbidden})) {
+				if(!$self->{allow_dtd}) {
+					$self->status(403);
+					$self->_warn("XML $complexity->{forbidden} declaration blocked");
+					return;
+				}
+				# Audit trail: a DTD is only ever accepted because the caller
+				# opted in, so record that the exception was used.
+				$self->_audit_allowed_dtd($complexity->{forbidden});
 			}
 			if($self->_over_limit($complexity->{elements}, $self->{max_params})) {
 				$self->_reject_complexity("more than $self->{max_params} XML elements");
@@ -2135,6 +2232,68 @@ sub tmpdir {
 		croak(ref($self), ': tmpdir must be given a scalar');
 	}
 	return $params->{default} ? $params->{default} : File::Spec->tmpdir();
+}
+
+# Canonicalise a path for comparison: resolve '.' and '..' and symlinks when
+# the path exists (so '/tmp/../etc' cannot masquerade as '/tmp/...'), strip a
+# trailing slash, and fold case and separators on Windows.
+sub _temp_path :Protected {
+	my $self = shift;
+	my $path = shift;
+
+	return unless(defined($path) && length($path));
+	if(-d $path) {
+		my $real = Cwd::abs_path($path);
+		$path = $real if(defined($real) && length($real));
+	}
+	$path =~ tr{\\}{/};
+	$path = lc($path) if($^O eq 'MSWin32');
+	$path =~ s{(?<=.)/+\z}{};
+
+	return $path;
+}
+
+# The directories that count as temporary work areas for upload_dir.
+# tmpdir() on its own is not enough: a web server normally does not export
+# TMPDIR, so a directory that an operator created interactively in the
+# platform's own temporary tree (for example /var/folders/... on macOS) would
+# not be recognised and every upload would fail with a 500.  The classic
+# system temp directories and the TMPDIR/TEMP/TMP overrides are accepted too.
+sub _temp_areas :Protected {
+	my $self = shift;
+
+	my @areas = ($self->tmpdir(), File::Spec->tmpdir());
+	push(@areas, @ENV{qw(TMPDIR TEMP TMP)});
+	if($^O eq 'MSWin32') {
+		push(@areas, map { File::Spec->catdir($_, 'Temp') } grep { defined($_) } @ENV{qw(SYSTEMROOT WINDIR)});
+	} elsif($^O eq 'darwin') {
+		# Core Perl has no confstr(_CS_DARWIN_USER_TEMP_DIR), but the whole of
+		# /var/folders is the per-user temporary tree.
+		push(@areas, '/var/folders', '/private/var/folders');
+	} else {
+		push(@areas, qw(/tmp /var/tmp /usr/tmp));
+	}
+
+	my %seen;
+	# The filesystem root is never a temporary area: accepting it would defeat
+	# the point of the check.
+	return grep { defined($_) && (length($_) > 1) && !$seen{$_}++ }
+		map { $self->_temp_path($_) } @areas;
+}
+
+# Is $dir inside one of the temporary areas?  Compared on canonical paths and
+# on directory boundaries, so '/tmpfoo' is not accepted for '/tmp'.
+sub _in_temp_area :Protected {
+	my ($self, $dir) = @_;
+
+	my $path = $self->_temp_path($dir);
+	return unless defined($path);
+	foreach my $area ($self->_temp_areas()) {
+		return 1 if($path eq $area);
+		return 1 if(index($path, "$area/") == 0);
+	}
+
+	return;
 }
 
 =head2 rootdir

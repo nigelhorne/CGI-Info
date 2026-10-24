@@ -1449,6 +1449,69 @@ subtest 'upload_dir: file path (not a dir) rejected with 500' => sub {
     is($info->status(), 500, 'upload_dir pointing to a file rejected with 500');
 };
 
+# A web server usually does not export TMPDIR, so tmpdir() can point somewhere
+# other than the platform's temporary tree where the operator created the
+# upload directory.  Such a directory must still be accepted.
+subtest 'upload_dir: system temp area accepted when tmpdir() points elsewhere' => sub {
+    plan skip_all => 'POSIX temporary directories only' if $^O eq 'MSWin32';
+
+    # A classic system temporary directory.  This is not necessarily what
+    # tmpdir() reports, especially once TMPDIR is gone from the environment.
+    my ($system_temp) = grep { -d $_ && -w $_ } qw(/var/tmp /tmp /usr/tmp);
+    plan skip_all => 'no writable system temporary directory' unless defined($system_temp);
+
+    reset_env();
+    CGI::Info->reset();
+
+    my $upload_dir = tempdir(DIR => $system_temp, CLEANUP => 1);
+
+    # Make $info->tmpdir() resolve to a different writable directory.
+    my $elsewhere = tempdir(CLEANUP => 1);
+    mkdir File::Spec->catdir($elsewhere, 'tmp')
+        or die "Can't create " . File::Spec->catdir($elsewhere, 'tmp') . ": $!";
+    local $ENV{C_DOCUMENT_ROOT} = $elsewhere;
+    local $ENV{TMPDIR};
+    delete $ENV{TMPDIR};
+
+    my $body = "--BOUND\nContent-Disposition: form-data; name=\"a\"\n\n1\n"
+        . "--BOUND\nContent-Disposition: form-data; name=\"b\"\n\n2\n--BOUND--\n";
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+    $ENV{CONTENT_LENGTH}    = length($body);
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    local *STDIN;
+    open STDIN, '<', \$body or die "Can't open scalar handle: $!";
+
+    my $info = CGI::Info->new(upload_dir => $upload_dir);
+    my $p    = eval { $info->params() };
+    is($@, '', 'does not die for a directory in the system temp area');
+    is($info->status(), 200, 'directory in the system temp area is accepted');
+    is_deeply($p, { a => '1' }, 'multipart body parsed');
+};
+
+# The area test must not be fooled by the root, by '..', or by a name that
+# merely shares a prefix with a temporary directory.
+subtest 'temp-area check rejects the root and cannot be escaped with ..' => sub {
+    reset_env();
+
+    my $info = CGI::Info->new();
+    ok(!$info->_in_temp_area('/'), 'filesystem root is not a temporary area');
+
+    SKIP: {
+        skip 'POSIX path semantics only', 2 if $^O eq 'MSWin32';
+
+        my $tmp     = $info->tmpdir();
+        my $escaped = File::Spec->catdir($tmp, ('..') x 20, 'etc');
+        ok(!$info->_in_temp_area($escaped), "'..' cannot escape the temporary area");
+
+        # '/tmpfoo' shares the name prefix of '/tmp' but is not inside it.
+        my $sibling = File::Spec->catdir(File::Spec->rootdir(), 'tmp') . 'foo';
+        ok(!$info->_in_temp_area($sibling), 'a shared name prefix is not inside the area');
+    }
+};
+
 # ============================================================
 # 24. Global variable integrity: $_ and $@ must not be clobbered
 # ============================================================

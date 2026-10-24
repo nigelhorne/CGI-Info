@@ -32,6 +32,28 @@ sub multipart_body {
 	return $body;
 }
 
+# Build a POST request with an XML body and return the object and its parsed
+# parameters.  %args go to the constructor; env => {...} adds variables to the
+# request environment.
+sub parse_xml_request {
+	my ($xml, %args) = @_;
+
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'text/xml',
+		CONTENT_LENGTH    => length($xml),
+		$args{'env'} ? %{$args{'env'}} : (),
+	);
+	delete $args{'env'};
+	CGI::Info->reset();
+	local *STDIN;
+	open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+	my $info = CGI::Info->new(%args);
+	return ($info, eval { $info->params() });
+}
+
 subtest 'constructor defaults and overrides' => sub {
 	my $info = CGI::Info->new();
 
@@ -577,47 +599,72 @@ subtest 'XML bodies with DOCTYPE or ENTITY declarations are rejected' => sub {
 };
 
 subtest 'allow_dtd accepts DOCTYPE and ENTITY declarations' => sub {
-	my $parse = sub {
-		my ($xml, %args) = @_;
-
-		local %ENV = (
-			GATEWAY_INTERFACE => 'CGI/1.1',
-			REQUEST_METHOD    => 'POST',
-			CONTENT_TYPE      => 'text/xml',
-			CONTENT_LENGTH    => length($xml),
-			$args{'env'} ? %{$args{'env'}} : (),
-		);
-		delete $args{'env'};
-		CGI::Info->reset();
-		local *STDIN;
-		open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
-
-		my $info = CGI::Info->new(%args);
-		return ($info, eval { $info->params() });
-	};
-
 	my $doctype = q{<?xml version="1.0"?><!DOCTYPE root SYSTEM "http://example.com/root.dtd"><root><item>ok</item></root>};
-	my ($info, $params) = $parse->($doctype, allow_dtd => 1);
+	my ($info, $params) = parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0);
 	ok(defined($params) && ($params->{XML} eq $doctype), 'allow_dtd keeps a body with a DOCTYPE');
 	is($info->status(), 200, 'allow_dtd leaves the status at 200');
+	like($info->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
+		'an accepted DOCTYPE is logged as an audit warning');
 
 	my $entities = q{<!DOCTYPE root [<!ENTITY greet "hi">]><root>&greet;</root>};
-	($info, $params) = $parse->($entities, allow_dtd => 1);
+	($info, $params) = parse_xml_request($entities, allow_dtd => 1, dtd_warning_interval => 0);
 	ok(defined($params) && ($params->{XML} eq $entities), 'allow_dtd keeps an internal ENTITY subset');
 	is($info->status(), 200, 'an internal subset with allow_dtd leaves the status at 200');
+	like($info->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
+		'an internal ENTITY subset is logged as an audit warning');
 
-	($info, $params) = $parse->($doctype);
+	my $clean = q{<root><item>ok</item></root>};
+	($info, $params) = parse_xml_request($clean, allow_dtd => 1, dtd_warning_interval => 0);
+	ok(defined($params), 'a body without a declaration is still accepted');
+	unlike($info->messages_as_string(), qr/allowed by allow_dtd/,
+		'no audit warning for a body without a declaration');
+
+	($info, $params) = parse_xml_request($doctype);
 	ok(!defined($params), 'allow_dtd defaults to off');
 	is($info->status(), 403, 'a DOCTYPE without allow_dtd is still rejected');
+	like($info->messages_as_string(), qr/DOCTYPE declaration blocked/,
+		'a rejected DOCTYPE is still logged');
 
-	($info, $params) = $parse->($doctype, env => { CGI__Info__allow_dtd => 1 });
+	($info, $params) = parse_xml_request($doctype, env => { CGI__Info__allow_dtd => 1 });
 	ok(defined($params) && ($params->{XML} eq $doctype), 'allow_dtd can be set from the environment');
 	is($info->status(), 200, 'environment-configured allow_dtd leaves the status at 200');
 
 	my $many = q{<!DOCTYPE root SYSTEM "root.dtd"><root><a/><b/></root>};
-	($info, $params) = $parse->($many, allow_dtd => 1, max_params => 2);
+	($info, $params) = parse_xml_request($many, allow_dtd => 1, max_params => 2);
 	ok(!defined($params), 'allow_dtd does not relax the element count');
 	is($info->status(), 413, 'complexity limits still apply with allow_dtd');
+};
+
+subtest 'allow_dtd audit warning is rate limited' => sub {
+	# The limiter is process-wide and deliberately survives reset().
+	local $CGI::Info::DTD_WARNING_LAST = 0;
+	local $CGI::Info::DTD_WARNING_SUPPRESSED = 0;
+
+	my $doctype = q{<!DOCTYPE root SYSTEM "root.dtd"><root/>};
+
+	my ($info, $params) = parse_xml_request($doctype, allow_dtd => 1);
+	ok(defined($params), 'the first body is accepted');
+	like($info->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
+		'the first accepted declaration is logged');
+
+	($info, $params) = parse_xml_request($doctype, allow_dtd => 1);
+	ok(defined($params), 'a second declaration in the interval is still accepted');
+	unlike($info->messages_as_string(), qr/allowed by allow_dtd/,
+		'a declaration within the interval is not logged');
+
+	# Pretend the interval has passed.
+	$CGI::Info::DTD_WARNING_LAST -= 61;
+
+	($info, $params) = parse_xml_request($doctype, allow_dtd => 1);
+	like($info->messages_as_string(),
+		qr/DOCTYPE declaration allowed by allow_dtd \(1 earlier declaration not logged\)/,
+		'the next warning reports how many declarations were suppressed');
+
+	parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0);
+	my ($second, $second_params) = parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0);
+	ok(defined($second_params), 'the declaration is accepted with the limit disabled');
+	like($second->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
+		'an interval of 0 logs every accepted declaration');
 };
 
 subtest 'per-call limits must be integers' => sub {

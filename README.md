@@ -131,6 +131,18 @@ It takes other optional parameters:
     (`CGI__Info__allow_dtd`) setting; it cannot be overridden per `params()`
     call.
 
+- `dtd_warning_interval`
+
+    The minimum number of seconds between audit warnings for XML bodies
+    accepted because of `allow_dtd`.
+    The default is 60.
+    Declarations accepted but not logged are counted, and the next warning
+    reports how many were suppressed.
+    Set this to `0` to log every accepted declaration.
+    The limit is per process, not per object, so it also applies when a
+    persistent handler (mod_perl, FastCGI, PSGI) creates a new object for
+    every request.
+
 - `max_body_size`
 
     The maximum number of bytes read from a POST body.
@@ -195,6 +207,7 @@ use [Carp](https://metacpan.org/pod/Carp).  For more information see [Object::Co
   carp_on_warn   => { type => 'boolean',  optional => 1 },
   config_dirs    => { type => 'arrayref', optional => 1 },
   config_file    => { type => 'string',   optional => 1 },
+  dtd_warning_interval => { type => 'integer', optional => 1, min => 0 },
   logger         => { type => 'object',   optional => 1 },
   max_body_size  => { type => 'integer',  optional => 1, min => -1 },
   max_nesting_depth => { type => 'integer', optional => 1, min => -1 },
@@ -381,7 +394,17 @@ This is useful to help to block attacks on your site.
 
 Upload\_dir is a string containing a directory where files being uploaded are to
 be stored.
-It must be a writeable directory in the temporary area.
+It must be a writeable directory inside a temporary area: the directory
+returned by [tmpdir](#tmpdir), a classic system temporary directory such as `/tmp`,
+`/var/tmp` or `/usr/tmp`, the area named by `TMPDIR`, `TEMP` or `TMP`, or
+on macOS any directory below `/var/folders`.
+This matters because a web server usually does not export `TMPDIR`, so
+[tmpdir](#tmpdir) can point somewhere different from the platform's temporary tree.
+
+The test is made against the resolved path, so a directory reached through
+`..` is judged by where it really is, and a sibling that merely shares a name
+prefix with a temporary area is not accepted.
+The filesystem root is never treated as a temporary area.
 
 Takes an optional parameter logger, which is used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
@@ -453,7 +476,11 @@ element 'XML', thus:
 A request body containing a `<!DOCTYPE>` or `<!ENTITY>` declaration is
 rejected: `params()` returns undef and the status is set to 403.  Declarations
 inside comments and CDATA sections are ignored.  Pass `allow_dtd => 1` to the
-constructor to accept them for a trusted feed.
+constructor to accept them for a trusted feed; each accepted declaration is
+still logged as a warning, so the exception is recorded in the audit trail.
+Those warnings are rate limited to at most one per `dtd_warning_interval`
+seconds (default 60, `0` logs every occurrence), and the next warning reports
+how many declarations were accepted without being logged.
 
 Carp if logger is not set and we detect something serious.
 

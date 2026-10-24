@@ -14,7 +14,19 @@ Revision history for CGI-Info
 	  body.
 	- Reject XML request bodies containing a DOCTYPE or ENTITY declaration,
 	  setting status 403 and making params() return undef.  The new allow_dtd
-	  constructor option accepts such bodies for trusted feeds.
+	  constructor option accepts such bodies for trusted feeds, and logs a
+	  warning naming the declaration.  The new dtd_warning_interval option
+	  (default 60 seconds, 0 for every occurrence) rate limits that warning per
+	  process and reports how many declarations were suppressed, so a polled
+	  feed does not flood the log.
+
+	[ Bug fixes ]
+	- upload_dir is accepted anywhere in a temporary area, not just below
+	  tmpdir(): a CGI process usually has no TMPDIR exported, so a directory in
+	  the platform's own temporary tree (e.g. /var/folders/... on macOS) was
+	  rejected with a 500.  The check now compares resolved paths, so '..'
+	  cannot escape the temporary area and a sibling that only shares a name
+	  prefix no longer matches.
 
 	[ Tests ]
 	- Use Test::Log::Adapter
