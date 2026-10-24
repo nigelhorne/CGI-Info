@@ -635,33 +635,40 @@ subtest 'allow_dtd accepts DOCTYPE and ENTITY declarations' => sub {
 	is($info->status(), 413, 'complexity limits still apply with allow_dtd');
 };
 
-subtest 'allow_dtd audit warning is rate limited' => sub {
+subtest 'allow_dtd audit warning is rate limited per request path' => sub {
 	# The limiter is process-wide and deliberately survives reset().
-	local $CGI::Info::DTD_WARNING_LAST = 0;
-	local $CGI::Info::DTD_WARNING_SUPPRESSED = 0;
+	local %CGI::Info::DTD_WARNING_STATE = ();
 
 	my $doctype = q{<!DOCTYPE root SYSTEM "root.dtd"><root/>};
+	my %feed_a = (env => { PATH_INFO => '/feed/a' });
+	my %feed_b = (env => { PATH_INFO => '/feed/b' });
 
-	my ($info, $params) = parse_xml_request($doctype, allow_dtd => 1);
+	my ($info, $params) = parse_xml_request($doctype, allow_dtd => 1, %feed_a);
 	ok(defined($params), 'the first body is accepted');
 	like($info->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
 		'the first accepted declaration is logged');
+	is_deeply([sort keys %CGI::Info::DTD_WARNING_STATE], ['/feed/a'],
+		'the warning budget is tracked per request path');
 
-	($info, $params) = parse_xml_request($doctype, allow_dtd => 1);
+	($info, $params) = parse_xml_request($doctype, allow_dtd => 1, %feed_a);
 	ok(defined($params), 'a second declaration in the interval is still accepted');
 	unlike($info->messages_as_string(), qr/allowed by allow_dtd/,
 		'a declaration within the interval is not logged');
 
-	# Pretend the interval has passed.
-	$CGI::Info::DTD_WARNING_LAST -= 61;
+	($info, $params) = parse_xml_request($doctype, allow_dtd => 1, %feed_b);
+	like($info->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
+		'another request path has its own budget and is logged immediately');
 
-	($info, $params) = parse_xml_request($doctype, allow_dtd => 1);
+	# Pretend the interval has passed for feed A only.
+	$CGI::Info::DTD_WARNING_STATE{'/feed/a'}{last} -= 61;
+
+	($info, $params) = parse_xml_request($doctype, allow_dtd => 1, %feed_a);
 	like($info->messages_as_string(),
 		qr/DOCTYPE declaration allowed by allow_dtd \(1 earlier declaration not logged\)/,
-		'the next warning reports how many declarations were suppressed');
+		'the next warning reports how many declarations were suppressed for that path');
 
-	parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0);
-	my ($second, $second_params) = parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0);
+	parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0, %feed_a);
+	my ($second, $second_params) = parse_xml_request($doctype, allow_dtd => 1, dtd_warning_interval => 0, %feed_a);
 	ok(defined($second_params), 'the declaration is accepted with the limit disabled');
 	like($second->messages_as_string(), qr/DOCTYPE declaration allowed by allow_dtd/,
 		'an interval of 0 logs every accepted declaration');

@@ -217,9 +217,18 @@ Declarations that are accepted but not logged are counted, and the next
 warning reports how many were suppressed, so a frequently polled feed does
 not hide its traffic while still not writing a line per request.
 Set this to C<0> to log every accepted declaration.
-The limit is per process, not per object, so it also applies when a
-persistent handler (such as mod_perl, FastCGI or PSGI) creates a new object
-for every request.
+
+The limit is per process and per request path, so the warnings for
+F</feed/a> and F</feed/b> are counted separately and one busy feed does not
+silence another.
+The path is taken from C<PATH_INFO>, falling back to C<SCRIPT_NAME> and then
+to the path part of C<REQUEST_URI>; the query string is ignored, so it cannot
+be used to split one feed's budget.
+The limiter is not per object, so it also applies when a persistent handler
+(such as mod_perl, FastCGI or PSGI) creates a new object for every request,
+and C<reset()> does not clear it.
+At most 100 paths are tracked at once; when that many are in use the table is
+cleared, which can produce one extra warning per feed.
 It is a constructor, configuration file or environment
 (C<CGI__Info__dtd_warning_interval>) setting.
 
