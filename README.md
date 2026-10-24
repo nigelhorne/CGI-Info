@@ -410,8 +410,9 @@ constructor.
     }
 ```
 
-If the request is an XML request (i.e. the content type of the POST is text/xml),
-CGI::Info will put the request into the params element 'XML', thus:
+If the request is an XML request (i.e. the content type of the POST is
+text/xml or application/xml), CGI::Info will put the request into the params
+element 'XML', thus:
 
 ```perl
     use CGI::Info;

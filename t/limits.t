@@ -451,6 +451,39 @@ subtest 'XML complexity ignores declarations, comments, CDATA and quoted >' => s
 	is($info->status(), 413, 'XML limits hash rejection returns 413');
 };
 
+subtest 'application/xml bodies use the XML path and limits' => sub {
+	my $xml = '<root><a><b/></a></root>';
+
+	my $parse = sub {
+		my %limits = @_;
+
+		local %ENV = (
+			GATEWAY_INTERFACE => 'CGI/1.1',
+			REQUEST_METHOD    => 'POST',
+			CONTENT_TYPE      => 'application/xml; charset=utf-8',
+			CONTENT_LENGTH    => length($xml),
+		);
+		CGI::Info->reset();
+		local *STDIN;
+		open STDIN, '<', \$xml or die "Can't open scalar handle: $!";
+
+		my $info = CGI::Info->new(%limits);
+		return ($info, eval { $info->params() });
+	};
+
+	my ($info, $params) = $parse->(max_params => 3, max_nesting_depth => 3);
+	ok(defined($params) && ($params->{XML} eq $xml), 'application/xml body is stored under XML');
+	is($info->status(), 200, 'valid application/xml leaves the status at 200');
+
+	($info, $params) = $parse->(max_params => 2);
+	ok(!defined($params), 'application/xml over the element limit is rejected');
+	is($info->status(), 413, 'too many application/xml elements returns 413');
+
+	($info, $params) = $parse->(max_nesting_depth => 2);
+	ok(!defined($params), 'application/xml deeper than the limit is rejected');
+	is($info->status(), 413, 'too deeply nested application/xml returns 413');
+};
+
 subtest 'per-call limits must be integers' => sub {
 	local %ENV = (
 		GATEWAY_INTERFACE => 'CGI/1.1',

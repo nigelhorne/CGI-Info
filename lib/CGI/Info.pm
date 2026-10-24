@@ -209,8 +209,8 @@ When omitted it falls back to C<max_upload_size>, preserving the historical
 The maximum number of parameters accepted from one request.
 The check is made on the raw key=value pairs before decoding, so it also
 bounds the amount of work done by the parser.
-For C<text/xml> bodies, this is the number of XML elements, including the
-root element.
+For XML bodies (C<text/xml> and C<application/xml>), this is the number of
+XML elements, including the root element.
 Use C<0> to reject every parameter and C<-1> for no limit.
 The default is 1000.
 
@@ -233,8 +233,8 @@ The maximum depth of square-bracket nesting in a parameter name, for
 example C<a[b][c]> has a depth of 2.
 This applies to URL-encoded, JSON and multipart parameter names, not to
 values.
-For C<text/xml> bodies, this is the XML element nesting depth, where the
-root element is depth 1.
+For XML bodies (C<text/xml> and C<application/xml>), this is the XML element
+nesting depth, where the root element is depth 1.
 Use C<0> to reject any bracketed name (or any XML element) and C<-1> for no
 limit.
 The default is 8.
@@ -766,8 +766,9 @@ constructor.
 		}
 	}
 
-If the request is an XML request (i.e. the content type of the POST is text/xml),
-CGI::Info will put the request into the params element 'XML', thus:
+If the request is an XML request (i.e. the content type of the POST is
+text/xml or application/xml), CGI::Info will put the request into the params
+element 'XML', thus:
 
 	use CGI::Info;
 	# ...
@@ -1207,7 +1208,7 @@ sub params {
 				});
 				return if($self->{_limit_exceeded});
 			}
-		} elsif($content_type =~ /text\/xml/i) {
+		} elsif($content_type =~ m{(?:text|application)/xml}i) {
 			my $buffer;
 			if($stdin_data) {
 				$buffer = $stdin_data;
