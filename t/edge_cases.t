@@ -1504,10 +1504,15 @@ subtest 'upload_dir: temporary area root rejected with 500' => sub {
         skip "$root is not a writable temporary area root", 4
             unless (-d $root) && (-w $root) && $info->_temp_area_root($root);
 
+        # Supply the body through the class variable so that a regression which
+        # accepts the area root fails instead of blocking on STDIN.
+        my $body = qq{--BOUND\nContent-Disposition: form-data; name="a"\n\n1\n--BOUND--\n};
+        local $CGI::Info::stdin_data = $body;
+
         $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
         $ENV{REQUEST_METHOD}    = 'POST';
-        $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
-        $ENV{CONTENT_LENGTH}    = 100;
+        $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+        $ENV{CONTENT_LENGTH}    = length($body);
         $ENV{REMOTE_ADDR}       = '1.2.3.4';
 
         my $p = eval { $info->params(upload_dir => $root) };
@@ -1536,10 +1541,15 @@ subtest 'upload_dir: encoded traversal rejected when the literal directory exist
     ok(-d $escaped, 'the literal directory exists');
     is($probe->_temp_path($escaped), '/etc', 'the name decodes to /etc');
 
+    # Supply the body through the class variable so that a regression which
+    # accepts the directory fails instead of blocking on STDIN.
+    my $body = qq{--BOUND\nContent-Disposition: form-data; name="a"\n\n1\n--BOUND--\n};
+    local $CGI::Info::stdin_data = $body;
+
     $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
     $ENV{REQUEST_METHOD}    = 'POST';
-    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
-    $ENV{CONTENT_LENGTH}    = 100;
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=BOUND';
+    $ENV{CONTENT_LENGTH}    = length($body);
     $ENV{REMOTE_ADDR}       = '1.2.3.4';
 
     my $info = CGI::Info->new(upload_dir => $escaped);
