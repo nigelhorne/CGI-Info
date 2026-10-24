@@ -34,6 +34,7 @@ Readonly my $MAX_PARAMS_DEFAULT       => 1000;		# Maximum number of input parame
 Readonly my $MAX_PARTS_DEFAULT        => 100;		# Maximum number of multipart parts
 Readonly my $MAX_PART_HEADERS_DEFAULT => 20;		# Maximum header lines per multipart part
 Readonly my $MAX_NESTING_DEPTH_DEFAULT => 8;		# Maximum [] nesting in parameter names
+Readonly my @COMPLEXITY_LIMITS      => qw(max_body_size max_params max_parts max_part_headers max_nesting_depth);
 Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
 Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
 
@@ -235,6 +236,9 @@ The default is 8.
 
 =back
 
+Any of these limits can also be overridden for a single C<params()> call,
+either individually or through its C<limits> hash reference; see L</params>.
+
 The class can be configured at runtime using environment variables and configuration
 files; for example, setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to
 use L<Carp>.  For more information see L<Object::Configure>.
@@ -337,6 +341,7 @@ sub new
 		# Drop cached params so a new allow schema is applied on next call
 		my %merged = (%{$class}, %{$params});
 		delete $merged{'paramref'};
+		delete $merged{'_limits_key'};
 		return bless \%merged, ref($class);
 	}
 
@@ -666,8 +671,26 @@ The returned hash value can be passed into L<CGI::Untaint>.
 
 Takes the optional parameters allow, logger and upload_dir.
 The request-complexity limits (C<max_body_size>, C<max_params>, C<max_parts>,
-C<max_part_headers> and C<max_nesting_depth>) are set on the constructor or
-in the configuration file, not per call.
+C<max_part_headers> and C<max_nesting_depth>) can be set on the constructor or
+in the configuration file, and can also be overridden for a single call.
+Pass them individually:
+
+	my $params = $info->params(max_params => 50, max_nesting_depth => 2);
+
+or use a shared C<limits> hash reference:
+
+	my $params = $info->params(limits => {
+		max_params        => 50,
+		max_nesting_depth => 2,
+	});
+
+The C<limits> hash may contain any of the five limit names; unknown names are
+rejected. Individual limit arguments take precedence over values in the
+C<limits> hash. Passing a limit to C<params()> also makes that call re-parse
+the request if the cached result was produced with different limits, so a
+stricter limit cannot be bypassed by an earlier C<params()> call. The per-call
+values apply only to that call; the instance's configured limits are unchanged
+afterwards.
 The parameters are passed in a hash, or a reference to a hash.
 The latter is more efficient since it puts less on the stack.
 
@@ -808,6 +831,53 @@ Advanced features:
     }
 =cut
 
+# Validate one per-call limit.  Undef means "no override" so that
+# max_body_size can still fall back to max_upload_size.
+sub _validate_limit :Protected {
+	my ($self, $name, $value) = @_;
+
+	if(ref($value) || ($value !~ /\A[+-]?\d+\z/)) {
+		Carp::croak(__PACKAGE__ . "::params: $name must be an integer");
+	}
+
+	return $value + 0;
+}
+
+# Collect per-call complexity-limit overrides from either a shared limits
+# hash-ref, the individual limit arguments, or both.  Individual arguments
+# take precedence over values in the shared profile.
+sub _per_call_limits :Protected {
+	my ($self, $params) = @_;
+
+	return {} unless(defined($params) && (ref($params) eq 'HASH'));
+
+	my %known = map { $_ => 1 } @COMPLEXITY_LIMITS;
+	my %limits;
+
+	if(exists($params->{limits}) && defined($params->{limits})) {
+		my $profile = $params->{limits};
+		unless(ref($profile) eq 'HASH') {
+			Carp::croak(__PACKAGE__ . '::params: limits must be a hash reference');
+		}
+
+		foreach my $name (keys %{$profile}) {
+			unless($known{$name}) {
+				Carp::croak(__PACKAGE__ . "::params: unknown complexity limit '$name' in limits");
+			}
+			next unless(defined($profile->{$name}));
+			$limits{$name} = $self->_validate_limit($name, $profile->{$name});
+		}
+	}
+
+	foreach my $name (@COMPLEXITY_LIMITS) {
+		next unless(exists($params->{$name}));
+		next unless(defined($params->{$name}));
+		$limits{$name} = $self->_validate_limit($name, $params->{$name});
+	}
+
+	return \%limits;
+}
+
 # The effective raw-body limit.  max_body_size is optional so that existing
 # callers keep the historical max_upload_size behaviour when they do not set it.
 sub _body_limit :Protected {
@@ -837,6 +907,21 @@ sub _param_nesting_depth :Protected {
 	return $depth;
 }
 
+# Identify the effective limits so a cached parameter set is only reused when
+# it was produced under the same limits.  _body_limit() is used rather than
+# max_body_size because an unset max_body_size falls back to max_upload_size.
+sub _limits_key :Protected {
+	my $self = shift;
+
+	return join("\0", map { defined($_) ? $_ : 'undef' } (
+		$self->_body_limit(),
+		$self->{max_params},
+		$self->{max_parts},
+		$self->{max_part_headers},
+		$self->{max_nesting_depth},
+	));
+}
+
 # Record a complexity rejection once, set the status and log it.  The private
 # flag lets callers such as _multipart_data() abort a nested parse and have
 # params() stop without confusing an empty result with a successful parse.
@@ -853,8 +938,24 @@ sub params {
 	my $self = shift;
 
 	my $params = Params::Get::get_params(undef, @_);
+	my $overrides = $self->_per_call_limits($params);
 
-	if((defined($self->{paramref})) && ((!defined($params->{'allow'})) || defined($self->{allow}) && ($params->{'allow'} eq $self->{allow}))) {
+	# Localise the limit slots so per-call values apply to the rest of this
+	# call (including _multipart_data()) and are restored on return.
+	local $self->{max_body_size} = exists($overrides->{max_body_size})
+		? $overrides->{max_body_size} : $self->{max_body_size};
+	local $self->{max_params} = exists($overrides->{max_params})
+		? $overrides->{max_params} : $self->{max_params};
+	local $self->{max_parts} = exists($overrides->{max_parts})
+		? $overrides->{max_parts} : $self->{max_parts};
+	local $self->{max_part_headers} = exists($overrides->{max_part_headers})
+		? $overrides->{max_part_headers} : $self->{max_part_headers};
+	local $self->{max_nesting_depth} = exists($overrides->{max_nesting_depth})
+		? $overrides->{max_nesting_depth} : $self->{max_nesting_depth};
+
+	my $limits_key = $self->_limits_key();
+
+	if((defined($self->{paramref})) && (defined($self->{_limits_key})) && ($self->{_limits_key} eq $limits_key) && ((!defined($params->{'allow'})) || defined($self->{allow}) && ($params->{'allow'} eq $self->{allow}))) {
 		return $self->{paramref};
 	}
 
@@ -869,6 +970,10 @@ sub params {
 	}
 	$self->_trace('Entering params');
 
+	# A fresh parse may fail part-way through; do not leave a previous call's
+	# accepted parameter set (or its limit key) available for a later call.
+	delete $self->{paramref};
+	delete $self->{_limits_key};
 	delete $self->{_limit_exceeded};
 
 	my @pairs;
@@ -992,6 +1097,7 @@ sub params {
 			}
 			if(!-w $self->{upload_dir}) {
 				delete $self->{paramref};
+				delete $self->{_limits_key};
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't writeable"
 				});
@@ -1031,6 +1137,7 @@ sub params {
 			$FORM{XML} = $buffer;
 
 			$self->{paramref} = \%FORM;
+			$self->{_limits_key} = $limits_key;
 
 			return \%FORM;
 		} elsif($content_type =~ /application\/json/i) {
@@ -1330,6 +1437,7 @@ sub params {
 	}
 
 	$self->{paramref} = \%FORM;
+	$self->{_limits_key} = $limits_key;
 
 	return Return::Set::set_return(\%FORM, { type => 'hashref', min => 1 });
 }

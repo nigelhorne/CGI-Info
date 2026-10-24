@@ -199,4 +199,197 @@ subtest 'multipart nesting depth is capped' => sub {
 	is($info->status(), 413, 'deeply nested multipart name returns 413');
 };
 
+subtest 'per-call max_body_size overrides the constructor' => sub {
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'application/x-www-form-urlencoded',
+		CONTENT_LENGTH    => 6,
+	);
+	local $CGI::Info::stdin_data;
+	CGI::Info->reset();
+	$CGI::Info::stdin_data = 'a=1234';
+
+	my $info = CGI::Info->new(max_body_size => 100);
+	my $params = eval { $info->params(max_body_size => 5) };
+	ok(!defined($params), 'per-call max_body_size rejects an oversized body');
+	is($info->status(), 413, 'per-call max_body_size returns 413');
+	is($info->{max_body_size}, 100, 'per-call max_body_size does not change the instance');
+
+	$CGI::Info::stdin_data = 'a=1234';
+	$params = eval { $info->params(max_body_size => 6) };
+	is($params->{a}, '1234', 'per-call max_body_size at the limit is accepted');
+};
+
+subtest 'per-call max_params overrides the constructor and bypasses the cache' => sub {
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'GET',
+		QUERY_STRING      => 'a=1&b=2&c=3',
+	);
+	CGI::Info->reset();
+
+	my $info = CGI::Info->new(max_params => 3);
+	my $params = eval { $info->params() };
+	is_deeply($params, { a => '1', b => '2', c => '3' }, 'constructor limit accepts the request');
+
+	$params = eval { $info->params(max_params => 2) };
+	ok(!defined($params), 'per-call limit is applied to a cached request');
+	is($info->status(), 413, 'per-call max_params returns 413');
+	is($info->{max_params}, 3, 'per-call max_params does not change the instance');
+
+	$params = eval { $info->params() };
+	is_deeply($params, { a => '1', b => '2', c => '3' }, 'instance limit applies again on the next call');
+
+	my $strict = CGI::Info->new(max_params => 1);
+	$params = eval { $strict->params(max_params => 3) };
+	is_deeply($params, { a => '1', b => '2', c => '3' }, 'per-call limit can relax a strict instance limit');
+	is($strict->{max_params}, 1, 'relaxed per-call limit does not change the instance');
+};
+
+subtest 'limits hash applies a shared per-call profile' => sub {
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'GET',
+		QUERY_STRING      => 'a=1&b=2&c=3',
+	);
+	CGI::Info->reset();
+
+	my $info = CGI::Info->new(max_params => 3, max_nesting_depth => 2);
+	my $params = eval { $info->params(limits => { max_params => 2, max_nesting_depth => 1 }) };
+	ok(!defined($params), 'limits hash applies max_params');
+	is($info->status(), 413, 'limits hash rejection returns 413');
+	is($info->{max_params}, 3, 'limits hash does not change max_params on the instance');
+	is($info->{max_nesting_depth}, 2, 'limits hash does not change max_nesting_depth on the instance');
+
+	$params = eval { $info->params(limits => { max_params => 1 }, max_params => 3) };
+	is_deeply($params, { a => '1', b => '2', c => '3' }, 'individual argument overrides the limits hash');
+};
+
+subtest 'limits hash applies to multipart parsing' => sub {
+	my $upload_dir = tempdir(CLEANUP => 1);
+	my $body = multipart_body('BOUND',
+		"Content-Disposition: form-data; name=\"a\"\n\n1",
+		"Content-Disposition: form-data; name=\"b\"\n\n2",
+	);
+
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
+		CONTENT_LENGTH    => length($body),
+	);
+	CGI::Info->reset();
+	local *STDIN;
+	open STDIN, '<', \$body or die "Can't open scalar handle: $!";
+
+	my $info = CGI::Info->new(upload_dir => $upload_dir, max_parts => 10);
+	my $params = eval { $info->params(limits => { max_parts => 1 }) };
+	ok(!defined($params), 'limits hash reaches multipart parsing');
+	is($info->status(), 413, 'multipart limits hash rejection returns 413');
+	is($info->{max_parts}, 10, 'multipart limits hash does not change the instance');
+};
+
+subtest 'limits hash is validated' => sub {
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'GET',
+		QUERY_STRING      => 'a=1',
+	);
+	CGI::Info->reset();
+
+	my $info = CGI::Info->new();
+
+	my $ok = eval { $info->params(limits => 'strict'); 1 };
+	ok(!$ok, 'a non-hash limits value is rejected');
+	like($@, qr/limits must be a hash reference/, 'the error explains the limits type');
+
+	$ok = eval { $info->params(limits => { max_parms => 2 }); 1 };
+	ok(!$ok, 'an unknown limit name is rejected');
+	like($@, qr/unknown complexity limit 'max_parms'/, 'the error names the unknown limit');
+
+	$ok = eval { $info->params(limits => { max_params => 'lots' }); 1 };
+	ok(!$ok, 'a non-integer value in limits is rejected');
+	like($@, qr/max_params must be an integer/, 'the error names the invalid limit in the hash');
+};
+
+subtest 'per-call max_nesting_depth overrides the constructor' => sub {
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'GET',
+		QUERY_STRING      => 'a[b][c]=1',
+	);
+	CGI::Info->reset();
+
+	my $info = CGI::Info->new(max_nesting_depth => 2);
+	my $params = eval { $info->params(max_nesting_depth => 1) };
+	ok(!defined($params), 'per-call max_nesting_depth rejects a deeper name');
+	is($info->status(), 413, 'per-call max_nesting_depth returns 413');
+	is($info->{max_nesting_depth}, 2, 'per-call max_nesting_depth does not change the instance');
+
+	$params = eval { $info->params(max_nesting_depth => 2) };
+	ok(defined($params) && defined($params->{'a[b][c]'}), 'per-call max_nesting_depth at the limit is accepted');
+};
+
+subtest 'per-call max_parts overrides the constructor' => sub {
+	my $upload_dir = tempdir(CLEANUP => 1);
+	my $body = multipart_body('BOUND',
+		"Content-Disposition: form-data; name=\"a\"\n\n1",
+		"Content-Disposition: form-data; name=\"b\"\n\n2",
+	);
+
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
+		CONTENT_LENGTH    => length($body),
+	);
+	CGI::Info->reset();
+	local *STDIN;
+	open STDIN, '<', \$body or die "Can't open scalar handle: $!";
+
+	my $info = CGI::Info->new(upload_dir => $upload_dir, max_parts => 10);
+	my $params = eval { $info->params(max_parts => 1) };
+	ok(!defined($params), 'per-call max_parts rejects extra multipart parts');
+	is($info->status(), 413, 'per-call max_parts returns 413');
+	is($info->{max_parts}, 10, 'per-call max_parts does not change the instance');
+};
+
+subtest 'per-call max_part_headers overrides the constructor' => sub {
+	my $upload_dir = tempdir(CLEANUP => 1);
+	my $body = multipart_body('BOUND',
+		"Content-Disposition: form-data; name=\"a\"\nX-One: 1\nX-Two: 2\n\nvalue",
+	);
+
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'POST',
+		CONTENT_TYPE      => 'multipart/form-data; boundary=BOUND',
+		CONTENT_LENGTH    => length($body),
+	);
+	CGI::Info->reset();
+	local *STDIN;
+	open STDIN, '<', \$body or die "Can't open scalar handle: $!";
+
+	my $info = CGI::Info->new(upload_dir => $upload_dir, max_part_headers => 10);
+	my $params = eval { $info->params(max_part_headers => 2) };
+	ok(!defined($params), 'per-call max_part_headers rejects extra part headers');
+	is($info->status(), 413, 'per-call max_part_headers returns 413');
+	is($info->{max_part_headers}, 10, 'per-call max_part_headers does not change the instance');
+};
+
+subtest 'per-call limits must be integers' => sub {
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'GET',
+		QUERY_STRING      => 'a=1',
+	);
+	CGI::Info->reset();
+
+	my $info = CGI::Info->new();
+	my $error = eval { $info->params(max_params => 'lots'); 1 };
+	ok(!$error, 'a non-integer per-call limit is rejected');
+	like($@, qr/max_params must be an integer/, 'the error names the invalid limit');
+};
+
 done_testing();

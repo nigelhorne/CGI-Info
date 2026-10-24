@@ -5,6 +5,8 @@ Revision history for CGI-Info
 	- Add configurable request-complexity limits: max_body_size, max_params,
 	  max_parts, max_part_headers and max_nesting_depth. Exceeding one sets
 	  status 413 and makes params() return undef.
+	- Allow those limits to be overridden per params() call; the override
+	  applies only to that call and cannot be bypassed by a cached result.
 
 	[ Tests ]
 	- Use Test::Log::Adapter
