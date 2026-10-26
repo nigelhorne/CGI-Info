@@ -2285,12 +2285,14 @@ sub tmpdir {
 # decoding so that an encoded '%5C' cannot hide a traversal from the segment
 # resolution.
 sub _tidy_path :Protected {
-	my ($self, $path, $windows) = @_;
+	my ($self, $path, $windows, $decoded) = @_;
 
 	return unless defined($path);
 
 	# Decoding first means '%2e%2e' is treated like '..' and '%2F' like '/'.
-	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	# $decoded says the caller has already done so, and decoding twice would
+	# turn a literal '%2e' in a real directory name into '.'.
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge unless($decoded);
 	$path =~ tr{\\}{/} if($windows);
 	$path =~ s{/+}{/}g;
 
@@ -2319,6 +2321,11 @@ sub _temp_path :Protected {
 	my $path = shift;
 
 	return unless(defined($path) && length($path));
+
+	# Decode before asking the filesystem, so that an encoded spelling of an
+	# existing directory resolves its symlinks just as the plain one does
+	# (on macOS /tmp and /var are symlinks into /private).
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
 	if(-d $path) {
 		my $real = Cwd::abs_path($path);
 		$path = $real if(defined($real) && length($real));
@@ -2326,7 +2333,7 @@ sub _temp_path :Protected {
 	my $windows = ($^O eq 'MSWin32');
 	$path = lc($path) if($windows);
 
-	return $self->_tidy_path($path, $windows);
+	return $self->_tidy_path($path, $windows, 1);
 }
 
 # Windows spellings that cannot be checked by comparing strings.  A
@@ -2373,19 +2380,26 @@ sub _temp_areas :Protected {
 	push(@areas, @ENV{qw(TMPDIR TEMP TMP)});
 	if($^O eq 'MSWin32') {
 		push(@areas, map { File::Spec->catdir($_, 'Temp') } grep { defined($_) } @ENV{qw(SYSTEMROOT WINDIR)});
-	} elsif($^O eq 'darwin') {
-		# Core Perl has no confstr(_CS_DARWIN_USER_TEMP_DIR), but the whole of
-		# /var/folders is the per-user temporary tree.
-		push(@areas, '/var/folders', '/private/var/folders');
 	} else {
 		push(@areas, qw(/tmp /var/tmp /usr/tmp));
+		if($^O eq 'darwin') {
+			# Core Perl has no confstr(_CS_DARWIN_USER_TEMP_DIR), but the whole
+			# of /var/folders is the per-user temporary tree.
+			push(@areas, '/var/folders', '/private/var/folders');
+		}
 	}
 
+	# Each area is listed both as spelt and with its symlinks resolved.  An
+	# upload_dir that exists is resolved by _temp_path, one that does not yet
+	# exist is not, and on macOS the two spellings differ (/var/folders is
+	# really /private/var/folders).
+	my $windows = ($^O eq 'MSWin32');
 	my %seen;
 	# The filesystem root is never a temporary area: accepting it would defeat
 	# the point of the check.
 	return grep { defined($_) && (length($_) > 1) && !$seen{$_}++ }
-		map { $self->_temp_path($_) } @areas;
+		map { ($self->_tidy_path($windows ? lc($_) : $_, $windows), $self->_temp_path($_)) }
+		grep { defined($_) && length($_) } @areas;
 }
 
 # Is $dir a directory inside one of the temporary areas?  Compared on
