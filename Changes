@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+1.17
+	[ Bug Fixes ]
+	- Fix _temp_path on Darwin, the symlinks that Darwin uses for /tmp
+	  broke the code
+
 1.16	Sat Oct 24 07:51:38 PM EDT 2026
 	[ Enhancements ]
 	- Add configurable request-complexity limits: max_body_size, max_params,

@@ -1539,7 +1539,9 @@ subtest 'upload_dir: encoded traversal rejected when the literal directory exist
 
     my $probe = CGI::Info->new();
     ok(-d $escaped, 'the literal directory exists');
-    is($probe->_temp_path($escaped), '/etc', 'the name decodes to /etc');
+    # Compared with /etc as this platform resolves it: on macOS /etc is a
+    # symlink to /private/etc.
+    is($probe->_temp_path($escaped), $probe->_temp_path('/etc'), 'the name decodes to /etc');
 
     # Supply the body through the class variable so that a regression which
     # accepts the directory fails instead of blocking on STDIN.
