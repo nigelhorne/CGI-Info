@@ -1871,6 +1871,9 @@ subtest 'upload_dir: a POSIX name shaped like an 8.3 alias is accepted' => sub {
     }
 
     # End to end: the directory is accepted and the body is parsed normally.
+    # Only on a POSIX host: on Windows 'build~1' really is refused, as above.
+    return if($^O eq 'MSWin32');
+
     my $body = join("\n", '--BOUND',
         'Content-Disposition: form-data; name="a"', '', '1',
         '--BOUND',

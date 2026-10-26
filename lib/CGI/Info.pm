@@ -2331,16 +2331,36 @@ sub _temp_path :Protected {
 		$path = $real if(defined($real) && length($real));
 	}
 	my $windows = ($^O eq 'MSWin32');
-	$path = lc($path) if($windows);
+	if($windows) {
+		$path = $self->_win32_long_path($path);
+		$path = lc($path);
+	}
 
 	return $self->_tidy_path($path, $windows, 1);
+}
+
+# Expand any 8.3 short names in an existing Windows path to their long forms,
+# so that 'C:\Users\RUNNER~1\...' is judged as 'C:\Users\runneradmin\...'.
+# Windows commonly sets TEMP to a short spelling like that, so without this
+# every directory File::Temp creates would be refused.  Cwd::abs_path does not
+# do the expansion.  The path is returned unchanged when it does not exist or
+# Win32::GetLongPathName is unavailable (not running on Windows).
+sub _win32_long_path :Protected {
+	my ($self, $path) = @_;
+
+	return $path unless(defined($path) && length($path) && (-e $path));
+	return $path unless(eval { require Win32; 1 } && defined(&Win32::GetLongPathName));
+
+	my $long = Win32::GetLongPathName($path);
+	return (defined($long) && length($long)) ? $long : $path;
 }
 
 # Windows spellings that cannot be checked by comparing strings.  A
 # drive-relative path (C:foo) starts from the per-drive current directory
 # rather than from the drive root, so it can point anywhere; and an 8.3 short
-# name (PROGRA~1) is an alias for a long name that cannot be expanded without
-# asking the filesystem.  Both are refused rather than guessed at, so
+# name (PROGRA~1) is an alias for a long name.  Short names in a path that
+# exists are expanded first; anything still ambiguous after that is refused
+# rather than guessed at, so
 # upload_dir is always judged by an unambiguous path.  A tilde that is not
 # followed by digits is an ordinary character, not an alias.
 sub _win32_path_problem :Protected {
@@ -2350,6 +2370,10 @@ sub _win32_path_problem :Protected {
 
 	my $path = $dir;
 	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	# A short name the filesystem can expand is not ambiguous.  What is left
+	# afterwards is either a name that really is spelt that way or a path that
+	# does not exist, and both are still refused.
+	$path = $self->_win32_long_path($path);
 	$path =~ tr{\\}{/};
 
 	# 'C:foo', and a bare 'C:', are relative to the working directory on that
