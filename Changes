@@ -4,6 +4,10 @@ Revision history for CGI-Info
 	[ Bug Fixes ]
 	- Fix _temp_path on Darwin, the symlinks that Darwin uses for /tmp
 	  broke the code
+	- Fix logdir() adding LOGDIR to the caller's environment. The candidates
+	  were collected in a foreach list, and Perl aliases a %ENV element in
+	  such a list, so a plain logdir() call left $ENV{'LOGDIR'} existing with
+	  an undefined value. The candidates are now copied into an array first.
 
 1.16	Sat Oct 24 07:51:38 PM EDT 2026
 	[ Enhancements ]

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 11;
+use Test::Most tests => 13;
 use Test::NoWarnings;
 
 BEGIN {
@@ -27,4 +27,14 @@ PATHS: {
 	diag($dir);
 	ok(-w $dir);
 	ok(-d $dir);
+}
+
+# Collecting the candidates in a foreach list aliases a %ENV element, which
+# vivifies it: a plain logdir() call must not leave LOGDIR in the environment.
+NO_ENV_LEAK: {
+	delete $ENV{'LOGDIR'};
+
+	my $i = new_ok('CGI::Info');
+	$i->logdir();
+	ok(!defined($ENV{'LOGDIR'}), 'logdir() does not add LOGDIR to the environment');
 }

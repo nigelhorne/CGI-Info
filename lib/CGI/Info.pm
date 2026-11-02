@@ -2577,7 +2577,11 @@ sub logdir {
 		Carp::croak("Invalid logdir: $dir");
 	}
 
-	foreach my $rc($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
+	# Copy the candidates into an array first: aliasing a %ENV element in a
+	# foreach list vivifies that key, so the loop below would leave LOGDIR set
+	# to undef in the caller's environment.
+	my @candidates = ($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir());
+	foreach my $rc(@candidates) {
 		if(defined($rc) && length($rc) && (-d $rc) && (-w $rc)) {
 			$dir = $rc;
 			last;
