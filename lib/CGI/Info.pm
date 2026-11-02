@@ -3166,8 +3166,16 @@ sub status
 	my $self = shift;
 	my $status = shift;
 
-	# Set status if provided
-	return $self->{status} = $status if(defined($status));
+	# Set status if provided.
+	# So reject anything non-integer here rather than storing it
+	# and having the next read fail validation.
+	if(defined($status)) {
+		croak(__PACKAGE__, ': status must be an integer')
+			if(ref($status) || !Scalar::Util::looks_like_number($status)
+			   || (($status - $status) != 0) || ($status != int($status)));
+
+		return $self->{status} = $status;
+	}
 
 	# Determine status based on request method if status is not set
 	unless (defined $self->{status}) {
@@ -3179,8 +3187,9 @@ sub status
 		return 200;
 	}
 
-	# Return current status or 200 by default
-	return $self->{status} || 200;
+	# Return current status or 200 by default. // rather than || so that a
+	# status of 0 is returned as set rather than replaced by the default.
+	return $self->{status} // 200;
 }
 
 =head2 messages
