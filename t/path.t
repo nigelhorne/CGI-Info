@@ -706,12 +706,12 @@ subtest 'status S6: stored truthy status returned as-is' => sub {
 	is($info->status(), 503, 'stored 503 returned');
 };
 
-subtest 'status S7: stored 0 (falsy) returns 200 via || fallback' => sub {
+subtest 'status S7: stored 0 is returned as set, not replaced' => sub {
 	plan tests => 1;
 	local %ENV;
 	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
-	$info->{status} = 0;    # force falsy stored value
-	is($info->status(), 200, 'falsy stored status → 200');
+	$info->{status} = 0;    # a defined but falsy stored value
+	is($info->status(), 0, 'stored 0 returned as-is');
 };
 
 # ===========================================================================

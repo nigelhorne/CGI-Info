@@ -1178,19 +1178,20 @@ subtest 'AUTOLOAD: auto_load => 0 causes croak on unknown method' => sub {
 };
 
 # ============================================================
-# 55. status(): explicit status(0) sets to 0 but read-back returns 200
-#     Branch: return $self->{status} || 200  — falsy zero becomes 200
+# 55. status(): explicit status(0) is kept and read back as 0
+#     Branch: return $self->{status} // 200  — a defined zero is
+#     returned as set instead of falling back to the default
 # ============================================================
 
-# Setting status to 0 uses the assignment branch (returns 0).
-# Reading it back hits the || 200 fallback because 0 is falsy.
-# This is the documented (if surprising) behaviour.
-subtest 'status: setting 0 and reading back returns 200 due to || 200 fallback' => sub {
+# Setting status to 0 uses the assignment branch (returns 0).  Reading
+# it back takes the // branch: 0 is defined, so the stored value is what
+# comes back, not the 200 default.
+subtest 'status: setting 0 and reading back returns 0' => sub {
 	reset_env();
 	my $info = CGI::Info->new();
 	my $set  = $info->status(0);
 	is($set, 0, 'status(0) assignment returns 0');
-	is($info->status(), 200, 'status() after status(0) returns 200 (0 || 200 fallback)');
+	is($info->status(), 0, 'status() after status(0) returns 0 (defined value kept)');
 };
 
 # ============================================================
