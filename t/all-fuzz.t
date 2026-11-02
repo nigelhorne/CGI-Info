@@ -57,6 +57,7 @@ use Test::Needs {
 	'IPC::Run3' => 0,
 	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
+	'Test::Which' => 0,
 	'YAML::XS' => 0,
 	'perl' => 5.036,	# Later A::T::G need this version
 };
@@ -73,6 +74,8 @@ use IPC::Run3;
 use POSIX qw(_exit);
 use YAML::XS qw(LoadFile);
 
+use Test::Which 'extract-schemas', 'fuzz-harness-generator';
+
 my $VERBOSE = $ENV{TEST_VERBOSE} // 0;
 my $TIMEOUT = $ENV{ALL_FUZZ_TIMEOUT} // 180;
 
@@ -82,10 +85,10 @@ my $lib_dir = File::Spec->catdir($root, 'lib');
 
 plan skip_all => "all-fuzz: no lib/ directory under $root" unless(-d $lib_dir);
 
-my $extract_bin = _which('extract-schemas');
-my $fuzz_bin    = _which('fuzz-harness-generator');
-plan skip_all => 'all-fuzz: extract-schemas and fuzz-harness-generator must both be on PATH'
-	unless($extract_bin && $fuzz_bin);
+# Test::Which has just confirmed both are on PATH; the generated harnesses
+# run them by their bare names.
+my $extract_bin = 'extract-schemas';
+my $fuzz_bin    = 'fuzz-harness-generator';
 
 # The harness runs in a child process with a scratch cwd, so the module
 # under test is found through PERL5LIB rather than through "prove -l".
@@ -377,20 +380,4 @@ sub _tail
 	splice(@lines, 0, @lines - $lines) if(@lines > $lines);
 
 	return join("\n", @lines) . "\n";
-}
-
-sub _which
-{
-	my ($program) = @_;
-
-	my @suffixes = ($^O eq 'MSWin32') ? ('', '.bat', '.cmd', '.exe') : ('');
-
-	for my $dir (File::Spec->path()) {
-		for my $suffix (@suffixes) {
-			my $candidate = File::Spec->catfile($dir, $program . $suffix);
-			return $candidate if(-f $candidate && -x $candidate);
-		}
-	}
-
-	return undef;
 }
