@@ -20,7 +20,7 @@ https://pjcj.net
 <h1>Branch Coverage</h1>
 <table>
 <tr><td class="h" align="right">File:</td><td align="left">blib/lib/CGI/Info.pm</td></tr>
-<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">86.0%</td></tr>
+<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">85.8%</td></tr>
 </table>
 <div><br/></div>
 <table>
@@ -197,85 +197,86 @@ https://pjcj.net
 <tr><td class="h"><a id="L2568">2568</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (ref $self)</td></tr>
 <tr><td class="h"><a id="L2572">2572</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($dir)</td></tr>
 <tr><td class="h"><a id="L2573">2573</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (length $dir and -d $dir and -w $dir)</td></tr>
-<tr><td class="h"><a id="L2581">2581</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $rc and length $rc and -d $rc and -w $rc)</td></tr>
-<tr><td class="h"><a id="L2586">2586</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if not defined $dir or length $dir == 0</td></tr>
-<tr><td class="h"><a id="L2612">2612</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $self-&gt;{&#39;is_robot&#39;})</td></tr>
-<tr><td class="h"><a id="L2619">2619</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
-<tr><td class="h"><a id="L2630">2630</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /\bSELECT\b.{1,500}?\bAND\b/i or $agent =~ /\bORDER\s+BY\b/i or $agent =~ /\bOR\s+NOT\b/i or $agent =~ /\bAND\b\s+\d+=\d+/ or $agent =~ /\bTHEN\b.{1,300}?\bELSE\b.{1,300}?\bEND\b/i or $agent =~ /\bAND\b.{1,500}?\bSELECT\b/i or $agent =~ /\sAND\s.{1,500}?\sAND\s/)</td></tr>
-<tr><td class="h"><a id="L2639">2639</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L2650">2650</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_ai)</td></tr>
-<tr><td class="h"><a id="L2655">2655</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[\bbot\b|axios/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy\.Intelligence\.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith\.cymru|trendictionbot|ias_crawler|WPsec|Yak/1\.0|ZoominfoBot]i)</td></tr>
-<tr><td class="h"><a id="L2670">2670</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2671">2671</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $type = $self-&gt;{&#39;cache&#39;}-&gt;get($key))</td></tr>
-<tr><td class="h"><a id="L2676">2676</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $referrer = $ENV{&#39;HTTP_REFERER&#39;})</td></tr>
-<tr><td class="h"><a id="L2681">2681</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($referrer =~ /\)/ or $referrer =~ /$CRAWLER_REFERER_RE/)</td></tr>
-<tr><td class="h"><a id="L2683">2683</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2693">2693</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
-<tr><td class="h"><a id="L2695">2695</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2701">2701</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;browser_detect&#39;})</td></tr>
-<tr><td class="h"><a id="L2702">2702</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
+<tr><td class="h"><a id="L2585">2585</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $rc and length $rc and -d $rc and -w $rc)</td></tr>
+<tr><td class="h"><a id="L2590">2590</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if not defined $dir or length $dir == 0</td></tr>
+<tr><td class="h"><a id="L2616">2616</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $self-&gt;{&#39;is_robot&#39;})</td></tr>
+<tr><td class="h"><a id="L2623">2623</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
+<tr><td class="h"><a id="L2634">2634</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($agent =~ /\bSELECT\b.{1,500}?\bAND\b/i or $agent =~ /\bORDER\s+BY\b/i or $agent =~ /\bOR\s+NOT\b/i or $agent =~ /\bAND\b\s+\d+=\d+/ or $agent =~ /\bTHEN\b.{1,300}?\bELSE\b.{1,300}?\bEND\b/i or $agent =~ /\bAND\b.{1,500}?\bSELECT\b/i or $agent =~ /\sAND\s.{1,500}?\sAND\s/)</td></tr>
+<tr><td class="h"><a id="L2643">2643</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($ENV{&#39;REMOTE_ADDR&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L2654">2654</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_ai)</td></tr>
+<tr><td class="h"><a id="L2659">2659</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[\bbot\b|axios/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy\.Intelligence\.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith\.cymru|trendictionbot|ias_crawler|WPsec|Yak/1\.0|ZoominfoBot]i)</td></tr>
+<tr><td class="h"><a id="L2674">2674</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2675">2675</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $type = $self-&gt;{&#39;cache&#39;}-&gt;get($key))</td></tr>
+<tr><td class="h"><a id="L2680">2680</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $referrer = $ENV{&#39;HTTP_REFERER&#39;})</td></tr>
+<tr><td class="h"><a id="L2685">2685</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($referrer =~ /\)/ or $referrer =~ /$CRAWLER_REFERER_RE/)</td></tr>
+<tr><td class="h"><a id="L2687">2687</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2697">2697</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
+<tr><td class="h"><a id="L2699">2699</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2705">2705</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;browser_detect&#39;})</td></tr>
+<tr><td class="h"><a id="L2706">2706</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;require HTTP::BrowserDetect
 }
 })</td></tr>
-<tr><td class="h"><a id="L2707">2707</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($self-&gt;{&#39;browser_detect&#39;})</td></tr>
-<tr><td class="h"><a id="L2709">2709</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $is_robot)</td></tr>
-<tr><td class="h"><a id="L2712">2712</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">defined $is_robot &amp;&amp; $is_robot ? :</td></tr>
-<tr><td class="h"><a id="L2715">2715</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($is_robot)</td></tr>
-<tr><td class="h"><a id="L2716">2716</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2724">2724</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2749">2749</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $self-&gt;{&#39;is_search_engine&#39;})</td></tr>
-<tr><td class="h"><a id="L2753">2753</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;IS_SEARCH_ENGINE&#39;})</td></tr>
-<tr><td class="h"><a id="L2760">2760</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
-<tr><td class="h"><a id="L2768">2768</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2769">2769</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $type = $self-&gt;{&#39;cache&#39;}-&gt;get($key))</td></tr>
-<tr><td class="h"><a id="L2779">2779</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
-<tr><td class="h"><a id="L2781">2781</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2787">2787</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;browser_detect&#39;})</td></tr>
-<tr><td class="h"><a id="L2788">2788</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
+<tr><td class="h"><a id="L2711">2711</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if ($self-&gt;{&#39;browser_detect&#39;})</td></tr>
+<tr><td class="h"><a id="L2713">2713</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $is_robot)</td></tr>
+<tr><td class="h"><a id="L2716">2716</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">defined $is_robot &amp;&amp; $is_robot ? :</td></tr>
+<tr><td class="h"><a id="L2719">2719</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($is_robot)</td></tr>
+<tr><td class="h"><a id="L2720">2720</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2728">2728</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2753">2753</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $self-&gt;{&#39;is_search_engine&#39;})</td></tr>
+<tr><td class="h"><a id="L2757">2757</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($ENV{&#39;IS_SEARCH_ENGINE&#39;})</td></tr>
+<tr><td class="h"><a id="L2764">2764</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
+<tr><td class="h"><a id="L2772">2772</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2773">2773</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $type = $self-&gt;{&#39;cache&#39;}-&gt;get($key))</td></tr>
+<tr><td class="h"><a id="L2783">2783</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /www\.majestic12\.co\.uk|facebookexternal/)</td></tr>
+<tr><td class="h"><a id="L2785">2785</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2791">2791</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;browser_detect&#39;})</td></tr>
+<tr><td class="h"><a id="L2792">2792</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (eval {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;require HTTP::BrowserDetect
 }
 })</td></tr>
-<tr><td class="h"><a id="L2793">2793</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $browser = $self-&gt;{&#39;browser_detect&#39;})</td></tr>
-<tr><td class="h"><a id="L2795">2795</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($is_search)</td></tr>
-<tr><td class="h"><a id="L2796">2796</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[SeznamBot/] or $agent =~ m[Google-InspectionTool/] or $agent =~ m[Googlebot/])</td></tr>
-<tr><td class="h"><a id="L2802">2802</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($is_search and $self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2812">2812</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">unless (defined $safe_remote)</td></tr>
-<tr><td class="h"><a id="L2823">2823</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (defined $hostname and $hostname =~ /\b(?:google|msnbot|bingbot|amazonbot|GPTBot)\b/i and not $hostname =~ /^google-proxy/i or Net::CIDR::cidrlookup($remote, @cidr_blocks))</td></tr>
-<tr><td class="h"><a id="L2825">2825</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
-<tr><td class="h"><a id="L2920">2920</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $self-&gt;{&#39;is_ai&#39;})</td></tr>
-<tr><td class="h"><a id="L2925">2925</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined(my $override = $ENV{&#39;IS_AI&#39;}))</td></tr>
-<tr><td class="h"><a id="L2926">2926</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">$override ? :</td></tr>
-<tr><td class="h"><a id="L2932">2932</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
-<tr><td class="h"><a id="L2957">2957</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /ClaudeBot|Claude-Web|anthropic-ai|GPTBot|ChatGPT-User|OAI-SearchBot|Google-Extended|meta-externalagent|FacebookBot|Applebot-Extended|PerplexityBot|Amazonbot|YouBot|Diffbot|cohere-ai|CCBot|Bytespider|AI2Bot|TimpiBot/i)</td></tr>
-<tr><td class="h"><a id="L3007">3007</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_mobile)</td></tr>
-<tr><td class="h"><a id="L3010">3010</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_ai)</td></tr>
-<tr><td class="h"><a id="L3013">3013</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_search_engine)</td></tr>
-<tr><td class="h"><a id="L3016">3016</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_robot)</td></tr>
-<tr><td class="h"><a id="L3110">3110</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (defined $field)</td></tr>
-<tr><td class="h"><a id="L3115">3115</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (ref $field)</td></tr>
-<tr><td class="h"><a id="L3122">3122</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;jar&#39;})</td></tr>
-<tr><td class="h"><a id="L3123">3123</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $ENV{&#39;HTTP_COOKIE&#39;})</td></tr>
-<tr><td class="h"><a id="L3170">3170</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if defined $status</td></tr>
-<tr><td class="h"><a id="L3173">3173</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $self-&gt;{&#39;status&#39;})</td></tr>
-<tr><td class="h"><a id="L3176">3176</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and $method eq &#39;OPTIONS&#39; || $method eq &#39;DELETE&#39;</td></tr>
-<tr><td class="h"><a id="L3177">3177</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and ($method eq &quot;POST&quot; and not defined $ENV{&#39;CONTENT_LENGTH&#39;})</td></tr>
-<tr><td class="h"><a id="L3217">3217</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar $self-&gt;{&#39;messages&#39;})</td></tr>
-<tr><td class="h"><a id="L3250">3250</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
-<tr><td class="h"><a id="L3251">3251</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless &amp;Scalar::Util::blessed($cache)</td></tr>
-<tr><td class="h"><a id="L3252">3252</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $cache-&gt;can(&quot;get&quot;)</td></tr>
-<tr><td class="h"><a id="L3253">3253</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $cache-&gt;can(&quot;set&quot;)</td></tr>
-<tr><td class="h"><a id="L3273">3273</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $logger = $params-&gt;{&#39;logger&#39;}) { }</td></tr>
-<tr><td class="h"><a id="L3274">3274</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
-<tr><td class="h"><a id="L3371">3371</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L3383">3383</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
-<tr><td class="h"><a id="L3385">3385</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless defined $AUTOLOAD</td></tr>
-<tr><td class="h"><a id="L3391">3391</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
-<tr><td class="h"><a id="L3393">3393</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
-<tr><td class="h"><a id="L3396">3396</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($self-&gt;{&#39;auto_load&#39;})-&gt;isFalse</td></tr>
-<tr><td class="h"><a id="L3399">3399</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
-<tr><td class="h"><a id="L3404">3404</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
+<tr><td class="h"><a id="L2797">2797</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">if (my $browser = $self-&gt;{&#39;browser_detect&#39;})</td></tr>
+<tr><td class="h"><a id="L2799">2799</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($is_search)</td></tr>
+<tr><td class="h"><a id="L2800">2800</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ m[SeznamBot/] or $agent =~ m[Google-InspectionTool/] or $agent =~ m[Googlebot/])</td></tr>
+<tr><td class="h"><a id="L2806">2806</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ($is_search and $self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2816">2816</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">unless (defined $safe_remote)</td></tr>
+<tr><td class="h"><a id="L2827">2827</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if (defined $hostname and $hostname =~ /\b(?:google|msnbot|bingbot|amazonbot|GPTBot)\b/i and not $hostname =~ /^google-proxy/i or Net::CIDR::cidrlookup($remote, @cidr_blocks))</td></tr>
+<tr><td class="h"><a id="L2829">2829</a></td><td class="c0">0</td><td class="c0">T</td><td class="c0">F</td><td class="s">if ($self-&gt;{&#39;cache&#39;})</td></tr>
+<tr><td class="h"><a id="L2924">2924</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $self-&gt;{&#39;is_ai&#39;})</td></tr>
+<tr><td class="h"><a id="L2929">2929</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined(my $override = $ENV{&#39;IS_AI&#39;}))</td></tr>
+<tr><td class="h"><a id="L2930">2930</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">$override ? :</td></tr>
+<tr><td class="h"><a id="L2936">2936</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($remote and $agent)</td></tr>
+<tr><td class="h"><a id="L2961">2961</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($agent =~ /ClaudeBot|Claude-Web|anthropic-ai|GPTBot|ChatGPT-User|OAI-SearchBot|Google-Extended|meta-externalagent|FacebookBot|Applebot-Extended|PerplexityBot|Amazonbot|YouBot|Diffbot|cohere-ai|CCBot|Bytespider|AI2Bot|TimpiBot/i)</td></tr>
+<tr><td class="h"><a id="L3011">3011</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_mobile)</td></tr>
+<tr><td class="h"><a id="L3014">3014</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_ai)</td></tr>
+<tr><td class="h"><a id="L3017">3017</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_search_engine)</td></tr>
+<tr><td class="h"><a id="L3020">3020</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($self-&gt;is_robot)</td></tr>
+<tr><td class="h"><a id="L3114">3114</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless (defined $field)</td></tr>
+<tr><td class="h"><a id="L3119">3119</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if (ref $field)</td></tr>
+<tr><td class="h"><a id="L3126">3126</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($self-&gt;{&#39;jar&#39;})</td></tr>
+<tr><td class="h"><a id="L3127">3127</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $ENV{&#39;HTTP_COOKIE&#39;})</td></tr>
+<tr><td class="h"><a id="L3176">3176</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $status)</td></tr>
+<tr><td class="h"><a id="L3177">3177</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">if ref $status or not &amp;Scalar::Util::looks_like_number($status) or $status - $status != 0 or $status != int $status</td></tr>
+<tr><td class="h"><a id="L3185">3185</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless (defined $self-&gt;{&#39;status&#39;})</td></tr>
+<tr><td class="h"><a id="L3188">3188</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and $method eq &#39;OPTIONS&#39; || $method eq &#39;DELETE&#39;</td></tr>
+<tr><td class="h"><a id="L3189">3189</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method and ($method eq &quot;POST&quot; and not defined $ENV{&#39;CONTENT_LENGTH&#39;})</td></tr>
+<tr><td class="h"><a id="L3230">3230</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar $self-&gt;{&#39;messages&#39;})</td></tr>
+<tr><td class="h"><a id="L3263">3263</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($cache)</td></tr>
+<tr><td class="h"><a id="L3264">3264</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless &amp;Scalar::Util::blessed($cache)</td></tr>
+<tr><td class="h"><a id="L3265">3265</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $cache-&gt;can(&quot;get&quot;)</td></tr>
+<tr><td class="h"><a id="L3266">3266</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $cache-&gt;can(&quot;set&quot;)</td></tr>
+<tr><td class="h"><a id="L3286">3286</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (my $logger = $params-&gt;{&#39;logger&#39;}) { }</td></tr>
+<tr><td class="h"><a id="L3287">3287</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (&amp;Scalar::Util::blessed($logger)) { }</td></tr>
+<tr><td class="h"><a id="L3384">3384</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($class eq __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L3396">3396</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
+<tr><td class="h"><a id="L3398">3398</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless defined $AUTOLOAD</td></tr>
+<tr><td class="h"><a id="L3404">3404</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $method eq &quot;DESTROY&quot;</td></tr>
+<tr><td class="h"><a id="L3406">3406</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ref $self</td></tr>
+<tr><td class="h"><a id="L3409">3409</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if exists $self-&gt;{&#39;auto_load&#39;} and &amp;boolean($self-&gt;{&#39;auto_load&#39;})-&gt;isFalse</td></tr>
+<tr><td class="h"><a id="L3412">3412</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__ or UNIVERSAL::isa((&amp;CORE::GLOBAL::caller())[0], __PACKAGE__)</td></tr>
+<tr><td class="h"><a id="L3417">3417</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/</td></tr>
 </table>
 </body>
 </html>
