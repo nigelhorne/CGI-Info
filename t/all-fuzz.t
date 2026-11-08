@@ -200,7 +200,8 @@ for my $pm_file (@pm_files) {
 				# constructor args (e.g. constructor needs a coderef or object param).
 				# Skip — the harness can't build $self automatically in this case.
 				push @fuzz_report, { module => $module, func => $func, status => 'oop' };
-				pass("$func: skipped (OOP instance method - constructor not auto-buildable)");
+				pass("$func: skipped (OOP instance method - constructor not auto-buildable, perhaps this is an abstract class?, "
+									. "perhaps this is an abstract class?)");
 				next;
 			}
 
@@ -271,7 +272,7 @@ if (@fuzz_report) {
 			$r->{status} eq 'failed'  ? 'FAILED'                              :
 			$r->{status} eq 'private' ? 'skipped (internal helper)'           :
 			$r->{status} eq 'no_fuzz' ? 'skipped (excluded from fuzz list)'   :
-			$r->{status} eq 'oop'     ? 'skipped (constructor not auto-buildable)' :
+			$r->{status} eq 'oop'     ? 'skipped (constructor not auto-buildable, perhaps this is an abstract class?, perhaps this is an abstract class?)' :
 			$r->{status} eq 'timeout' ? "skipped (no result in ${TIMEOUT}s)"  :
 			$r->{status} eq 'no_can'  ? 'skipped (object param without can:)' : '?';
 		diag(sprintf '  %-*s  %-*s  %s', $mw, $r->{module}, $fw, $r->{func}, $tests_col);
