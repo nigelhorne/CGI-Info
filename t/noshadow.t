@@ -1,128 +1,192 @@
 #!perl -w
 #
-# t/noshadow.t - a sample of how Test::NoShadow would be used here.
+# t/noshadow.t - check that this distribution's modules, and the modules it
+# loads, are the copies you think they are.
 #
-#     prove -l t/noshadow.t
+# Written to be copied or symlinked into any distribution:
 #
-# Two different questions, two different functions:
+#     cp ../CGI-Info/t/noshadow.t t/
+#     ln -s ../CGI-Info/t/noshadow.t t/noshadow.t
 #
-#   lib_ok()      did *this* test run exercise the copy of CGI::Info in this
-#                 distribution's lib/ or blib/lib, or some other copy of it?
-#                 That is a per-distribution question, so it belongs here.
+# Nothing here names a module, a distribution or a directory. The modules come
+# from lib/, and the workspace scan only runs when you point it at a workspace:
 #
-#   find_shadows() do two checkouts in the workspace supply the same package?
-#                 That is a question about the workspace, not about CGI::Info,
-#                 so it does not belong in this distribution's test suite.
-#                 The guarded block at the end shows how it would be wired up.
+#     NOSHADOW_WORKSPACE=/home/njh/src/njh prove -l t/noshadow.t
 #
-# Both functions emit their own TAP through Test::Builder and return a true or
-# false value, so call them directly. Wrapping them in ok() double-counts, and
-# also throws away the diagnostics they attach to the failure.
+# Use $Bin and not $RealBin throughout: for a symlinked .t, $Bin is the
+# directory the link lives in - the distribution under test - while $RealBin is
+# the one it points into, which is the wrong distribution entirely.
+#
+# If you keep this file, add Test::NoShadow to TEST_REQUIRES; without it the
+# whole file is skipped rather than failed.
+#
+# Test::NoShadow's two functions emit their own TAP through Test::Builder and
+# return a boolean, so call them directly. Wrapping them in ok() double-counts
+# the test and throws away the diagnostics they attach to the failure.
 
 use strict;
 use warnings;
 
 use Test::Most;
-use Test::Needs 'Test::NoShadow';	# skip cleanly if it isn't installed
+use Test::Needs 'Test::NoShadow';	# skip cleanly where it isn't installed
 use Test::NoShadow qw(lib_ok find_shadows);
 
 use Cwd qw(abs_path);
+use File::Find ();
 use File::Spec;
 use FindBin;
 
-# lib_ok() looks the module up in %INC, so it has to be loaded first. Note this
-# means the test fails outright, rather than skipping, when run without -Ilib
-# against an installed CGI::Info - which is the failure it is there to catch.
-use CGI::Info;
+my $root = abs_path(File::Spec->catdir($FindBin::Bin, File::Spec->updir));
+my $lib = File::Spec->catdir($root, 'lib');
 
-subtest 'CGI::Info came from this distribution' => sub {
-	# Passes under prove -l and under make test (blib/lib). Fails if CGI::Info
-	# was picked up from site_perl, which is what happens when the distribution
-	# is installed and the tests are run from the wrong directory.
-	lib_ok('CGI::Info');
-};
+my @modules = _modules_in($lib);
 
-subtest 'CGI::Info was not loaded twice' => sub {
-	# lib_ok() only checks the module it is given. The complementary risk is a
-	# second copy of the same package being pulled in from t/ or a sibling
-	# checkout during this run.
-	my @files = grep { defined } values %INC;
-	my @copies = grep { m{/CGI/Info\.pm$} } @files;
+# The shallowest module in lib/ is the one the distribution is named after.
+my ($main) = sort {
+	($a =~ tr/://) <=> ($b =~ tr/://) or $a cmp $b
+} @modules;
 
-	is(scalar(@copies), 1, 'exactly one CGI/Info.pm is loaded');
-	diag("  loaded from: $copies[0]") if @copies == 1;
-};
+subtest 'every module in this distribution was loaded from lib/' => sub {
+	plan skip_all => "no .pm files found under $lib" unless @modules;
 
-subtest 'pre-requisites came from the installed releases' => sub {
-	# Every one of these is also a checkout in the same workspace, so a stray
-	# -I on the command line, or a polluted PERL5LIB, would quietly substitute
-	# a copy I am part-way through editing for the released version these tests
-	# are supposed to be exercising.
-	#
-	# lib_ok() cannot express this. It passes when the loaded file *is* under
-	# one of its lib arguments, so there is no way to say "not from there".
-	# This is the check that the workspace-level tool is really for; here it is
-	# done directly against %INC.
-	my @prereqs = qw(Log::Abstraction Object::Configure Params::Get
-		Params::Validate::Strict Return::Set Sub::Protected);
-	my $siblings = abs_path(File::Spec->catdir($FindBin::Bin, File::Spec->updir, File::Spec->updir));
-
-	foreach my $module (@prereqs) {
-		(my $path = $module) =~ s/::/\//g;
-		my $file = $INC{"$path.pm"};
-
-		if(!defined($file)) {
-			# Nothing loaded it, so there is no copy to have opinions about.
-			pass("$module is not loaded by this test");
-			next;
+	# %INC is keyed by 'Foo/Bar.pm', so the modules have to be loaded by name;
+	# require() on a file path would be recorded under the path instead and
+	# lib_ok() would not find it.
+	my @loaded;
+	foreach my $module (@modules) {
+		if(eval "require $module; 1") {
+			push @loaded, $module;
 		}
-
-		my $abs = abs_path($file) || File::Spec->rel2abs($file);
-		my $rel = File::Spec->abs2rel($abs, $siblings);
-		my $from_sibling = ($rel !~ /^\.\.(?:\/|$)/)
-			&& !File::Spec->file_name_is_absolute($rel);
-
-		ok(!$from_sibling, "$module came from the installed release, not a sibling checkout")
-			or diag("  $module was loaded from $abs");
+		else {
+			# Not fatal: a module that cannot load standalone is a job for
+			# Test::Compile, not for this test.
+			(my $error = $@) =~ s/\s+\z//;
+			diag("  $module did not load standalone, not checked: $error");
+		}
 	}
+
+	plan skip_all => 'none of the modules under lib/ loaded' unless @loaded;
+
+	# Fails if any of them came from site_perl or a sibling checkout instead of
+	# this distribution's lib/ or blib/lib. Passes under prove -l and under
+	# make test, which uses blib/lib.
+	lib_ok(@loaded);
 };
 
-# The workspace-level check. CGI::Info should not start failing its own test
-# suite because of how the surrounding workspace is laid out, so this is off by
-# default:
-#
-#     CGI_INFO_NOSHADOW_WORKSPACE=1 prove -l t/noshadow.t
-#
-# Two full scans of roughly 190 checkouts; expect it to take a few seconds.
+subtest 'the main module was loaded exactly once' => sub {
+	plan skip_all => 'no modules found under lib/' unless defined($main);
+
+	(my $rel = $main) =~ s/::/\//g;
+	my @copies = grep { defined($_) && m{(?:\A|/)\Q$rel\E\.pm\z} } values %INC;
+
+	is(scalar(@copies), 1, "exactly one $rel.pm is loaded");
+	diag('  loaded from: ' . join(', ', @copies)) if @copies;
+};
+
+subtest 'nothing was loaded out of t/' => sub {
+	# The other half of lib_ok()'s question: a copy vendored into t/ (or into
+	# t/lib/, which many distributions put on @INC) must not win.
+	my $tdir = File::Spec->catdir($root, 't');
+
+	my @leaks = grep { _under($_, $tdir) } grep { defined } map { abs_path($_) || $_ } values %INC;
+
+	is_deeply(\@leaks, [], 'no module was loaded out of t/')
+		or diag(join("\n", map { "  $_" } @leaks));
+};
+
 SKIP: {
-	skip 'set CGI_INFO_NOSHADOW_WORKSPACE=1 to scan the workspace', 2
-		unless $ENV{'CGI_INFO_NOSHADOW_WORKSPACE'};
+	my $workspace = _workspace();
+	skip 'set NOSHADOW_WORKSPACE=<dir of checkouts> to scan a workspace', 1
+		unless defined($workspace);
 
-	my $workspace = abs_path(File::Spec->catdir($FindBin::Bin, File::Spec->updir, File::Spec->updir));
+	subtest 'the workspace supplies no duplicate packages' => sub {
+		# Any module this run pulled from inside the workspace but from
+		# outside this distribution came from a sibling checkout: a stray -I
+		# or a polluted PERL5LIB substituting a copy that is being edited for
+		# the released version the tests are meant to exercise.
+		my @leaks = grep {
+			_under($_, $workspace) && !_under($_, $root)
+		} grep { defined } map { abs_path($_) || $_ } values %INC;
 
-	# Backups and scratch copies of the same repository are expected to provide
-	# the same packages as the checkout they were copied from; that is not a
-	# bug, so they are filtered out. Providers are named by the first directory
-	# beneath the scanned root, and ignore patterns are matched against both
-	# "provider/package" and the full file path.
-	my @backups = (qr{^ged2ste-http-vwf/}, qr{^OHTTP_VWF/}, qr{^Nvwf/});
+		is_deeply(\@leaks, [], 'no module in this run came from a sibling checkout')
+			or diag(join("\n", map { "  $_" } @leaks));
 
-	my $all = find_shadows($workspace);
-	my $real = find_shadows($workspace, { ignore => \@backups });
+		# Backups and scratch copies of a repository are expected to provide
+		# the same packages as the checkout they came from, so they are worth
+		# filtering out. Providers are named by the first directory beneath the
+		# scanned root; NOSHADOW_IGNORE is a colon-separated list of those
+		# names, for example:
+		#
+		#     NOSHADOW_IGNORE=ged2ste-http-vwf:OHTTP_VWF:Nvwf
+		my @ignore = map { qr{\A\Q$_\E/} }
+			grep { length } split /:/, ($ENV{'NOSHADOW_IGNORE'} // '');
 
-	my $before = scalar(keys %$all);
-	my $after = scalar(keys %$real);
+		my $all = find_shadows($workspace);
+		my $real = find_shadows($workspace, { ignore => \@ignore });
+		my ($before, $after) = (scalar(keys %$all), scalar(keys %$real));
 
-	cmp_ok($after, '<=', $before, 'ignoring backups cannot invent a shadow');
-	cmp_ok($after, '<', $before, 'ignoring the backup checkouts shortens the list')
-		or diag('nothing was filtered - are those directories still at the top level?');
+		cmp_ok($after, '<=', $before, 'ignoring a provider cannot invent a shadow')
+			or diag('NOSHADOW_IGNORE matched nothing - are those directories at the top level?');
 
-	diag(sprintf '%d shadowed package(s) under %s, %d once the backups are ignored',
-		$before, $workspace, $after);
+		diag(sprintf '%d shadowed package(s) under %s, %d once %d provider(s) are ignored',
+			$before, $workspace, $after, scalar(@ignore));
 
-	# What is left is the interesting part: the packages that are genuinely
-	# supplied by two live checkouts, which is what find_shadows is for.
-	diag("still shadowed: $_") foreach (sort keys %$real);
+		# What is left is the interesting part: packages genuinely supplied by
+		# two live checkouts.
+		diag("still shadowed: $_") foreach (sort keys %$real);
+	};
 }
 
 done_testing();
+
+# Every module name under $lib, derived from the file layout.
+sub _modules_in {
+	my ($dir) = @_;
+
+	return () unless -d $dir;
+
+	my @modules;
+	File::Find::find({
+		no_chdir => 1,
+		wanted => sub {
+			return unless /\.pm\z/;
+			my $rel = File::Spec->abs2rel($File::Find::name, $dir);
+			$rel =~ s/\.pm\z//;
+			$rel =~ s{[/\\]}{::}g;
+			push @modules, $rel;
+		},
+	}, $dir);
+
+	return sort @modules;
+}
+
+# The workspace to scan, or undef. NOSHADOW_WORKSPACE=1 means "the directory
+# two levels up from this test", which is right for a checkout one level deep
+# in a workspace of checkouts.
+sub _workspace {
+	my $dir = $ENV{'NOSHADOW_WORKSPACE'};
+
+	return unless defined($dir);
+	$dir = File::Spec->catdir($FindBin::Bin, File::Spec->updir, File::Spec->updir) if $dir eq '1';
+
+	$dir = abs_path($dir) || $dir;
+	unless(-d $dir) {
+		diag("NOSHADOW_WORKSPACE=$dir is not a directory, skipping the workspace scan");
+		return;
+	}
+
+	return $dir;
+}
+
+# Is $path inside $dir? Both must be absolute.
+sub _under {
+	my ($path, $dir) = @_;
+
+	return 0 unless defined($path) && defined($dir);
+
+	my $rel = File::Spec->abs2rel($path, $dir);
+
+	return 0 if $rel =~ /\A\.\.(?:[\/\\]|\z)/;
+
+	return !File::Spec->file_name_is_absolute($rel);
+}
