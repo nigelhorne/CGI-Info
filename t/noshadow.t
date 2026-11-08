@@ -27,6 +27,7 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(author);
 use Test::Most;
 use Test::Needs 'Test::NoShadow';	# skip cleanly where it isn't installed
 use Test::NoShadow qw(lib_ok find_shadows);
