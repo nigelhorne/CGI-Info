@@ -1,6 +1,6 @@
 Revision history for CGI-Info
 
-1.17	
+1.17	Wed Nov 11 11:26:40 AM EST 2026
 	[ Bug Fixes ]
 	- Fix _temp_path on Darwin, the symlinks that Darwin uses for /tmp
 	  broke the code
