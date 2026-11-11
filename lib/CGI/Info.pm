@@ -20,7 +20,7 @@ use File::Spec;
 use Log::Abstraction 0.10;
 use Net::CIDR;
 use Params::Get 0.13;
-use Params::Validate::Strict 0.35;
+use Params::Validate::Strict 0.40;
 use Return::Set;
 use Sys::Path;
 use Sub::Protected;
@@ -89,17 +89,19 @@ Readonly my $CRAWLER_REFERER_RE => do {
 
 sub _sanitise_input;
 
+=encoding utf-8
+
 =head1 NAME
 
 CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.16
+Version 1.17
 
 =cut
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 =head1 SYNOPSIS
 
@@ -490,7 +492,9 @@ sub _find_paths :Protected {
 
 	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
-	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
+	# Called fully-qualified rather than imported: a runtime import would
+	# bypass namespace::clean and shadow AUTOLOAD for a field named 'basename'
+	require File::Basename;
 
 	# Determine script name
 	my $script_name = $self->_get_env('SCRIPT_NAME') // $0;
@@ -931,6 +935,51 @@ Advanced features:
         die 'Hacking attempt!' if $_[1] =~ /DROP TABLE/;
         return 1;
     }
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    allow => { type => 'hashref', optional => 1 },	# name => regex | coderef | undef
+    upload_dir => { type => 'string', optional => 1 },	# must be inside a temporary area
+    logger => { type => 'object|string|coderef|arrayref', optional => 1 },
+    limits => { type => 'hashref', optional => 1 },
+    max_body_size => { type => 'integer', min => 0, optional => 1 },
+    max_params => { type => 'integer', min => 0, optional => 1 },
+    max_parts => { type => 'integer', min => 0, optional => 1 },
+    max_part_headers => { type => 'integer', min => 0, optional => 1 },
+    max_nesting_depth => { type => 'integer', min => 0, optional => 1 },
+  }
+
+=head4 OUTPUT
+
+A hash reference of sanitised parameters, or undef.
+When undef is returned, L</status($status)> gives the reason:
+
+=over 4
+
+=item * 200 - no parameters were given
+
+=item * 403 - the WAF blocked the request, or an XML body contained a DOCTYPE/ENTITY declaration (unless C<allow_dtd> is set)
+
+=item * 405 - the request method was OPTIONS
+
+=item * 411 - a POST arrived without a valid CONTENT_LENGTH
+
+=item * 413 - a request-complexity limit was exceeded
+
+=item * 422 - a parameter failed its C<allow> rule (the parameter is dropped; the others are still returned)
+
+=item * 500 - C<upload_dir> is not absolute, does not exist, is not writable, or is outside every temporary area
+
+=item * 501 - unsupported method, multipart GET, or a file upload without C<upload_dir>
+
+=back
+
+  {
+    type => 'hashref|undef',
+  }
+
 =cut
 
 # Validate one per-call limit.  Undef means "no override" so that
@@ -1414,9 +1463,8 @@ sub params {
 
 			return \%FORM;
 		} elsif($content_type =~ /application\/json/i) {
-			require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
-			# require JSON::MaybeXS;
-			# JSON::MaybeXS->import();
+			# Not imported: see the comment in _find_paths
+			require JSON::MaybeXS;
 
 			my $buffer;
 
@@ -1432,7 +1480,7 @@ sub params {
 			}
 			# JSON::Parse::assert_valid_json($buffer);
 			# my $paramref = JSON::Parse::parse_json($buffer);
-			my $paramref = decode_json($buffer);
+			my $paramref = JSON::MaybeXS::decode_json($buffer);
 			foreach my $key(keys(%{$paramref})) {
 				push @pairs, "$key=" . $paramref->{$key};
 			}
@@ -1478,7 +1526,6 @@ sub params {
 	}
 
 	require String::Clean::XSS;
-	String::Clean::XSS->import();
 	# require String::EscapeCage;
 	# String::EscapeCage->import();
 
@@ -1822,7 +1869,9 @@ sub _sanitise_input :Protected {
 
 	# return $arg;
 	# return String::EscapeCage->new(convert_XSS($arg))->escapecstring();
-	return convert_XSS($arg);
+	# Loaded here (cheap once cached) so direct calls work before params()
+	require String::Clean::XSS;
+	return String::Clean::XSS::convert_XSS($arg);
 }
 
 sub _multipart_data :Protected {
@@ -2238,6 +2287,26 @@ Tmpdir allows a reference of the options to be passed.
 	# or
 
 	my $dir = CGI::Info->tmpdir();
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    default => { type => 'string', optional => 1 },
+  }
+
+May be called as a class or an instance method.
+
+=head4 OUTPUT
+
+An untainted directory path.  A C<default> that is used is returned
+without any sanity checks.
+
+  {
+    type => 'string',
+    min => 1,
+  }
+
 =cut
 
 sub tmpdir {
@@ -2559,6 +2628,29 @@ Path to the directory where logs will be stored.
 
 =back
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    dir => { type => 'string', optional => 1 },	# an existing, writable directory
+  }
+
+May be called as a class or an instance method.
+An undefined or empty C<$dir> is treated as a get.
+
+=head4 OUTPUT
+
+The log directory, chosen in order from the value previously set,
+C<$ENV{LOGDIR}>, L<Sys::Path/logdir> and L</tmpdir>.
+Returns undef, and logs a warning, if none of those is a writable directory.
+Croaks C<Invalid logdir: $dir> if C<$dir> is given but is not a writable
+directory.
+
+  {
+    type => 'string|undef',
+  }
+
 =cut
 
 sub logdir {
@@ -2569,8 +2661,9 @@ sub logdir {
 		$self = __PACKAGE__->new();
 	}
 
-	if($dir) {
-		if(length($dir) && (-d $dir) && (-w $dir)) {
+	# defined + length rather than truthiness, so a directory called "0" can be set
+	if(defined($dir) && length($dir)) {
+		if((-d $dir) && (-w $dir)) {
 			return $self->{'logdir'} = $dir;
 		}
 		$self->_warn("Invalid logdir: $dir");
@@ -2607,6 +2700,23 @@ Is the visitor a real person or a robot?
 If the client is seen to be attempting an SQL injection,
 set the HTTP status to 403,
 and return 1.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+A true value if the client is a robot (including AI crawlers and clients
+whose User-Agent contains SQL injection), otherwise 0.
+Returns 0 when C<REMOTE_ADDR> or C<HTTP_USER_AGENT> is not set.
+When a SQL injection attempt is detected the status is also set to 403.
+
+  {
+    type => 'boolean',
+  }
 
 =cut
 
@@ -2743,6 +2853,22 @@ Is the visitor a search engine?
     }
 
 Can be overridden by the IS_SEARCH_ENGINE environment setting
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+A true value if the client is a search engine, otherwise 0.
+C<$ENV{IS_SEARCH_ENGINE}> overrides detection.
+Returns 0 when C<REMOTE_ADDR> or C<HTTP_USER_AGENT> is not set.
+
+  {
+    type => 'boolean',
+  }
 
 =cut
 
@@ -3003,6 +3129,21 @@ Returns a string classifying the visitor's client.  The possible values are:
     my $template = Template->new();
     $template->process($filename, {}) or croak $template->error();
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+The first matching type, checked in this order: mobile, ai, search, robot.
+
+  {
+    type => 'string',
+    memberof => [ 'mobile', 'ai', 'search', 'robot', 'web' ],
+  }
+
 =cut
 
 sub browser_type {
@@ -3106,21 +3247,9 @@ sub cookie
 		}
 	});
 
+	# validate_strict() above enforces type => string, min => 1 and croaks for
+	# undef/ref inputs, so $field is always a non-empty string here
 	my $field = $params->{'cookie_name'};
-
-	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	# validate_strict() above enforces type=>string, min=>1 and croaks for undef/ref
-	# inputs before control ever reaches these two guards.
-	if(!defined($field)) {
-		$self->_error('what cookie do you want?');
-		Carp::croak('what cookie do you want?');
-		return;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	}
-	if(ref($field)) {
-		$self->_error('Cookie name should be a string');
-		Carp::croak('Cookie name should be a string');
-		return;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	}
 
 	# Load cookies if not already loaded
 	unless($self->{jar}) {
@@ -3162,6 +3291,25 @@ Optional integer value to be set or retrieved.
 If omitted, the value is retrieved.
 
 =back
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    status => { type => 'integer', optional => 1 },
+  }
+
+Croaks C<status must be an integer> if a non-integer is given.
+
+=head4 OUTPUT
+
+The status that was set or, if none has been set, 405 for OPTIONS and DELETE
+requests, 411 for a POST without CONTENT_LENGTH, otherwise 200.
+
+  {
+    type => 'integer',
+  }
 
 =cut
 
@@ -3253,6 +3401,25 @@ returns the current cache object.
 
 =back
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    cache => { type => 'object', can => [ 'get', 'set' ], optional => 1 },
+  }
+
+Croaks if C<$cache> is not a blessed object, or lacks a C<get()> or C<set()>
+method.
+
+=head4 OUTPUT
+
+The current cache object, or undef if none has been set.
+
+  {
+    type => 'object|undef',
+  }
+
 =cut
 
 sub cache
@@ -3275,6 +3442,28 @@ Sets the class, array, code reference, or file that will be used for logging.
 
 Sometimes you don't know what the logger is until you've instantiated the class.
 This function fixes the catch-22 situation.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    logger => { type => 'object|string|coderef|arrayref|undef' },
+  }
+
+The C<logger> argument is required; C<set_logger()> with no arguments croaks.
+A blessed object is stored as-is; anything else is passed to
+C<< Log::Abstraction->new() >>; undef installs a default
+L<Log::Abstraction> logger.
+
+=head4 OUTPUT
+
+The object, to allow chaining.
+
+  {
+    type => 'object',
+    isa => 'CGI::Info',
+  }
 
 =cut
 
@@ -3376,6 +3565,17 @@ Class method to reset the class.
 You should do this in an FCGI environment before instantiating,
 but nowhere else.
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None. Must be called as C<< CGI::Info->reset() >>; any other invocant carps
+C<Reset is a class method> and does nothing.
+
+=head4 OUTPUT
+
+None.
+
 =cut
 
 sub reset {
@@ -3411,9 +3611,8 @@ sub AUTOLOAD
 	# Ensure the method is called on the correct package object or a subclass
 	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
 
-	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	# $method is captured via /::(\w+)$/ which only yields \w+ chars; a digit-leading
-	# name is possible in theory but Perl's method dispatch never generates one.
+	# Reachable: a symbolic call with a digit-leading name ($info->$m) dispatches
+	# here, and /::(\w+)$/ above still captures that name
 	Carp::croak(__PACKAGE__, ": Invalid method name: $method") unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 	# Delegate to the param method
@@ -3484,11 +3683,12 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
 
-=encoding utf-8
+=head1 FORMAL SPECIFICATION
 
-=head2 FORMAL SPECIFICATION
+The following Z-style specifications describe the intended behaviour of
+selected methods.
 
-=head3 new
+=head2 Specification of new()
 
   -- CGI::Info construction
   new : ClassName x Params --> CGIInfo
@@ -3518,7 +3718,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
     let merged == (self (+) params) \ {paramref}
     in  CGIInfo { ...merged }
 
-=head3 param
+=head2 Specification of param()
 
 Let F be the set of all possible CGI field names, V be the set of all
 possible (sanitised) scalar values, and allow : F -> Regex | undef be the
@@ -3535,7 +3735,7 @@ current allow-list schema (undef means all fields are permitted).
 
 Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = undef.
 
-=head2 is_ai
+=head2 Specification of is_ai()
 
     -- is_ai ---------------------------------------------------------
     -- Given CGIInfo state i, returns a boolean result.
