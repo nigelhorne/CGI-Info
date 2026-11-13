@@ -488,7 +488,7 @@ subtest 'HTTP method validation' => sub {
 	is($info->{status}, 405, 'DELETE method returns 405');
 
 	# Test unsupported method
-	$ENV{REQUEST_METHOD} = 'PATCH';
+	$ENV{REQUEST_METHOD} = 'QUERY';
 	$params = $info->params();
 	is($info->{status}, 501, 'Unsupported method returns 501');
 
@@ -501,7 +501,7 @@ subtest 'Testing flags' => sub {
 	delete $ENV{'GATEWAY_INTERFACE'};
 	delete $ENV{'REQUEST_METHOD'};
 	delete $ENV{'QUERY_STRING'};
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 
 	# Test robot flag
 	local @ARGV = ('--robot', 'param=value');

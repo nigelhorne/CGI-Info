@@ -1501,15 +1501,11 @@ sub params {
 				warning => "POST: Invalid or unsupported content type: $content_type: $buffer",
 			});
 		}
-	} elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
-		$self->{status} = 405;
-		return;
-	} elsif($ENV{'REQUEST_METHOD'} eq 'DELETE') {
+	} elsif ($ENV{'REQUEST_METHOD'} =~ /^(?:OPTIONS|DELETE|PATCH)$/) {
+		# Not allowed
 		$self->{status} = 405;
 		return;
 	} else {
-		# TODO: Design a way to tell the caller to send HTTP
-		# status 501
 		$self->{status} = 501;
 		$self->_warn({
 			warning => 'Use POST, GET or HEAD, not ' . $ENV{REQUEST_METHOD}

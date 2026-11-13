@@ -302,16 +302,16 @@ subtest 'params P14: DELETE → 405' => sub {
 	is($info->status(), 405,   'status 405');
 };
 
-subtest 'params P15: unrecognised method → 501' => sub {
-	plan tests => 2;
+subtest 'params P15: unrecognised method => 501' => sub {
+	plan tests => 3;
 	local %ENV = (
 		GATEWAY_INTERFACE => 'CGI/1.1',
-		REQUEST_METHOD    => 'PATCH',
+		REQUEST_METHOD    => 'QUERY',
 	);
 	CGI::Info->reset();
-	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
-	is($info->params(), undef, 'PATCH → undef');
-	is($info->status(), 501,   'status 501');
+	my $info = CGI::Info->new(logger => new_ok('Test::Log::Abstraction'));
+	is($info->params(), undef, 'Query => undef');
+	is($info->status(), 501, 'status 501');
 };
 
 # ---------------------------------------------------------------------------
