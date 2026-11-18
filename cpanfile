@@ -56,7 +56,6 @@ on 'test' => sub {
 	requires 'Test::Log::Abstraction';
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.08';
-	requires 'Test::More';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';

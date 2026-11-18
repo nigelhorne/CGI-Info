@@ -30,6 +30,8 @@ use warnings;
 #   excluded from fuzz list   listed in %no_fuzz below
 #   constructor not buildable the extractor emitted "new: ~", so the
 #                             harness cannot build $self
+#   needs an input file       the routine reads a file, so no generated
+#                             value can satisfy it; the schema says "skip:"
 #   object param without can  a mandatory object parameter that the
 #                             harness cannot mock
 #   no result in $TIMEOUT s   the routine did not finish; see below
@@ -102,7 +104,17 @@ my @fuzz_report;
 # When adding an entry here, first check whether extract-schemas produces a
 # wrong schema (fix SchemaExtractor) before resorting to a skip.
 #
+# load_dynamic_vocabulary downloads the Schema.org JSON-LD vocabulary on every
+# call that does not pass cache_file, and every generated case gets a fresh
+# random cache_file, so nothing is cached between cases.  Each successful call
+# then writes a ~1.5 MB cache file, which is what the harness's leftover-files
+# check reports, and the downloads push a full run past the per-routine
+# timeout.  Turning that check off for this one function (check_files: 0)
+# would hide the file while leaving the downloads in place, so the routine is
+# excluded instead: its documented behaviour is network I/O plus a cache write,
+# neither of which a generated harness can control or assert.
 my %no_fuzz = map { $_ => 1 } qw(
+	load_dynamic_vocabulary
 );
 
 my @pm_files;
@@ -206,6 +218,15 @@ for my $pm_file (@pm_files) {
 				next;
 			}
 
+			if(my $reason = $schema->{skip}) {
+				# A documented precondition no generated value can meet (for
+				# example a file the routine itself parses).  Fuzzing cannot
+				# make the call correctly, so report it rather than fail it.
+				push @fuzz_report, { module => $module, func => $func, status => 'skip', reason => $reason };
+				pass("$func: skipped ($reason)");
+				next;
+			}
+
 			if(ref($schema->{input}) eq 'HASH') {
 				my $skip;
 				for my $spec (values %{$schema->{input}}) {
@@ -275,7 +296,8 @@ if (@fuzz_report) {
 			$r->{status} eq 'no_fuzz' ? 'skipped (excluded from fuzz list)'   :
 			$r->{status} eq 'oop'     ? 'skipped (constructor not auto-buildable, perhaps this is an abstract class?)' :
 			$r->{status} eq 'timeout' ? "skipped (no result in ${TIMEOUT}s)"  :
-			$r->{status} eq 'no_can'  ? 'skipped (object param without can:)' : '?';
+			$r->{status} eq 'no_can'  ? 'skipped (object param without can:)' :
+			$r->{status} eq 'skip'    ? 'skipped (' . ($r->{reason} // 'precondition not fuzzable') . ')' : '?';
 		diag(sprintf '  %-*s  %-*s  %s', $mw, $r->{module}, $fw, $r->{func}, $tests_col);
 		$total += $r->{tests} // 0;
 	}
