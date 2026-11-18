@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -111,8 +113,7 @@ WriteMakefile(
 					'CHI' => 0,	# Optional: t/is_robot.t, t/is_search.t
 				},
 			},
-		},
-		resources => {
+		}, resources => {
 			homepage => 'https://metacpan.org/pod/CGI::Info',
 			repository => {
 				type => 'git',
