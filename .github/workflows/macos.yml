@@ -33,6 +33,13 @@ jobs:
       - run: perl -V
       - name: Install Dependencies
         run: |
+          # export PATH=$PATH:/opt/homebrew/Cellar/perl/5.40.2/bin
+          # Don't pin the perl version: brew's perl moves on (5.40 -> 5.44)
+          PERL_BIN="$(brew --prefix perl)/bin"
+          echo "$PERL_BIN" >> "$GITHUB_PATH"
+          export PATH="$PERL_BIN:$PATH"
+          cpan -iT File::Spec ExtUtils::MakeMaker App::cpanminus
+
           cpanm -iqn --skip-satisfied File::Spec ExtUtils::MakeMaker Devel::Cover::Report::Codecov Test::Harness
           cpanm -iqn --skip-satisfied Test::Script Test::Portability::Files Test::Carp Test::Compile Test::Pod::Coverage LWP::UserAgent
           cpanm -iqn --skip-satisfied --installdeps --notest .
